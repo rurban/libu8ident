@@ -11,12 +11,12 @@ homoglyph attacks, mixed scripts, confusables, and support normalized
 storage. For the UTF-8 encoding only, wchar_t users are rare.
 
 Supporting the various Unicode security profiles for identifiers can
-be small, performant and easy.  Still everybody is still vulnerable to
-unicode identifier attacks. Since I implemented proper unicode
-security in cperl an 2016, the 2nd language after Java which did so, I
-publish this little library so that others can follow.
+be small, performant and easy.  Still everybody (roughly 98 out of
+100) are vulnerable to unicode identifier attacks. Since I implemented
+proper unicode security in cperl an 2016, the 2nd language after Java
+which did so, I publish this little library so that others can follow.
 
-Remember, the meaning of identifiers is to be identifiable. A user
+Remember, the meaning of identifiers is to be **identifiable**. A user
 should not confuse one identifier with another. Only a program or
 library can properly handle unicode identifiers, humans certainly not.
 
@@ -31,17 +31,18 @@ As perl regex:
        (?[ ( \p{Word} & \p{XID_Continue} ) ]) * /x
 
 This is done by the parser, to the library you just pass the len or null-terminated identifier.
+Optionally we can check for proper `XID_Start`/`XID_Continue` properties also. 
 
 Normalization
 -------------
 
 All utf8 identifiers and literals are parsed and stored as normalized
-NFC variants, which prevents from various TR39 and TR36 unicode
+NFKC variants, which prevents from various TR39 and TR36 unicode
 confusable and spoofing security problems.  Normalization is similar
 to Perl 6 and Python 3, but Perl 6 normalized to their own NFG format
-and Python 3 normalizes to the non-canonical NFKC format.  See
+and Python 3 normalizes to the NFKC format. See
 http://www.unicode.org/reports/tr36/ and http://www.unicode.org/reports/tr39.
-
+Optionally we also support the NFK and NFD formats.
 
 Mixed Scripts
 -------------
@@ -49,8 +50,9 @@ Mixed Scripts
 Many mixed scripts combinations in unicode identifiers for a certain
 context (such as a document or directory) are forbidden, but they can
 be declared via a special API.  The 'Common', 'Latin' and 'Inherited'
-scripts are always allowed and don't need to be declared. Also the
-following combinations are allowed without any declaration: Latin +
+scripts are always allowed and don't need to be declared. 
+With some Common and Inherited the SCX Extended scripts needs to be checked.
+Also the following combinations are allowed without any declaration: Latin +
 Hangul + Han (:Korean), Latin + Katakana + Hiregana (::Japanese) and
 Latin + Han + Bopomofo (:Hanb).  And some more recommended and
 aspirational scripts, which are not excluded, except Cyrillic and
@@ -121,15 +123,19 @@ API
 
 **u8id_options** is an enum of the following bits:
 
-    U8ID_NFD  = 0 // the default decomposed, longer normalization
-    U8ID_NFKC = 1 // as in Python 3
-    U8ID_NFC  = 2 // the shorter composed normalization, as in the previous Apple HPFS filesystem
+    U8ID_NFKC = 0  // by the default the compatibility composed normalization, as in Python 3
+    U8ID_NFD  = 1  // the longer, decomposed normalization, as in the previous Apple HPFS filesystem
+    U8ID_NFC  = 2  // the shorter composed normalization
 
     U8ID_PROFILE_2 = 4  // Single Script only
     U8ID_PROFILE_3 = 8  // Highly Restrictive
     U8ID_PROFILE_4 = 16 // Moderately Restrictive
     U8ID_PROFILE_5 = 32 // Minimally Restrictive
     U8ID_PROFILE_6 = 64 // Unrestricted
+
+    U8ID_CHECK_XID = 128 // optional, the parser should do that
+    U8ID_WARN_CONFUSABLE  = 256 // not yet implemented
+    U8ID_ERROR_CONFUSABLE = 512 //        -"-
 
 `int u8ident_init(u8id_options)`
 
@@ -156,6 +162,7 @@ I cannot think of any such usage, so better avoid contexts with usernames to avo
 
 Changes to the context generated with `u8ident_new_ctx`.
 
+`int u8ident_add_script_name(const char *name)`
 `int u8ident_add_script(uint8_t script)`
 
 Adds the script to the context, if it's known or declared
@@ -169,6 +176,14 @@ optional, all remaining contexts are deleted by `u8ident_delete`.
 `int u8ident_delete()`
 
 End this library, cleaning up all internal structures.
+
+`uint8_t u8ident_get_script(const uint32_t cp)`
+
+Lookup the script property for a codepoint.
+
+`const char* u8ident_script_name(const int scr)`
+
+Lookup the long script name for the internal script byte/index.
 
 `int u8ident_check(const u8* string)`
 
@@ -205,20 +220,19 @@ Each context keeps a list of all seen unique scripts, which are represented as a
 4-8 bytes are kept in a word, so you rarely need to allocate room for the scripts.
 
 The normalization tables need to be updated every year with the new Unicode database.
+This is generated from the current UCD via the current perl, every April/May.
 Stored are small 3-way tables for the canonical decomposition (NFD) of each utf-8 character.
 With `U8ID_NFC` also the canonical composition (NFC) tables and the reorder logic.
+With `U8ID_NFKC` even the larger compatibility composition tables and the reorder logic.
 
-The NFK strings are always shorter, but need a 2nd table set (2x
+The NFC strings are always shorter, but need a 2nd table set (2x
 memory) and 3x longer lookup times. If compiled with `--disable-nfc`
 the library is smaller and faster, but the resulting identifiers maybe
 a bit longer. The NFD table is very sparse, only 3 of 17 initial planes are needed.
 Some rare overlong entries (296 codepoints with > 5 byte of UTF-8) are searched in an extra
 list to keep static memory usage low, contrary to most other unicode libs.
 
-We only support the canonical compositions and
-decompositions, not the compatibility variants NFKD and NFKC.  With
-`--enable-nfkc` the two compatibility decomposition and compatibility
-composition tables are used, as with Python 3.  We don't support the
-variants FCC nor FCD.
+We don't support the normalization variants FCC nor FCD.
 
 The character to script lookup is done with a sorted list of ranges, for less space.
+This is also generated from the current UCD.

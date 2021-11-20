@@ -193,10 +193,10 @@ ignore Latin, Common and Inherited.
 
 */
 
+#if 0
 const struct scx scriptx_list[] = {
   {0x483, 0x483, "\x08\x5a"}, // Cyrillic, Old_Permic
 };
-
 #endif
 
 /*

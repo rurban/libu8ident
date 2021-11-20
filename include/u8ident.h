@@ -7,12 +7,12 @@
 
 #define U8IDENT_VERSION_MAJOR 0
 #define U8IDENT_VERSION_MINOR 0
-#define U8IDENT_UNICODE_VERSION 13 // patch this with regen-norm
+#define U8IDENT_UNICODE_VERSION 14 // TODO patch this with regen-norm/mkscripts.pl
 
 enum u8id_options {
-  U8ID_NFD  = 0, // the default decomposed, longer normalization
-  U8ID_NFKC = 1, // as in Python 3
-  U8ID_NFC  = 2, // the shorter composed normalization, as in the previous Apple HPFS filesystem
+  U8ID_NFKC = 0,  // by the default the compatibility composed normalization, as in Python 3
+  U8ID_NFD  = 1,  // the longer, decomposed normalization, as in the previous Apple HPFS filesystem
+  U8ID_NFC  = 2,  // the shorter composed normalization
 
   U8ID_PROFILE_2 = 4,  // Single Script only
   U8ID_PROFILE_3 = 8,  // Highly Restrictive
@@ -66,6 +66,8 @@ int u8ident_set_ctx(int ctx);
    Meetei_Mayek Miao New_Tai_Lue Newa Nko Nyiakeng_Puachue_Hmong Ol_Chiki
    Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
    Tai_Viet Tifinagh Vai Wancho Yi Unknown
+
+   All others need to be added with u8ident_add_script_name().
 */
 int u8ident_add_script_name(const char *name);
 int u8ident_add_script(uint8_t script);
@@ -96,7 +98,7 @@ int u8ident_check(const uint8_t* string);
 int u8ident_check_buf(const char* buf, int len);
 
 /* Returns a freshly allocated normalized string, in the option defined at `u8ident_init`.
-   Defaults to U8ID_NFD, the longer but faster variant. */
+   Defaults to U8ID_NFKC. */
 uint8_t* u8ident_normalize(const char* buf, int len);
 
 /* Returns a string for the combinations of the seen scripts in this
