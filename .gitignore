@@ -3,6 +3,10 @@ GPATH
 GRTAGS
 TAGS
 libu8ident.a
+u8ident.o
 u8idnorm.o
 u8idscr.o
 /test
+Scripts.txt
+ScriptExtensions.txt
+Unicode-Normalize
