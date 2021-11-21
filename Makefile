@@ -27,8 +27,7 @@ check: libu8ident.a test.c
 clean:
 	rm u8ident.o u8idnorm.o u8idscr.o libu8ident.a test
 
-# TODO patch U8IDENT_UNICODE_VERSION
-# Download UCD and create scripts.h
+# Create the normalization headers via a current perl
 regen-norm:
 	git clone https://github.com/rurban/Unicode-Normalize
 	cd Unicode-Normalize && \
@@ -36,6 +35,7 @@ regen-norm:
 	  make && \
 	  $(PERL) mkheader -ind -std && \
 	  cp un8if*.h ../ && cd ..
+# Download UCD and create scripts.h
 regen-scripts:
 	wget -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
 	wget -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt

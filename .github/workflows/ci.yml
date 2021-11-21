@@ -48,12 +48,9 @@ jobs:
         path-type: minimal
         update: true
         install: >-
-          git
           base-devel
           coreutils
           mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-libtool
-          mingw-w64-x86_64-perl
     - run: reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /f /v DontShowUI /d 1
     - run: git config --global core.autocrlf input
     - name: checkout
