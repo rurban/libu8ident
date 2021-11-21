@@ -54,28 +54,27 @@ EXTERN int u8ident_set_ctx(int i) {
     return -1;
 }
 
-uint8_t u8ident_get_script(const uint32_t cp) {
-  struct sc *s;
-  size_t sz;
-#ifndef DISABLE_CHECK_XID
-  if (s_u8id_options & U8ID_CHECK_XID) {
-    s = (struct sc *)xid_script_list;
-    sz = sizeof(xid_script_list)/sizeof(*xid_script_list);
-  }
-  else
-#endif
-  {
-    s = (struct sc *)nonxid_script_list;
-    sz = sizeof(nonxid_script_list)/sizeof(*nonxid_script_list);
-  }
-  // TODO switch from linear to binary search
-  for (size_t i=0; i<sz; i++) {
-    if (cp >= s->from && cp <= s->to) {
+static uint8_t sc_search(const uint32_t cp, const struct sc *sc_list, const int len) {
+  struct sc *s = (struct sc *)sc_list;
+  // so far only linear search. TODO binary
+  for (int i=0; i<len; i++) {
+    assert(s->from <= s->to);
+    if (cp >= s->from && cp <= s->to)
       return s->scr;
-    }
+    if (cp <= s->to) // s is sorted. not found
+      return 0;
     s++;
   }
   return 0;
+}
+
+uint8_t u8ident_get_script(const uint32_t cp) {
+#ifndef DISABLE_CHECK_XID
+  if (s_u8id_options & U8ID_CHECK_XID)
+    return sc_search(cp, xid_script_list, sizeof(xid_script_list)/sizeof(*xid_script_list));
+  else
+#endif
+    return sc_search(cp, nonxid_script_list, sizeof(nonxid_script_list)/sizeof(*nonxid_script_list));
 }
 
 const char* u8ident_script_name(const int scr) {
@@ -211,15 +210,6 @@ http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 Scripts: from a perl with Unicode 14 (perl5.34),
 ignore Latin, Common and Inherited.
 
-*/
-
-#if 0
-const struct scx scriptx_list[] = {
-  {0x483, 0x483, "\x08\x5a"}, // Cyrillic, Old_Permic
-};
-#endif
-
-/*
 Default:        Unknown
 0	40	Common
 41	5A	Latin

@@ -32,7 +32,7 @@ while (<$IDTYPE>) {
   if (/^#\tIdentifier_Type:/) { $started++; }
   next unless $started;
   if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; (\w+)\s+#/) {
-    ($from, $to, $id) = ($1, $2, $3);
+    ($from, $to, $id) = (hex($1), hex($2), $3);
     push @IDTYPES, [$from, $to, $id];
     # TODO match from-to with @SC ranges
   }
@@ -43,7 +43,7 @@ my (@_ID, $oldid, $oldto);
 for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
   my ($from, $to, $id) = ($r->[0], $r->[1], $r->[2]);
   if (($from != $oldto + 1) or ($oldid ne $id)) { # honor holes
-    push @_ID, [$from, $to, $sc];
+    push @_ID, [$from, $to, $id];
     $oldsc = $sc;
   } else { # update the range
     my $range = $_ID[$#_ID];
@@ -54,18 +54,17 @@ for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
 @IDTYPES = @_ID;
 undef @_ID;
 
-open my $IDSTAT, "<", $idtype or die "$idtype $!";
+open my $IDSTAT, "<", $idstat or die "$idstat $!";
 $started = 0;
+# already sorted, as there is only one value
 while (<$IDSTAT>) {
   if (/^#\tIdentifier_Status:/) { $started++; }
   next unless $started;
   if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; Allowed\s+#/) {
-    ($from, $to) = ($1, $2);
-    push @ALLOWED, [$from, $to, $id];
+    push @ALLOWED, [hex($1), hex($2)];
   }
   elsif (/^([0-9A-F]{4,5})\s+; Allowed\s+#/) {
-    $from = $1;
-    push @ALLOWED, [$from, $from];
+    push @ALLOWED, [hex($1), hex($1)];
   }
 }
 close $IDTYPE;
@@ -122,6 +121,7 @@ my @limited = qw(
   Tai_Viet Tifinagh Vai Wancho Yi Unknown);
 
 open my $SC, "<", $scn or die "$scn $!";
+$started = 0;
 while (<$SC>) {
   if (!$started && /^# Scripts-(\d+)\.(\d+)\.(\d+)\.txt/) {
     @ucd_version = ($1, $2, $3);
@@ -250,7 +250,7 @@ struct sc {
 struct scx {
   uint32_t from;
   uint32_t to;
-  uint8_t *list; // indices
+  const char *list; // indices
 };
 
 /* Provide a mapping of the $num_scripts Script properties to an index byte.
@@ -337,8 +337,33 @@ for my $r (@SCXR) {
 };
 print $H <<"EOF";
 };
-EOF
 
+// Allowed scripts from IdentifierStatus.txt. 1 if first is recommended, 0 if not.
+const struct sc allowed_scripts_list[] = {
+EOF
+for my $r (@ALLOWED) {
+  #my $split = 0;
+  $from = $r->[0];
+  my $code1 = ok_idtype($from);
+  #if ($from != $to) {
+  #  my $second = $from + 1;
+  #  for my $cp ($second .. $to) {
+  #    my $code = ok_idtype($cp);
+  #    if ($code != $code1) {
+  #      $split++;
+  #      printf $H "  {0x%04X, 0x%04X, %d},\n", $from, $cp-1, $code1;
+  #      # FIXME collapse rest also
+  #      # printf $H "  {0x%04X, 0x%04X, %d},\n", $cp, $cp, $code;
+  #    }
+  #  }
+  #}
+  #if (!$split) {
+    printf $H "  {0x%04X, 0x%04X, %d},\n", $from, $r->[1], $code1;
+  #}
+};
+print $H <<"EOF";
+};
+EOF
 close $H;
 
 # patch our header
@@ -356,11 +381,13 @@ while (<$INC>) {
 }
 close $INC;
 
+# FIXME
 sub patch_ucd_major {
   my ($inc, $version) = @_;
+  return unless $version;
   open my $OLD, "<", $inc or die "$inc $!";
   open my $NEW, ">", "$inc.new" or die "$inc.new $!";
-  while (<$INC>) {
+  while (<$OLD>) {
     if (/^(#define U8IDENT_UNICODE_VERSION )(\d+)/) {
       print $NEW "$1 $version\n";
     } else {
