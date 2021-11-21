@@ -86,22 +86,22 @@ const char* u8ident_script_name(const int scr) {
 }
 
 /* Optionally adds a script to the context, if it's known or declared
-   beforehand. Such as `use utf8 "Greek";` in cperl. */
+   beforehand. Such as `use utf8 "Greek";` in cperl.
+   0, 1, 2 are always included by default.
+*/
 EXTERN int u8ident_add_script(uint8_t scr) {
-  if (scr < 0 || scr > LAST_SCRIPT)
+  if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
     return -1;
-  if (scr > 2) {
-    int i = i_ctx;
-    int c = ctxp[i].count;
-    if (c < 8) {
-      ctxp[i].scr8[c] = scr;
-    } else {
-      if ((c & 7) == 7) // add a new word
-        ctxp[i].u8p = realloc(ctxp[i].u8p, (c+1) * 2);
-      ctxp[i].u8p[c] = scr;
-    }
-    ctxp[i].count++;
+  int i = i_ctx;
+  int c = ctxp[i].count;
+  if (c < 8) {
+    ctxp[i].scr8[c] = scr;
+  } else {
+    if ((c & 7) == 7) // add a new word
+      ctxp[i].u8p = realloc(ctxp[i].u8p, (c+1) * 2);
+    ctxp[i].u8p[c] = scr;
   }
+  ctxp[i].count++;
   return 0;
 }
 
@@ -208,7 +208,7 @@ http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
    Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
    Tai_Viet Tifinagh Vai Wancho Yi Unknown
 
-Scripts: from a perl with Unicode 13 (perl5.34),
+Scripts: from a perl with Unicode 14 (perl5.34),
 ignore Latin, Common and Inherited.
 
 */

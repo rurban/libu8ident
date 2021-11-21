@@ -22,6 +22,8 @@ struct scx {
    Sorted into usages.
  */
 const char* const all_scripts[] = {
+  // Recommended Scripts (not need to add them)
+  // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 #define FIRST_RECOMMENDED_SCRIPT 0
 #define SC_Common     0
   "Common",
@@ -85,8 +87,9 @@ const char* const all_scripts[] = {
   "Thai",
 #define SC_Tibetan    30
   "Tibetan",
-#define FIRST_NOT_RECOMMENDED_SCRIPT 31
-  // Not Recommended Scripts (but can to be declared expliclitly)
+#define FIRST_EXCLUDED_SCRIPT 31
+  // Excluded Scripts (but can be added expliclitly)
+  // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
 #define SC_Ahom       31
   "Ahom",
 #define SC_Anatolian_Hieroglyphs 32
@@ -281,6 +284,7 @@ const char* const all_scripts[] = {
   "Zanabazar_Square",
 #define FIRST_LIMITED_USE_SCRIPT 127
   // Limited Use Scripts
+  // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 #define SC_Adlam      127
   "Adlam",
 #define SC_Balinese   128
@@ -1728,127 +1732,128 @@ const struct sc nonxid_script_list[] = {
   {0xE0100, 0xE01EF, 1},	// Inherited
 };
 
-// FIXME SCX list
+// FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
+// Remove all Limited Use SC's from the list.
 const struct scx scriptx_list[] = {
-  {0x0342, 0x0342, "Grek"},	// Grek
-  {0x0345, 0x0345, "Grek"},	// Grek
-  {0x0363, 0x036F, "Latn"},	// Latn
-  {0x0483, 0x0483, "Cyrl Perm"},	// Cyrl Perm
-  {0x0484, 0x0484, "Cyrl Glag"},	// Cyrl Glag
-  {0x0485, 0x0486, "Cyrl Latn"},	// Cyrl Latn
-  {0x0487, 0x0487, "Cyrl Glag"},	// Cyrl Glag
-  {0x060C, 0x060C, "Arab Nkoo Rohg Syrc Thaa Yezi"},	// Arab Nkoo Rohg Syrc Thaa Yezi
-  {0x061B, 0x061B, "Arab Nkoo Rohg Syrc Thaa Yezi"},	// Arab Nkoo Rohg Syrc Thaa Yezi
-  {0x061C, 0x061C, "Arab Syrc Thaa"},	// Arab Syrc Thaa
-  {0x061F, 0x061F, "Adlm Arab Nkoo Rohg Syrc Thaa Yezi"},	// Adlm Arab Nkoo Rohg Syrc Thaa Yezi
-  {0x0640, 0x0640, "Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc"},	// Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
-  {0x064B, 0x0655, "Arab Syrc"},	// Arab Syrc
-  {0x0660, 0x0669, "Arab Thaa Yezi"},	// Arab Thaa Yezi
-  {0x0670, 0x0670, "Arab Syrc"},	// Arab Syrc
-  {0x06D4, 0x06D4, "Arab Rohg"},	// Arab Rohg
-  {0x0951, 0x0951, "Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
-  {0x0952, 0x0952, "Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
-  {0x0964, 0x0964, "Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
-  {0x0965, 0x0965, "Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
-  {0x0966, 0x096F, "Deva Dogr Kthi Mahj"},	// Deva Dogr Kthi Mahj
-  {0x09E6, 0x09EF, "Beng Cakm Sylo"},	// Beng Cakm Sylo
-  {0x0A66, 0x0A6F, "Guru Mult"},	// Guru Mult
-  {0x0AE6, 0x0AEF, "Gujr Khoj"},	// Gujr Khoj
-  {0x0BE6, 0x0BF3, "Gran Taml"},	// Gran Taml
-  {0x0CE6, 0x0CEF, "Knda Nand"},	// Knda Nand
-  {0x1040, 0x1049, "Cakm Mymr Tale"},	// Cakm Mymr Tale
-  {0x10FB, 0x10FB, "Geor Latn"},	// Geor Latn
-  {0x1735, 0x1736, "Buhd Hano Tagb Tglg"},	// Buhd Hano Tagb Tglg
-  {0x1802, 0x1803, "Mong Phag"},	// Mong Phag
-  {0x1805, 0x1805, "Mong Phag"},	// Mong Phag
-  {0x1CD0, 0x1CD0, "Beng Deva Gran Knda"},	// Beng Deva Gran Knda
-  {0x1CD1, 0x1CD1, "Deva"},	// Deva
-  {0x1CD2, 0x1CD2, "Beng Deva Gran Knda"},	// Beng Deva Gran Knda
-  {0x1CD3, 0x1CD3, "Deva Gran"},	// Deva Gran
-  {0x1CD4, 0x1CD4, "Deva"},	// Deva
-  {0x1CD5, 0x1CD6, "Beng Deva"},	// Beng Deva
-  {0x1CD7, 0x1CD7, "Deva Shrd"},	// Deva Shrd
-  {0x1CD8, 0x1CD8, "Beng Deva"},	// Beng Deva
-  {0x1CD9, 0x1CD9, "Deva Shrd"},	// Deva Shrd
-  {0x1CDA, 0x1CDA, "Deva Knda Mlym Orya Taml Telu"},	// Deva Knda Mlym Orya Taml Telu
-  {0x1CDB, 0x1CDB, "Deva"},	// Deva
-  {0x1CDC, 0x1CDD, "Deva Shrd"},	// Deva Shrd
-  {0x1CDE, 0x1CDF, "Deva"},	// Deva
-  {0x1CE0, 0x1CE0, "Deva Shrd"},	// Deva Shrd
-  {0x1CE1, 0x1CE1, "Beng Deva"},	// Beng Deva
-  {0x1CE2, 0x1CE8, "Deva"},	// Deva
-  {0x1CE9, 0x1CE9, "Deva Nand"},	// Deva Nand
-  {0x1CEA, 0x1CEA, "Beng Deva"},	// Beng Deva
-  {0x1CEB, 0x1CEC, "Deva"},	// Deva
-  {0x1CED, 0x1CED, "Beng Deva"},	// Beng Deva
-  {0x1CEE, 0x1CF1, "Deva"},	// Deva
-  {0x1CF2, 0x1CF2, "Beng Deva Gran Knda Nand Orya Telu Tirh"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
-  {0x1CF3, 0x1CF3, "Deva Gran"},	// Deva Gran
-  {0x1CF4, 0x1CF4, "Deva Gran Knda"},	// Deva Gran Knda
-  {0x1CF5, 0x1CF6, "Beng Deva"},	// Beng Deva
-  {0x1CF7, 0x1CF7, "Beng"},	// Beng
-  {0x1CF8, 0x1CF9, "Deva Gran"},	// Deva Gran
-  {0x1CFA, 0x1CFA, "Nand"},	// Nand
-  {0x1DC0, 0x1DC1, "Grek"},	// Grek
-  {0x1DF8, 0x1DF8, "Cyrl Syrc"},	// Cyrl Syrc
-  {0x1DFA, 0x1DFA, "Syrc"},	// Syrc
-  {0x202F, 0x202F, "Latn Mong"},	// Latn Mong
-  {0x20F0, 0x20F0, "Deva Gran Latn"},	// Deva Gran Latn
-  {0x2E43, 0x2E43, "Cyrl Glag"},	// Cyrl Glag
-  {0x3001, 0x3002, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
-  {0x3003, 0x3003, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
-  {0x3006, 0x3006, "Hani"},	// Hani
-  {0x3008, 0x3011, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
-  {0x3013, 0x3013, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
-  {0x3014, 0x301B, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
-  {0x301C, 0x301F, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
-  {0x302A, 0x302D, "Bopo Hani"},	// Bopo Hani
-  {0x3030, 0x3030, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
-  {0x3031, 0x3035, "Hira Kana"},	// Hira Kana
-  {0x3037, 0x3037, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
-  {0x303C, 0x303D, "Hani Hira Kana"},	// Hani Hira Kana
-  {0x303E, 0x303F, "Hani"},	// Hani
-  {0x3099, 0x309C, "Hira Kana"},	// Hira Kana
-  {0x30A0, 0x30A0, "Hira Kana"},	// Hira Kana
-  {0x30FB, 0x30FB, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
-  {0x30FC, 0x30FC, "Hira Kana"},	// Hira Kana
-  {0x3190, 0x319F, "Hani"},	// Hani
-  {0x31C0, 0x31E3, "Hani"},	// Hani
-  {0x3220, 0x3247, "Hani"},	// Hani
-  {0x3280, 0x32B0, "Hani"},	// Hani
-  {0x32C0, 0x32CB, "Hani"},	// Hani
-  {0x32FF, 0x32FF, "Hani"},	// Hani
-  {0x3358, 0x3370, "Hani"},	// Hani
-  {0x337B, 0x337F, "Hani"},	// Hani
-  {0x33E0, 0x33FE, "Hani"},	// Hani
-  {0xA66F, 0xA66F, "Cyrl Glag"},	// Cyrl Glag
-  {0xA700, 0xA707, "Hani Latn"},	// Hani Latn
-  {0xA830, 0xA832, "Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
-  {0xA833, 0xA835, "Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh
-  {0xA836, 0xA839, "Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh"},	// Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh
-  {0xA8F1, 0xA8F1, "Beng Deva"},	// Beng Deva
-  {0xA8F3, 0xA8F3, "Deva Taml"},	// Deva Taml
-  {0xA92E, 0xA92E, "Kali Latn Mymr"},	// Kali Latn Mymr
-  {0xA9CF, 0xA9CF, "Bugi Java"},	// Bugi Java
-  {0xFD3E, 0xFD3F, "Arab Nkoo"},	// Arab Nkoo
-  {0xFDF2, 0xFDF2, "Arab Thaa"},	// Arab Thaa
-  {0xFDFD, 0xFDFD, "Arab Thaa"},	// Arab Thaa
-  {0xFE45, 0xFE46, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
-  {0xFF61, 0xFF65, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
-  {0xFF70, 0xFF70, "Hira Kana"},	// Hira Kana
-  {0xFF9E, 0xFF9F, "Hira Kana"},	// Hira Kana
-  {0x10100, 0x10101, "Cpmn Cprt Linb"},	// Cpmn Cprt Linb
-  {0x10102, 0x10102, "Cprt Linb"},	// Cprt Linb
-  {0x10107, 0x10133, "Cprt Lina Linb"},	// Cprt Lina Linb
-  {0x10137, 0x1013F, "Cprt Linb"},	// Cprt Linb
-  {0x102E0, 0x102FB, "Arab Copt"},	// Arab Copt
-  {0x10AF2, 0x10AF2, "Mani Ougr"},	// Mani Ougr
-  {0x11301, 0x11301, "Gran Taml"},	// Gran Taml
-  {0x11303, 0x11303, "Gran Taml"},	// Gran Taml
-  {0x1133B, 0x1133C, "Gran Taml"},	// Gran Taml
-  {0x11FD0, 0x11FD1, "Gran Taml"},	// Gran Taml
-  {0x11FD3, 0x11FD3, "Gran Taml"},	// Gran Taml
-  {0x1BCA0, 0x1BCA3, "Dupl"},	// Dupl
-  {0x1D360, 0x1D371, "Hani"},	// Hani
-  {0x1F250, 0x1F251, "Hani"},	// Hani
+  {0x0342, 0x0342, "\x0b"},	// Grek
+  {0x0345, 0x0345, "\x0b"},	// Grek
+  {0x0363, 0x036F, "\x02"},	// Latn
+  {0x0483, 0x0483, "\x07\x5c"},	// Cyrl Perm
+  {0x0484, 0x0484, "\x07\x36"},	// Cyrl Glag
+  {0x0485, 0x0486, "\x07\x02"},	// Cyrl Latn
+  {0x0487, 0x0487, "\x07\x36"},	// Cyrl Glag
+  {0x060C, 0x060C, "\x03\x92\x87\x99\x1c\x00"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+  {0x061B, 0x061B, "\x03\x92\x87\x99\x1c\x00"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+  {0x061C, 0x061C, "\x03\x99\x1c"},	// Arab Syrc Thaa
+  {0x061F, 0x061F, "\x7f\x03\x92\x87\x99\x1c\x00"},	// Adlm Arab Nkoo Rohg Syrc Thaa Yezi
+  {0x0640, 0x0640, "\x7f\x03\x8d\x4a\x00\x68\x87\x70\x99"},	// Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
+  {0x064B, 0x0655, "\x03\x99"},	// Arab Syrc
+  {0x0660, 0x0669, "\x03\x1c\x00"},	// Arab Thaa Yezi
+  {0x0670, 0x0670, "\x03\x99"},	// Arab Syrc
+  {0x06D4, 0x06D4, "\x03\x87"},	// Arab Rohg
+  {0x0951, 0x0951, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x6c\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
+  {0x0952, 0x0952, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
+  {0x0964, 0x0964, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+  {0x0965, 0x0965, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x8b\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+  {0x0966, 0x096F, "\x08\x31\x3f\x48"},	// Deva Dogr Kthi Mahj
+  {0x09E6, 0x09EF, "\x05\x84\x98"},	// Beng Cakm Sylo
+  {0x0A66, 0x0A6F, "\x0d\x54"},	// Guru Mult
+  {0x0AE6, 0x0AEF, "\x0c\x42"},	// Gujr Khoj
+  {0x0BE6, 0x0BF3, "\x38\x1a"},	// Gran Taml
+  {0x0CE6, 0x0CEF, "\x13\x56"},	// Knda Nand
+  {0x1040, 0x1049, "\x84\x17\x9a"},	// Cakm Mymr Tale
+  {0x10FB, 0x10FB, "\x0a\x02"},	// Geor Latn
+  {0x1735, 0x1736, "\x27\x3a\x74\x73"},	// Buhd Hano Tagb Tglg
+  {0x1802, 0x1803, "\x52\x66"},	// Mong Phag
+  {0x1805, 0x1805, "\x52\x66"},	// Mong Phag
+  {0x1CD0, 0x1CD0, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
+  {0x1CD1, 0x1CD1, "\x08"},	// Deva
+  {0x1CD2, 0x1CD2, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
+  {0x1CD3, 0x1CD3, "\x08\x38"},	// Deva Gran
+  {0x1CD4, 0x1CD4, "\x08"},	// Deva
+  {0x1CD5, 0x1CD6, "\x05\x08"},	// Beng Deva
+  {0x1CD7, 0x1CD7, "\x08\x6c"},	// Deva Shrd
+  {0x1CD8, 0x1CD8, "\x05\x08"},	// Beng Deva
+  {0x1CD9, 0x1CD9, "\x08\x6c"},	// Deva Shrd
+  {0x1CDA, 0x1CDA, "\x08\x13\x16\x18\x1a\x1b"},	// Deva Knda Mlym Orya Taml Telu
+  {0x1CDB, 0x1CDB, "\x08"},	// Deva
+  {0x1CDC, 0x1CDD, "\x08\x6c"},	// Deva Shrd
+  {0x1CDE, 0x1CDF, "\x08"},	// Deva
+  {0x1CE0, 0x1CE0, "\x08\x6c"},	// Deva Shrd
+  {0x1CE1, 0x1CE1, "\x05\x08"},	// Beng Deva
+  {0x1CE2, 0x1CE8, "\x08"},	// Deva
+  {0x1CE9, 0x1CE9, "\x08\x56"},	// Deva Nand
+  {0x1CEA, 0x1CEA, "\x05\x08"},	// Beng Deva
+  {0x1CEB, 0x1CEC, "\x08"},	// Deva
+  {0x1CED, 0x1CED, "\x05\x08"},	// Beng Deva
+  {0x1CEE, 0x1CF1, "\x08"},	// Deva
+  {0x1CF2, 0x1CF2, "\x05\x08\x38\x13\x56\x18\x1b\x78"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
+  {0x1CF3, 0x1CF3, "\x08\x38"},	// Deva Gran
+  {0x1CF4, 0x1CF4, "\x08\x38\x13"},	// Deva Gran Knda
+  {0x1CF5, 0x1CF6, "\x05\x08"},	// Beng Deva
+  {0x1CF7, 0x1CF7, "\x05"},	// Beng
+  {0x1CF8, 0x1CF9, "\x08\x38"},	// Deva Gran
+  {0x1CFA, 0x1CFA, "\x56"},	// Nand
+  {0x1DC0, 0x1DC1, "\x0b"},	// Grek
+  {0x1DF8, 0x1DF8, "\x07\x99"},	// Cyrl Syrc
+  {0x1DFA, 0x1DFA, "\x99"},	// Syrc
+  {0x202F, 0x202F, "\x02\x52"},	// Latn Mong
+  {0x20F0, 0x20F0, "\x08\x38\x02"},	// Deva Gran Latn
+  {0x2E43, 0x2E43, "\x07\x36"},	// Cyrl Glag
+  {0x3001, 0x3002, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x3003, 0x3003, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+  {0x3006, 0x3006, "\x0f"},	// Hani
+  {0x3008, 0x3011, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x3013, 0x3013, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+  {0x3014, 0x301B, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x301C, 0x301F, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+  {0x302A, 0x302D, "\x06\x0f"},	// Bopo Hani
+  {0x3030, 0x3030, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+  {0x3031, 0x3035, "\x11\x12"},	// Hira Kana
+  {0x3037, 0x3037, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+  {0x303C, 0x303D, "\x0f\x11\x12"},	// Hani Hira Kana
+  {0x303E, 0x303F, "\x0f"},	// Hani
+  {0x3099, 0x309C, "\x11\x12"},	// Hira Kana
+  {0x30A0, 0x30A0, "\x11\x12"},	// Hira Kana
+  {0x30FB, 0x30FB, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x30FC, 0x30FC, "\x11\x12"},	// Hira Kana
+  {0x3190, 0x319F, "\x0f"},	// Hani
+  {0x31C0, 0x31E3, "\x0f"},	// Hani
+  {0x3220, 0x3247, "\x0f"},	// Hani
+  {0x3280, 0x32B0, "\x0f"},	// Hani
+  {0x32C0, 0x32CB, "\x0f"},	// Hani
+  {0x32FF, 0x32FF, "\x0f"},	// Hani
+  {0x3358, 0x3370, "\x0f"},	// Hani
+  {0x337B, 0x337F, "\x0f"},	// Hani
+  {0x33E0, 0x33FE, "\x0f"},	// Hani
+  {0xA66F, 0xA66F, "\x07\x36"},	// Cyrl Glag
+  {0xA700, 0xA707, "\x0f\x02"},	// Hani Latn
+  {0xA830, 0xA832, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x16\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
+  {0xA833, 0xA835, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh
+  {0xA836, 0xA839, "\x08\x31\x0c\x0d\x42\x3f\x48\x51\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh
+  {0xA8F1, 0xA8F1, "\x05\x08"},	// Beng Deva
+  {0xA8F3, 0xA8F3, "\x08\x1a"},	// Deva Taml
+  {0xA92E, 0xA92E, "\x89\x02\x17"},	// Kali Latn Mymr
+  {0xA9CF, 0xA9CF, "\x26\x88"},	// Bugi Java
+  {0xFD3E, 0xFD3F, "\x03\x92"},	// Arab Nkoo
+  {0xFDF2, 0xFDF2, "\x03\x1c"},	// Arab Thaa
+  {0xFDFD, 0xFDFD, "\x03\x1c"},	// Arab Thaa
+  {0xFE45, 0xFE46, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+  {0xFF61, 0xFF65, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+  {0xFF70, 0xFF70, "\x11\x12"},	// Hira Kana
+  {0xFF9E, 0xFF9F, "\x11\x12"},	// Hira Kana
+  {0x10100, 0x10101, "\x00\x2d\x45"},	// Cpmn Cprt Linb
+  {0x10102, 0x10102, "\x2d\x45"},	// Cprt Linb
+  {0x10107, 0x10133, "\x2d\x44\x45"},	// Cprt Lina Linb
+  {0x10137, 0x1013F, "\x2d\x45"},	// Cprt Linb
+  {0x102E0, 0x102FB, "\x03\x00"},	// Arab Copt
+  {0x10AF2, 0x10AF2, "\x4a\x00"},	// Mani Ougr
+  {0x11301, 0x11301, "\x38\x1a"},	// Gran Taml
+  {0x11303, 0x11303, "\x38\x1a"},	// Gran Taml
+  {0x1133B, 0x1133C, "\x38\x1a"},	// Gran Taml
+  {0x11FD0, 0x11FD1, "\x38\x1a"},	// Gran Taml
+  {0x11FD3, 0x11FD3, "\x38\x1a"},	// Gran Taml
+  {0x1BCA0, 0x1BCA3, "\x32"},	// Dupl
+  {0x1D360, 0x1D371, "\x0f"},	// Hani
+  {0x1F250, 0x1F251, "\x0f"},	// Hani
 };

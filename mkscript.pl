@@ -9,20 +9,109 @@
 use strict;
 my $scn = "Scripts.txt";
 my $scxn = "ScriptExtensions.txt";
-if (!-e $scn) {
-  system("wget -N https://www.unicode.org/Public/UNIDATA/Scripts.txt");
+my $pva = "PropValueAliases.txt";
+my $idtype = "IdentifierType.txt";
+my $idstat = "IdentifierStatus.txt";
+my $conf = "confusables.txt";
+for ($scn, $scxn, $pva) {
+  if (!-e $_) {
+    system("wget -N https://www.unicode.org/Public/UNIDATA/$_");
+  }
 }
-if (!-e $scxn) {
-  system("wget -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt");
+for ($idtype, $idstat, $conf) {
+  if (!-e $_) {
+    system("wget -N https://www.unicode.org/Public/security/latest/$_");
+  }
 }
 
+my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
+    @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $sc, $id);
+my ($started, @IDTYPES, @ALLOWED);
+open my $IDTYPE, "<", $idtype or die "$idtype $!";
+while (<$IDTYPE>) {
+  if (/^#\tIdentifier_Type:/) { $started++; }
+  next unless $started;
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; (\w+)\s+#/) {
+    ($from, $to, $id) = ($1, $2, $3);
+    push @IDTYPES, [$from, $to, $id];
+    # TODO match from-to with @SC ranges
+  }
+}
+close $IDTYPE;
+# Collapse neighbors. sort the scripts by ->from
+my (@_ID, $oldid, $oldto);
+for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
+  my ($from, $to, $id) = ($r->[0], $r->[1], $r->[2]);
+  if (($from != $oldto + 1) or ($oldid ne $id)) { # honor holes
+    push @_ID, [$from, $to, $sc];
+    $oldsc = $sc;
+  } else { # update the range
+    my $range = $_ID[$#_ID];
+    $range->[1] = $to;
+    $_ID[$#_ID] = $range;
+  }
+}
+@IDTYPES = @_ID;
+undef @_ID;
+
+open my $IDSTAT, "<", $idtype or die "$idtype $!";
+$started = 0;
+while (<$IDSTAT>) {
+  if (/^#\tIdentifier_Status:/) { $started++; }
+  next unless $started;
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; Allowed\s+#/) {
+    ($from, $to) = ($1, $2);
+    push @ALLOWED, [$from, $to, $id];
+  }
+  elsif (/^([0-9A-F]{4,5})\s+; Allowed\s+#/) {
+    $from = $1;
+    push @ALLOWED, [$from, $from];
+  }
+}
+close $IDTYPE;
+
+sub search {
+  my ($cp, $listref) = @_;
+  for my $r (@$listref) {
+    if ($cp >= $r->[0] and $cp <= $r->[1]) {
+      return $r;
+    }
+  }
+  return 0; # not found
+}
+
+sub is_allowed {
+  my $cp = shift;
+  for my $r (@ALLOWED) {
+    if ($cp >= $r->[0] and $cp <= $r->[1]) {
+      return 1;
+    }
+  }
+  return 0; # not allowed
+}
+
+# Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable, Deprecated
+# Allowed: keep Recommended, Inclusion
+# Maybe allow by request Technical
+sub ok_idtype {
+  my $cp = shift;
+  for my $r (@IDTYPES) {
+    if ($cp >= $r->[0] and $cp <= $r->[1]) {
+      return 0 if $r->[2] =~ /\b(Limited_Use|Obsolete|Exclusion|Not_XID|Not_NFKC|Uncommon_Use|Default_Ignorable|Deprecated)\b/;
+      return 1 if $r->[2] =~ /\b(Recommended|Inclusion|Technical)\b/;
+      return 0; # unknown identifier type
+    }
+  }
+  return 0; # not a character
+}
+
+# TOOD: generate these 2 lists from the IDTYPES
 # http://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 my @recommended = qw(
   Common Inherited Latin Arabic Armenian Bengali Bopomofo Cyrillic
   Devanagari Ethiopic Georgian Greek Gujarati Gurmukhi Hangul Han Hebrew
   Hiragana Katakana Kannada Khmer Lao Malayalam Myanmar Oriya
   Sinhala Tamil Telugu Thaana Thai Tibetan);
-
 #All Limited Use Scripts are disallowed:
 #http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 my @limited = qw(
@@ -31,9 +120,8 @@ my @limited = qw(
   Meetei_Mayek Miao New_Tai_Lue Newa Nko Nyiakeng_Puachue_Hmong Ol_Chiki
   Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
   Tai_Viet Tifinagh Vai Wancho Yi Unknown);
+
 open my $SC, "<", $scn or die "$scn $!";
-my (@ucd_version, $started, $from, $to, $sc, $oldto, $oldsc,
-    @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $sc);
 while (<$SC>) {
   if (!$started && /^# Scripts-(\d+)\.(\d+)\.(\d+)\.txt/) {
     @ucd_version = ($1, $2, $3);
@@ -62,6 +150,19 @@ while (<$SC>) {
   $oldto = $to;
 }
 close $SC;
+
+# neded for the SCX short -> name lookup
+my %PVA;
+$started = 0;
+open my $PVA, "<", $pva or die "$pva $!";
+while (<$PVA>) {
+  if (/^# Script \(sc\)/) { $started++; }
+  if (/^sc ; (\w+?)\s+; (\w+)$/) {
+    $PVA{$1} = $2; # Zinh is not in SCX
+  }
+}
+close $PVA;
+
 $started = 0;
 $oldto = 0; $oldsc = "";
 open my $SCX, "<", $scxn or die "$scxn $!";
@@ -108,7 +209,7 @@ undef $oldsc;
 my $oldscf;
 for my $r (@SCR) {
   ($from, $to, $sc) = ($r->[0], $r->[1], $r->[2]);
-  # the full list, with all holes
+  # the full list, with all holes. TODO skip disallowed id types
   if (($from != $oldto + 1) or ($oldsc ne $sc)) { # honor holes
     push @_SCR, [$from, $to, $sc];
     $oldsc = $sc;
@@ -156,6 +257,8 @@ struct scx {
    Sorted into usages.
  */
 const char* const all_scripts[] = {
+  // Recommended Scripts (not need to add them)
+  // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 #define FIRST_RECOMMENDED_SCRIPT 0
 EOF
 my $i = 0;
@@ -167,8 +270,9 @@ for my $sc (@recommended) {
   $i++;
 }
 print $H <<"EOF";
-#define FIRST_NOT_RECOMMENDED_SCRIPT $i
-  // Not Recommended Scripts (but can to be declared expliclitly)
+#define FIRST_EXCLUDED_SCRIPT $i
+  // Excluded Scripts (but can be added expliclitly)
+  // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
 EOF
 my %other = map {$_ => 1} @recommended, @limited;
 for my $sc (sort keys %scripts) {
@@ -183,6 +287,7 @@ for my $sc (sort keys %scripts) {
 print $H <<"EOF";
 #define FIRST_LIMITED_USE_SCRIPT $i
   // Limited Use Scripts
+  // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 EOF
 for my $sc (@limited) {
   my $ws = " " x (10-length($sc));
@@ -217,11 +322,18 @@ for my $r (@SCRF) {
 print $H <<"EOF";
 };
 
-// FIXME SCX list
+// FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
+// Remove all Limited Use SC's from the list.
 const struct scx scriptx_list[] = {
 EOF
 for my $r (@SCXR) {
-  printf $H "  {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $r->[2], $r->[2];
+  my $code;
+  my @list = split " ", $r->[2];
+  for my $short (@list) {
+    my $long = $PVA{$short};
+    $code .= sprintf("\\x%02x", $SC{$long});
+  }
+  printf $H "  {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
 };
 print $H <<"EOF";
 };
@@ -259,4 +371,3 @@ sub patch_ucd_major {
   rename $inc, "$inc.bak";
   rename "$inc.new", $inc;
 }
-

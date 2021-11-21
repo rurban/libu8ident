@@ -141,23 +141,25 @@ API
     U8ID_PROFILE_5 = 32 // Minimally Restrictive
     U8ID_PROFILE_6 = 64 // Unrestricted
 
-    U8ID_CHECK_XID = 128 // optional, the parser should do that
-    U8ID_WARN_CONFUSABLE  = 256 // not yet implemented
-    U8ID_ERROR_CONFUSABLE = 512 //        -"-
+    U8ID_FOLDCASE = 128, // optional for case-insensitive idents. case-folded when normalized.
+    U8ID_CHECK_XID = 256,// optional, the parser should do that. Without, the script checker
+                         // can be much smaller.
+    U8ID_WARN_CONFUSABLE  = 512,  // not yet implemented
+    U8ID_ERROR_CONFUSABLE = 1024, //       -"-
 
-`int u8ident_init(u8id_options)`
+`int u8ident_init (u8id_options)`
 
 Initialize the library with a bitmask of options, which define the
 performed checks. Recommended is `U8ID_PROFILE_4` only.
 
-`int u8ident_set_maxlength(int maxlen)`
+`int u8ident_set_maxlength (int maxlen)`
 
 of an identifier. Default: 1024. Beware that such longs identiers are
 not really identifiable anymore, and keep them under 80 or even
 less. Some filesystems do allow now 32K identifiers, which is a
 glaring security hole, waiting to be exploited.
 
-`int u8ident_new_ctx()`
+`int u8ident_new_ctx ()`
 
 Generates a new identifier document/context/directory, which
 initializes a new list of seen scripts. Contexts are optional. By
@@ -166,55 +168,56 @@ and interpreters a context is a source file, with filesystems a directory,
 with usernames you may choose if you need to support different languages at once.
 I cannot think of any such usage, so better avoid contexts with usernames to avoid mixups.
 
-`int u8ident_set_ctx(int ctx)`
+`int u8ident_set_ctx (int ctx)`
 
 Changes to the context generated with `u8ident_new_ctx`.
 
 `int u8ident_add_script_name(const char *name)`
-`int u8ident_add_script(uint8_t script)`
+`int u8ident_add_script (uint8_t script)`
 
 Adds the script to the context, if it's known or declared
 beforehand. Such as `use utf8 "Greek";` in cperl.
 
-`int u8ident_delete_ctx(int)`
+`int u8ident_delete_ctx (int)`
 
 Deletes the context generated with `u8ident_new_ctx`. This is
 optional, all remaining contexts are deleted by `u8ident_delete`.
 
-`int u8ident_delete()`
+`int u8ident_delete ()`
 
 End this library, cleaning up all internal structures.
 
-`uint8_t u8ident_get_script(const uint32_t cp)`
+`uint8_t u8ident_get_script (const uint32_t cp)`
 
 Lookup the script property for a codepoint.
 
-`const char* u8ident_script_name(const int scr)`
+`const char* u8ident_script_name (const int scr)`
 
 Lookup the long script name for the internal script byte/index.
 
-`int u8ident_check(const u8* string)`
+`int u8ident_check (const u8* string)`
 
-`int u8ident_check_buf(const char* buf, int len)`
+`int u8ident_check_buf (const char* buf, int len)`
 
 Two variants to check if this identifier is valid. The second avoids
 allocating a fresh string from the parsed input.
 
 Return values:
 
-* 0  - valid without need to normalize.
-* -1 - valid with need to normalize.
-* 1  - invalid character class
-* 2  - invalid script
-* 3  - invalid encoding
-* (4  - invalid because confusable, not yet implemented)
+  * 0  - valid without need to normalize.
+  * 1   - valid with need to normalize.
+  * 2   - warn about confusable (_not yet implemented_)
+  * -1  - invalid script
+  * -2  - invalid character class (only with `U8ID_CHECK_XID`)
+  * -3  - invalid UTF-8 encoding (only with `U8ID_CHECK_XID`)
+  * -4  - invalid because confusable (_not yet implemented_)
 
-`char * u8ident_normalize(const char* buf, int len)`
+`char * u8ident_normalize (const char* buf, int len)`
 
-Returns a freshly allocated normalized string, in the option defined at
+Returns a freshly allocated normalized string, with the options defined at
 `u8ident_init`.
 
-`weak const char* u8ident_script_error(int ctx)`
+`weak const char* u8ident_script_error (int ctx)`
 
 Returns a string for the combinations of the seen scripts in this context
 whenever a mixed script error occurs.  The default string may be overridden by
