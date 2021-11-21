@@ -1,6 +1,6 @@
 /* libu8ident - Follow unicode security guidelines for identifiers.
-   Copyright 2014, 2021 Reini Urban
-   Apache LICENSE
+   Copyright 2021 Reini Urban
+   SPDX-License-Identifier: Apache-2.0
 
   Classify and search for the script property https://www.unicode.org/reports/tr24/tr24-32.html
   Implement http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
@@ -14,6 +14,7 @@
 
 #include "scripts.h"
 
+extern unsigned s_u8id_options;
 // not yet thread-safe
 static int i_ctx = 0;
 struct ctx_t {
@@ -54,8 +55,22 @@ EXTERN int u8ident_set_ctx(int i) {
 }
 
 uint8_t u8ident_get_script(const uint32_t cp) {
-  struct sc *s = &script_list[0];
-  for (int i=0; i<sizeof(script_list)/sizeof(*script_list); i++) {
+  struct sc *s;
+  size_t sz;
+#ifndef DISABLE_CHECK_XID
+  if (s_u8id_options & U8ID_CHECK_XID) {
+    s = &xid_script_list[0];
+    sz = sizeof(xid_script_list)/sizeof(*xid_script_list);
+  } else
+#endif
+#ifdef DISABLE_CHECK_XID
+  {
+    s = &nonxid_script_list[0];
+    sz = sizeof(nonxid_script_list)/sizeof(*nonxid_script_list);
+  }
+#endif
+  // TODO from linear to binary search
+  for (int i=0; i<sz; i++) {
     if (cp >= s->from && cp <= s->to) {
       return s->scr;
     }

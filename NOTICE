@@ -1,0 +1,15 @@
+libu8ident is
+Copyright © 2017, 2021 Reini Urban.
+
+The normalization headers were created by perl-Unicode-Normalize.
+Copyright © 2001-2012 SADAHIRO Tomoyuki. Japan.
+Copyright © 2017  Reini Urban.
+
+Parts of the normalization code were written for cperl (u8) and the safeclib (wchar).
+Copyright © 2015-2016 cPanel Inc.
+Copyright © 2017, 2021 Reini Urban.
+
+The Unicode Database is 
+Copyright © 2021 Unicode®, Inc.
+Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
+For terms of use, see http://www.unicode.org/terms_of_use.html

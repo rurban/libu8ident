@@ -1,6 +1,6 @@
 /* libu8ident - Follow unicode security guidelines for identifiers.
-   Copyright 2014, 2021 Reini Urban
-   Apache LICENSE
+   Copyright 2021 Reini Urban
+   SPDX-License-Identifier: Apache-2.0
 */
 
 #include <stdint.h>
@@ -20,7 +20,8 @@ enum u8id_options {
   U8ID_PROFILE_5 = 32, // Minimally Restrictive
   U8ID_PROFILE_6 = 64, // Unrestricted
 
-  U8ID_CHECK_XID = 128, // optional, the parser should do that
+  U8ID_CHECK_XID = 128, // optional, the parser should do that. Without, the script checker
+                        // can be much smaller.
   U8ID_WARN_CONFUSABLE  = 256, // not yet implemented
   U8ID_ERROR_CONFUSABLE = 512, //       -"-
 };

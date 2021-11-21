@@ -87,198 +87,198 @@ const char* const all_scripts[] = {
   "Tibetan",
 #define FIRST_NOT_RECOMMENDED_SCRIPT 31
   // Not Recommended Scripts (but can to be declared expliclitly)
-#define SC_Tangut     31
-  "Tangut",
-#define SC_Old_Permic 32
-  "Old_Permic",
-#define SC_Tangsa     33
-  "Tangsa",
-#define SC_Caucasian_Albanian 34
-  "Caucasian_Albanian",
-#define SC_Kharoshthi 35
-  "Kharoshthi",
-#define SC_Hatran     36
-  "Hatran",
-#define SC_Bhaiksuki  37
-  "Bhaiksuki",
-#define SC_Buhid      38
-  "Buhid",
-#define SC_Pahawh_Hmong 39
-  "Pahawh_Hmong",
-#define SC_Dives_Akuru 40
-  "Dives_Akuru",
-#define SC_Hanunoo    41
-  "Hanunoo",
-#define SC_Khitan_Small_Script 42
-  "Khitan_Small_Script",
-#define SC_Osmanya    43
+#define SC_Manichaean 31
+  "Manichaean",
+#define SC_Osmanya    32
   "Osmanya",
-#define SC_Yezidi     44
-  "Yezidi",
-#define SC_Carian     45
-  "Carian",
-#define SC_Pau_Cin_Hau 46
-  "Pau_Cin_Hau",
-#define SC_Khojki     47
+#define SC_Masaram_Gondi 33
+  "Masaram_Gondi",
+#define SC_Multani    34
+  "Multani",
+#define SC_Khojki     35
   "Khojki",
-#define SC_Mongolian  48
-  "Mongolian",
-#define SC_Kaithi     49
-  "Kaithi",
-#define SC_Rejang     50
-  "Rejang",
-#define SC_Siddham    51
-  "Siddham",
-#define SC_Linear_B   52
-  "Linear_B",
-#define SC_Coptic     53
-  "Coptic",
-#define SC_Lydian     54
-  "Lydian",
-#define SC_Sharada    55
-  "Sharada",
-#define SC_Avestan    56
+#define SC_Yezidi     36
+  "Yezidi",
+#define SC_Deseret    37
+  "Deseret",
+#define SC_Tangsa     38
+  "Tangsa",
+#define SC_Buhid      39
+  "Buhid",
+#define SC_Mro        40
+  "Mro",
+#define SC_Hatran     41
+  "Hatran",
+#define SC_Inscriptional_Pahlavi 42
+  "Inscriptional_Pahlavi",
+#define SC_Meroitic_Cursive 43
+  "Meroitic_Cursive",
+#define SC_Avestan    44
   "Avestan",
-#define SC_Shavian    57
-  "Shavian",
-#define SC_Old_North_Arabian 58
-  "Old_North_Arabian",
-#define SC_Duployan   59
-  "Duployan",
-#define SC_Inscriptional_Parthian 60
-  "Inscriptional_Parthian",
-#define SC_SignWriting 61
-  "SignWriting",
-#define SC_Phoenician 62
-  "Phoenician",
+#define SC_Elymaic    45
+  "Elymaic",
+#define SC_Ogham      46
+  "Ogham",
+#define SC_Lydian     47
+  "Lydian",
+#define SC_Old_Hungarian 48
+  "Old_Hungarian",
+#define SC_Grantha    49
+  "Grantha",
+#define SC_Toto       50
+  "Toto",
+#define SC_Rejang     51
+  "Rejang",
+#define SC_Runic      52
+  "Runic",
+#define SC_Nandinagari 53
+  "Nandinagari",
+#define SC_Medefaidrin 54
+  "Medefaidrin",
+#define SC_Palmyrene  55
+  "Palmyrene",
+#define SC_Kaithi     56
+  "Kaithi",
+#define SC_Zanabazar_Square 57
+  "Zanabazar_Square",
+#define SC_Ugaritic   58
+  "Ugaritic",
+#define SC_Linear_A   59
+  "Linear_A",
+#define SC_Gunjala_Gondi 60
+  "Gunjala_Gondi",
+#define SC_Egyptian_Hieroglyphs 61
+  "Egyptian_Hieroglyphs",
+#define SC_Tangut     62
+  "Tangut",
 #define SC_Old_Turkic 63
   "Old_Turkic",
-#define SC_Bassa_Vah  64
-  "Bassa_Vah",
-#define SC_Glagolitic 65
-  "Glagolitic",
-#define SC_Braille    66
-  "Braille",
-#define SC_Nandinagari 67
-  "Nandinagari",
-#define SC_Takri      68
-  "Takri",
-#define SC_Tagalog    69
-  "Tagalog",
-#define SC_Makasar    70
-  "Makasar",
-#define SC_Buginese   71
-  "Buginese",
-#define SC_Medefaidrin 72
-  "Medefaidrin",
-#define SC_Psalter_Pahlavi 73
-  "Psalter_Pahlavi",
-#define SC_Modi       74
-  "Modi",
-#define SC_Imperial_Aramaic 75
-  "Imperial_Aramaic",
-#define SC_Cuneiform  76
-  "Cuneiform",
-#define SC_Meroitic_Hieroglyphs 77
-  "Meroitic_Hieroglyphs",
-#define SC_Khudawadi  78
+#define SC_Dives_Akuru 64
+  "Dives_Akuru",
+#define SC_Khudawadi  65
   "Khudawadi",
-#define SC_Manichaean 79
-  "Manichaean",
-#define SC_Phags_Pa   80
-  "Phags_Pa",
-#define SC_Nabataean  81
-  "Nabataean",
-#define SC_Nushu      82
-  "Nushu",
-#define SC_Warang_Citi 83
+#define SC_SignWriting 66
+  "SignWriting",
+#define SC_Warang_Citi 67
   "Warang_Citi",
-#define SC_Gothic     84
-  "Gothic",
-#define SC_Gunjala_Gondi 85
-  "Gunjala_Gondi",
-#define SC_Old_Persian 86
-  "Old_Persian",
-#define SC_Zanabazar_Square 87
-  "Zanabazar_Square",
-#define SC_Tagbanwa   88
-  "Tagbanwa",
-#define SC_Ugaritic   89
-  "Ugaritic",
-#define SC_Old_Uyghur 90
-  "Old_Uyghur",
-#define SC_Meroitic_Cursive 91
-  "Meroitic_Cursive",
-#define SC_Egyptian_Hieroglyphs 92
-  "Egyptian_Hieroglyphs",
-#define SC_Inscriptional_Pahlavi 93
-  "Inscriptional_Pahlavi",
-#define SC_Chorasmian 94
+#define SC_Carian     68
+  "Carian",
+#define SC_Cuneiform  69
+  "Cuneiform",
+#define SC_Chorasmian 70
   "Chorasmian",
-#define SC_Linear_A   95
-  "Linear_A",
-#define SC_Marchen    96
+#define SC_Nushu      71
+  "Nushu",
+#define SC_Marchen    72
   "Marchen",
-#define SC_Toto       97
-  "Toto",
-#define SC_Dogra      98
+#define SC_Dogra      73
   "Dogra",
-#define SC_Anatolian_Hieroglyphs 99
-  "Anatolian_Hieroglyphs",
-#define SC_Elbasan    100
-  "Elbasan",
-#define SC_Ahom       101
+#define SC_Phags_Pa   74
+  "Phags_Pa",
+#define SC_Ahom       75
   "Ahom",
-#define SC_Tirhuta    102
-  "Tirhuta",
-#define SC_Soyombo    103
-  "Soyombo",
-#define SC_Grantha    104
-  "Grantha",
-#define SC_Deseret    105
-  "Deseret",
-#define SC_Old_Hungarian 106
-  "Old_Hungarian",
-#define SC_Mro        107
-  "Mro",
-#define SC_Old_Italic 108
-  "Old_Italic",
-#define SC_Old_South_Arabian 109
-  "Old_South_Arabian",
-#define SC_Multani    110
-  "Multani",
-#define SC_Brahmi     111
-  "Brahmi",
-#define SC_Mahajani   112
-  "Mahajani",
-#define SC_Old_Sogdian 113
+#define SC_Coptic     76
+  "Coptic",
+#define SC_Glagolitic 77
+  "Glagolitic",
+#define SC_Old_Sogdian 78
   "Old_Sogdian",
-#define SC_Samaritan  114
-  "Samaritan",
-#define SC_Lycian     115
-  "Lycian",
-#define SC_Sogdian    116
+#define SC_Khitan_Small_Script 79
+  "Khitan_Small_Script",
+#define SC_Pau_Cin_Hau 80
+  "Pau_Cin_Hau",
+#define SC_Braille    81
+  "Braille",
+#define SC_Bhaiksuki  82
+  "Bhaiksuki",
+#define SC_Sogdian    83
   "Sogdian",
-#define SC_Mende_Kikakui 117
-  "Mende_Kikakui",
-#define SC_Masaram_Gondi 118
-  "Masaram_Gondi",
-#define SC_Elymaic    119
-  "Elymaic",
-#define SC_Cypriot    120
-  "Cypriot",
-#define SC_Runic      121
-  "Runic",
-#define SC_Cypro_Minoan 122
+#define SC_Phoenician 84
+  "Phoenician",
+#define SC_Cypro_Minoan 85
   "Cypro_Minoan",
-#define SC_Ogham      123
-  "Ogham",
-#define SC_Sora_Sompeng 124
+#define SC_Cypriot    86
+  "Cypriot",
+#define SC_Anatolian_Hieroglyphs 87
+  "Anatolian_Hieroglyphs",
+#define SC_Gothic     88
+  "Gothic",
+#define SC_Nabataean  89
+  "Nabataean",
+#define SC_Imperial_Aramaic 90
+  "Imperial_Aramaic",
+#define SC_Psalter_Pahlavi 91
+  "Psalter_Pahlavi",
+#define SC_Kharoshthi 92
+  "Kharoshthi",
+#define SC_Samaritan  93
+  "Samaritan",
+#define SC_Bassa_Vah  94
+  "Bassa_Vah",
+#define SC_Mende_Kikakui 95
+  "Mende_Kikakui",
+#define SC_Old_Uyghur 96
+  "Old_Uyghur",
+#define SC_Siddham    97
+  "Siddham",
+#define SC_Old_North_Arabian 98
+  "Old_North_Arabian",
+#define SC_Mahajani   99
+  "Mahajani",
+#define SC_Tagbanwa   100
+  "Tagbanwa",
+#define SC_Elbasan    101
+  "Elbasan",
+#define SC_Brahmi     102
+  "Brahmi",
+#define SC_Meroitic_Hieroglyphs 103
+  "Meroitic_Hieroglyphs",
+#define SC_Lycian     104
+  "Lycian",
+#define SC_Takri      105
+  "Takri",
+#define SC_Inscriptional_Parthian 106
+  "Inscriptional_Parthian",
+#define SC_Tirhuta    107
+  "Tirhuta",
+#define SC_Old_Permic 108
+  "Old_Permic",
+#define SC_Sora_Sompeng 109
   "Sora_Sompeng",
-#define SC_Vithkuqi   125
+#define SC_Buginese   110
+  "Buginese",
+#define SC_Caucasian_Albanian 111
+  "Caucasian_Albanian",
+#define SC_Tagalog    112
+  "Tagalog",
+#define SC_Pahawh_Hmong 113
+  "Pahawh_Hmong",
+#define SC_Vithkuqi   114
   "Vithkuqi",
-#define SC_Palmyrene  126
-  "Palmyrene",
+#define SC_Soyombo    115
+  "Soyombo",
+#define SC_Old_Persian 116
+  "Old_Persian",
+#define SC_Sharada    117
+  "Sharada",
+#define SC_Shavian    118
+  "Shavian",
+#define SC_Mongolian  119
+  "Mongolian",
+#define SC_Old_Italic 120
+  "Old_Italic",
+#define SC_Duployan   121
+  "Duployan",
+#define SC_Makasar    122
+  "Makasar",
+#define SC_Old_South_Arabian 123
+  "Old_South_Arabian",
+#define SC_Linear_B   124
+  "Linear_B",
+#define SC_Hanunoo    125
+  "Hanunoo",
+#define SC_Modi       126
+  "Modi",
 #define FIRST_LIMITED_USE_SCRIPT 127
   // Limited Use Scripts
 #define SC_Adlam      127
@@ -354,342 +354,93 @@ const char* const all_scripts[] = {
 #define LAST_SCRIPT 161
 };
 
-const struct sc script_list[] = {
+#ifndef DISABLE_CHECK_XID
+// The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or non-codepoints.
+const struct sc xid_script_list[] = {
   {0x0000, 0x0040, 0},	// Common
-  {0x005B, 0x0060, 0},	// Common
-  {0x007B, 0x00A9, 0},	// Common
-  {0x00AB, 0x00B9, 0},	// Common
-  {0x00BB, 0x00BF, 0},	// Common
-  {0x00D7, 0x00D7, 0},	// Common
-  {0x00F7, 0x00F7, 0},	// Common
-  {0x02B9, 0x02DF, 0},	// Common
-  {0x02E5, 0x02E9, 0},	// Common
-  {0x02EC, 0x02FF, 0},	// Common
-  {0x0374, 0x0374, 0},	// Common
-  {0x037E, 0x037E, 0},	// Common
-  {0x0385, 0x0385, 0},	// Common
-  {0x0387, 0x0387, 0},	// Common
-  {0x0605, 0x0605, 0},	// Common
-  {0x060C, 0x060C, 0},	// Common
-  {0x061B, 0x061B, 0},	// Common
-  {0x061F, 0x061F, 0},	// Common
-  {0x0640, 0x0640, 0},	// Common
-  {0x06DD, 0x06DD, 0},	// Common
-  {0x08E2, 0x08E2, 0},	// Common
-  {0x0964, 0x0965, 0},	// Common
-  {0x0E3F, 0x0E3F, 0},	// Common
-  {0x0FD5, 0x0FD8, 0},	// Common
-  {0x10FB, 0x10FB, 0},	// Common
-  {0x16EB, 0x16ED, 0},	// Common
-  {0x1735, 0x1736, 0},	// Common
-  {0x1802, 0x1803, 0},	// Common
-  {0x1805, 0x1805, 0},	// Common
-  {0x1CD3, 0x1CD3, 0},	// Common
-  {0x1CE1, 0x1CE1, 0},	// Common
-  {0x1CE9, 0x1CEC, 0},	// Common
-  {0x1CEE, 0x1CF3, 0},	// Common
-  {0x1CF5, 0x1CF7, 0},	// Common
-  {0x1CFA, 0x1CFA, 0},	// Common
-  {0x2000, 0x200B, 0},	// Common
-  {0x200E, 0x2064, 0},	// Common
-  {0x2066, 0x2070, 0},	// Common
-  {0x2074, 0x207E, 0},	// Common
-  {0x2080, 0x208E, 0},	// Common
-  {0x20A0, 0x20C0, 0},	// Common
-  {0x2100, 0x2125, 0},	// Common
-  {0x2127, 0x2129, 0},	// Common
-  {0x212C, 0x2131, 0},	// Common
-  {0x2133, 0x214D, 0},	// Common
-  {0x214F, 0x215F, 0},	// Common
-  {0x2189, 0x218B, 0},	// Common
-  {0x2190, 0x2426, 0},	// Common
-  {0x2440, 0x244A, 0},	// Common
-  {0x2460, 0x27FF, 0},	// Common
-  {0x2900, 0x2B73, 0},	// Common
-  {0x2B76, 0x2B95, 0},	// Common
-  {0x2B97, 0x2BFF, 0},	// Common
-  {0x2E00, 0x2E5D, 0},	// Common
-  {0x2FF0, 0x2FFB, 0},	// Common
-  {0x3000, 0x3004, 0},	// Common
-  {0x3006, 0x3006, 0},	// Common
-  {0x3008, 0x3020, 0},	// Common
-  {0x3030, 0x3037, 0},	// Common
-  {0x303C, 0x303F, 0},	// Common
-  {0x309B, 0x309C, 0},	// Common
-  {0x30A0, 0x30A0, 0},	// Common
-  {0x30FB, 0x30FC, 0},	// Common
-  {0x3190, 0x319F, 0},	// Common
-  {0x31C0, 0x31E3, 0},	// Common
-  {0x3220, 0x325F, 0},	// Common
-  {0x327F, 0x32CF, 0},	// Common
-  {0x32FF, 0x32FF, 0},	// Common
-  {0x3358, 0x33FF, 0},	// Common
-  {0x4DC0, 0x4DFF, 0},	// Common
-  {0xA700, 0xA721, 0},	// Common
-  {0xA788, 0xA78A, 0},	// Common
-  {0xA830, 0xA839, 0},	// Common
-  {0xA92E, 0xA92E, 0},	// Common
-  {0xA9CF, 0xA9CF, 0},	// Common
-  {0xAB5B, 0xAB5B, 0},	// Common
-  {0xAB6A, 0xAB6B, 0},	// Common
-  {0xFD3E, 0xFD3F, 0},	// Common
-  {0xFE10, 0xFE19, 0},	// Common
-  {0xFE30, 0xFE52, 0},	// Common
-  {0xFE54, 0xFE66, 0},	// Common
-  {0xFE68, 0xFE6B, 0},	// Common
-  {0xFEFF, 0xFEFF, 0},	// Common
-  {0xFF01, 0xFF20, 0},	// Common
-  {0xFF3B, 0xFF40, 0},	// Common
-  {0xFF5B, 0xFF65, 0},	// Common
-  {0xFF70, 0xFF70, 0},	// Common
-  {0xFF9E, 0xFF9F, 0},	// Common
-  {0xFFE0, 0xFFE6, 0},	// Common
-  {0xFFE8, 0xFFEE, 0},	// Common
-  {0xFFF9, 0xFFFD, 0},	// Common
-  {0x10100, 0x10102, 0},	// Common
-  {0x10107, 0x10133, 0},	// Common
-  {0x10137, 0x1013F, 0},	// Common
-  {0x10190, 0x1019C, 0},	// Common
-  {0x101D0, 0x101FC, 0},	// Common
-  {0x102E1, 0x102FB, 0},	// Common
-  {0x1BCA0, 0x1BCA3, 0},	// Common
-  {0x1CF50, 0x1CFC3, 0},	// Common
-  {0x1D000, 0x1D0F5, 0},	// Common
-  {0x1D100, 0x1D126, 0},	// Common
-  {0x1D129, 0x1D166, 0},	// Common
-  {0x1D16A, 0x1D17A, 0},	// Common
-  {0x1D183, 0x1D184, 0},	// Common
-  {0x1D18C, 0x1D1A9, 0},	// Common
-  {0x1D1AE, 0x1D1EA, 0},	// Common
-  {0x1D2E0, 0x1D2F3, 0},	// Common
-  {0x1D300, 0x1D356, 0},	// Common
-  {0x1D360, 0x1D378, 0},	// Common
-  {0x1D400, 0x1D454, 0},	// Common
-  {0x1D456, 0x1D49C, 0},	// Common
-  {0x1D49E, 0x1D49F, 0},	// Common
-  {0x1D4A2, 0x1D4A2, 0},	// Common
-  {0x1D4A5, 0x1D4A6, 0},	// Common
-  {0x1D4A9, 0x1D4AC, 0},	// Common
-  {0x1D4AE, 0x1D4B9, 0},	// Common
-  {0x1D4BB, 0x1D4BB, 0},	// Common
-  {0x1D4BD, 0x1D4C3, 0},	// Common
-  {0x1D4C5, 0x1D505, 0},	// Common
-  {0x1D507, 0x1D50A, 0},	// Common
-  {0x1D50D, 0x1D514, 0},	// Common
-  {0x1D516, 0x1D51C, 0},	// Common
-  {0x1D51E, 0x1D539, 0},	// Common
-  {0x1D53B, 0x1D53E, 0},	// Common
-  {0x1D540, 0x1D544, 0},	// Common
-  {0x1D546, 0x1D546, 0},	// Common
-  {0x1D54A, 0x1D550, 0},	// Common
-  {0x1D552, 0x1D6A5, 0},	// Common
-  {0x1D6A8, 0x1D7CB, 0},	// Common
-  {0x1D7CE, 0x1D7FF, 0},	// Common
-  {0x1EC71, 0x1ECB4, 0},	// Common
-  {0x1ED01, 0x1ED3D, 0},	// Common
-  {0x1F000, 0x1F02B, 0},	// Common
-  {0x1F030, 0x1F093, 0},	// Common
-  {0x1F0A0, 0x1F0AE, 0},	// Common
-  {0x1F0B1, 0x1F0BF, 0},	// Common
-  {0x1F0C1, 0x1F0CF, 0},	// Common
-  {0x1F0D1, 0x1F0F5, 0},	// Common
-  {0x1F100, 0x1F1AD, 0},	// Common
-  {0x1F1E6, 0x1F1FF, 0},	// Common
-  {0x1F201, 0x1F202, 0},	// Common
-  {0x1F210, 0x1F23B, 0},	// Common
-  {0x1F240, 0x1F248, 0},	// Common
-  {0x1F250, 0x1F251, 0},	// Common
-  {0x1F260, 0x1F265, 0},	// Common
-  {0x1F300, 0x1F6D7, 0},	// Common
-  {0x1F6DD, 0x1F6EC, 0},	// Common
-  {0x1F6F0, 0x1F6FC, 0},	// Common
-  {0x1F700, 0x1F773, 0},	// Common
-  {0x1F780, 0x1F7D8, 0},	// Common
-  {0x1F7E0, 0x1F7EB, 0},	// Common
-  {0x1F7F0, 0x1F7F0, 0},	// Common
-  {0x1F800, 0x1F80B, 0},	// Common
-  {0x1F810, 0x1F847, 0},	// Common
-  {0x1F850, 0x1F859, 0},	// Common
-  {0x1F860, 0x1F887, 0},	// Common
-  {0x1F890, 0x1F8AD, 0},	// Common
-  {0x1F8B0, 0x1F8B1, 0},	// Common
-  {0x1F900, 0x1FA53, 0},	// Common
-  {0x1FA60, 0x1FA6D, 0},	// Common
-  {0x1FA70, 0x1FA74, 0},	// Common
-  {0x1FA78, 0x1FA7C, 0},	// Common
-  {0x1FA80, 0x1FA86, 0},	// Common
-  {0x1FA90, 0x1FAAC, 0},	// Common
-  {0x1FAB0, 0x1FABA, 0},	// Common
-  {0x1FAC0, 0x1FAC5, 0},	// Common
-  {0x1FAD0, 0x1FAD9, 0},	// Common
-  {0x1FAE0, 0x1FAE7, 0},	// Common
-  {0x1FAF0, 0x1FAF6, 0},	// Common
-  {0x1FB00, 0x1FB92, 0},	// Common
-  {0x1FB94, 0x1FBCA, 0},	// Common
-  {0x1FBF0, 0x1FBF9, 0},	// Common
-  {0xE0001, 0xE0001, 0},	// Common
-  {0xE0020, 0xE007F, 0},	// Common
   {0x0041, 0x005A, 2},	// Latin
+  {0x005B, 0x0060, 0},	// Common
   {0x0061, 0x007A, 2},	// Latin
+  {0x007B, 0x00A9, 0},	// Common
   {0x00AA, 0x00AA, 2},	// Latin
+  {0x00AB, 0x00B9, 0},	// Common
   {0x00BA, 0x00BA, 2},	// Latin
+  {0x00BB, 0x00BF, 0},	// Common
   {0x00C0, 0x00D6, 2},	// Latin
+  {0x00D7, 0x00D7, 0},	// Common
   {0x00D8, 0x00F6, 2},	// Latin
+  {0x00F7, 0x00F7, 0},	// Common
   {0x00F8, 0x02B8, 2},	// Latin
+  {0x02B9, 0x02DF, 0},	// Common
   {0x02E0, 0x02E4, 2},	// Latin
-  {0x1D00, 0x1D25, 2},	// Latin
-  {0x1D2C, 0x1D5C, 2},	// Latin
-  {0x1D62, 0x1D65, 2},	// Latin
-  {0x1D6B, 0x1D77, 2},	// Latin
-  {0x1D79, 0x1DBE, 2},	// Latin
-  {0x1E00, 0x1EFF, 2},	// Latin
-  {0x2071, 0x2071, 2},	// Latin
-  {0x207F, 0x207F, 2},	// Latin
-  {0x2090, 0x209C, 2},	// Latin
-  {0x212A, 0x212B, 2},	// Latin
-  {0x2132, 0x2132, 2},	// Latin
-  {0x214E, 0x214E, 2},	// Latin
-  {0x2160, 0x2188, 2},	// Latin
-  {0x2C60, 0x2C7F, 2},	// Latin
-  {0xA722, 0xA787, 2},	// Latin
-  {0xA78B, 0xA7CA, 2},	// Latin
-  {0xA7D0, 0xA7D1, 2},	// Latin
-  {0xA7D3, 0xA7D3, 2},	// Latin
-  {0xA7D5, 0xA7D9, 2},	// Latin
-  {0xA7F2, 0xA7FF, 2},	// Latin
-  {0xAB30, 0xAB5A, 2},	// Latin
-  {0xAB5C, 0xAB64, 2},	// Latin
-  {0xAB66, 0xAB69, 2},	// Latin
-  {0xFB00, 0xFB06, 2},	// Latin
-  {0xFF21, 0xFF3A, 2},	// Latin
-  {0xFF41, 0xFF5A, 2},	// Latin
-  {0x10780, 0x10785, 2},	// Latin
-  {0x10787, 0x107B0, 2},	// Latin
-  {0x107B2, 0x107BA, 2},	// Latin
-  {0x1DF00, 0x1DF1E, 2},	// Latin
+  {0x02E5, 0x02E9, 0},	// Common
+  {0x02EA, 0x02EB, 6},	// Bopomofo
+  {0x02EC, 0x02FF, 0},	// Common
+  {0x0300, 0x036F, 1},	// Inherited
   {0x0370, 0x0373, 11},	// Greek
+  {0x0374, 0x0374, 0},	// Common
   {0x0375, 0x0377, 11},	// Greek
   {0x037A, 0x037D, 11},	// Greek
+  {0x037E, 0x037E, 0},	// Common
   {0x037F, 0x037F, 11},	// Greek
   {0x0384, 0x0384, 11},	// Greek
+  {0x0385, 0x0385, 0},	// Common
   {0x0386, 0x0386, 11},	// Greek
+  {0x0387, 0x0387, 0},	// Common
   {0x0388, 0x038A, 11},	// Greek
   {0x038C, 0x038C, 11},	// Greek
   {0x038E, 0x03A1, 11},	// Greek
   {0x03A3, 0x03E1, 11},	// Greek
+  {0x03E2, 0x03EF, 76},	// Coptic
   {0x03F0, 0x03FF, 11},	// Greek
-  {0x1D26, 0x1D2A, 11},	// Greek
-  {0x1D5D, 0x1D61, 11},	// Greek
-  {0x1D66, 0x1D6A, 11},	// Greek
-  {0x1DBF, 0x1DBF, 11},	// Greek
-  {0x1F00, 0x1F15, 11},	// Greek
-  {0x1F18, 0x1F1D, 11},	// Greek
-  {0x1F20, 0x1F45, 11},	// Greek
-  {0x1F48, 0x1F4D, 11},	// Greek
-  {0x1F50, 0x1F57, 11},	// Greek
-  {0x1F59, 0x1F59, 11},	// Greek
-  {0x1F5B, 0x1F5B, 11},	// Greek
-  {0x1F5D, 0x1F5D, 11},	// Greek
-  {0x1F5F, 0x1F7D, 11},	// Greek
-  {0x1F80, 0x1FB4, 11},	// Greek
-  {0x1FB6, 0x1FC4, 11},	// Greek
-  {0x1FC6, 0x1FD3, 11},	// Greek
-  {0x1FD6, 0x1FDB, 11},	// Greek
-  {0x1FDD, 0x1FEF, 11},	// Greek
-  {0x1FF2, 0x1FF4, 11},	// Greek
-  {0x1FF6, 0x1FFE, 11},	// Greek
-  {0x2126, 0x2126, 11},	// Greek
-  {0xAB65, 0xAB65, 11},	// Greek
-  {0x10140, 0x1018E, 11},	// Greek
-  {0x101A0, 0x101A0, 11},	// Greek
-  {0x1D200, 0x1D245, 11},	// Greek
   {0x0400, 0x0484, 7},	// Cyrillic
+  {0x0485, 0x0486, 1},	// Inherited
   {0x0487, 0x052F, 7},	// Cyrillic
-  {0x1C80, 0x1C88, 7},	// Cyrillic
-  {0x1D2B, 0x1D2B, 7},	// Cyrillic
-  {0x1D78, 0x1D78, 7},	// Cyrillic
-  {0x2DE0, 0x2DFF, 7},	// Cyrillic
-  {0xA640, 0xA69F, 7},	// Cyrillic
-  {0xFE2E, 0xFE2F, 7},	// Cyrillic
   {0x0531, 0x0556, 4},	// Armenian
   {0x0559, 0x058A, 4},	// Armenian
   {0x058D, 0x058F, 4},	// Armenian
-  {0xFB13, 0xFB17, 4},	// Armenian
   {0x0591, 0x05C7, 16},	// Hebrew
   {0x05D0, 0x05EA, 16},	// Hebrew
   {0x05EF, 0x05F4, 16},	// Hebrew
-  {0xFB1D, 0xFB36, 16},	// Hebrew
-  {0xFB38, 0xFB3C, 16},	// Hebrew
-  {0xFB3E, 0xFB3E, 16},	// Hebrew
-  {0xFB40, 0xFB41, 16},	// Hebrew
-  {0xFB43, 0xFB44, 16},	// Hebrew
-  {0xFB46, 0xFB4F, 16},	// Hebrew
   {0x0600, 0x0604, 3},	// Arabic
+  {0x0605, 0x0605, 0},	// Common
   {0x0606, 0x060B, 3},	// Arabic
+  {0x060C, 0x060C, 0},	// Common
   {0x060D, 0x061A, 3},	// Arabic
+  {0x061B, 0x061B, 0},	// Common
   {0x061C, 0x061E, 3},	// Arabic
+  {0x061F, 0x061F, 0},	// Common
   {0x0620, 0x063F, 3},	// Arabic
+  {0x0640, 0x0640, 0},	// Common
   {0x0641, 0x064A, 3},	// Arabic
+  {0x064B, 0x0655, 1},	// Inherited
   {0x0656, 0x066F, 3},	// Arabic
+  {0x0670, 0x0670, 1},	// Inherited
   {0x0671, 0x06DC, 3},	// Arabic
+  {0x06DD, 0x06DD, 0},	// Common
   {0x06DE, 0x06FF, 3},	// Arabic
-  {0x0750, 0x077F, 3},	// Arabic
-  {0x0870, 0x088E, 3},	// Arabic
-  {0x0890, 0x0891, 3},	// Arabic
-  {0x0898, 0x08E1, 3},	// Arabic
-  {0x08E3, 0x08FF, 3},	// Arabic
-  {0xFB50, 0xFBC2, 3},	// Arabic
-  {0xFBD3, 0xFD3D, 3},	// Arabic
-  {0xFD40, 0xFD8F, 3},	// Arabic
-  {0xFD92, 0xFDC7, 3},	// Arabic
-  {0xFDCF, 0xFDCF, 3},	// Arabic
-  {0xFDF0, 0xFDFF, 3},	// Arabic
-  {0xFE70, 0xFE74, 3},	// Arabic
-  {0xFE76, 0xFEFC, 3},	// Arabic
-  {0x10E60, 0x10E7E, 3},	// Arabic
-  {0x1EE00, 0x1EE03, 3},	// Arabic
-  {0x1EE05, 0x1EE1F, 3},	// Arabic
-  {0x1EE21, 0x1EE22, 3},	// Arabic
-  {0x1EE24, 0x1EE24, 3},	// Arabic
-  {0x1EE27, 0x1EE27, 3},	// Arabic
-  {0x1EE29, 0x1EE32, 3},	// Arabic
-  {0x1EE34, 0x1EE37, 3},	// Arabic
-  {0x1EE39, 0x1EE39, 3},	// Arabic
-  {0x1EE3B, 0x1EE3B, 3},	// Arabic
-  {0x1EE42, 0x1EE42, 3},	// Arabic
-  {0x1EE47, 0x1EE47, 3},	// Arabic
-  {0x1EE49, 0x1EE49, 3},	// Arabic
-  {0x1EE4B, 0x1EE4B, 3},	// Arabic
-  {0x1EE4D, 0x1EE4F, 3},	// Arabic
-  {0x1EE51, 0x1EE52, 3},	// Arabic
-  {0x1EE54, 0x1EE54, 3},	// Arabic
-  {0x1EE57, 0x1EE57, 3},	// Arabic
-  {0x1EE59, 0x1EE59, 3},	// Arabic
-  {0x1EE5B, 0x1EE5B, 3},	// Arabic
-  {0x1EE5D, 0x1EE5D, 3},	// Arabic
-  {0x1EE5F, 0x1EE5F, 3},	// Arabic
-  {0x1EE61, 0x1EE62, 3},	// Arabic
-  {0x1EE64, 0x1EE64, 3},	// Arabic
-  {0x1EE67, 0x1EE6A, 3},	// Arabic
-  {0x1EE6C, 0x1EE72, 3},	// Arabic
-  {0x1EE74, 0x1EE77, 3},	// Arabic
-  {0x1EE79, 0x1EE7C, 3},	// Arabic
-  {0x1EE7E, 0x1EE7E, 3},	// Arabic
-  {0x1EE80, 0x1EE89, 3},	// Arabic
-  {0x1EE8B, 0x1EE9B, 3},	// Arabic
-  {0x1EEA1, 0x1EEA3, 3},	// Arabic
-  {0x1EEA5, 0x1EEA9, 3},	// Arabic
-  {0x1EEAB, 0x1EEBB, 3},	// Arabic
-  {0x1EEF0, 0x1EEF1, 3},	// Arabic
   {0x0700, 0x070D, 153},	// Syriac
   {0x070F, 0x074A, 153},	// Syriac
   {0x074D, 0x074F, 153},	// Syriac
-  {0x0860, 0x086A, 153},	// Syriac
+  {0x0750, 0x077F, 3},	// Arabic
   {0x0780, 0x07B1, 28},	// Thaana
+  {0x07C0, 0x07FA, 146},	// Nko
+  {0x07FD, 0x07FF, 146},	// Nko
+  {0x0800, 0x082D, 93},	// Samaritan
+  {0x0830, 0x083E, 93},	// Samaritan
+  {0x0840, 0x085B, 141},	// Mandaic
+  {0x085E, 0x085E, 141},	// Mandaic
+  {0x0860, 0x086A, 153},	// Syriac
+  {0x0870, 0x088E, 3},	// Arabic
+  {0x0890, 0x0891, 3},	// Arabic
+  {0x0898, 0x08E1, 3},	// Arabic
+  {0x08E2, 0x08E2, 0},	// Common
+  {0x08E3, 0x08FF, 3},	// Arabic
   {0x0900, 0x0950, 8},	// Devanagari
+  {0x0951, 0x0954, 1},	// Inherited
   {0x0955, 0x0963, 8},	// Devanagari
+  {0x0964, 0x0965, 0},	// Common
   {0x0966, 0x097F, 8},	// Devanagari
-  {0xA8E0, 0xA8FF, 8},	// Devanagari
   {0x0980, 0x0983, 5},	// Bengali
   {0x0985, 0x098C, 5},	// Bengali
   {0x098F, 0x0990, 5},	// Bengali
@@ -764,8 +515,6 @@ const struct sc script_list[] = {
   {0x0BD0, 0x0BD0, 26},	// Tamil
   {0x0BD7, 0x0BD7, 26},	// Tamil
   {0x0BE6, 0x0BFA, 26},	// Tamil
-  {0x11FC0, 0x11FF1, 26},	// Tamil
-  {0x11FFF, 0x11FFF, 26},	// Tamil
   {0x0C00, 0x0C0C, 27},	// Telugu
   {0x0C0E, 0x0C10, 27},	// Telugu
   {0x0C12, 0x0C28, 27},	// Telugu
@@ -811,8 +560,8 @@ const struct sc script_list[] = {
   {0x0DD8, 0x0DDF, 25},	// Sinhala
   {0x0DE6, 0x0DEF, 25},	// Sinhala
   {0x0DF2, 0x0DF4, 25},	// Sinhala
-  {0x111E1, 0x111F4, 25},	// Sinhala
   {0x0E01, 0x0E3A, 29},	// Thai
+  {0x0E3F, 0x0E3F, 0},	// Common
   {0x0E40, 0x0E5B, 29},	// Thai
   {0x0E81, 0x0E82, 21},	// Lao
   {0x0E84, 0x0E84, 21},	// Lao
@@ -831,34 +580,16 @@ const struct sc script_list[] = {
   {0x0F99, 0x0FBC, 30},	// Tibetan
   {0x0FBE, 0x0FCC, 30},	// Tibetan
   {0x0FCE, 0x0FD4, 30},	// Tibetan
+  {0x0FD5, 0x0FD8, 0},	// Common
   {0x0FD9, 0x0FDA, 30},	// Tibetan
   {0x1000, 0x109F, 23},	// Myanmar
-  {0xA9E0, 0xA9FE, 23},	// Myanmar
-  {0xAA60, 0xAA7F, 23},	// Myanmar
   {0x10A0, 0x10C5, 10},	// Georgian
   {0x10C7, 0x10C7, 10},	// Georgian
   {0x10CD, 0x10CD, 10},	// Georgian
   {0x10D0, 0x10FA, 10},	// Georgian
+  {0x10FB, 0x10FB, 0},	// Common
   {0x10FC, 0x10FF, 10},	// Georgian
-  {0x1C90, 0x1CBA, 10},	// Georgian
-  {0x1CBD, 0x1CBF, 10},	// Georgian
-  {0x2D00, 0x2D25, 10},	// Georgian
-  {0x2D27, 0x2D27, 10},	// Georgian
-  {0x2D2D, 0x2D2D, 10},	// Georgian
   {0x1100, 0x11FF, 14},	// Hangul
-  {0x302E, 0x302F, 14},	// Hangul
-  {0x3131, 0x318E, 14},	// Hangul
-  {0x3200, 0x321E, 14},	// Hangul
-  {0x3260, 0x327E, 14},	// Hangul
-  {0xA960, 0xA97C, 14},	// Hangul
-  {0xAC00, 0xD7A3, 14},	// Hangul
-  {0xD7B0, 0xD7C6, 14},	// Hangul
-  {0xD7CB, 0xD7FB, 14},	// Hangul
-  {0xFFA0, 0xFFBE, 14},	// Hangul
-  {0xFFC2, 0xFFC7, 14},	// Hangul
-  {0xFFCA, 0xFFCF, 14},	// Hangul
-  {0xFFD2, 0xFFD7, 14},	// Hangul
-  {0xFFDA, 0xFFDC, 14},	// Hangul
   {0x1200, 0x1248, 9},	// Ethiopic
   {0x124A, 0x124D, 9},	// Ethiopic
   {0x1250, 0x1256, 9},	// Ethiopic
@@ -877,6 +608,145 @@ const struct sc script_list[] = {
   {0x1318, 0x135A, 9},	// Ethiopic
   {0x135D, 0x137C, 9},	// Ethiopic
   {0x1380, 0x1399, 9},	// Ethiopic
+  {0x13A0, 0x13F5, 134},	// Cherokee
+  {0x13F8, 0x13FD, 134},	// Cherokee
+  {0x1400, 0x167F, 131},	// Canadian_Aboriginal
+  {0x1680, 0x169C, 46},	// Ogham
+  {0x16A0, 0x16EA, 52},	// Runic
+  {0x16EB, 0x16ED, 0},	// Common
+  {0x16EE, 0x16F8, 52},	// Runic
+  {0x1700, 0x1715, 112},	// Tagalog
+  {0x171F, 0x171F, 112},	// Tagalog
+  {0x1720, 0x1734, 125},	// Hanunoo
+  {0x1735, 0x1736, 0},	// Common
+  {0x1740, 0x1753, 39},	// Buhid
+  {0x1760, 0x176C, 100},	// Tagbanwa
+  {0x176E, 0x1770, 100},	// Tagbanwa
+  {0x1772, 0x1773, 100},	// Tagbanwa
+  {0x1780, 0x17DD, 20},	// Khmer
+  {0x17E0, 0x17E9, 20},	// Khmer
+  {0x17F0, 0x17F9, 20},	// Khmer
+  {0x1800, 0x1801, 119},	// Mongolian
+  {0x1802, 0x1803, 0},	// Common
+  {0x1804, 0x1804, 119},	// Mongolian
+  {0x1805, 0x1805, 0},	// Common
+  {0x1806, 0x1819, 119},	// Mongolian
+  {0x1820, 0x1878, 119},	// Mongolian
+  {0x1880, 0x18AA, 119},	// Mongolian
+  {0x18B0, 0x18F5, 131},	// Canadian_Aboriginal
+  {0x1900, 0x191E, 139},	// Limbu
+  {0x1920, 0x192B, 139},	// Limbu
+  {0x1930, 0x193B, 139},	// Limbu
+  {0x1940, 0x1940, 139},	// Limbu
+  {0x1944, 0x194F, 139},	// Limbu
+  {0x1950, 0x196D, 154},	// Tai_Le
+  {0x1970, 0x1974, 154},	// Tai_Le
+  {0x1980, 0x19AB, 144},	// New_Tai_Lue
+  {0x19B0, 0x19C9, 144},	// New_Tai_Lue
+  {0x19D0, 0x19DA, 144},	// New_Tai_Lue
+  {0x19DE, 0x19DF, 144},	// New_Tai_Lue
+  {0x19E0, 0x19FF, 20},	// Khmer
+  {0x1A00, 0x1A1B, 110},	// Buginese
+  {0x1A1E, 0x1A1F, 110},	// Buginese
+  {0x1A20, 0x1A5E, 155},	// Tai_Tham
+  {0x1A60, 0x1A7C, 155},	// Tai_Tham
+  {0x1A7F, 0x1A89, 155},	// Tai_Tham
+  {0x1A90, 0x1A99, 155},	// Tai_Tham
+  {0x1AA0, 0x1AAD, 155},	// Tai_Tham
+  {0x1AB0, 0x1ACE, 1},	// Inherited
+  {0x1B00, 0x1B4C, 128},	// Balinese
+  {0x1B50, 0x1B7E, 128},	// Balinese
+  {0x1B80, 0x1BBF, 151},	// Sundanese
+  {0x1BC0, 0x1BF3, 130},	// Batak
+  {0x1BFC, 0x1BFF, 130},	// Batak
+  {0x1C00, 0x1C37, 138},	// Lepcha
+  {0x1C3B, 0x1C49, 138},	// Lepcha
+  {0x1C4D, 0x1C4F, 138},	// Lepcha
+  {0x1C50, 0x1C7F, 148},	// Ol_Chiki
+  {0x1C80, 0x1C88, 7},	// Cyrillic
+  {0x1C90, 0x1CBA, 10},	// Georgian
+  {0x1CBD, 0x1CBF, 10},	// Georgian
+  {0x1CC0, 0x1CC7, 151},	// Sundanese
+  {0x1CD0, 0x1CD2, 1},	// Inherited
+  {0x1CD3, 0x1CD3, 0},	// Common
+  {0x1CD4, 0x1CE0, 1},	// Inherited
+  {0x1CE1, 0x1CE1, 0},	// Common
+  {0x1CE2, 0x1CE8, 1},	// Inherited
+  {0x1CE9, 0x1CEC, 0},	// Common
+  {0x1CED, 0x1CED, 1},	// Inherited
+  {0x1CEE, 0x1CF3, 0},	// Common
+  {0x1CF4, 0x1CF4, 1},	// Inherited
+  {0x1CF5, 0x1CF7, 0},	// Common
+  {0x1CF8, 0x1CF9, 1},	// Inherited
+  {0x1CFA, 0x1CFA, 0},	// Common
+  {0x1D00, 0x1D25, 2},	// Latin
+  {0x1D26, 0x1D2A, 11},	// Greek
+  {0x1D2B, 0x1D2B, 7},	// Cyrillic
+  {0x1D2C, 0x1D5C, 2},	// Latin
+  {0x1D5D, 0x1D61, 11},	// Greek
+  {0x1D62, 0x1D65, 2},	// Latin
+  {0x1D66, 0x1D6A, 11},	// Greek
+  {0x1D6B, 0x1D77, 2},	// Latin
+  {0x1D78, 0x1D78, 7},	// Cyrillic
+  {0x1D79, 0x1DBE, 2},	// Latin
+  {0x1DBF, 0x1DBF, 11},	// Greek
+  {0x1DC0, 0x1DFF, 1},	// Inherited
+  {0x1E00, 0x1EFF, 2},	// Latin
+  {0x1F00, 0x1F15, 11},	// Greek
+  {0x1F18, 0x1F1D, 11},	// Greek
+  {0x1F20, 0x1F45, 11},	// Greek
+  {0x1F48, 0x1F4D, 11},	// Greek
+  {0x1F50, 0x1F57, 11},	// Greek
+  {0x1F59, 0x1F59, 11},	// Greek
+  {0x1F5B, 0x1F5B, 11},	// Greek
+  {0x1F5D, 0x1F5D, 11},	// Greek
+  {0x1F5F, 0x1F7D, 11},	// Greek
+  {0x1F80, 0x1FB4, 11},	// Greek
+  {0x1FB6, 0x1FC4, 11},	// Greek
+  {0x1FC6, 0x1FD3, 11},	// Greek
+  {0x1FD6, 0x1FDB, 11},	// Greek
+  {0x1FDD, 0x1FEF, 11},	// Greek
+  {0x1FF2, 0x1FF4, 11},	// Greek
+  {0x1FF6, 0x1FFE, 11},	// Greek
+  {0x2000, 0x200B, 0},	// Common
+  {0x200C, 0x200D, 1},	// Inherited
+  {0x200E, 0x2064, 0},	// Common
+  {0x2066, 0x2070, 0},	// Common
+  {0x2071, 0x2071, 2},	// Latin
+  {0x2074, 0x207E, 0},	// Common
+  {0x207F, 0x207F, 2},	// Latin
+  {0x2080, 0x208E, 0},	// Common
+  {0x2090, 0x209C, 2},	// Latin
+  {0x20A0, 0x20C0, 0},	// Common
+  {0x20D0, 0x20F0, 1},	// Inherited
+  {0x2100, 0x2125, 0},	// Common
+  {0x2126, 0x2126, 11},	// Greek
+  {0x2127, 0x2129, 0},	// Common
+  {0x212A, 0x212B, 2},	// Latin
+  {0x212C, 0x2131, 0},	// Common
+  {0x2132, 0x2132, 2},	// Latin
+  {0x2133, 0x214D, 0},	// Common
+  {0x214E, 0x214E, 2},	// Latin
+  {0x214F, 0x215F, 0},	// Common
+  {0x2160, 0x2188, 2},	// Latin
+  {0x2189, 0x218B, 0},	// Common
+  {0x2190, 0x2426, 0},	// Common
+  {0x2440, 0x244A, 0},	// Common
+  {0x2460, 0x27FF, 0},	// Common
+  {0x2800, 0x28FF, 81},	// Braille
+  {0x2900, 0x2B73, 0},	// Common
+  {0x2B76, 0x2B95, 0},	// Common
+  {0x2B97, 0x2BFF, 0},	// Common
+  {0x2C00, 0x2C5F, 77},	// Glagolitic
+  {0x2C60, 0x2C7F, 2},	// Latin
+  {0x2C80, 0x2CF3, 76},	// Coptic
+  {0x2CF9, 0x2CFF, 76},	// Coptic
+  {0x2D00, 0x2D25, 10},	// Georgian
+  {0x2D27, 0x2D27, 10},	// Georgian
+  {0x2D2D, 0x2D2D, 10},	// Georgian
+  {0x2D30, 0x2D67, 157},	// Tifinagh
+  {0x2D6F, 0x2D70, 157},	// Tifinagh
+  {0x2D7F, 0x2D7F, 157},	// Tifinagh
   {0x2D80, 0x2D96, 9},	// Ethiopic
   {0x2DA0, 0x2DA6, 9},	// Ethiopic
   {0x2DA8, 0x2DAE, 9},	// Ethiopic
@@ -886,68 +756,539 @@ const struct sc script_list[] = {
   {0x2DC8, 0x2DCE, 9},	// Ethiopic
   {0x2DD0, 0x2DD6, 9},	// Ethiopic
   {0x2DD8, 0x2DDE, 9},	// Ethiopic
+  {0x2DE0, 0x2DFF, 7},	// Cyrillic
+  {0x2E00, 0x2E5D, 0},	// Common
+  {0x2E80, 0x2E99, 15},	// Han
+  {0x2E9B, 0x2EF3, 15},	// Han
+  {0x2F00, 0x2FD5, 15},	// Han
+  {0x2FF0, 0x2FFB, 0},	// Common
+  {0x3000, 0x3004, 0},	// Common
+  {0x3005, 0x3005, 15},	// Han
+  {0x3006, 0x3006, 0},	// Common
+  {0x3007, 0x3007, 15},	// Han
+  {0x3008, 0x3020, 0},	// Common
+  {0x3021, 0x3029, 15},	// Han
+  {0x302A, 0x302D, 1},	// Inherited
+  {0x302E, 0x302F, 14},	// Hangul
+  {0x3030, 0x3037, 0},	// Common
+  {0x3038, 0x303B, 15},	// Han
+  {0x303C, 0x303F, 0},	// Common
+  {0x3041, 0x3096, 17},	// Hiragana
+  {0x3099, 0x309A, 1},	// Inherited
+  {0x309B, 0x309C, 0},	// Common
+  {0x309D, 0x309F, 17},	// Hiragana
+  {0x30A0, 0x30A0, 0},	// Common
+  {0x30A1, 0x30FA, 18},	// Katakana
+  {0x30FB, 0x30FC, 0},	// Common
+  {0x30FD, 0x30FF, 18},	// Katakana
+  {0x3105, 0x312F, 6},	// Bopomofo
+  {0x3131, 0x318E, 14},	// Hangul
+  {0x3190, 0x319F, 0},	// Common
+  {0x31A0, 0x31BF, 6},	// Bopomofo
+  {0x31C0, 0x31E3, 0},	// Common
+  {0x31F0, 0x31FF, 18},	// Katakana
+  {0x3200, 0x321E, 14},	// Hangul
+  {0x3220, 0x325F, 0},	// Common
+  {0x3260, 0x327E, 14},	// Hangul
+  {0x327F, 0x32CF, 0},	// Common
+  {0x32D0, 0x32FE, 18},	// Katakana
+  {0x32FF, 0x32FF, 0},	// Common
+  {0x3300, 0x3357, 18},	// Katakana
+  {0x3358, 0x33FF, 0},	// Common
+  {0x3400, 0x4DBF, 15},	// Han
+  {0x4DC0, 0x4DFF, 0},	// Common
+  {0x4E00, 0x9FFF, 15},	// Han
+  {0xA000, 0xA48C, 160},	// Yi
+  {0xA490, 0xA4C6, 160},	// Yi
+  {0xA4D0, 0xA4FF, 140},	// Lisu
+  {0xA500, 0xA62B, 158},	// Vai
+  {0xA640, 0xA69F, 7},	// Cyrillic
+  {0xA6A0, 0xA6F7, 129},	// Bamum
+  {0xA700, 0xA721, 0},	// Common
+  {0xA722, 0xA787, 2},	// Latin
+  {0xA788, 0xA78A, 0},	// Common
+  {0xA78B, 0xA7CA, 2},	// Latin
+  {0xA7D0, 0xA7D1, 2},	// Latin
+  {0xA7D3, 0xA7D3, 2},	// Latin
+  {0xA7D5, 0xA7D9, 2},	// Latin
+  {0xA7F2, 0xA7FF, 2},	// Latin
+  {0xA800, 0xA82C, 152},	// Syloti_Nagri
+  {0xA830, 0xA839, 0},	// Common
+  {0xA840, 0xA877, 74},	// Phags_Pa
+  {0xA880, 0xA8C5, 150},	// Saurashtra
+  {0xA8CE, 0xA8D9, 150},	// Saurashtra
+  {0xA8E0, 0xA8FF, 8},	// Devanagari
+  {0xA900, 0xA92D, 137},	// Kayah_Li
+  {0xA92E, 0xA92E, 0},	// Common
+  {0xA92F, 0xA92F, 137},	// Kayah_Li
+  {0xA930, 0xA953, 51},	// Rejang
+  {0xA95F, 0xA95F, 51},	// Rejang
+  {0xA960, 0xA97C, 14},	// Hangul
+  {0xA980, 0xA9CD, 136},	// Javanese
+  {0xA9CF, 0xA9CF, 0},	// Common
+  {0xA9D0, 0xA9D9, 136},	// Javanese
+  {0xA9DE, 0xA9DF, 136},	// Javanese
+  {0xA9E0, 0xA9FE, 23},	// Myanmar
+  {0xAA00, 0xAA36, 133},	// Cham
+  {0xAA40, 0xAA4D, 133},	// Cham
+  {0xAA50, 0xAA59, 133},	// Cham
+  {0xAA5C, 0xAA5F, 133},	// Cham
+  {0xAA60, 0xAA7F, 23},	// Myanmar
+  {0xAA80, 0xAAC2, 156},	// Tai_Viet
+  {0xAADB, 0xAADF, 156},	// Tai_Viet
+  {0xAAE0, 0xAAF6, 142},	// Meetei_Mayek
   {0xAB01, 0xAB06, 9},	// Ethiopic
   {0xAB09, 0xAB0E, 9},	// Ethiopic
   {0xAB11, 0xAB16, 9},	// Ethiopic
   {0xAB20, 0xAB26, 9},	// Ethiopic
   {0xAB28, 0xAB2E, 9},	// Ethiopic
-  {0x1E7E0, 0x1E7E6, 9},	// Ethiopic
-  {0x1E7E8, 0x1E7EB, 9},	// Ethiopic
-  {0x1E7ED, 0x1E7EE, 9},	// Ethiopic
-  {0x1E7F0, 0x1E7FE, 9},	// Ethiopic
-  {0x13A0, 0x13F5, 134},	// Cherokee
-  {0x13F8, 0x13FD, 134},	// Cherokee
+  {0xAB30, 0xAB5A, 2},	// Latin
+  {0xAB5B, 0xAB5B, 0},	// Common
+  {0xAB5C, 0xAB64, 2},	// Latin
+  {0xAB65, 0xAB65, 11},	// Greek
+  {0xAB66, 0xAB69, 2},	// Latin
+  {0xAB6A, 0xAB6B, 0},	// Common
   {0xAB70, 0xABBF, 134},	// Cherokee
-  {0x1400, 0x167F, 131},	// Canadian_Aboriginal
-  {0x18B0, 0x18F5, 131},	// Canadian_Aboriginal
-  {0x11AB0, 0x11ABF, 131},	// Canadian_Aboriginal
-  {0x1680, 0x169C, 123},	// Ogham
-  {0x16A0, 0x16EA, 121},	// Runic
-  {0x16EE, 0x16F8, 121},	// Runic
-  {0x1780, 0x17DD, 20},	// Khmer
-  {0x17E0, 0x17E9, 20},	// Khmer
-  {0x17F0, 0x17F9, 20},	// Khmer
-  {0x19E0, 0x19FF, 20},	// Khmer
-  {0x1800, 0x1801, 48},	// Mongolian
-  {0x1804, 0x1804, 48},	// Mongolian
-  {0x1806, 0x1819, 48},	// Mongolian
-  {0x1820, 0x1878, 48},	// Mongolian
-  {0x1880, 0x18AA, 48},	// Mongolian
-  {0x11660, 0x1166C, 48},	// Mongolian
-  {0x3041, 0x3096, 17},	// Hiragana
-  {0x309D, 0x309F, 17},	// Hiragana
-  {0x1B001, 0x1B11F, 17},	// Hiragana
-  {0x1B150, 0x1B152, 17},	// Hiragana
-  {0x1F200, 0x1F200, 17},	// Hiragana
-  {0x30A1, 0x30FA, 18},	// Katakana
-  {0x30FD, 0x30FF, 18},	// Katakana
-  {0x31F0, 0x31FF, 18},	// Katakana
-  {0x32D0, 0x32FE, 18},	// Katakana
-  {0x3300, 0x3357, 18},	// Katakana
+  {0xABC0, 0xABED, 142},	// Meetei_Mayek
+  {0xABF0, 0xABF9, 142},	// Meetei_Mayek
+  {0xAC00, 0xD7A3, 14},	// Hangul
+  {0xD7B0, 0xD7C6, 14},	// Hangul
+  {0xD7CB, 0xD7FB, 14},	// Hangul
+  {0xF900, 0xFA6D, 15},	// Han
+  {0xFA70, 0xFAD9, 15},	// Han
+  {0xFB00, 0xFB06, 2},	// Latin
+  {0xFB13, 0xFB17, 4},	// Armenian
+  {0xFB1D, 0xFB36, 16},	// Hebrew
+  {0xFB38, 0xFB3C, 16},	// Hebrew
+  {0xFB3E, 0xFB3E, 16},	// Hebrew
+  {0xFB40, 0xFB41, 16},	// Hebrew
+  {0xFB43, 0xFB44, 16},	// Hebrew
+  {0xFB46, 0xFB4F, 16},	// Hebrew
+  {0xFB50, 0xFBC2, 3},	// Arabic
+  {0xFBD3, 0xFD3D, 3},	// Arabic
+  {0xFD3E, 0xFD3F, 0},	// Common
+  {0xFD40, 0xFD8F, 3},	// Arabic
+  {0xFD92, 0xFDC7, 3},	// Arabic
+  {0xFDCF, 0xFDCF, 3},	// Arabic
+  {0xFDF0, 0xFDFF, 3},	// Arabic
+  {0xFE00, 0xFE0F, 1},	// Inherited
+  {0xFE10, 0xFE19, 0},	// Common
+  {0xFE20, 0xFE2D, 1},	// Inherited
+  {0xFE2E, 0xFE2F, 7},	// Cyrillic
+  {0xFE30, 0xFE52, 0},	// Common
+  {0xFE54, 0xFE66, 0},	// Common
+  {0xFE68, 0xFE6B, 0},	// Common
+  {0xFE70, 0xFE74, 3},	// Arabic
+  {0xFE76, 0xFEFC, 3},	// Arabic
+  {0xFEFF, 0xFEFF, 0},	// Common
+  {0xFF01, 0xFF20, 0},	// Common
+  {0xFF21, 0xFF3A, 2},	// Latin
+  {0xFF3B, 0xFF40, 0},	// Common
+  {0xFF41, 0xFF5A, 2},	// Latin
+  {0xFF5B, 0xFF65, 0},	// Common
   {0xFF66, 0xFF6F, 18},	// Katakana
+  {0xFF70, 0xFF70, 0},	// Common
   {0xFF71, 0xFF9D, 18},	// Katakana
+  {0xFF9E, 0xFF9F, 0},	// Common
+  {0xFFA0, 0xFFBE, 14},	// Hangul
+  {0xFFC2, 0xFFC7, 14},	// Hangul
+  {0xFFCA, 0xFFCF, 14},	// Hangul
+  {0xFFD2, 0xFFD7, 14},	// Hangul
+  {0xFFDA, 0xFFDC, 14},	// Hangul
+  {0xFFE0, 0xFFE6, 0},	// Common
+  {0xFFE8, 0xFFEE, 0},	// Common
+  {0xFFF9, 0xFFFD, 0},	// Common
+  {0x10000, 0x1000B, 124},	// Linear_B
+  {0x1000D, 0x10026, 124},	// Linear_B
+  {0x10028, 0x1003A, 124},	// Linear_B
+  {0x1003C, 0x1003D, 124},	// Linear_B
+  {0x1003F, 0x1004D, 124},	// Linear_B
+  {0x10050, 0x1005D, 124},	// Linear_B
+  {0x10080, 0x100FA, 124},	// Linear_B
+  {0x10100, 0x10102, 0},	// Common
+  {0x10107, 0x10133, 0},	// Common
+  {0x10137, 0x1013F, 0},	// Common
+  {0x10140, 0x1018E, 11},	// Greek
+  {0x10190, 0x1019C, 0},	// Common
+  {0x101A0, 0x101A0, 11},	// Greek
+  {0x101D0, 0x101FC, 0},	// Common
+  {0x101FD, 0x101FD, 1},	// Inherited
+  {0x10280, 0x1029C, 104},	// Lycian
+  {0x102A0, 0x102D0, 68},	// Carian
+  {0x102E0, 0x102E0, 1},	// Inherited
+  {0x102E1, 0x102FB, 0},	// Common
+  {0x10300, 0x10323, 120},	// Old_Italic
+  {0x1032D, 0x1032F, 120},	// Old_Italic
+  {0x10330, 0x1034A, 88},	// Gothic
+  {0x10350, 0x1037A, 108},	// Old_Permic
+  {0x10380, 0x1039D, 58},	// Ugaritic
+  {0x1039F, 0x1039F, 58},	// Ugaritic
+  {0x103A0, 0x103C3, 116},	// Old_Persian
+  {0x103C8, 0x103D5, 116},	// Old_Persian
+  {0x10400, 0x1044F, 37},	// Deseret
+  {0x10450, 0x1047F, 118},	// Shavian
+  {0x10480, 0x1049D, 32},	// Osmanya
+  {0x104A0, 0x104A9, 32},	// Osmanya
+  {0x104B0, 0x104D3, 149},	// Osage
+  {0x104D8, 0x104FB, 149},	// Osage
+  {0x10500, 0x10527, 101},	// Elbasan
+  {0x10530, 0x10563, 111},	// Caucasian_Albanian
+  {0x1056F, 0x1056F, 111},	// Caucasian_Albanian
+  {0x10570, 0x1057A, 114},	// Vithkuqi
+  {0x1057C, 0x1058A, 114},	// Vithkuqi
+  {0x1058C, 0x10592, 114},	// Vithkuqi
+  {0x10594, 0x10595, 114},	// Vithkuqi
+  {0x10597, 0x105A1, 114},	// Vithkuqi
+  {0x105A3, 0x105B1, 114},	// Vithkuqi
+  {0x105B3, 0x105B9, 114},	// Vithkuqi
+  {0x105BB, 0x105BC, 114},	// Vithkuqi
+  {0x10600, 0x10736, 59},	// Linear_A
+  {0x10740, 0x10755, 59},	// Linear_A
+  {0x10760, 0x10767, 59},	// Linear_A
+  {0x10780, 0x10785, 2},	// Latin
+  {0x10787, 0x107B0, 2},	// Latin
+  {0x107B2, 0x107BA, 2},	// Latin
+  {0x10800, 0x10805, 86},	// Cypriot
+  {0x10808, 0x10808, 86},	// Cypriot
+  {0x1080A, 0x10835, 86},	// Cypriot
+  {0x10837, 0x10838, 86},	// Cypriot
+  {0x1083C, 0x1083C, 86},	// Cypriot
+  {0x1083F, 0x1083F, 86},	// Cypriot
+  {0x10840, 0x10855, 90},	// Imperial_Aramaic
+  {0x10857, 0x1085F, 90},	// Imperial_Aramaic
+  {0x10860, 0x1087F, 55},	// Palmyrene
+  {0x10880, 0x1089E, 89},	// Nabataean
+  {0x108A7, 0x108AF, 89},	// Nabataean
+  {0x108E0, 0x108F2, 41},	// Hatran
+  {0x108F4, 0x108F5, 41},	// Hatran
+  {0x108FB, 0x108FF, 41},	// Hatran
+  {0x10900, 0x1091B, 84},	// Phoenician
+  {0x1091F, 0x1091F, 84},	// Phoenician
+  {0x10920, 0x10939, 47},	// Lydian
+  {0x1093F, 0x1093F, 47},	// Lydian
+  {0x10980, 0x1099F, 103},	// Meroitic_Hieroglyphs
+  {0x109A0, 0x109B7, 43},	// Meroitic_Cursive
+  {0x109BC, 0x109CF, 43},	// Meroitic_Cursive
+  {0x109D2, 0x109FF, 43},	// Meroitic_Cursive
+  {0x10A00, 0x10A03, 92},	// Kharoshthi
+  {0x10A05, 0x10A06, 92},	// Kharoshthi
+  {0x10A0C, 0x10A13, 92},	// Kharoshthi
+  {0x10A15, 0x10A17, 92},	// Kharoshthi
+  {0x10A19, 0x10A35, 92},	// Kharoshthi
+  {0x10A38, 0x10A3A, 92},	// Kharoshthi
+  {0x10A3F, 0x10A48, 92},	// Kharoshthi
+  {0x10A50, 0x10A58, 92},	// Kharoshthi
+  {0x10A60, 0x10A7F, 123},	// Old_South_Arabian
+  {0x10A80, 0x10A9F, 98},	// Old_North_Arabian
+  {0x10AC0, 0x10AE6, 31},	// Manichaean
+  {0x10AEB, 0x10AF6, 31},	// Manichaean
+  {0x10B00, 0x10B35, 44},	// Avestan
+  {0x10B39, 0x10B3F, 44},	// Avestan
+  {0x10B40, 0x10B55, 106},	// Inscriptional_Parthian
+  {0x10B58, 0x10B5F, 106},	// Inscriptional_Parthian
+  {0x10B60, 0x10B72, 42},	// Inscriptional_Pahlavi
+  {0x10B78, 0x10B7F, 42},	// Inscriptional_Pahlavi
+  {0x10B80, 0x10B91, 91},	// Psalter_Pahlavi
+  {0x10B99, 0x10B9C, 91},	// Psalter_Pahlavi
+  {0x10BA9, 0x10BAF, 91},	// Psalter_Pahlavi
+  {0x10C00, 0x10C48, 63},	// Old_Turkic
+  {0x10C80, 0x10CB2, 48},	// Old_Hungarian
+  {0x10CC0, 0x10CF2, 48},	// Old_Hungarian
+  {0x10CFA, 0x10CFF, 48},	// Old_Hungarian
+  {0x10D00, 0x10D27, 135},	// Hanifi_Rohingya
+  {0x10D30, 0x10D39, 135},	// Hanifi_Rohingya
+  {0x10E60, 0x10E7E, 3},	// Arabic
+  {0x10E80, 0x10EA9, 36},	// Yezidi
+  {0x10EAB, 0x10EAD, 36},	// Yezidi
+  {0x10EB0, 0x10EB1, 36},	// Yezidi
+  {0x10F00, 0x10F27, 78},	// Old_Sogdian
+  {0x10F30, 0x10F59, 83},	// Sogdian
+  {0x10F70, 0x10F89, 96},	// Old_Uyghur
+  {0x10FB0, 0x10FCB, 70},	// Chorasmian
+  {0x10FE0, 0x10FF6, 45},	// Elymaic
+  {0x11000, 0x1104D, 102},	// Brahmi
+  {0x11052, 0x11075, 102},	// Brahmi
+  {0x1107F, 0x1107F, 102},	// Brahmi
+  {0x11080, 0x110C2, 56},	// Kaithi
+  {0x110CD, 0x110CD, 56},	// Kaithi
+  {0x110D0, 0x110E8, 109},	// Sora_Sompeng
+  {0x110F0, 0x110F9, 109},	// Sora_Sompeng
+  {0x11100, 0x11134, 132},	// Chakma
+  {0x11136, 0x11147, 132},	// Chakma
+  {0x11150, 0x11176, 99},	// Mahajani
+  {0x11180, 0x111DF, 117},	// Sharada
+  {0x111E1, 0x111F4, 25},	// Sinhala
+  {0x11200, 0x11211, 35},	// Khojki
+  {0x11213, 0x1123E, 35},	// Khojki
+  {0x11280, 0x11286, 34},	// Multani
+  {0x11288, 0x11288, 34},	// Multani
+  {0x1128A, 0x1128D, 34},	// Multani
+  {0x1128F, 0x1129D, 34},	// Multani
+  {0x1129F, 0x112A9, 34},	// Multani
+  {0x112B0, 0x112EA, 65},	// Khudawadi
+  {0x112F0, 0x112F9, 65},	// Khudawadi
+  {0x11300, 0x11303, 49},	// Grantha
+  {0x11305, 0x1130C, 49},	// Grantha
+  {0x1130F, 0x11310, 49},	// Grantha
+  {0x11313, 0x11328, 49},	// Grantha
+  {0x1132A, 0x11330, 49},	// Grantha
+  {0x11332, 0x11333, 49},	// Grantha
+  {0x11335, 0x11339, 49},	// Grantha
+  {0x1133B, 0x1133B, 1},	// Inherited
+  {0x1133C, 0x11344, 49},	// Grantha
+  {0x11347, 0x11348, 49},	// Grantha
+  {0x1134B, 0x1134D, 49},	// Grantha
+  {0x11350, 0x11350, 49},	// Grantha
+  {0x11357, 0x11357, 49},	// Grantha
+  {0x1135D, 0x11363, 49},	// Grantha
+  {0x11366, 0x1136C, 49},	// Grantha
+  {0x11370, 0x11374, 49},	// Grantha
+  {0x11400, 0x1145B, 145},	// Newa
+  {0x1145D, 0x11461, 145},	// Newa
+  {0x11480, 0x114C7, 107},	// Tirhuta
+  {0x114D0, 0x114D9, 107},	// Tirhuta
+  {0x11580, 0x115B5, 97},	// Siddham
+  {0x115B8, 0x115DD, 97},	// Siddham
+  {0x11600, 0x11644, 126},	// Modi
+  {0x11650, 0x11659, 126},	// Modi
+  {0x11660, 0x1166C, 119},	// Mongolian
+  {0x11680, 0x116B9, 105},	// Takri
+  {0x116C0, 0x116C9, 105},	// Takri
+  {0x11700, 0x1171A, 75},	// Ahom
+  {0x1171D, 0x1172B, 75},	// Ahom
+  {0x11730, 0x11746, 75},	// Ahom
+  {0x11800, 0x1183B, 73},	// Dogra
+  {0x118A0, 0x118F2, 67},	// Warang_Citi
+  {0x118FF, 0x118FF, 67},	// Warang_Citi
+  {0x11900, 0x11906, 64},	// Dives_Akuru
+  {0x11909, 0x11909, 64},	// Dives_Akuru
+  {0x1190C, 0x11913, 64},	// Dives_Akuru
+  {0x11915, 0x11916, 64},	// Dives_Akuru
+  {0x11918, 0x11935, 64},	// Dives_Akuru
+  {0x11937, 0x11938, 64},	// Dives_Akuru
+  {0x1193B, 0x11946, 64},	// Dives_Akuru
+  {0x11950, 0x11959, 64},	// Dives_Akuru
+  {0x119A0, 0x119A7, 53},	// Nandinagari
+  {0x119AA, 0x119D7, 53},	// Nandinagari
+  {0x119DA, 0x119E4, 53},	// Nandinagari
+  {0x11A00, 0x11A47, 57},	// Zanabazar_Square
+  {0x11A50, 0x11AA2, 115},	// Soyombo
+  {0x11AB0, 0x11ABF, 131},	// Canadian_Aboriginal
+  {0x11AC0, 0x11AF8, 80},	// Pau_Cin_Hau
+  {0x11C00, 0x11C08, 82},	// Bhaiksuki
+  {0x11C0A, 0x11C36, 82},	// Bhaiksuki
+  {0x11C38, 0x11C45, 82},	// Bhaiksuki
+  {0x11C50, 0x11C6C, 82},	// Bhaiksuki
+  {0x11C70, 0x11C8F, 72},	// Marchen
+  {0x11C92, 0x11CA7, 72},	// Marchen
+  {0x11CA9, 0x11CB6, 72},	// Marchen
+  {0x11D00, 0x11D06, 33},	// Masaram_Gondi
+  {0x11D08, 0x11D09, 33},	// Masaram_Gondi
+  {0x11D0B, 0x11D36, 33},	// Masaram_Gondi
+  {0x11D3A, 0x11D3A, 33},	// Masaram_Gondi
+  {0x11D3C, 0x11D3D, 33},	// Masaram_Gondi
+  {0x11D3F, 0x11D47, 33},	// Masaram_Gondi
+  {0x11D50, 0x11D59, 33},	// Masaram_Gondi
+  {0x11D60, 0x11D65, 60},	// Gunjala_Gondi
+  {0x11D67, 0x11D68, 60},	// Gunjala_Gondi
+  {0x11D6A, 0x11D8E, 60},	// Gunjala_Gondi
+  {0x11D90, 0x11D91, 60},	// Gunjala_Gondi
+  {0x11D93, 0x11D98, 60},	// Gunjala_Gondi
+  {0x11DA0, 0x11DA9, 60},	// Gunjala_Gondi
+  {0x11EE0, 0x11EF8, 122},	// Makasar
+  {0x11FB0, 0x11FB0, 140},	// Lisu
+  {0x11FC0, 0x11FF1, 26},	// Tamil
+  {0x11FFF, 0x11FFF, 26},	// Tamil
+  {0x12000, 0x12399, 69},	// Cuneiform
+  {0x12400, 0x1246E, 69},	// Cuneiform
+  {0x12470, 0x12474, 69},	// Cuneiform
+  {0x12480, 0x12543, 69},	// Cuneiform
+  {0x12F90, 0x12FF2, 85},	// Cypro_Minoan
+  {0x13000, 0x1342E, 61},	// Egyptian_Hieroglyphs
+  {0x13430, 0x13438, 61},	// Egyptian_Hieroglyphs
+  {0x14400, 0x14646, 87},	// Anatolian_Hieroglyphs
+  {0x16800, 0x16A38, 129},	// Bamum
+  {0x16A40, 0x16A5E, 40},	// Mro
+  {0x16A60, 0x16A69, 40},	// Mro
+  {0x16A6E, 0x16A6F, 40},	// Mro
+  {0x16A70, 0x16ABE, 38},	// Tangsa
+  {0x16AC0, 0x16AC9, 38},	// Tangsa
+  {0x16AD0, 0x16AED, 94},	// Bassa_Vah
+  {0x16AF0, 0x16AF5, 94},	// Bassa_Vah
+  {0x16B00, 0x16B45, 113},	// Pahawh_Hmong
+  {0x16B50, 0x16B59, 113},	// Pahawh_Hmong
+  {0x16B5B, 0x16B61, 113},	// Pahawh_Hmong
+  {0x16B63, 0x16B77, 113},	// Pahawh_Hmong
+  {0x16B7D, 0x16B8F, 113},	// Pahawh_Hmong
+  {0x16E40, 0x16E9A, 54},	// Medefaidrin
+  {0x16F00, 0x16F4A, 143},	// Miao
+  {0x16F4F, 0x16F87, 143},	// Miao
+  {0x16F8F, 0x16F9F, 143},	// Miao
+  {0x16FE0, 0x16FE0, 62},	// Tangut
+  {0x16FE1, 0x16FE1, 71},	// Nushu
+  {0x16FE2, 0x16FE3, 15},	// Han
+  {0x16FE4, 0x16FE4, 79},	// Khitan_Small_Script
+  {0x16FF0, 0x16FF1, 15},	// Han
+  {0x17000, 0x187F7, 62},	// Tangut
+  {0x18800, 0x18AFF, 62},	// Tangut
+  {0x18B00, 0x18CD5, 79},	// Khitan_Small_Script
+  {0x18D00, 0x18D08, 62},	// Tangut
   {0x1AFF0, 0x1AFF3, 18},	// Katakana
   {0x1AFF5, 0x1AFFB, 18},	// Katakana
   {0x1AFFD, 0x1AFFE, 18},	// Katakana
   {0x1B000, 0x1B000, 18},	// Katakana
+  {0x1B001, 0x1B11F, 17},	// Hiragana
   {0x1B120, 0x1B122, 18},	// Katakana
+  {0x1B150, 0x1B152, 17},	// Hiragana
   {0x1B164, 0x1B167, 18},	// Katakana
-  {0x02EA, 0x02EB, 6},	// Bopomofo
-  {0x3105, 0x312F, 6},	// Bopomofo
-  {0x31A0, 0x31BF, 6},	// Bopomofo
-  {0x2E80, 0x2E99, 15},	// Han
-  {0x2E9B, 0x2EF3, 15},	// Han
-  {0x2F00, 0x2FD5, 15},	// Han
-  {0x3005, 0x3005, 15},	// Han
-  {0x3007, 0x3007, 15},	// Han
-  {0x3021, 0x3029, 15},	// Han
-  {0x3038, 0x303B, 15},	// Han
-  {0x3400, 0x4DBF, 15},	// Han
-  {0x4E00, 0x9FFF, 15},	// Han
-  {0xF900, 0xFA6D, 15},	// Han
-  {0xFA70, 0xFAD9, 15},	// Han
-  {0x16FE2, 0x16FE3, 15},	// Han
-  {0x16FF0, 0x16FF1, 15},	// Han
+  {0x1B170, 0x1B2FB, 71},	// Nushu
+  {0x1BC00, 0x1BC6A, 121},	// Duployan
+  {0x1BC70, 0x1BC7C, 121},	// Duployan
+  {0x1BC80, 0x1BC88, 121},	// Duployan
+  {0x1BC90, 0x1BC99, 121},	// Duployan
+  {0x1BC9C, 0x1BC9F, 121},	// Duployan
+  {0x1BCA0, 0x1BCA3, 0},	// Common
+  {0x1CF00, 0x1CF2D, 1},	// Inherited
+  {0x1CF30, 0x1CF46, 1},	// Inherited
+  {0x1CF50, 0x1CFC3, 0},	// Common
+  {0x1D000, 0x1D0F5, 0},	// Common
+  {0x1D100, 0x1D126, 0},	// Common
+  {0x1D129, 0x1D166, 0},	// Common
+  {0x1D167, 0x1D169, 1},	// Inherited
+  {0x1D16A, 0x1D17A, 0},	// Common
+  {0x1D17B, 0x1D182, 1},	// Inherited
+  {0x1D183, 0x1D184, 0},	// Common
+  {0x1D185, 0x1D18B, 1},	// Inherited
+  {0x1D18C, 0x1D1A9, 0},	// Common
+  {0x1D1AA, 0x1D1AD, 1},	// Inherited
+  {0x1D1AE, 0x1D1EA, 0},	// Common
+  {0x1D200, 0x1D245, 11},	// Greek
+  {0x1D2E0, 0x1D2F3, 0},	// Common
+  {0x1D300, 0x1D356, 0},	// Common
+  {0x1D360, 0x1D378, 0},	// Common
+  {0x1D400, 0x1D454, 0},	// Common
+  {0x1D456, 0x1D49C, 0},	// Common
+  {0x1D49E, 0x1D49F, 0},	// Common
+  {0x1D4A2, 0x1D4A2, 0},	// Common
+  {0x1D4A5, 0x1D4A6, 0},	// Common
+  {0x1D4A9, 0x1D4AC, 0},	// Common
+  {0x1D4AE, 0x1D4B9, 0},	// Common
+  {0x1D4BB, 0x1D4BB, 0},	// Common
+  {0x1D4BD, 0x1D4C3, 0},	// Common
+  {0x1D4C5, 0x1D505, 0},	// Common
+  {0x1D507, 0x1D50A, 0},	// Common
+  {0x1D50D, 0x1D514, 0},	// Common
+  {0x1D516, 0x1D51C, 0},	// Common
+  {0x1D51E, 0x1D539, 0},	// Common
+  {0x1D53B, 0x1D53E, 0},	// Common
+  {0x1D540, 0x1D544, 0},	// Common
+  {0x1D546, 0x1D546, 0},	// Common
+  {0x1D54A, 0x1D550, 0},	// Common
+  {0x1D552, 0x1D6A5, 0},	// Common
+  {0x1D6A8, 0x1D7CB, 0},	// Common
+  {0x1D7CE, 0x1D7FF, 0},	// Common
+  {0x1D800, 0x1DA8B, 66},	// SignWriting
+  {0x1DA9B, 0x1DA9F, 66},	// SignWriting
+  {0x1DAA1, 0x1DAAF, 66},	// SignWriting
+  {0x1DF00, 0x1DF1E, 2},	// Latin
+  {0x1E000, 0x1E006, 77},	// Glagolitic
+  {0x1E008, 0x1E018, 77},	// Glagolitic
+  {0x1E01B, 0x1E021, 77},	// Glagolitic
+  {0x1E023, 0x1E024, 77},	// Glagolitic
+  {0x1E026, 0x1E02A, 77},	// Glagolitic
+  {0x1E100, 0x1E12C, 147},	// Nyiakeng_Puachue_Hmong
+  {0x1E130, 0x1E13D, 147},	// Nyiakeng_Puachue_Hmong
+  {0x1E140, 0x1E149, 147},	// Nyiakeng_Puachue_Hmong
+  {0x1E14E, 0x1E14F, 147},	// Nyiakeng_Puachue_Hmong
+  {0x1E290, 0x1E2AE, 50},	// Toto
+  {0x1E2C0, 0x1E2F9, 159},	// Wancho
+  {0x1E2FF, 0x1E2FF, 159},	// Wancho
+  {0x1E7E0, 0x1E7E6, 9},	// Ethiopic
+  {0x1E7E8, 0x1E7EB, 9},	// Ethiopic
+  {0x1E7ED, 0x1E7EE, 9},	// Ethiopic
+  {0x1E7F0, 0x1E7FE, 9},	// Ethiopic
+  {0x1E800, 0x1E8C4, 95},	// Mende_Kikakui
+  {0x1E8C7, 0x1E8D6, 95},	// Mende_Kikakui
+  {0x1E900, 0x1E94B, 127},	// Adlam
+  {0x1E950, 0x1E959, 127},	// Adlam
+  {0x1E95E, 0x1E95F, 127},	// Adlam
+  {0x1EC71, 0x1ECB4, 0},	// Common
+  {0x1ED01, 0x1ED3D, 0},	// Common
+  {0x1EE00, 0x1EE03, 3},	// Arabic
+  {0x1EE05, 0x1EE1F, 3},	// Arabic
+  {0x1EE21, 0x1EE22, 3},	// Arabic
+  {0x1EE24, 0x1EE24, 3},	// Arabic
+  {0x1EE27, 0x1EE27, 3},	// Arabic
+  {0x1EE29, 0x1EE32, 3},	// Arabic
+  {0x1EE34, 0x1EE37, 3},	// Arabic
+  {0x1EE39, 0x1EE39, 3},	// Arabic
+  {0x1EE3B, 0x1EE3B, 3},	// Arabic
+  {0x1EE42, 0x1EE42, 3},	// Arabic
+  {0x1EE47, 0x1EE47, 3},	// Arabic
+  {0x1EE49, 0x1EE49, 3},	// Arabic
+  {0x1EE4B, 0x1EE4B, 3},	// Arabic
+  {0x1EE4D, 0x1EE4F, 3},	// Arabic
+  {0x1EE51, 0x1EE52, 3},	// Arabic
+  {0x1EE54, 0x1EE54, 3},	// Arabic
+  {0x1EE57, 0x1EE57, 3},	// Arabic
+  {0x1EE59, 0x1EE59, 3},	// Arabic
+  {0x1EE5B, 0x1EE5B, 3},	// Arabic
+  {0x1EE5D, 0x1EE5D, 3},	// Arabic
+  {0x1EE5F, 0x1EE5F, 3},	// Arabic
+  {0x1EE61, 0x1EE62, 3},	// Arabic
+  {0x1EE64, 0x1EE64, 3},	// Arabic
+  {0x1EE67, 0x1EE6A, 3},	// Arabic
+  {0x1EE6C, 0x1EE72, 3},	// Arabic
+  {0x1EE74, 0x1EE77, 3},	// Arabic
+  {0x1EE79, 0x1EE7C, 3},	// Arabic
+  {0x1EE7E, 0x1EE7E, 3},	// Arabic
+  {0x1EE80, 0x1EE89, 3},	// Arabic
+  {0x1EE8B, 0x1EE9B, 3},	// Arabic
+  {0x1EEA1, 0x1EEA3, 3},	// Arabic
+  {0x1EEA5, 0x1EEA9, 3},	// Arabic
+  {0x1EEAB, 0x1EEBB, 3},	// Arabic
+  {0x1EEF0, 0x1EEF1, 3},	// Arabic
+  {0x1F000, 0x1F02B, 0},	// Common
+  {0x1F030, 0x1F093, 0},	// Common
+  {0x1F0A0, 0x1F0AE, 0},	// Common
+  {0x1F0B1, 0x1F0BF, 0},	// Common
+  {0x1F0C1, 0x1F0CF, 0},	// Common
+  {0x1F0D1, 0x1F0F5, 0},	// Common
+  {0x1F100, 0x1F1AD, 0},	// Common
+  {0x1F1E6, 0x1F1FF, 0},	// Common
+  {0x1F200, 0x1F200, 17},	// Hiragana
+  {0x1F201, 0x1F202, 0},	// Common
+  {0x1F210, 0x1F23B, 0},	// Common
+  {0x1F240, 0x1F248, 0},	// Common
+  {0x1F250, 0x1F251, 0},	// Common
+  {0x1F260, 0x1F265, 0},	// Common
+  {0x1F300, 0x1F6D7, 0},	// Common
+  {0x1F6DD, 0x1F6EC, 0},	// Common
+  {0x1F6F0, 0x1F6FC, 0},	// Common
+  {0x1F700, 0x1F773, 0},	// Common
+  {0x1F780, 0x1F7D8, 0},	// Common
+  {0x1F7E0, 0x1F7EB, 0},	// Common
+  {0x1F7F0, 0x1F7F0, 0},	// Common
+  {0x1F800, 0x1F80B, 0},	// Common
+  {0x1F810, 0x1F847, 0},	// Common
+  {0x1F850, 0x1F859, 0},	// Common
+  {0x1F860, 0x1F887, 0},	// Common
+  {0x1F890, 0x1F8AD, 0},	// Common
+  {0x1F8B0, 0x1F8B1, 0},	// Common
+  {0x1F900, 0x1FA53, 0},	// Common
+  {0x1FA60, 0x1FA6D, 0},	// Common
+  {0x1FA70, 0x1FA74, 0},	// Common
+  {0x1FA78, 0x1FA7C, 0},	// Common
+  {0x1FA80, 0x1FA86, 0},	// Common
+  {0x1FA90, 0x1FAAC, 0},	// Common
+  {0x1FAB0, 0x1FABA, 0},	// Common
+  {0x1FAC0, 0x1FAC5, 0},	// Common
+  {0x1FAD0, 0x1FAD9, 0},	// Common
+  {0x1FAE0, 0x1FAE7, 0},	// Common
+  {0x1FAF0, 0x1FAF6, 0},	// Common
+  {0x1FB00, 0x1FB92, 0},	// Common
+  {0x1FB94, 0x1FBCA, 0},	// Common
+  {0x1FBF0, 0x1FBF9, 0},	// Common
   {0x20000, 0x2A6DF, 15},	// Han
   {0x2A700, 0x2B738, 15},	// Han
   {0x2B740, 0x2B81D, 15},	// Han
@@ -955,346 +1296,561 @@ const struct sc script_list[] = {
   {0x2CEB0, 0x2EBE0, 15},	// Han
   {0x2F800, 0x2FA1D, 15},	// Han
   {0x30000, 0x3134A, 15},	// Han
-  {0xA000, 0xA48C, 160},	// Yi
-  {0xA490, 0xA4C6, 160},	// Yi
-  {0x10300, 0x10323, 108},	// Old_Italic
-  {0x1032D, 0x1032F, 108},	// Old_Italic
-  {0x10330, 0x1034A, 84},	// Gothic
-  {0x10400, 0x1044F, 105},	// Deseret
-  {0x0300, 0x036F, 1},	// Inherited
-  {0x0485, 0x0486, 1},	// Inherited
-  {0x064B, 0x0655, 1},	// Inherited
-  {0x0670, 0x0670, 1},	// Inherited
-  {0x0951, 0x0954, 1},	// Inherited
-  {0x1AB0, 0x1ACE, 1},	// Inherited
-  {0x1CD0, 0x1CD2, 1},	// Inherited
-  {0x1CD4, 0x1CE0, 1},	// Inherited
-  {0x1CE2, 0x1CE8, 1},	// Inherited
-  {0x1CED, 0x1CED, 1},	// Inherited
-  {0x1CF4, 0x1CF4, 1},	// Inherited
-  {0x1CF8, 0x1CF9, 1},	// Inherited
-  {0x1DC0, 0x1DFF, 1},	// Inherited
-  {0x200C, 0x200D, 1},	// Inherited
-  {0x20D0, 0x20F0, 1},	// Inherited
-  {0x302A, 0x302D, 1},	// Inherited
-  {0x3099, 0x309A, 1},	// Inherited
-  {0xFE00, 0xFE0F, 1},	// Inherited
-  {0xFE20, 0xFE2D, 1},	// Inherited
-  {0x101FD, 0x101FD, 1},	// Inherited
-  {0x102E0, 0x102E0, 1},	// Inherited
-  {0x1133B, 0x1133B, 1},	// Inherited
-  {0x1CF00, 0x1CF2D, 1},	// Inherited
-  {0x1CF30, 0x1CF46, 1},	// Inherited
-  {0x1D167, 0x1D169, 1},	// Inherited
-  {0x1D17B, 0x1D182, 1},	// Inherited
-  {0x1D185, 0x1D18B, 1},	// Inherited
-  {0x1D1AA, 0x1D1AD, 1},	// Inherited
+  {0xE0001, 0xE0001, 0},	// Common
+  {0xE0020, 0xE007F, 0},	// Common
   {0xE0100, 0xE01EF, 1},	// Inherited
-  {0x1700, 0x1715, 69},	// Tagalog
-  {0x171F, 0x171F, 69},	// Tagalog
-  {0x1720, 0x1734, 41},	// Hanunoo
-  {0x1740, 0x1753, 38},	// Buhid
-  {0x1760, 0x176C, 88},	// Tagbanwa
-  {0x176E, 0x1770, 88},	// Tagbanwa
-  {0x1772, 0x1773, 88},	// Tagbanwa
-  {0x1900, 0x191E, 139},	// Limbu
-  {0x1920, 0x192B, 139},	// Limbu
-  {0x1930, 0x193B, 139},	// Limbu
-  {0x1940, 0x1940, 139},	// Limbu
-  {0x1944, 0x194F, 139},	// Limbu
-  {0x1950, 0x196D, 154},	// Tai_Le
-  {0x1970, 0x1974, 154},	// Tai_Le
-  {0x10000, 0x1000B, 52},	// Linear_B
-  {0x1000D, 0x10026, 52},	// Linear_B
-  {0x10028, 0x1003A, 52},	// Linear_B
-  {0x1003C, 0x1003D, 52},	// Linear_B
-  {0x1003F, 0x1004D, 52},	// Linear_B
-  {0x10050, 0x1005D, 52},	// Linear_B
-  {0x10080, 0x100FA, 52},	// Linear_B
-  {0x10380, 0x1039D, 89},	// Ugaritic
-  {0x1039F, 0x1039F, 89},	// Ugaritic
-  {0x10450, 0x1047F, 57},	// Shavian
-  {0x10480, 0x1049D, 43},	// Osmanya
-  {0x104A0, 0x104A9, 43},	// Osmanya
-  {0x10800, 0x10805, 120},	// Cypriot
-  {0x10808, 0x10808, 120},	// Cypriot
-  {0x1080A, 0x10835, 120},	// Cypriot
-  {0x10837, 0x10838, 120},	// Cypriot
-  {0x1083C, 0x1083C, 120},	// Cypriot
-  {0x1083F, 0x1083F, 120},	// Cypriot
-  {0x2800, 0x28FF, 66},	// Braille
-  {0x1A00, 0x1A1B, 71},	// Buginese
-  {0x1A1E, 0x1A1F, 71},	// Buginese
-  {0x03E2, 0x03EF, 53},	// Coptic
-  {0x2C80, 0x2CF3, 53},	// Coptic
-  {0x2CF9, 0x2CFF, 53},	// Coptic
-  {0x1980, 0x19AB, 144},	// New_Tai_Lue
-  {0x19B0, 0x19C9, 144},	// New_Tai_Lue
-  {0x19D0, 0x19DA, 144},	// New_Tai_Lue
-  {0x19DE, 0x19DF, 144},	// New_Tai_Lue
-  {0x2C00, 0x2C5F, 65},	// Glagolitic
-  {0x1E000, 0x1E006, 65},	// Glagolitic
-  {0x1E008, 0x1E018, 65},	// Glagolitic
-  {0x1E01B, 0x1E021, 65},	// Glagolitic
-  {0x1E023, 0x1E024, 65},	// Glagolitic
-  {0x1E026, 0x1E02A, 65},	// Glagolitic
-  {0x2D30, 0x2D67, 157},	// Tifinagh
-  {0x2D6F, 0x2D70, 157},	// Tifinagh
-  {0x2D7F, 0x2D7F, 157},	// Tifinagh
-  {0xA800, 0xA82C, 152},	// Syloti_Nagri
-  {0x103A0, 0x103C3, 86},	// Old_Persian
-  {0x103C8, 0x103D5, 86},	// Old_Persian
-  {0x10A00, 0x10A03, 35},	// Kharoshthi
-  {0x10A05, 0x10A06, 35},	// Kharoshthi
-  {0x10A0C, 0x10A13, 35},	// Kharoshthi
-  {0x10A15, 0x10A17, 35},	// Kharoshthi
-  {0x10A19, 0x10A35, 35},	// Kharoshthi
-  {0x10A38, 0x10A3A, 35},	// Kharoshthi
-  {0x10A3F, 0x10A48, 35},	// Kharoshthi
-  {0x10A50, 0x10A58, 35},	// Kharoshthi
-  {0x1B00, 0x1B4C, 128},	// Balinese
-  {0x1B50, 0x1B7E, 128},	// Balinese
-  {0x12000, 0x12399, 76},	// Cuneiform
-  {0x12400, 0x1246E, 76},	// Cuneiform
-  {0x12470, 0x12474, 76},	// Cuneiform
-  {0x12480, 0x12543, 76},	// Cuneiform
-  {0x10900, 0x1091B, 62},	// Phoenician
-  {0x1091F, 0x1091F, 62},	// Phoenician
-  {0xA840, 0xA877, 80},	// Phags_Pa
-  {0x07C0, 0x07FA, 146},	// Nko
-  {0x07FD, 0x07FF, 146},	// Nko
+};
+#endif
+
+#ifdef DISABLE_CHECK_XID
+// The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
+// as the parser already disallowed such codepoints.
+const struct sc nonxid_script_list[] = {
+  {0x0000, 0x0040, 0},	// Common
+  {0x0041, 0x005A, 2},	// Latin
+  {0x005B, 0x0060, 0},	// Common
+  {0x0061, 0x007A, 2},	// Latin
+  {0x007B, 0x00A9, 0},	// Common
+  {0x00AA, 0x00AA, 2},	// Latin
+  {0x00AB, 0x00B9, 0},	// Common
+  {0x00BA, 0x00BA, 2},	// Latin
+  {0x00BB, 0x00BF, 0},	// Common
+  {0x00C0, 0x00D6, 2},	// Latin
+  {0x00D7, 0x00D7, 0},	// Common
+  {0x00D8, 0x00F6, 2},	// Latin
+  {0x00F7, 0x00F7, 0},	// Common
+  {0x00F8, 0x02B8, 2},	// Latin
+  {0x02B9, 0x02DF, 0},	// Common
+  {0x02E0, 0x02E4, 2},	// Latin
+  {0x02E5, 0x02E9, 0},	// Common
+  {0x02EA, 0x02EB, 6},	// Bopomofo
+  {0x02EC, 0x02FF, 0},	// Common
+  {0x0300, 0x036F, 1},	// Inherited
+  {0x0370, 0x0373, 11},	// Greek
+  {0x0374, 0x0374, 0},	// Common
+  {0x0375, 0x037D, 11},	// Greek
+  {0x037E, 0x037E, 0},	// Common
+  {0x037F, 0x0384, 11},	// Greek
+  {0x0385, 0x0385, 0},	// Common
+  {0x0386, 0x0386, 11},	// Greek
+  {0x0387, 0x0387, 0},	// Common
+  {0x0388, 0x03E1, 11},	// Greek
+  {0x03E2, 0x03EF, 76},	// Coptic
+  {0x03F0, 0x03FF, 11},	// Greek
+  {0x0400, 0x0484, 7},	// Cyrillic
+  {0x0485, 0x0486, 1},	// Inherited
+  {0x0487, 0x052F, 7},	// Cyrillic
+  {0x0531, 0x058F, 4},	// Armenian
+  {0x0591, 0x05F4, 16},	// Hebrew
+  {0x0600, 0x0604, 3},	// Arabic
+  {0x0605, 0x0605, 0},	// Common
+  {0x0606, 0x060B, 3},	// Arabic
+  {0x060C, 0x060C, 0},	// Common
+  {0x060D, 0x061A, 3},	// Arabic
+  {0x061B, 0x061B, 0},	// Common
+  {0x061C, 0x061E, 3},	// Arabic
+  {0x061F, 0x061F, 0},	// Common
+  {0x0620, 0x063F, 3},	// Arabic
+  {0x0640, 0x0640, 0},	// Common
+  {0x0641, 0x064A, 3},	// Arabic
+  {0x064B, 0x0655, 1},	// Inherited
+  {0x0656, 0x066F, 3},	// Arabic
+  {0x0670, 0x0670, 1},	// Inherited
+  {0x0671, 0x06DC, 3},	// Arabic
+  {0x06DD, 0x06DD, 0},	// Common
+  {0x06DE, 0x06FF, 3},	// Arabic
+  {0x0700, 0x074F, 153},	// Syriac
+  {0x0750, 0x077F, 3},	// Arabic
+  {0x0780, 0x07B1, 28},	// Thaana
+  {0x07C0, 0x07FF, 146},	// Nko
+  {0x0800, 0x083E, 93},	// Samaritan
+  {0x0840, 0x085E, 141},	// Mandaic
+  {0x0860, 0x086A, 153},	// Syriac
+  {0x0870, 0x08E1, 3},	// Arabic
+  {0x08E2, 0x08E2, 0},	// Common
+  {0x08E3, 0x08FF, 3},	// Arabic
+  {0x0900, 0x0950, 8},	// Devanagari
+  {0x0951, 0x0954, 1},	// Inherited
+  {0x0955, 0x0963, 8},	// Devanagari
+  {0x0964, 0x0965, 0},	// Common
+  {0x0966, 0x097F, 8},	// Devanagari
+  {0x0980, 0x09FE, 5},	// Bengali
+  {0x0A01, 0x0A76, 13},	// Gurmukhi
+  {0x0A81, 0x0AFF, 12},	// Gujarati
+  {0x0B01, 0x0B77, 24},	// Oriya
+  {0x0B82, 0x0BFA, 26},	// Tamil
+  {0x0C00, 0x0C7F, 27},	// Telugu
+  {0x0C80, 0x0CF2, 19},	// Kannada
+  {0x0D00, 0x0D7F, 22},	// Malayalam
+  {0x0D81, 0x0DF4, 25},	// Sinhala
+  {0x0E01, 0x0E3A, 29},	// Thai
+  {0x0E3F, 0x0E3F, 0},	// Common
+  {0x0E40, 0x0E5B, 29},	// Thai
+  {0x0E81, 0x0EDF, 21},	// Lao
+  {0x0F00, 0x0FD4, 30},	// Tibetan
+  {0x0FD5, 0x0FD8, 0},	// Common
+  {0x0FD9, 0x0FDA, 30},	// Tibetan
+  {0x1000, 0x109F, 23},	// Myanmar
+  {0x10A0, 0x10FA, 10},	// Georgian
+  {0x10FB, 0x10FB, 0},	// Common
+  {0x10FC, 0x10FF, 10},	// Georgian
+  {0x1100, 0x11FF, 14},	// Hangul
+  {0x1200, 0x1399, 9},	// Ethiopic
+  {0x13A0, 0x13FD, 134},	// Cherokee
+  {0x1400, 0x167F, 131},	// Canadian_Aboriginal
+  {0x1680, 0x169C, 46},	// Ogham
+  {0x16A0, 0x16EA, 52},	// Runic
+  {0x16EB, 0x16ED, 0},	// Common
+  {0x16EE, 0x16F8, 52},	// Runic
+  {0x1700, 0x171F, 112},	// Tagalog
+  {0x1720, 0x1734, 125},	// Hanunoo
+  {0x1735, 0x1736, 0},	// Common
+  {0x1740, 0x1753, 39},	// Buhid
+  {0x1760, 0x1773, 100},	// Tagbanwa
+  {0x1780, 0x17F9, 20},	// Khmer
+  {0x1800, 0x1801, 119},	// Mongolian
+  {0x1802, 0x1803, 0},	// Common
+  {0x1804, 0x1804, 119},	// Mongolian
+  {0x1805, 0x1805, 0},	// Common
+  {0x1806, 0x18AA, 119},	// Mongolian
+  {0x18B0, 0x18F5, 131},	// Canadian_Aboriginal
+  {0x1900, 0x194F, 139},	// Limbu
+  {0x1950, 0x1974, 154},	// Tai_Le
+  {0x1980, 0x19DF, 144},	// New_Tai_Lue
+  {0x19E0, 0x19FF, 20},	// Khmer
+  {0x1A00, 0x1A1F, 110},	// Buginese
+  {0x1A20, 0x1AAD, 155},	// Tai_Tham
+  {0x1AB0, 0x1ACE, 1},	// Inherited
+  {0x1B00, 0x1B7E, 128},	// Balinese
   {0x1B80, 0x1BBF, 151},	// Sundanese
-  {0x1CC0, 0x1CC7, 151},	// Sundanese
-  {0x1C00, 0x1C37, 138},	// Lepcha
-  {0x1C3B, 0x1C49, 138},	// Lepcha
-  {0x1C4D, 0x1C4F, 138},	// Lepcha
+  {0x1BC0, 0x1BFF, 130},	// Batak
+  {0x1C00, 0x1C4F, 138},	// Lepcha
   {0x1C50, 0x1C7F, 148},	// Ol_Chiki
-  {0xA500, 0xA62B, 158},	// Vai
-  {0xA880, 0xA8C5, 150},	// Saurashtra
-  {0xA8CE, 0xA8D9, 150},	// Saurashtra
-  {0xA900, 0xA92D, 137},	// Kayah_Li
-  {0xA92F, 0xA92F, 137},	// Kayah_Li
-  {0xA930, 0xA953, 50},	// Rejang
-  {0xA95F, 0xA95F, 50},	// Rejang
-  {0x10280, 0x1029C, 115},	// Lycian
-  {0x102A0, 0x102D0, 45},	// Carian
-  {0x10920, 0x10939, 54},	// Lydian
-  {0x1093F, 0x1093F, 54},	// Lydian
-  {0xAA00, 0xAA36, 133},	// Cham
-  {0xAA40, 0xAA4D, 133},	// Cham
-  {0xAA50, 0xAA59, 133},	// Cham
-  {0xAA5C, 0xAA5F, 133},	// Cham
-  {0x1A20, 0x1A5E, 155},	// Tai_Tham
-  {0x1A60, 0x1A7C, 155},	// Tai_Tham
-  {0x1A7F, 0x1A89, 155},	// Tai_Tham
-  {0x1A90, 0x1A99, 155},	// Tai_Tham
-  {0x1AA0, 0x1AAD, 155},	// Tai_Tham
-  {0xAA80, 0xAAC2, 156},	// Tai_Viet
-  {0xAADB, 0xAADF, 156},	// Tai_Viet
-  {0x10B00, 0x10B35, 56},	// Avestan
-  {0x10B39, 0x10B3F, 56},	// Avestan
-  {0x13000, 0x1342E, 92},	// Egyptian_Hieroglyphs
-  {0x13430, 0x13438, 92},	// Egyptian_Hieroglyphs
-  {0x0800, 0x082D, 114},	// Samaritan
-  {0x0830, 0x083E, 114},	// Samaritan
+  {0x1C80, 0x1C88, 7},	// Cyrillic
+  {0x1C90, 0x1CBF, 10},	// Georgian
+  {0x1CC0, 0x1CC7, 151},	// Sundanese
+  {0x1CD0, 0x1CD2, 1},	// Inherited
+  {0x1CD3, 0x1CD3, 0},	// Common
+  {0x1CD4, 0x1CE0, 1},	// Inherited
+  {0x1CE1, 0x1CE1, 0},	// Common
+  {0x1CE2, 0x1CE8, 1},	// Inherited
+  {0x1CE9, 0x1CEC, 0},	// Common
+  {0x1CED, 0x1CED, 1},	// Inherited
+  {0x1CEE, 0x1CF3, 0},	// Common
+  {0x1CF4, 0x1CF4, 1},	// Inherited
+  {0x1CF5, 0x1CF7, 0},	// Common
+  {0x1CF8, 0x1CF9, 1},	// Inherited
+  {0x1CFA, 0x1CFA, 0},	// Common
+  {0x1D00, 0x1D25, 2},	// Latin
+  {0x1D26, 0x1D2A, 11},	// Greek
+  {0x1D2B, 0x1D2B, 7},	// Cyrillic
+  {0x1D2C, 0x1D5C, 2},	// Latin
+  {0x1D5D, 0x1D61, 11},	// Greek
+  {0x1D62, 0x1D65, 2},	// Latin
+  {0x1D66, 0x1D6A, 11},	// Greek
+  {0x1D6B, 0x1D77, 2},	// Latin
+  {0x1D78, 0x1D78, 7},	// Cyrillic
+  {0x1D79, 0x1DBE, 2},	// Latin
+  {0x1DBF, 0x1DBF, 11},	// Greek
+  {0x1DC0, 0x1DFF, 1},	// Inherited
+  {0x1E00, 0x1EFF, 2},	// Latin
+  {0x1F00, 0x1FFE, 11},	// Greek
+  {0x2000, 0x200B, 0},	// Common
+  {0x200C, 0x200D, 1},	// Inherited
+  {0x200E, 0x2070, 0},	// Common
+  {0x2071, 0x2071, 2},	// Latin
+  {0x2074, 0x207E, 0},	// Common
+  {0x207F, 0x207F, 2},	// Latin
+  {0x2080, 0x208E, 0},	// Common
+  {0x2090, 0x209C, 2},	// Latin
+  {0x20A0, 0x20C0, 0},	// Common
+  {0x20D0, 0x20F0, 1},	// Inherited
+  {0x2100, 0x2125, 0},	// Common
+  {0x2126, 0x2126, 11},	// Greek
+  {0x2127, 0x2129, 0},	// Common
+  {0x212A, 0x212B, 2},	// Latin
+  {0x212C, 0x2131, 0},	// Common
+  {0x2132, 0x2132, 2},	// Latin
+  {0x2133, 0x214D, 0},	// Common
+  {0x214E, 0x214E, 2},	// Latin
+  {0x214F, 0x215F, 0},	// Common
+  {0x2160, 0x2188, 2},	// Latin
+  {0x2189, 0x27FF, 0},	// Common
+  {0x2800, 0x28FF, 81},	// Braille
+  {0x2900, 0x2BFF, 0},	// Common
+  {0x2C00, 0x2C5F, 77},	// Glagolitic
+  {0x2C60, 0x2C7F, 2},	// Latin
+  {0x2C80, 0x2CFF, 76},	// Coptic
+  {0x2D00, 0x2D2D, 10},	// Georgian
+  {0x2D30, 0x2D7F, 157},	// Tifinagh
+  {0x2D80, 0x2DDE, 9},	// Ethiopic
+  {0x2DE0, 0x2DFF, 7},	// Cyrillic
+  {0x2E00, 0x2E5D, 0},	// Common
+  {0x2E80, 0x2FD5, 15},	// Han
+  {0x2FF0, 0x3004, 0},	// Common
+  {0x3005, 0x3005, 15},	// Han
+  {0x3006, 0x3006, 0},	// Common
+  {0x3007, 0x3007, 15},	// Han
+  {0x3008, 0x3020, 0},	// Common
+  {0x3021, 0x3029, 15},	// Han
+  {0x302A, 0x302D, 1},	// Inherited
+  {0x302E, 0x302F, 14},	// Hangul
+  {0x3030, 0x3037, 0},	// Common
+  {0x3038, 0x303B, 15},	// Han
+  {0x303C, 0x303F, 0},	// Common
+  {0x3041, 0x3096, 17},	// Hiragana
+  {0x3099, 0x309A, 1},	// Inherited
+  {0x309B, 0x309C, 0},	// Common
+  {0x309D, 0x309F, 17},	// Hiragana
+  {0x30A0, 0x30A0, 0},	// Common
+  {0x30A1, 0x30FA, 18},	// Katakana
+  {0x30FB, 0x30FC, 0},	// Common
+  {0x30FD, 0x30FF, 18},	// Katakana
+  {0x3105, 0x312F, 6},	// Bopomofo
+  {0x3131, 0x318E, 14},	// Hangul
+  {0x3190, 0x319F, 0},	// Common
+  {0x31A0, 0x31BF, 6},	// Bopomofo
+  {0x31C0, 0x31E3, 0},	// Common
+  {0x31F0, 0x31FF, 18},	// Katakana
+  {0x3200, 0x321E, 14},	// Hangul
+  {0x3220, 0x325F, 0},	// Common
+  {0x3260, 0x327E, 14},	// Hangul
+  {0x327F, 0x32CF, 0},	// Common
+  {0x32D0, 0x32FE, 18},	// Katakana
+  {0x32FF, 0x32FF, 0},	// Common
+  {0x3300, 0x3357, 18},	// Katakana
+  {0x3358, 0x33FF, 0},	// Common
+  {0x3400, 0x4DBF, 15},	// Han
+  {0x4DC0, 0x4DFF, 0},	// Common
+  {0x4E00, 0x9FFF, 15},	// Han
+  {0xA000, 0xA4C6, 160},	// Yi
   {0xA4D0, 0xA4FF, 140},	// Lisu
-  {0x11FB0, 0x11FB0, 140},	// Lisu
+  {0xA500, 0xA62B, 158},	// Vai
+  {0xA640, 0xA69F, 7},	// Cyrillic
   {0xA6A0, 0xA6F7, 129},	// Bamum
-  {0x16800, 0x16A38, 129},	// Bamum
+  {0xA700, 0xA721, 0},	// Common
+  {0xA722, 0xA787, 2},	// Latin
+  {0xA788, 0xA78A, 0},	// Common
+  {0xA78B, 0xA7FF, 2},	// Latin
+  {0xA800, 0xA82C, 152},	// Syloti_Nagri
+  {0xA830, 0xA839, 0},	// Common
+  {0xA840, 0xA877, 74},	// Phags_Pa
+  {0xA880, 0xA8D9, 150},	// Saurashtra
+  {0xA8E0, 0xA8FF, 8},	// Devanagari
+  {0xA900, 0xA92D, 137},	// Kayah_Li
+  {0xA92E, 0xA92E, 0},	// Common
+  {0xA92F, 0xA92F, 137},	// Kayah_Li
+  {0xA930, 0xA95F, 51},	// Rejang
+  {0xA960, 0xA97C, 14},	// Hangul
   {0xA980, 0xA9CD, 136},	// Javanese
-  {0xA9D0, 0xA9D9, 136},	// Javanese
-  {0xA9DE, 0xA9DF, 136},	// Javanese
+  {0xA9CF, 0xA9CF, 0},	// Common
+  {0xA9D0, 0xA9DF, 136},	// Javanese
+  {0xA9E0, 0xA9FE, 23},	// Myanmar
+  {0xAA00, 0xAA5F, 133},	// Cham
+  {0xAA60, 0xAA7F, 23},	// Myanmar
+  {0xAA80, 0xAADF, 156},	// Tai_Viet
   {0xAAE0, 0xAAF6, 142},	// Meetei_Mayek
-  {0xABC0, 0xABED, 142},	// Meetei_Mayek
-  {0xABF0, 0xABF9, 142},	// Meetei_Mayek
-  {0x10840, 0x10855, 75},	// Imperial_Aramaic
-  {0x10857, 0x1085F, 75},	// Imperial_Aramaic
-  {0x10A60, 0x10A7F, 109},	// Old_South_Arabian
-  {0x10B40, 0x10B55, 60},	// Inscriptional_Parthian
-  {0x10B58, 0x10B5F, 60},	// Inscriptional_Parthian
-  {0x10B60, 0x10B72, 93},	// Inscriptional_Pahlavi
-  {0x10B78, 0x10B7F, 93},	// Inscriptional_Pahlavi
+  {0xAB01, 0xAB2E, 9},	// Ethiopic
+  {0xAB30, 0xAB5A, 2},	// Latin
+  {0xAB5B, 0xAB5B, 0},	// Common
+  {0xAB5C, 0xAB64, 2},	// Latin
+  {0xAB65, 0xAB65, 11},	// Greek
+  {0xAB66, 0xAB69, 2},	// Latin
+  {0xAB6A, 0xAB6B, 0},	// Common
+  {0xAB70, 0xABBF, 134},	// Cherokee
+  {0xABC0, 0xABF9, 142},	// Meetei_Mayek
+  {0xAC00, 0xD7FB, 14},	// Hangul
+  {0xF900, 0xFAD9, 15},	// Han
+  {0xFB00, 0xFB06, 2},	// Latin
+  {0xFB13, 0xFB17, 4},	// Armenian
+  {0xFB1D, 0xFB4F, 16},	// Hebrew
+  {0xFB50, 0xFD3D, 3},	// Arabic
+  {0xFD3E, 0xFD3F, 0},	// Common
+  {0xFD40, 0xFDFF, 3},	// Arabic
+  {0xFE00, 0xFE0F, 1},	// Inherited
+  {0xFE10, 0xFE19, 0},	// Common
+  {0xFE20, 0xFE2D, 1},	// Inherited
+  {0xFE2E, 0xFE2F, 7},	// Cyrillic
+  {0xFE30, 0xFE6B, 0},	// Common
+  {0xFE70, 0xFEFC, 3},	// Arabic
+  {0xFEFF, 0xFF20, 0},	// Common
+  {0xFF21, 0xFF3A, 2},	// Latin
+  {0xFF3B, 0xFF40, 0},	// Common
+  {0xFF41, 0xFF5A, 2},	// Latin
+  {0xFF5B, 0xFF65, 0},	// Common
+  {0xFF66, 0xFF6F, 18},	// Katakana
+  {0xFF70, 0xFF70, 0},	// Common
+  {0xFF71, 0xFF9D, 18},	// Katakana
+  {0xFF9E, 0xFF9F, 0},	// Common
+  {0xFFA0, 0xFFDC, 14},	// Hangul
+  {0xFFE0, 0xFFFD, 0},	// Common
+  {0x10000, 0x100FA, 124},	// Linear_B
+  {0x10100, 0x1013F, 0},	// Common
+  {0x10140, 0x1018E, 11},	// Greek
+  {0x10190, 0x1019C, 0},	// Common
+  {0x101A0, 0x101A0, 11},	// Greek
+  {0x101D0, 0x101FC, 0},	// Common
+  {0x101FD, 0x101FD, 1},	// Inherited
+  {0x10280, 0x1029C, 104},	// Lycian
+  {0x102A0, 0x102D0, 68},	// Carian
+  {0x102E0, 0x102E0, 1},	// Inherited
+  {0x102E1, 0x102FB, 0},	// Common
+  {0x10300, 0x1032F, 120},	// Old_Italic
+  {0x10330, 0x1034A, 88},	// Gothic
+  {0x10350, 0x1037A, 108},	// Old_Permic
+  {0x10380, 0x1039F, 58},	// Ugaritic
+  {0x103A0, 0x103D5, 116},	// Old_Persian
+  {0x10400, 0x1044F, 37},	// Deseret
+  {0x10450, 0x1047F, 118},	// Shavian
+  {0x10480, 0x104A9, 32},	// Osmanya
+  {0x104B0, 0x104FB, 149},	// Osage
+  {0x10500, 0x10527, 101},	// Elbasan
+  {0x10530, 0x1056F, 111},	// Caucasian_Albanian
+  {0x10570, 0x105BC, 114},	// Vithkuqi
+  {0x10600, 0x10767, 59},	// Linear_A
+  {0x10780, 0x107BA, 2},	// Latin
+  {0x10800, 0x1083F, 86},	// Cypriot
+  {0x10840, 0x1085F, 90},	// Imperial_Aramaic
+  {0x10860, 0x1087F, 55},	// Palmyrene
+  {0x10880, 0x108AF, 89},	// Nabataean
+  {0x108E0, 0x108FF, 41},	// Hatran
+  {0x10900, 0x1091F, 84},	// Phoenician
+  {0x10920, 0x1093F, 47},	// Lydian
+  {0x10980, 0x1099F, 103},	// Meroitic_Hieroglyphs
+  {0x109A0, 0x109FF, 43},	// Meroitic_Cursive
+  {0x10A00, 0x10A58, 92},	// Kharoshthi
+  {0x10A60, 0x10A7F, 123},	// Old_South_Arabian
+  {0x10A80, 0x10A9F, 98},	// Old_North_Arabian
+  {0x10AC0, 0x10AF6, 31},	// Manichaean
+  {0x10B00, 0x10B3F, 44},	// Avestan
+  {0x10B40, 0x10B5F, 106},	// Inscriptional_Parthian
+  {0x10B60, 0x10B7F, 42},	// Inscriptional_Pahlavi
+  {0x10B80, 0x10BAF, 91},	// Psalter_Pahlavi
   {0x10C00, 0x10C48, 63},	// Old_Turkic
-  {0x11080, 0x110C2, 49},	// Kaithi
-  {0x110CD, 0x110CD, 49},	// Kaithi
-  {0x1BC0, 0x1BF3, 130},	// Batak
-  {0x1BFC, 0x1BFF, 130},	// Batak
-  {0x11000, 0x1104D, 111},	// Brahmi
-  {0x11052, 0x11075, 111},	// Brahmi
-  {0x1107F, 0x1107F, 111},	// Brahmi
-  {0x0840, 0x085B, 141},	// Mandaic
-  {0x085E, 0x085E, 141},	// Mandaic
-  {0x11100, 0x11134, 132},	// Chakma
-  {0x11136, 0x11147, 132},	// Chakma
-  {0x109A0, 0x109B7, 91},	// Meroitic_Cursive
-  {0x109BC, 0x109CF, 91},	// Meroitic_Cursive
-  {0x109D2, 0x109FF, 91},	// Meroitic_Cursive
-  {0x10980, 0x1099F, 77},	// Meroitic_Hieroglyphs
-  {0x16F00, 0x16F4A, 143},	// Miao
-  {0x16F4F, 0x16F87, 143},	// Miao
-  {0x16F8F, 0x16F9F, 143},	// Miao
-  {0x11180, 0x111DF, 55},	// Sharada
-  {0x110D0, 0x110E8, 124},	// Sora_Sompeng
-  {0x110F0, 0x110F9, 124},	// Sora_Sompeng
-  {0x11680, 0x116B9, 68},	// Takri
-  {0x116C0, 0x116C9, 68},	// Takri
-  {0x10530, 0x10563, 34},	// Caucasian_Albanian
-  {0x1056F, 0x1056F, 34},	// Caucasian_Albanian
-  {0x16AD0, 0x16AED, 64},	// Bassa_Vah
-  {0x16AF0, 0x16AF5, 64},	// Bassa_Vah
-  {0x1BC00, 0x1BC6A, 59},	// Duployan
-  {0x1BC70, 0x1BC7C, 59},	// Duployan
-  {0x1BC80, 0x1BC88, 59},	// Duployan
-  {0x1BC90, 0x1BC99, 59},	// Duployan
-  {0x1BC9C, 0x1BC9F, 59},	// Duployan
-  {0x10500, 0x10527, 100},	// Elbasan
-  {0x11300, 0x11303, 104},	// Grantha
-  {0x11305, 0x1130C, 104},	// Grantha
-  {0x1130F, 0x11310, 104},	// Grantha
-  {0x11313, 0x11328, 104},	// Grantha
-  {0x1132A, 0x11330, 104},	// Grantha
-  {0x11332, 0x11333, 104},	// Grantha
-  {0x11335, 0x11339, 104},	// Grantha
-  {0x1133C, 0x11344, 104},	// Grantha
-  {0x11347, 0x11348, 104},	// Grantha
-  {0x1134B, 0x1134D, 104},	// Grantha
-  {0x11350, 0x11350, 104},	// Grantha
-  {0x11357, 0x11357, 104},	// Grantha
-  {0x1135D, 0x11363, 104},	// Grantha
-  {0x11366, 0x1136C, 104},	// Grantha
-  {0x11370, 0x11374, 104},	// Grantha
-  {0x16B00, 0x16B45, 39},	// Pahawh_Hmong
-  {0x16B50, 0x16B59, 39},	// Pahawh_Hmong
-  {0x16B5B, 0x16B61, 39},	// Pahawh_Hmong
-  {0x16B63, 0x16B77, 39},	// Pahawh_Hmong
-  {0x16B7D, 0x16B8F, 39},	// Pahawh_Hmong
-  {0x11200, 0x11211, 47},	// Khojki
-  {0x11213, 0x1123E, 47},	// Khojki
-  {0x10600, 0x10736, 95},	// Linear_A
-  {0x10740, 0x10755, 95},	// Linear_A
-  {0x10760, 0x10767, 95},	// Linear_A
-  {0x11150, 0x11176, 112},	// Mahajani
-  {0x10AC0, 0x10AE6, 79},	// Manichaean
-  {0x10AEB, 0x10AF6, 79},	// Manichaean
-  {0x1E800, 0x1E8C4, 117},	// Mende_Kikakui
-  {0x1E8C7, 0x1E8D6, 117},	// Mende_Kikakui
-  {0x11600, 0x11644, 74},	// Modi
-  {0x11650, 0x11659, 74},	// Modi
-  {0x16A40, 0x16A5E, 107},	// Mro
-  {0x16A60, 0x16A69, 107},	// Mro
-  {0x16A6E, 0x16A6F, 107},	// Mro
-  {0x10A80, 0x10A9F, 58},	// Old_North_Arabian
-  {0x10880, 0x1089E, 81},	// Nabataean
-  {0x108A7, 0x108AF, 81},	// Nabataean
-  {0x10860, 0x1087F, 126},	// Palmyrene
-  {0x11AC0, 0x11AF8, 46},	// Pau_Cin_Hau
-  {0x10350, 0x1037A, 32},	// Old_Permic
-  {0x10B80, 0x10B91, 73},	// Psalter_Pahlavi
-  {0x10B99, 0x10B9C, 73},	// Psalter_Pahlavi
-  {0x10BA9, 0x10BAF, 73},	// Psalter_Pahlavi
-  {0x11580, 0x115B5, 51},	// Siddham
-  {0x115B8, 0x115DD, 51},	// Siddham
-  {0x112B0, 0x112EA, 78},	// Khudawadi
-  {0x112F0, 0x112F9, 78},	// Khudawadi
-  {0x11480, 0x114C7, 102},	// Tirhuta
-  {0x114D0, 0x114D9, 102},	// Tirhuta
-  {0x118A0, 0x118F2, 83},	// Warang_Citi
-  {0x118FF, 0x118FF, 83},	// Warang_Citi
-  {0x11700, 0x1171A, 101},	// Ahom
-  {0x1171D, 0x1172B, 101},	// Ahom
-  {0x11730, 0x11746, 101},	// Ahom
-  {0x14400, 0x14646, 99},	// Anatolian_Hieroglyphs
-  {0x108E0, 0x108F2, 36},	// Hatran
-  {0x108F4, 0x108F5, 36},	// Hatran
-  {0x108FB, 0x108FF, 36},	// Hatran
-  {0x11280, 0x11286, 110},	// Multani
-  {0x11288, 0x11288, 110},	// Multani
-  {0x1128A, 0x1128D, 110},	// Multani
-  {0x1128F, 0x1129D, 110},	// Multani
-  {0x1129F, 0x112A9, 110},	// Multani
-  {0x10C80, 0x10CB2, 106},	// Old_Hungarian
-  {0x10CC0, 0x10CF2, 106},	// Old_Hungarian
-  {0x10CFA, 0x10CFF, 106},	// Old_Hungarian
-  {0x1D800, 0x1DA8B, 61},	// SignWriting
-  {0x1DA9B, 0x1DA9F, 61},	// SignWriting
-  {0x1DAA1, 0x1DAAF, 61},	// SignWriting
-  {0x1E900, 0x1E94B, 127},	// Adlam
-  {0x1E950, 0x1E959, 127},	// Adlam
-  {0x1E95E, 0x1E95F, 127},	// Adlam
-  {0x11C00, 0x11C08, 37},	// Bhaiksuki
-  {0x11C0A, 0x11C36, 37},	// Bhaiksuki
-  {0x11C38, 0x11C45, 37},	// Bhaiksuki
-  {0x11C50, 0x11C6C, 37},	// Bhaiksuki
-  {0x11C70, 0x11C8F, 96},	// Marchen
-  {0x11C92, 0x11CA7, 96},	// Marchen
-  {0x11CA9, 0x11CB6, 96},	// Marchen
-  {0x11400, 0x1145B, 145},	// Newa
-  {0x1145D, 0x11461, 145},	// Newa
-  {0x104B0, 0x104D3, 149},	// Osage
-  {0x104D8, 0x104FB, 149},	// Osage
-  {0x16FE0, 0x16FE0, 31},	// Tangut
-  {0x17000, 0x187F7, 31},	// Tangut
-  {0x18800, 0x18AFF, 31},	// Tangut
-  {0x18D00, 0x18D08, 31},	// Tangut
-  {0x11D00, 0x11D06, 118},	// Masaram_Gondi
-  {0x11D08, 0x11D09, 118},	// Masaram_Gondi
-  {0x11D0B, 0x11D36, 118},	// Masaram_Gondi
-  {0x11D3A, 0x11D3A, 118},	// Masaram_Gondi
-  {0x11D3C, 0x11D3D, 118},	// Masaram_Gondi
-  {0x11D3F, 0x11D47, 118},	// Masaram_Gondi
-  {0x11D50, 0x11D59, 118},	// Masaram_Gondi
-  {0x16FE1, 0x16FE1, 82},	// Nushu
-  {0x1B170, 0x1B2FB, 82},	// Nushu
-  {0x11A50, 0x11AA2, 103},	// Soyombo
-  {0x11A00, 0x11A47, 87},	// Zanabazar_Square
-  {0x11800, 0x1183B, 98},	// Dogra
-  {0x11D60, 0x11D65, 85},	// Gunjala_Gondi
-  {0x11D67, 0x11D68, 85},	// Gunjala_Gondi
-  {0x11D6A, 0x11D8E, 85},	// Gunjala_Gondi
-  {0x11D90, 0x11D91, 85},	// Gunjala_Gondi
-  {0x11D93, 0x11D98, 85},	// Gunjala_Gondi
-  {0x11DA0, 0x11DA9, 85},	// Gunjala_Gondi
-  {0x11EE0, 0x11EF8, 70},	// Makasar
-  {0x16E40, 0x16E9A, 72},	// Medefaidrin
-  {0x10D00, 0x10D27, 135},	// Hanifi_Rohingya
-  {0x10D30, 0x10D39, 135},	// Hanifi_Rohingya
-  {0x10F30, 0x10F59, 116},	// Sogdian
-  {0x10F00, 0x10F27, 113},	// Old_Sogdian
-  {0x10FE0, 0x10FF6, 119},	// Elymaic
-  {0x119A0, 0x119A7, 67},	// Nandinagari
-  {0x119AA, 0x119D7, 67},	// Nandinagari
-  {0x119DA, 0x119E4, 67},	// Nandinagari
-  {0x1E100, 0x1E12C, 147},	// Nyiakeng_Puachue_Hmong
-  {0x1E130, 0x1E13D, 147},	// Nyiakeng_Puachue_Hmong
-  {0x1E140, 0x1E149, 147},	// Nyiakeng_Puachue_Hmong
-  {0x1E14E, 0x1E14F, 147},	// Nyiakeng_Puachue_Hmong
-  {0x1E2C0, 0x1E2F9, 159},	// Wancho
-  {0x1E2FF, 0x1E2FF, 159},	// Wancho
-  {0x10FB0, 0x10FCB, 94},	// Chorasmian
-  {0x11900, 0x11906, 40},	// Dives_Akuru
-  {0x11909, 0x11909, 40},	// Dives_Akuru
-  {0x1190C, 0x11913, 40},	// Dives_Akuru
-  {0x11915, 0x11916, 40},	// Dives_Akuru
-  {0x11918, 0x11935, 40},	// Dives_Akuru
-  {0x11937, 0x11938, 40},	// Dives_Akuru
-  {0x1193B, 0x11946, 40},	// Dives_Akuru
-  {0x11950, 0x11959, 40},	// Dives_Akuru
-  {0x16FE4, 0x16FE4, 42},	// Khitan_Small_Script
-  {0x18B00, 0x18CD5, 42},	// Khitan_Small_Script
-  {0x10E80, 0x10EA9, 44},	// Yezidi
-  {0x10EAB, 0x10EAD, 44},	// Yezidi
-  {0x10EB0, 0x10EB1, 44},	// Yezidi
-  {0x12F90, 0x12FF2, 122},	// Cypro_Minoan
-  {0x10F70, 0x10F89, 90},	// Old_Uyghur
-  {0x16A70, 0x16ABE, 33},	// Tangsa
-  {0x16AC0, 0x16AC9, 33},	// Tangsa
-  {0x1E290, 0x1E2AE, 97},	// Toto
-  {0x10570, 0x1057A, 125},	// Vithkuqi
-  {0x1057C, 0x1058A, 125},	// Vithkuqi
-  {0x1058C, 0x10592, 125},	// Vithkuqi
-  {0x10594, 0x10595, 125},	// Vithkuqi
-  {0x10597, 0x105A1, 125},	// Vithkuqi
-  {0x105A3, 0x105B1, 125},	// Vithkuqi
-  {0x105B3, 0x105B9, 125},	// Vithkuqi
-  {0x105BB, 0x105BC, 125},	// Vithkuqi
+  {0x10C80, 0x10CFF, 48},	// Old_Hungarian
+  {0x10D00, 0x10D39, 135},	// Hanifi_Rohingya
+  {0x10E60, 0x10E7E, 3},	// Arabic
+  {0x10E80, 0x10EB1, 36},	// Yezidi
+  {0x10F00, 0x10F27, 78},	// Old_Sogdian
+  {0x10F30, 0x10F59, 83},	// Sogdian
+  {0x10F70, 0x10F89, 96},	// Old_Uyghur
+  {0x10FB0, 0x10FCB, 70},	// Chorasmian
+  {0x10FE0, 0x10FF6, 45},	// Elymaic
+  {0x11000, 0x1107F, 102},	// Brahmi
+  {0x11080, 0x110CD, 56},	// Kaithi
+  {0x110D0, 0x110F9, 109},	// Sora_Sompeng
+  {0x11100, 0x11147, 132},	// Chakma
+  {0x11150, 0x11176, 99},	// Mahajani
+  {0x11180, 0x111DF, 117},	// Sharada
+  {0x111E1, 0x111F4, 25},	// Sinhala
+  {0x11200, 0x1123E, 35},	// Khojki
+  {0x11280, 0x112A9, 34},	// Multani
+  {0x112B0, 0x112F9, 65},	// Khudawadi
+  {0x11300, 0x11339, 49},	// Grantha
+  {0x1133B, 0x1133B, 1},	// Inherited
+  {0x1133C, 0x11374, 49},	// Grantha
+  {0x11400, 0x11461, 145},	// Newa
+  {0x11480, 0x114D9, 107},	// Tirhuta
+  {0x11580, 0x115DD, 97},	// Siddham
+  {0x11600, 0x11659, 126},	// Modi
+  {0x11660, 0x1166C, 119},	// Mongolian
+  {0x11680, 0x116C9, 105},	// Takri
+  {0x11700, 0x11746, 75},	// Ahom
+  {0x11800, 0x1183B, 73},	// Dogra
+  {0x118A0, 0x118FF, 67},	// Warang_Citi
+  {0x11900, 0x11959, 64},	// Dives_Akuru
+  {0x119A0, 0x119E4, 53},	// Nandinagari
+  {0x11A00, 0x11A47, 57},	// Zanabazar_Square
+  {0x11A50, 0x11AA2, 115},	// Soyombo
+  {0x11AB0, 0x11ABF, 131},	// Canadian_Aboriginal
+  {0x11AC0, 0x11AF8, 80},	// Pau_Cin_Hau
+  {0x11C00, 0x11C6C, 82},	// Bhaiksuki
+  {0x11C70, 0x11CB6, 72},	// Marchen
+  {0x11D00, 0x11D59, 33},	// Masaram_Gondi
+  {0x11D60, 0x11DA9, 60},	// Gunjala_Gondi
+  {0x11EE0, 0x11EF8, 122},	// Makasar
+  {0x11FB0, 0x11FB0, 140},	// Lisu
+  {0x11FC0, 0x11FFF, 26},	// Tamil
+  {0x12000, 0x12543, 69},	// Cuneiform
+  {0x12F90, 0x12FF2, 85},	// Cypro_Minoan
+  {0x13000, 0x13438, 61},	// Egyptian_Hieroglyphs
+  {0x14400, 0x14646, 87},	// Anatolian_Hieroglyphs
+  {0x16800, 0x16A38, 129},	// Bamum
+  {0x16A40, 0x16A6F, 40},	// Mro
+  {0x16A70, 0x16AC9, 38},	// Tangsa
+  {0x16AD0, 0x16AF5, 94},	// Bassa_Vah
+  {0x16B00, 0x16B8F, 113},	// Pahawh_Hmong
+  {0x16E40, 0x16E9A, 54},	// Medefaidrin
+  {0x16F00, 0x16F9F, 143},	// Miao
+  {0x16FE0, 0x16FE0, 62},	// Tangut
+  {0x16FE1, 0x16FE1, 71},	// Nushu
+  {0x16FE2, 0x16FE3, 15},	// Han
+  {0x16FE4, 0x16FE4, 79},	// Khitan_Small_Script
+  {0x16FF0, 0x16FF1, 15},	// Han
+  {0x17000, 0x18AFF, 62},	// Tangut
+  {0x18B00, 0x18CD5, 79},	// Khitan_Small_Script
+  {0x18D00, 0x18D08, 62},	// Tangut
+  {0x1AFF0, 0x1B000, 18},	// Katakana
+  {0x1B001, 0x1B11F, 17},	// Hiragana
+  {0x1B120, 0x1B122, 18},	// Katakana
+  {0x1B150, 0x1B152, 17},	// Hiragana
+  {0x1B164, 0x1B167, 18},	// Katakana
+  {0x1B170, 0x1B2FB, 71},	// Nushu
+  {0x1BC00, 0x1BC9F, 121},	// Duployan
+  {0x1BCA0, 0x1BCA3, 0},	// Common
+  {0x1CF00, 0x1CF46, 1},	// Inherited
+  {0x1CF50, 0x1D166, 0},	// Common
+  {0x1D167, 0x1D169, 1},	// Inherited
+  {0x1D16A, 0x1D17A, 0},	// Common
+  {0x1D17B, 0x1D182, 1},	// Inherited
+  {0x1D183, 0x1D184, 0},	// Common
+  {0x1D185, 0x1D18B, 1},	// Inherited
+  {0x1D18C, 0x1D1A9, 0},	// Common
+  {0x1D1AA, 0x1D1AD, 1},	// Inherited
+  {0x1D1AE, 0x1D1EA, 0},	// Common
+  {0x1D200, 0x1D245, 11},	// Greek
+  {0x1D2E0, 0x1D7FF, 0},	// Common
+  {0x1D800, 0x1DAAF, 66},	// SignWriting
+  {0x1DF00, 0x1DF1E, 2},	// Latin
+  {0x1E000, 0x1E02A, 77},	// Glagolitic
+  {0x1E100, 0x1E14F, 147},	// Nyiakeng_Puachue_Hmong
+  {0x1E290, 0x1E2AE, 50},	// Toto
+  {0x1E2C0, 0x1E2FF, 159},	// Wancho
+  {0x1E7E0, 0x1E7FE, 9},	// Ethiopic
+  {0x1E800, 0x1E8D6, 95},	// Mende_Kikakui
+  {0x1E900, 0x1E95F, 127},	// Adlam
+  {0x1EC71, 0x1ED3D, 0},	// Common
+  {0x1EE00, 0x1EEF1, 3},	// Arabic
+  {0x1F000, 0x1F1FF, 0},	// Common
+  {0x1F200, 0x1F200, 17},	// Hiragana
+  {0x1F201, 0x1FBF9, 0},	// Common
+  {0x20000, 0x3134A, 15},	// Han
+  {0xE0001, 0xE007F, 0},	// Common
+  {0xE0100, 0xE01EF, 1},	// Inherited
+};
+#endif
+
+// FIXME SCX list
+const struct scx scriptx_list[] = {
+  {0x0342, 0x0342, "Grek"},	// Grek
+  {0x0345, 0x0345, "Grek"},	// Grek
+  {0x0363, 0x036F, "Latn"},	// Latn
+  {0x0483, 0x0483, "Cyrl Perm"},	// Cyrl Perm
+  {0x0484, 0x0484, "Cyrl Glag"},	// Cyrl Glag
+  {0x0485, 0x0486, "Cyrl Latn"},	// Cyrl Latn
+  {0x0487, 0x0487, "Cyrl Glag"},	// Cyrl Glag
+  {0x060C, 0x060C, "Arab Nkoo Rohg Syrc Thaa Yezi"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+  {0x061B, 0x061B, "Arab Nkoo Rohg Syrc Thaa Yezi"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+  {0x061C, 0x061C, "Arab Syrc Thaa"},	// Arab Syrc Thaa
+  {0x061F, 0x061F, "Adlm Arab Nkoo Rohg Syrc Thaa Yezi"},	// Adlm Arab Nkoo Rohg Syrc Thaa Yezi
+  {0x0640, 0x0640, "Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc"},	// Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
+  {0x064B, 0x0655, "Arab Syrc"},	// Arab Syrc
+  {0x0660, 0x0669, "Arab Thaa Yezi"},	// Arab Thaa Yezi
+  {0x0670, 0x0670, "Arab Syrc"},	// Arab Syrc
+  {0x06D4, 0x06D4, "Arab Rohg"},	// Arab Rohg
+  {0x0951, 0x0951, "Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
+  {0x0952, 0x0952, "Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
+  {0x0964, 0x0964, "Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+  {0x0965, 0x0965, "Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+  {0x0966, 0x096F, "Deva Dogr Kthi Mahj"},	// Deva Dogr Kthi Mahj
+  {0x09E6, 0x09EF, "Beng Cakm Sylo"},	// Beng Cakm Sylo
+  {0x0A66, 0x0A6F, "Guru Mult"},	// Guru Mult
+  {0x0AE6, 0x0AEF, "Gujr Khoj"},	// Gujr Khoj
+  {0x0BE6, 0x0BF3, "Gran Taml"},	// Gran Taml
+  {0x0CE6, 0x0CEF, "Knda Nand"},	// Knda Nand
+  {0x1040, 0x1049, "Cakm Mymr Tale"},	// Cakm Mymr Tale
+  {0x10FB, 0x10FB, "Geor Latn"},	// Geor Latn
+  {0x1735, 0x1736, "Buhd Hano Tagb Tglg"},	// Buhd Hano Tagb Tglg
+  {0x1802, 0x1803, "Mong Phag"},	// Mong Phag
+  {0x1805, 0x1805, "Mong Phag"},	// Mong Phag
+  {0x1CD0, 0x1CD0, "Beng Deva Gran Knda"},	// Beng Deva Gran Knda
+  {0x1CD1, 0x1CD1, "Deva"},	// Deva
+  {0x1CD2, 0x1CD2, "Beng Deva Gran Knda"},	// Beng Deva Gran Knda
+  {0x1CD3, 0x1CD3, "Deva Gran"},	// Deva Gran
+  {0x1CD4, 0x1CD4, "Deva"},	// Deva
+  {0x1CD5, 0x1CD6, "Beng Deva"},	// Beng Deva
+  {0x1CD7, 0x1CD7, "Deva Shrd"},	// Deva Shrd
+  {0x1CD8, 0x1CD8, "Beng Deva"},	// Beng Deva
+  {0x1CD9, 0x1CD9, "Deva Shrd"},	// Deva Shrd
+  {0x1CDA, 0x1CDA, "Deva Knda Mlym Orya Taml Telu"},	// Deva Knda Mlym Orya Taml Telu
+  {0x1CDB, 0x1CDB, "Deva"},	// Deva
+  {0x1CDC, 0x1CDD, "Deva Shrd"},	// Deva Shrd
+  {0x1CDE, 0x1CDF, "Deva"},	// Deva
+  {0x1CE0, 0x1CE0, "Deva Shrd"},	// Deva Shrd
+  {0x1CE1, 0x1CE1, "Beng Deva"},	// Beng Deva
+  {0x1CE2, 0x1CE8, "Deva"},	// Deva
+  {0x1CE9, 0x1CE9, "Deva Nand"},	// Deva Nand
+  {0x1CEA, 0x1CEA, "Beng Deva"},	// Beng Deva
+  {0x1CEB, 0x1CEC, "Deva"},	// Deva
+  {0x1CED, 0x1CED, "Beng Deva"},	// Beng Deva
+  {0x1CEE, 0x1CF1, "Deva"},	// Deva
+  {0x1CF2, 0x1CF2, "Beng Deva Gran Knda Nand Orya Telu Tirh"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
+  {0x1CF3, 0x1CF3, "Deva Gran"},	// Deva Gran
+  {0x1CF4, 0x1CF4, "Deva Gran Knda"},	// Deva Gran Knda
+  {0x1CF5, 0x1CF6, "Beng Deva"},	// Beng Deva
+  {0x1CF7, 0x1CF7, "Beng"},	// Beng
+  {0x1CF8, 0x1CF9, "Deva Gran"},	// Deva Gran
+  {0x1CFA, 0x1CFA, "Nand"},	// Nand
+  {0x1DC0, 0x1DC1, "Grek"},	// Grek
+  {0x1DF8, 0x1DF8, "Cyrl Syrc"},	// Cyrl Syrc
+  {0x1DFA, 0x1DFA, "Syrc"},	// Syrc
+  {0x202F, 0x202F, "Latn Mong"},	// Latn Mong
+  {0x20F0, 0x20F0, "Deva Gran Latn"},	// Deva Gran Latn
+  {0x2E43, 0x2E43, "Cyrl Glag"},	// Cyrl Glag
+  {0x3001, 0x3002, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x3003, 0x3003, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
+  {0x3006, 0x3006, "Hani"},	// Hani
+  {0x3008, 0x3011, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x3013, 0x3013, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
+  {0x3014, 0x301B, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x301C, 0x301F, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
+  {0x302A, 0x302D, "Bopo Hani"},	// Bopo Hani
+  {0x3030, 0x3030, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
+  {0x3031, 0x3035, "Hira Kana"},	// Hira Kana
+  {0x3037, 0x3037, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
+  {0x303C, 0x303D, "Hani Hira Kana"},	// Hani Hira Kana
+  {0x303E, 0x303F, "Hani"},	// Hani
+  {0x3099, 0x309C, "Hira Kana"},	// Hira Kana
+  {0x30A0, 0x30A0, "Hira Kana"},	// Hira Kana
+  {0x30FB, 0x30FB, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
+  {0x30FC, 0x30FC, "Hira Kana"},	// Hira Kana
+  {0x3190, 0x319F, "Hani"},	// Hani
+  {0x31C0, 0x31E3, "Hani"},	// Hani
+  {0x3220, 0x3247, "Hani"},	// Hani
+  {0x3280, 0x32B0, "Hani"},	// Hani
+  {0x32C0, 0x32CB, "Hani"},	// Hani
+  {0x32FF, 0x32FF, "Hani"},	// Hani
+  {0x3358, 0x3370, "Hani"},	// Hani
+  {0x337B, 0x337F, "Hani"},	// Hani
+  {0x33E0, 0x33FE, "Hani"},	// Hani
+  {0xA66F, 0xA66F, "Cyrl Glag"},	// Cyrl Glag
+  {0xA700, 0xA707, "Hani Latn"},	// Hani Latn
+  {0xA830, 0xA832, "Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
+  {0xA833, 0xA835, "Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh
+  {0xA836, 0xA839, "Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh"},	// Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh
+  {0xA8F1, 0xA8F1, "Beng Deva"},	// Beng Deva
+  {0xA8F3, 0xA8F3, "Deva Taml"},	// Deva Taml
+  {0xA92E, 0xA92E, "Kali Latn Mymr"},	// Kali Latn Mymr
+  {0xA9CF, 0xA9CF, "Bugi Java"},	// Bugi Java
+  {0xFD3E, 0xFD3F, "Arab Nkoo"},	// Arab Nkoo
+  {0xFDF2, 0xFDF2, "Arab Thaa"},	// Arab Thaa
+  {0xFDFD, 0xFDFD, "Arab Thaa"},	// Arab Thaa
+  {0xFE45, 0xFE46, "Bopo Hang Hani Hira Kana"},	// Bopo Hang Hani Hira Kana
+  {0xFF61, 0xFF65, "Bopo Hang Hani Hira Kana Yiii"},	// Bopo Hang Hani Hira Kana Yiii
+  {0xFF70, 0xFF70, "Hira Kana"},	// Hira Kana
+  {0xFF9E, 0xFF9F, "Hira Kana"},	// Hira Kana
+  {0x10100, 0x10101, "Cpmn Cprt Linb"},	// Cpmn Cprt Linb
+  {0x10102, 0x10102, "Cprt Linb"},	// Cprt Linb
+  {0x10107, 0x10133, "Cprt Lina Linb"},	// Cprt Lina Linb
+  {0x10137, 0x1013F, "Cprt Linb"},	// Cprt Linb
+  {0x102E0, 0x102FB, "Arab Copt"},	// Arab Copt
+  {0x10AF2, 0x10AF2, "Mani Ougr"},	// Mani Ougr
+  {0x11301, 0x11301, "Gran Taml"},	// Gran Taml
+  {0x11303, 0x11303, "Gran Taml"},	// Gran Taml
+  {0x1133B, 0x1133C, "Gran Taml"},	// Gran Taml
+  {0x11FD0, 0x11FD1, "Gran Taml"},	// Gran Taml
+  {0x11FD3, 0x11FD3, "Gran Taml"},	// Gran Taml
+  {0x1BCA0, 0x1BCA3, "Dupl"},	// Dupl
+  {0x1D360, 0x1D371, "Hani"},	// Hani
+  {0x1F250, 0x1F251, "Hani"},	// Hani
 };

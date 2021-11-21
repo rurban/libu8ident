@@ -1,3 +1,7 @@
+/* libu8ident - Follow unicode security guidelines for identifiers.
+   Copyright 2021 Reini Urban
+   SPDX-License-Identifier: Apache-2.0
+*/
 #include <string.h>
 #include <assert.h>
 #include "u8ident.h"

@@ -1,13 +1,21 @@
+/* libu8ident - Follow unicode security guidelines for identifiers.
+   Copyright 2021 Reini Urban
+   SPDX-License-Identifier: Apache-2.0
+*/
 #include "u8ident.h"
 #include "u8id_private.h"
 
-unsigned s_u8id_options = U8ID_NFD | U8ID_PROFILE_4;
+unsigned s_u8id_options = U8ID_NFKC | U8ID_PROFILE_4;
 unsigned s_maxlen = 1024;
 
 /* Initialize the library with a bitmask of options, which define the
    performed checks. Recommended is `U8ID_PROFILE_4` only. */
 EXTERN int u8ident_init(enum u8id_options options) {
   s_u8id_options = (unsigned)options;
+}
+
+enum u8id_options u8ident_options(void) {
+  return s_u8id_options;
 }
 
 /* maxlength of an identifier. Default: 1024. Beware that such longs identiers are
