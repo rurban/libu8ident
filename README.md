@@ -42,12 +42,10 @@ Normalization
 -------------
 
 All utf8 identifiers and literals are parsed and stored as normalized
-NFKC variants, which prevents from various TR39 and TR36 unicode
-confusable and spoofing security problems.  Normalization is similar
-to Perl 6 and Python 3, but Perl 6 normalized to their own NFG format
-and Python 3 normalizes to the NFKC format. See
+NFKC variants (as in Python 3), which prevents from various TR39 and TR36 unicode
+confusable and spoofing security problems. See
 http://www.unicode.org/reports/tr36/ and http://www.unicode.org/reports/tr39.
-Optionally we also support the NFK and NFD formats.
+Optionally we also support the NFC and NFD formats.
 
 Mixed Scripts
 -------------
@@ -163,10 +161,11 @@ glaring security hole, waiting to be exploited.
 
 Generates a new identifier document/context/directory, which
 initializes a new list of seen scripts. Contexts are optional. By
-default all checks are done in the same context 0. With compilers
-and interpreters a context is a source file, with filesystems a directory,
-with usernames you may choose if you need to support different languages at once.
-I cannot think of any such usage, so better avoid contexts with usernames to avoid mixups.
+default all checks are done in the same context 0. With compilers and
+interpreters a context is a source file, with filesystems a directory,
+with usernames you may choose if you need to support different
+languages at once.  I cannot think of any such usage, so better avoid
+contexts with usernames to avoid mixups.
 
 `int u8ident_set_ctx (int ctx)`
 
