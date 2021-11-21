@@ -32,9 +32,12 @@ my @limited = qw(
   Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
   Tai_Viet Tifinagh Vai Wancho Yi Unknown);
 open my $SC, "<", $scn or die "$scn $!";
-my ($started, $from, $to, $sc, $oldto, $oldsc,
+my (@ucd_version, $started, $from, $to, $sc, $oldto, $oldsc,
     @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $sc);
 while (<$SC>) {
+  if (!$started && /^# Scripts-(\d+)\.(\d+)\.(\d+)\.txt/) {
+    @ucd_version = ($1, $2, $3);
+  }
   if (/^0000/) { $started++; }
   next unless $started;
   if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; (\w+) #/) {
@@ -168,7 +171,7 @@ print $H <<"EOF";
   // Not Recommended Scripts (but can to be declared expliclitly)
 EOF
 my %other = map {$_ => 1} @recommended, @limited;
-for my $sc (keys %scripts) {
+for my $sc (sort keys %scripts) {
   unless ($other{$sc}) {
     my $ws = " " x (10-length($sc));
     $SC{$sc} = $i;
@@ -204,7 +207,6 @@ print $H <<"EOF";
 };
 #endif
 
-#ifdef DISABLE_CHECK_XID
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
 // as the parser already disallowed such codepoints.
 const struct sc nonxid_script_list[] = {
@@ -214,7 +216,6 @@ for my $r (@SCRF) {
 };
 print $H <<"EOF";
 };
-#endif
 
 // FIXME SCX list
 const struct scx scriptx_list[] = {
@@ -227,3 +228,35 @@ print $H <<"EOF";
 EOF
 
 close $H;
+
+# patch our header
+my $inc = "include/u8ident.h";
+open my $INC, "<", $inc or die "$inc $!";
+while (<$INC>) {
+  if (/^#define U8IDENT_UNICODE_VERSION (\d+)/) {
+    my $version = $1;
+    if ($version != $ucd_version[0]) {
+      close $INC;
+      patch_ucd_major($inc, $ucd_version[0]);
+      last;
+    }
+  }
+}
+close $INC;
+
+sub patch_ucd_major {
+  my ($inc, $version) = @_;
+  open my $OLD, "<", $inc or die "$inc $!";
+  open my $NEW, ">", "$inc.new" or die "$inc.new $!";
+  while (<$INC>) {
+    if (/^(#define U8IDENT_UNICODE_VERSION )(\d+)/) {
+      print $NEW "$1 $version\n";
+    } else {
+      print $NEW $_;
+    }
+  }
+  close $OLD, $NEW;
+  rename $inc, "$inc.bak";
+  rename "$inc.new", $inc;
+}
+

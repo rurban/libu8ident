@@ -59,18 +59,17 @@ uint8_t u8ident_get_script(const uint32_t cp) {
   size_t sz;
 #ifndef DISABLE_CHECK_XID
   if (s_u8id_options & U8ID_CHECK_XID) {
-    s = &xid_script_list[0];
+    s = (struct sc *)xid_script_list;
     sz = sizeof(xid_script_list)/sizeof(*xid_script_list);
-  } else
+  }
+  else
 #endif
-#ifdef DISABLE_CHECK_XID
   {
-    s = &nonxid_script_list[0];
+    s = (struct sc *)nonxid_script_list;
     sz = sizeof(nonxid_script_list)/sizeof(*nonxid_script_list);
   }
-#endif
-  // TODO from linear to binary search
-  for (int i=0; i<sz; i++) {
+  // TODO switch from linear to binary search
+  for (size_t i=0; i<sz; i++) {
     if (cp >= s->from && cp <= s->to) {
       return s->scr;
     }
@@ -80,25 +79,30 @@ uint8_t u8ident_get_script(const uint32_t cp) {
 }
 
 const char* u8ident_script_name(const int scr) {
+  if (scr < 0 || scr > LAST_SCRIPT)
+    return NULL;
   assert(scr >= 0 && scr <= LAST_SCRIPT);
   return all_scripts[scr];
 }
 
 /* Optionally adds a script to the context, if it's known or declared
    beforehand. Such as `use utf8 "Greek";` in cperl. */
-EXTERN int u8ident_add_script(uint8_t script) {
-  if (script > 2) {
+EXTERN int u8ident_add_script(uint8_t scr) {
+  if (scr < 0 || scr > LAST_SCRIPT)
+    return -1;
+  if (scr > 2) {
     int i = i_ctx;
     int c = ctxp[i].count;
     if (c < 8) {
-      ctxp[i].scr8[c] = script;
+      ctxp[i].scr8[c] = scr;
     } else {
-      if (c & 7 == 7) // add a new word
+      if ((c & 7) == 7) // add a new word
         ctxp[i].u8p = realloc(ctxp[i].u8p, (c+1) * 2);
-      ctxp[i].u8p[c] = script;
+      ctxp[i].u8p[c] = scr;
     }
     ctxp[i].count++;
   }
+  return 0;
 }
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
@@ -131,6 +135,7 @@ EXTERN void u8ident_delete(void) {
    previous scripts is returned. The returned string needs to be freed by the user. */
 __attribute__((__weak__))
 const char* u8ident_script_error(int ctx) {
+  return "Invalid script %s, already have %s";
 }
 
 // See also the Table 3. Unicode Script Property Values and ISO 15924 Codes

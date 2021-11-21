@@ -2,6 +2,7 @@ GTAGS
 GPATH
 GRTAGS
 TAGS
+include/u8ident.h.bak
 libu8ident.a
 u8ident.o
 u8idnorm.o

@@ -7,7 +7,7 @@
 
 #define U8IDENT_VERSION_MAJOR 0
 #define U8IDENT_VERSION_MINOR 0
-#define U8IDENT_UNICODE_VERSION 14 // TODO patch this with regen-norm/mkscripts.pl
+#define U8IDENT_UNICODE_VERSION 14
 
 enum u8id_options {
   U8ID_NFKC = 0,  // by the default the compatibility composed normalization, as in Python 3
