@@ -278,7 +278,7 @@ struct range_bool {
 struct range_short {
   uint32_t from;
   uint32_t to;
-  uint16_t type;
+  uint16_t types;
 };
 
 /* Provide a mapping of the $num_scripts Script properties to an index byte.
@@ -349,14 +349,17 @@ for my $r (@SCR) {
   }
   printf $H "  {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
 };
-printf $H <<"EOF", $b, $s;
+printf $H <<"EOF", $b, $s, scalar(@SCRF);
 }; // %u ranges, %u single codepoints
 #endif
 #endif
 
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
 // as the parser already disallowed such codepoints.
-static const struct sc nonxid_script_list[] = {
+#ifdef TEST
+extern const struct sc nonxid_script_list[%u];
+#else
+const struct sc nonxid_script_list[] = {
 EOF
 ($b, $s) = (0, 0);
 for my $r (@SCRF) {
@@ -367,12 +370,16 @@ for my $r (@SCRF) {
   }
   printf $H "  {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
 };
-printf $H <<"EOF", $b, $s;
+printf $H <<"EOF", $b, $s, scalar(@SCXR);
 }; // %u ranges, %u single codepoints
+#endif
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
-static const struct scx scx_list[] = {
+#ifdef TEST
+extern const struct scx scx_script_list[%u];
+#else
+const struct scx scx_list[] = {
 EOF
 ($b, $s) = (0, 0);
 for my $r (@SCXR) {
@@ -391,6 +398,7 @@ for my $r (@SCXR) {
 };
 printf $H <<"EOF", $b, $s;
 }; // %u ranges, %u single codepoints
+#endif
 
 // Allowed scripts from IdentifierStatus.txt.
 #ifndef TEST
@@ -434,7 +442,8 @@ print $H <<"EOF";
    Allowed: keep Recommended, Inclusion
    Maybe allow by request Technical
 */
-static const struct range_short idtype_list[] = {
+#ifndef TEST
+const struct range_short idtype_list[] = {
 EOF
 sub idtype_bits {
   my $s = shift;
@@ -453,8 +462,11 @@ for my $r (@IDTYPES) {
   }
   printf $H "  {0x%04X, 0x%04X, %s },\n", $r->[0], $r->[1], idtype_bits($r->[2]);
 };
-printf $H <<"EOF", $b, $s;
+printf $H <<"EOF", $b, $s, scalar(@IDTYPES);
 }; // %u ranges, %u single codepoints
+#else
+extern const struct range_short idtype_list[%u];
+#endif
 //#endif
 EOF
 close $H;

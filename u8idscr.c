@@ -97,10 +97,6 @@ static inline bool range_bool_search(const uint32_t cp, const struct range_bool 
   const char* r = (char*)binary_search(cp, (char*)list, len, sizeof(*list));
   return r ? true : false;
 }
-static uint16_t range_short_search(const uint32_t cp, const struct range_short *list, const size_t len) {
-  const struct range_short* r = (struct range_short*)binary_search(cp, (char*)list, len, sizeof(*list));
-  return r ? r->type : UINT16_MAX;
-}
 
 uint8_t u8ident_get_script(const uint32_t cp) {
 #ifndef DISABLE_CHECK_XID
@@ -120,6 +116,13 @@ const char * u8ident_get_scx(const uint32_t cp) {
 
 bool u8ident_is_allowed(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, sizeof(allowed_id_list) / sizeof(*allowed_id_list));
+}
+
+// bitmask of u8id_idtypes
+uint16_t u8ident_get_idtypes(const uint32_t cp) {
+  const struct range_short* id = (struct range_short*)binary_search(cp, (char*)idtype_list,
+                                           sizeof(idtype_list) / sizeof(*idtype_list), sizeof(*idtype_list));
+  return id ? id->types : 0;
 }
 
 const char* u8ident_script_name(const int scr) {

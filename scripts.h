@@ -26,7 +26,7 @@ struct range_bool {
 struct range_short {
   uint32_t from;
   uint32_t to;
-  uint16_t type;
+  uint16_t types;
 };
 
 /* Provide a mapping of the 161 Script properties to an index byte.
@@ -1327,7 +1327,10 @@ const struct sc xid_script_list[] = {
 
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
 // as the parser already disallowed such codepoints.
-static const struct sc nonxid_script_list[] = {
+#ifdef TEST
+extern const struct sc nonxid_script_list[421];
+#else
+const struct sc nonxid_script_list[] = {
   {0x0000, 0x0040, 0},	// Common
   {0x0041, 0x005A, 2},	// Latin
   {0x005B, 0x0060, 0},	// Common
@@ -1750,10 +1753,14 @@ static const struct sc nonxid_script_list[] = {
   {0xE0001, 0xE007F, 0},	// Common
   {0xE0100, 0xE01EF, 1},	// Inherited
 }; // 367 ranges, 54 single codepoints
+#endif
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
-static const struct scx scx_list[] = {
+#ifdef TEST
+extern const struct scx scx_script_list[121];
+#else
+const struct scx scx_list[] = {
   {0x0342, 0x0342, "\x0b"},	// Grek
   {0x0345, 0x0345, "\x0b"},	// Grek
   {0x0363, 0x036F, "\x02"},	// Latn
@@ -1876,6 +1883,7 @@ static const struct scx scx_list[] = {
   {0x1D360, 0x1D371, "\x0f"},	// Hani
   {0x1F250, 0x1F251, "\x0f"},	// Hani
 }; // 56 ranges, 65 single codepoints
+#endif
 
 // Allowed scripts from IdentifierStatus.txt.
 #ifndef TEST
@@ -2294,7 +2302,8 @@ enum u8id_idtypes {
    Allowed: keep Recommended, Inclusion
    Maybe allow by request Technical
 */
-static const struct range_short idtype_list[] = {
+#ifndef TEST
+const struct range_short idtype_list[] = {
   {0x0009, 0x000D, U8ID_Not_XID },
   {0x0020, 0x0026, U8ID_Not_XID },
   {0x0028, 0x002C, U8ID_Not_XID },
@@ -3854,4 +3863,7 @@ static const struct range_short idtype_list[] = {
   {0xE0020, 0xE007F, U8ID_Default_Ignorable },
   {0xE0100, 0xE01EF, U8ID_Default_Ignorable },
 }; // 1558 ranges, 0 single codepoints
+#else
+extern const struct range_short idtype_list[1558];
+#endif
 //#endif
