@@ -6,11 +6,16 @@
 #include <assert.h>
 #include <stdbool.h>
 #include "u8ident.h"
+#define TEST
+#include "scripts.h"
+
+#define ARRAY_SIZE(x) sizeof(x)/sizeof(*x)
 
 // private access
 uint8_t u8ident_get_script(uint32_t cp);
 bool u8ident_is_allowed(const uint32_t cp);
 const char * u8ident_get_scx(const uint32_t cp);
+size_t u8ident_allowed_id_len(void);
 
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
@@ -40,6 +45,14 @@ void test_scripts_no_init(void) {
   assert(u8ident_is_allowed(0x27));
   assert(!u8ident_is_allowed(0x26));
   assert(u8ident_is_allowed(0x40e));
+
+  // check that no list elements can be merged
+  for (size_t i=0; i < ARRAY_SIZE(allowed_id_list) - 1; i++) {
+    const struct range_bool* r = &allowed_id_list[i];
+    const struct range_bool* n = &allowed_id_list[i+1];
+    assert(r->from <= r->to);
+    assert(r->to + 1 < n->from);  // can be merged
+  }
 }
 
 // TODO check normalizations, mixed-script check, contexts, options, XID.

@@ -119,7 +119,7 @@ const char * u8ident_get_scx(const uint32_t cp) {
 }
 
 bool u8ident_is_allowed(const uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list, sizeof(allowed_id_list)/sizeof(*allowed_id_list));
+  return range_bool_search(cp, allowed_id_list, sizeof(allowed_id_list) / sizeof(*allowed_id_list));
 }
 
 const char* u8ident_script_name(const int scr) {

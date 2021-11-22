@@ -67,6 +67,15 @@ while (<$IDSTAT>) {
   elsif (/^([0-9A-F]{4,5})\s+; Allowed\s+#/) {
     push @ALLOWED, [hex($1), hex($1)];
   }
+  # check if the entry can be merged into the previous
+  if ($#ALLOWED - 1 >= 0) {
+    my $prev = $ALLOWED[$#ALLOWED - 1];
+    my $last = $ALLOWED[$#ALLOWED];
+    if ($prev->[1] + 1 >= $last->[0]) {
+      $prev->[1] = $last->[1];
+      pop @ALLOWED;
+    }
+  }
 }
 close $IDTYPE;
 
@@ -275,6 +284,7 @@ struct range_short {
 /* Provide a mapping of the $num_scripts Script properties to an index byte.
    Sorted into usages.
  */
+#ifndef TEST
 const char* const all_scripts[] = {
   // Recommended Scripts (not need to add them)
   // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
@@ -316,12 +326,18 @@ for my $sc (@limited) {
   $i++;
 }
 $i--;
-print $H <<"EOF";
-#define LAST_SCRIPT $i
+printf $H <<"EOF", $i, $i, scalar @SCR;
+#define LAST_SCRIPT %u
 };
+#else
+extern const char* const all_scripts[%u];
+#endif
 
 #ifndef DISABLE_CHECK_XID
 // The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or non-codepoints.
+#ifdef TEST
+extern const struct sc xid_script_list[%u];
+#else
 const struct sc xid_script_list[] = {
 EOF
 my ($b, $s);
@@ -336,10 +352,11 @@ for my $r (@SCR) {
 printf $H <<"EOF", $b, $s;
 }; // %u ranges, %u single codepoints
 #endif
+#endif
 
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
 // as the parser already disallowed such codepoints.
-const struct sc nonxid_script_list[] = {
+static const struct sc nonxid_script_list[] = {
 EOF
 ($b, $s) = (0, 0);
 for my $r (@SCRF) {
@@ -355,7 +372,7 @@ printf $H <<"EOF", $b, $s;
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
-const struct scx scx_list[] = {
+static const struct scx scx_list[] = {
 EOF
 ($b, $s) = (0, 0);
 for my $r (@SCXR) {
@@ -376,6 +393,7 @@ printf $H <<"EOF", $b, $s;
 }; // %u ranges, %u single codepoints
 
 // Allowed scripts from IdentifierStatus.txt.
+#ifndef TEST
 const struct range_bool allowed_id_list[] = {
 EOF
 ($b, $s) = (0, 0);
@@ -387,8 +405,11 @@ for my $r (@ALLOWED) {
   }
   printf $H "  {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
 };
-printf $H <<"EOF", $b, $s;
+printf $H <<"EOF", $b, $s, scalar(@ALLOWED);
 }; // %u ranges, %u single codepoints
+#else
+extern const struct range_bool allowed_id_list[%u];
+#endif
 
 // IdentifierType bit-values
 enum u8id_idtypes {
@@ -407,13 +428,13 @@ for my $s (sort keys %idtype_keys) {
 print $H <<"EOF";
 };
 
-#if 0
+//#if 0
 /* IdentifierType
    Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable, Deprecated
    Allowed: keep Recommended, Inclusion
    Maybe allow by request Technical
 */
-const struct range_short idtype_list[] = {
+static const struct range_short idtype_list[] = {
 EOF
 sub idtype_bits {
   my $s = shift;
@@ -434,7 +455,7 @@ for my $r (@IDTYPES) {
 };
 printf $H <<"EOF", $b, $s;
 }; // %u ranges, %u single codepoints
-#endif
+//#endif
 EOF
 close $H;
 
