@@ -55,7 +55,7 @@ for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
     $range->[1] = $to;
     $_ID[$#_ID] = $range;
   }
-  # check if the entry can be merged into the previous
+  # check if the entry can be merged into the previous. The UCD tracks the history, we don't care
   if ($#_ID - 1 >= 0) {
     my $prev = $_ID[$#_ID - 1];
     my $last = $_ID[$#_ID];
@@ -81,7 +81,7 @@ while (<$IDSTAT>) {
   elsif (/^([0-9A-F]{4,5})\s+; Allowed\s+#/) {
     push @ALLOWED, [hex($1), hex($1)];
   }
-  # check if the entry can be merged into the previous
+  # check if the entry can be merged into the previous. The UCD tracks the history, we don't care
   if ($#ALLOWED - 1 >= 0) {
     my $prev = $ALLOWED[$#ALLOWED - 1];
     my $last = $ALLOWED[$#ALLOWED];
