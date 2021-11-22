@@ -407,7 +407,12 @@ for my $s (sort keys %idtype_keys) {
 print $H <<"EOF";
 };
 
-// IdentifierType
+#if 0
+/* IdentifierType
+   Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable, Deprecated
+   Allowed: keep Recommended, Inclusion
+   Maybe allow by request Technical
+*/
 const struct range_short idtype_list[] = {
 EOF
 sub idtype_bits {
@@ -429,6 +434,7 @@ for my $r (@IDTYPES) {
 };
 printf $H <<"EOF", $b, $s;
 }; // %u ranges, %u single codepoints
+#endif
 EOF
 close $H;
 
@@ -447,7 +453,6 @@ while (<$INC>) {
 }
 close $INC;
 
-# FIXME
 sub patch_ucd_major {
   my ($inc, $version) = @_;
   return unless $version;

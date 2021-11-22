@@ -1918,7 +1918,7 @@ const struct range_bool allowed_id_list[] = {
   {0x038C, 0x038C},
   {0x038E, 0x03A1},
   {0x03A3, 0x03CE},
-  {0x03FC, 0x03FF},
+  {0x03FC, 0x03FF}, // FIXME merge!!!
   {0x0400, 0x0400},
   {0x0401, 0x040C},
   {0x040D, 0x040D},
@@ -2438,7 +2438,12 @@ enum u8id_idtypes {
   U8ID_Uncommon_Use = 1024,
 };
 
-// IdentifierType
+#if 0
+/* IdentifierType
+   Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable, Deprecated
+   Allowed: keep Recommended, Inclusion
+   Maybe allow by request Technical
+*/
 const struct range_short idtype_list[] = {
   {0x0009, 0x000D, U8ID_Not_XID },
   {0x0020, 0x0026, U8ID_Not_XID },
@@ -3999,3 +4004,4 @@ const struct range_short idtype_list[] = {
   {0xE0020, 0xE007F, U8ID_Default_Ignorable },
   {0xE0100, 0xE01EF, U8ID_Default_Ignorable },
 }; // 1558 ranges, 0 single codepoints
+#endif

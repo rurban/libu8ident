@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "u8id_private.h"
 
 #include "scripts.h"
@@ -63,30 +64,42 @@ static uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, con
     if (cp >= s->from && cp <= s->to)
       return s->scr;
     if (cp <= s->to) // s is sorted. not found
-      return 0;
+      return 255;
     s++;
   }
-  return 0;
+  return 255;
 }
 #endif
 
-static uint8_t sc_search(const uint32_t cp, const struct sc *sc_list, const size_t len) {
-  size_t n = len;
-  struct sc *p, *pos;
-  p = (struct sc *)sc_list;
+static struct sc * binary_search(const uint32_t cp, const char *list, const size_t len, const size_t size) {
+  int n = (int)len;
+  const char *p = list;
+  struct sc *pos;
   while (n > 0) {
-    pos = &p[n/2];
-    assert(pos->from <= pos->to);
+    pos = (struct sc *)(p + size * (n / 2));
     if (cp >= pos->from && cp <= pos->to)
-      return pos->scr;
+      return pos;
     else if (cp < pos->from)
       n /= 2;
     else {
-      p = pos;
+      p = (char*)pos + size;
       n -= (n / 2) + 1;
     }
   }
-  return SC_Unknown;
+  return NULL;
+}
+
+static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list, const size_t len) {
+  const struct sc* sc = (struct sc*)binary_search(cp, (char*)sc_list, len, sizeof(*sc_list));
+  return sc ? sc->scr : 255;
+}
+static inline bool range_bool_search(const uint32_t cp, const struct range_bool *list, const size_t len) {
+  const char* r = (char*)binary_search(cp, (char*)list, len, sizeof(*list));
+  return r ? true : false;
+}
+static uint16_t range_short_search(const uint32_t cp, const struct range_short *list, const size_t len) {
+  const struct range_short* r = (struct range_short*)binary_search(cp, (char*)list, len, sizeof(*list));
+  return r ? r->type : UINT16_MAX;
 }
 
 uint8_t u8ident_get_script(const uint32_t cp) {
@@ -96,6 +109,17 @@ uint8_t u8ident_get_script(const uint32_t cp) {
   else
 #endif
     return sc_search(cp, nonxid_script_list, sizeof(nonxid_script_list)/sizeof(*nonxid_script_list));
+}
+
+/* list of script indices */
+const char * u8ident_get_scx(const uint32_t cp) {
+  const struct scx* scx = (struct scx*)binary_search(cp, (char*)scx_list,
+                                           sizeof(scx_list)/sizeof(*scx_list), sizeof(*scx_list));
+  return scx ? scx->list : NULL;
+}
+
+bool u8ident_is_allowed(const uint32_t cp) {
+  return range_bool_search(cp, allowed_id_list, sizeof(allowed_id_list)/sizeof(*allowed_id_list));
 }
 
 const char* u8ident_script_name(const int scr) {
