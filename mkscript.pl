@@ -31,7 +31,7 @@ open my $IDTYPE, "<", $idtype or die "$idtype $!";
 while (<$IDTYPE>) {
   if (/^#\tIdentifier_Type:/) { $started++; }
   next unless $started;
-  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; (\w+)\s+#/) {
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; ([\w ]+)\s+#/) {
     ($from, $to, $id) = (hex($1), hex($2), $3);
     push @IDTYPES, [$from, $to, $id];
     # TODO match from-to with @SC ranges
@@ -40,6 +40,7 @@ while (<$IDTYPE>) {
 close $IDTYPE;
 # Collapse neighbors. sort the scripts by ->from
 my (@_ID, $oldid, $oldto);
+my %idtype_values = map { $_->[2] => 1 } @IDTYPES;
 for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
   my ($from, $to, $id) = ($r->[0], $r->[1], $r->[2]);
   if (($from != $oldto + 1) or ($oldid ne $id)) { # honor holes
@@ -92,7 +93,7 @@ sub is_allowed {
 # Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable, Deprecated
 # Allowed: keep Recommended, Inclusion
 # Maybe allow by request Technical
-sub ok_idtype {
+sub ok_idtype_cp {
   my $cp = shift;
   for my $r (@IDTYPES) {
     if ($cp >= $r->[0] and $cp <= $r->[1]) {
@@ -102,6 +103,13 @@ sub ok_idtype {
     }
   }
   return 0; # not a character
+}
+
+sub ok_idtype {
+  my $id = shift;
+  return 0 if $id =~ /\b(Limited_Use|Obsolete|Exclusion|Not_XID|Not_NFKC|Uncommon_Use|Default_Ignorable|Deprecated)\b/;
+  return 1 if $id =~ /\b(Recommended|Inclusion|Technical)\b/;
+  return 0; # unknown identifier type
 }
 
 # TOOD: generate these 2 lists from the IDTYPES
@@ -253,6 +261,17 @@ struct scx {
   const char *list; // indices
 };
 
+struct range_bool {
+  uint32_t from;
+  uint32_t to;
+};
+
+struct range_short {
+  uint32_t from;
+  uint32_t to;
+  uint16_t type;
+};
+
 /* Provide a mapping of the $num_scripts Script properties to an index byte.
    Sorted into usages.
  */
@@ -339,27 +358,45 @@ print $H <<"EOF";
 };
 
 // Allowed scripts from IdentifierStatus.txt. 1 if first is recommended, 0 if not.
-const struct sc allowed_scripts_list[] = {
+// This really should be a binary lookup.
+const struct range_bool allowed_id_list[] = {
 EOF
 for my $r (@ALLOWED) {
-  #my $split = 0;
-  $from = $r->[0];
-  my $code1 = ok_idtype($from);
-  #if ($from != $to) {
-  #  my $second = $from + 1;
-  #  for my $cp ($second .. $to) {
-  #    my $code = ok_idtype($cp);
-  #    if ($code != $code1) {
-  #      $split++;
-  #      printf $H "  {0x%04X, 0x%04X, %d},\n", $from, $cp-1, $code1;
-  #      # FIXME collapse rest also
-  #      # printf $H "  {0x%04X, 0x%04X, %d},\n", $cp, $cp, $code;
-  #    }
-  #  }
-  #}
-  #if (!$split) {
-    printf $H "  {0x%04X, 0x%04X, %d},\n", $from, $r->[1], $code1;
-  #}
+  printf $H "  {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+};
+print $H <<"EOF";
+};
+
+// IdentifierType bit-values
+enum u8id_idtypes {
+EOF
+my $i = 1;
+my %idtype_keys;
+for my $s (keys %idtype_values) {
+  for (split(" ", $s)) {
+    $idtype_keys{$_} = 1;
+  }
+}
+for my $s (sort keys %idtype_keys) {
+  printf $H "  U8ID_%s = %u,\n", $s, $i;
+  $i *= 2;
+};
+print $H <<"EOF";
+};
+
+// IdentifierType
+const struct range_short idtype_list[] = {
+EOF
+sub idtype_bits {
+  my $s = shift;
+  my $ret = "";
+  for (split " ", $s) {
+    $ret .= " | U8ID_$_";
+  }
+  substr($ret, 3);
+}
+for my $r (@IDTYPES) {
+  printf $H "  {0x%04X, 0x%04X, %s },\n", $r->[0], $r->[1], idtype_bits($r->[2]);
 };
 print $H <<"EOF";
 };
