@@ -343,7 +343,7 @@ print $H <<"EOF";
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
-const struct scx scriptx_list[] = {
+const struct scx scx_list[] = {
 EOF
 for my $r (@SCXR) {
   my $code;
@@ -357,8 +357,7 @@ for my $r (@SCXR) {
 print $H <<"EOF";
 };
 
-// Allowed scripts from IdentifierStatus.txt. 1 if first is recommended, 0 if not.
-// This really should be a binary lookup.
+// Allowed scripts from IdentifierStatus.txt.
 const struct range_bool allowed_id_list[] = {
 EOF
 for my $r (@ALLOWED) {

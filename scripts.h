@@ -1745,7 +1745,7 @@ const struct sc nonxid_script_list[] = {
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
-const struct scx scriptx_list[] = {
+const struct scx scx_list[] = {
   {0x0342, 0x0342, "\x0b"},	// Grek
   {0x0345, 0x0345, "\x0b"},	// Grek
   {0x0363, 0x036F, "\x02"},	// Latn
@@ -1869,8 +1869,7 @@ const struct scx scriptx_list[] = {
   {0x1F250, 0x1F251, "\x0f"},	// Hani
 };
 
-// Allowed scripts from IdentifierStatus.txt. 1 if first is recommended, 0 if not.
-// This really should be a binary lookup.
+// Allowed scripts from IdentifierStatus.txt.
 const struct range_bool allowed_id_list[] = {
   {0x0027, 0x0027},
   {0x002D, 0x002E},
