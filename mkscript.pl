@@ -324,27 +324,40 @@ print $H <<"EOF";
 // The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or non-codepoints.
 const struct sc xid_script_list[] = {
 EOF
+my ($b, $s);
 for my $r (@SCR) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
   printf $H "  {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
 };
-print $H <<"EOF";
-};
+printf $H <<"EOF", $b, $s;
+}; // %u ranges, %u single codepoints
 #endif
 
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
 // as the parser already disallowed such codepoints.
 const struct sc nonxid_script_list[] = {
 EOF
+($b, $s) = (0, 0);
 for my $r (@SCRF) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
   printf $H "  {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
 };
-print $H <<"EOF";
-};
+printf $H <<"EOF", $b, $s;
+}; // %u ranges, %u single codepoints
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
 const struct scx scx_list[] = {
 EOF
+($b, $s) = (0, 0);
 for my $r (@SCXR) {
   my $code;
   my @list = split " ", $r->[2];
@@ -352,19 +365,30 @@ for my $r (@SCXR) {
     my $long = $PVA{$short};
     $code .= sprintf("\\x%02x", $SC{$long});
   }
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
   printf $H "  {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
 };
-print $H <<"EOF";
-};
+printf $H <<"EOF", $b, $s;
+}; // %u ranges, %u single codepoints
 
 // Allowed scripts from IdentifierStatus.txt.
 const struct range_bool allowed_id_list[] = {
 EOF
+($b, $s) = (0, 0);
 for my $r (@ALLOWED) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
   printf $H "  {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
 };
-print $H <<"EOF";
-};
+printf $H <<"EOF", $b, $s;
+}; // %u ranges, %u single codepoints
 
 // IdentifierType bit-values
 enum u8id_idtypes {
@@ -394,11 +418,17 @@ sub idtype_bits {
   }
   substr($ret, 3);
 }
+($b, $s) = (0, 0);
 for my $r (@IDTYPES) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
   printf $H "  {0x%04X, 0x%04X, %s },\n", $r->[0], $r->[1], idtype_bits($r->[2]);
 };
-print $H <<"EOF";
-};
+printf $H <<"EOF", $b, $s;
+}; // %u ranges, %u single codepoints
 EOF
 close $H;
 

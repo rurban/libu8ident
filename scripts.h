@@ -1314,7 +1314,7 @@ const struct sc xid_script_list[] = {
   {0xE0001, 0xE0001, 0},	// Common
   {0xE0020, 0xE007F, 0},	// Common
   {0xE0100, 0xE01EF, 1},	// Inherited
-};
+}; // 812 ranges, 130 single codepoints
 #endif
 
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
@@ -1741,7 +1741,7 @@ const struct sc nonxid_script_list[] = {
   {0x20000, 0x3134A, 15},	// Han
   {0xE0001, 0xE007F, 0},	// Common
   {0xE0100, 0xE01EF, 1},	// Inherited
-};
+}; // 367 ranges, 54 single codepoints
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
@@ -1867,7 +1867,7 @@ const struct scx scx_list[] = {
   {0x1BCA0, 0x1BCA3, "\x32"},	// Dupl
   {0x1D360, 0x1D371, "\x0f"},	// Hani
   {0x1F250, 0x1F251, "\x0f"},	// Hani
-};
+}; // 56 ranges, 65 single codepoints
 
 // Allowed scripts from IdentifierStatus.txt.
 const struct range_bool allowed_id_list[] = {
@@ -2421,7 +2421,7 @@ const struct range_bool allowed_id_list[] = {
   {0x2B820, 0x2CEA1},
   {0x2CEB0, 0x2EBE0},
   {0x30000, 0x3134A},
-};
+}; // 385 ranges, 165 single codepoints
 
 // IdentifierType bit-values
 enum u8id_idtypes {
@@ -3998,4 +3998,4 @@ const struct range_short idtype_list[] = {
   {0x30000, 0x3134A, U8ID_Recommended },
   {0xE0020, 0xE007F, U8ID_Default_Ignorable },
   {0xE0100, 0xE01EF, U8ID_Default_Ignorable },
-};
+}; // 1558 ranges, 0 single codepoints
