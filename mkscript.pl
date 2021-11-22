@@ -36,9 +36,13 @@ while (<$IDTYPE>) {
     push @IDTYPES, [$from, $to, $id];
     # TODO match from-to with @SC ranges
   }
+  elsif (/^([0-9A-F]{4,5})\s+; ([\w ]+)\s+#/) {
+    ($from, $id) = (hex($1), $2);
+    push @IDTYPES, [$from, $from, $id];
+  }
 }
 close $IDTYPE;
-# Collapse neighbors. sort the scripts by ->from
+# Collapse neighbors. sort the list by ->from
 my (@_ID, $oldid, $oldto);
 my %idtype_values = map { $_->[2] => 1 } @IDTYPES;
 for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
@@ -50,6 +54,16 @@ for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
     my $range = $_ID[$#_ID];
     $range->[1] = $to;
     $_ID[$#_ID] = $range;
+  }
+  # check if the entry can be merged into the previous
+  if ($#_ID - 1 >= 0) {
+    my $prev = $_ID[$#_ID - 1];
+    my $last = $_ID[$#_ID];
+    if ($prev->[1] + 1 >= $last->[0] and $prev->[2] eq $last->[2]) {
+      $prev->[1] = $last->[1];
+      $prev->[2] = $last->[2];
+      pop @_ID;
+    }
   }
 }
 @IDTYPES = @_ID;
@@ -77,7 +91,7 @@ while (<$IDSTAT>) {
     }
   }
 }
-close $IDTYPE;
+close $IDSTAT;
 
 sub search {
   my ($cp, $listref) = @_;
