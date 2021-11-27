@@ -37,7 +37,7 @@
 #define Hangul_IsT(u)  ((Hangul_TBase  < (u)) && ((u) <= Hangul_TFinal))
 
 /* much better would be the simple Hangul_IsS(cp) check */
-/*** GENERATED CODE for all Hangul codepoints ***/
+/*** perl5/cperl GENERATED CODE for all Hangul codepoints ***/
 #define is_HANGUL_cp_high(cp)                               \
     ( ( 0x1100 <= cp && cp <= 0x11FF ) || ( 0x11FF < cp &&  \
     ( 0x302E == cp || ( 0x302E < cp &&                      \

@@ -1,3 +1,3 @@
 #include <stddef.h>
 
-#define EXTERN
+#define EXTERN extern
