@@ -1,4 +1,4 @@
-libu8ident - Follow unicode security guidelines for identifiers
+libu8ident - Check unicode security guidelines for identifiers
 ===============================================================
 
 without adding the full Unicode database.
@@ -249,7 +249,7 @@ We don't support the normalization variants FCC nor FCD.
 
 The character to script lookup is done with a sorted list of ranges, for less
 space.  This is also generated from the current UCD.  The internally used script
-indices are arbitrarily created via mkscript.pl from the current UCD, sorted
+indices are arbitrarily created via mkscripts.pl from the current UCD, sorted
 into Recommended Scripts (sorted by codepoints), Not Recommended Scripts (sorted
 alphabetically) and Limited Use Scripts (sorted by codepoint).
 

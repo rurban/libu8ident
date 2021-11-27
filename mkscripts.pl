@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# libu8ident - Follow unicode security guidelines for identifiers.
+# libu8ident - Check unicode security guidelines for identifiers.
 # Copyright 2014, 2021 Reini Urban
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -265,7 +265,7 @@ for my $r (@SCR) {
 open my $H, ">", "scripts.h" or die "writing scripts.h $!";
 print $H <<"EOF";
 /* ex: set ro ft=c: -*- mode: c; buffer-read-only: t -*- */
-/* libu8ident - Follow unicode security guidelines for identifiers.
+/* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2014, 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 

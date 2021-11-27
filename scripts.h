@@ -1,5 +1,5 @@
 /* ex: set ro ft=c: -*- mode: c; buffer-read-only: t -*- */
-/* libu8ident - Follow unicode security guidelines for identifiers.
+/* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2014, 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
