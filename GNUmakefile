@@ -51,5 +51,5 @@ regen-norm:
 regen-scripts:
 	wget -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
 	wget -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
-	wget -N https://www.unicode.org/Public/UNIDATA/PropValueAliases.txt
+	wget -N http://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
 	$(PERL) mkscripts.pl

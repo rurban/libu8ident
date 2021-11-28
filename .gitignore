@@ -16,7 +16,7 @@ u8idscr-asan.o
 /test-asan
 Scripts.txt
 ScriptExtensions.txt
-PropValueAliases.txt
+PropertyValueAliases.txt
 IdentifierType.txt
 IdentifierStatus.txt
 confusables.txt
