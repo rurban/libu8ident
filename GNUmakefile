@@ -6,7 +6,8 @@ RANLIB := ranlib
 PERL := perl
 
 HEADER = include/u8ident.h
-HDRS = u8id_private.h hangul.h un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h scripts.h
+NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
+HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h
 SRC = u8ident.c u8idscr.c u8idnorm.c
 
 libu8ident.a: $(SRC) $(HEADER) $(HDRS)
@@ -40,8 +41,12 @@ clean:
 	rm u8ident-asan.o u8idnorm-asan.o u8idscr-asan.o libu8ident-asan.a test-asan
 
 # Create the normalization headers via a current perl
-regen-norm:
-	git clone https://github.com/rurban/Unicode-Normalize
+Unicode-Normalize: un8ifcan.h
+	if test -d Unicode-Normalize; then \
+	  cd Unicode-Normalize && git pull --rebase && cd ..; \
+	else \
+	  git clone https://github.com/rurban/Unicode-Normalize; fi
+regen-norm: Unicode-Normalize un8ifcan.h
 	cd Unicode-Normalize && \
 	  $(PERL) Makefile.PL && \
 	  make && \
