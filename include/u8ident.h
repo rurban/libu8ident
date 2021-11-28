@@ -13,18 +13,22 @@ enum u8id_options {
   U8ID_NFKC = 0,  // by the default the compatibility composed normalization, as in Python 3
   U8ID_NFD  = 1,  // the longer, decomposed normalization, as in the previous Apple HPFS filesystem
   U8ID_NFC  = 2,  // the shorter composed normalization
+  U8ID_NFKD = 3,  // the longer compatibility decomposed normalization
+  U8ID_FCD  = 4,  // the faster variants
+  U8ID_FCC  = 5,
 
-  U8ID_PROFILE_2 = 4,  // Single Script only
-  U8ID_PROFILE_3 = 8,  // Highly Restrictive
-  U8ID_PROFILE_4 = 16, // Moderately Restrictive
-  U8ID_PROFILE_5 = 32, // Minimally Restrictive
-  U8ID_PROFILE_6 = 64, // Unrestricted
+  U8ID_PROFILE_2 = 8,  // Single Script only
+  U8ID_PROFILE_3 = 16,  // Highly Restrictive
+  U8ID_PROFILE_4 = 32, // Moderately Restrictive
+  U8ID_PROFILE_5 = 64, // Minimally Restrictive
+  U8ID_PROFILE_6 = 128, // Unrestricted
 
-  U8ID_CHECK_XID = 128, // optional, the parser should do that. Without, the script checker
+  U8ID_CHECK_XID = 256, // optional, the parser should do that. Without, the script checker
                         // can be much smaller.
-  U8ID_WARN_CONFUSABLE  = 256, // not yet implemented
-  U8ID_ERROR_CONFUSABLE = 512, //       -"-
+  U8ID_WARN_CONFUSABLE  = 512,  // not yet implemented
+  U8ID_ERROR_CONFUSABLE = 1024, //       -"-
 };
+#define U8ID_NFMASK 7
 
 /* Initialize the library with a bitmask of options, which define the
    performed checks. Recommended is `U8ID_PROFILE_4` only. */
@@ -34,7 +38,7 @@ int u8ident_init(enum u8id_options);
    not really identifiable anymore, and keep them under 80 or even
    less. Some filesystems do allow now 32K identifiers, which is a
    glaring security hole, waiting to be exploited */
-int u8ident_set_maxlength(unsigned maxlen);
+void u8ident_set_maxlength(unsigned maxlen);
 
 
 /* Generates a new identifier document/context/directory, which
@@ -100,7 +104,7 @@ int u8ident_check_buf(const char* buf, int len);
 
 /* Returns a freshly allocated normalized string, in the option defined at `u8ident_init`.
    Defaults to U8ID_NFKC. */
-uint8_t* u8ident_normalize(const char* buf, int len);
+char* u8ident_normalize(const char* buf, int len);
 
 /* Returns a string for the combinations of the seen scripts in this
    context whenever a mixed script error occurs.  The default string may

@@ -9,10 +9,6 @@ u8ident.o
 u8idnorm.o
 u8idscr.o
 /test
-libu8ident-asan.a
-u8ident-asan.o
-u8idnorm-asan.o
-u8idscr-asan.o
 /test-asan
 Scripts.txt
 ScriptExtensions.txt

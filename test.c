@@ -2,6 +2,8 @@
    Copyright 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 */
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
@@ -10,6 +12,7 @@
 #include "scripts.h"
 
 #define ARRAY_SIZE(x) sizeof(x)/sizeof(*x)
+static char buf[128]; // for hex display
 
 // private access
 uint8_t u8ident_get_script(uint32_t cp);
@@ -82,9 +85,186 @@ void test_scripts_no_init(void) {
   }
 }
 
-// TODO check normalizations, mixed-script check, contexts, options, XID.
+static int sign(int i) {
+  return (i < 0) ? -1 : (i == 0) ? 0 : 1;
+}
+static char* xstr(const char *s) {
+  unsigned i;
+  memset(buf, 0, sizeof(buf));
+  for (i=0; i<strlen(s); i++) {
+    snprintf(&buf[i*2], 128-(i*2), "%02x", (unsigned char)s[i]);
+  }
+  //buf[i] = 0;
+  return buf;
+}
+
+struct norms_t {
+  const char *id;
+  const char *norm;
+  const int result;
+};
+
+static void testnorm(const char* name, const struct norms_t *testids) {
+  struct norms_t *p;
+  for (p = (struct norms_t*)testids; p->id; p++) {
+    char *norm = u8ident_normalize(p->id, strlen(p->id));
+    assert(norm);
+    if (strcmp(p->norm, norm) != 0) {
+      printf("%s[%ld]: %s [%s] != ", name, p - testids,
+             p->norm, xstr(p->norm));
+      printf("%s [%s]\n", norm, xstr(norm));
+    }
+    if (sign(strcmp(p->id, norm)) != sign(p->result))
+      printf("%s[%ld]: %s [%s] => %d\n", name, p - testids,
+             p->id, xstr(p->id), strcmp(p->id, norm));
+    if (strcmp(name, "FCD")) {
+      assert(strcmp(norm, p->norm) == 0);
+      assert(sign(strcmp(p->id, norm)) == sign(p->result));
+    }
+    free(norm);
+  }
+}
+
+/*
+all differences: unichars -a '\pL' 'NFC ne NFKC'
+
+sub wstr($) {
+  join('',map{sprintf'\x%02x',$_} unpack 'W*', encode_utf8 $_[0]);
+}
+./mktest-norm.pl
+Café [\x43\x61\x66\x65\xcc\x81]:
+NFC:  Café [\x43\x61\x66\xc3\xa9]
+NFKC: Café [\x43\x61\x66\xc3\xa9]
+FCC:  Café [\x43\x61\x66\xc3\xa9]
+NFD:  Café [\x43\x61\x66\x65\xcc\x81]
+NFKD: Café [\x43\x61\x66\x65\xcc\x81]
+FCD:  Café [\x43\x61\x66\x65\xcc\x81]
+
+Café [\x43\x61\x66\xc3\xa9]:
+NFC:  Café [\x43\x61\x66\xc3\xa9]
+NFKC: Café [\x43\x61\x66\xc3\xa9]
+FCC:  Café [\x43\x61\x66\xc3\xa9]
+NFD:  Café [\x43\x61\x66\x65\xcc\x81]
+NFKD: Café [\x43\x61\x66\x65\xcc\x81]
+FCD:  Café [\x43\x61\x66\xc3\xa9]
+
+ᾇ [\xe1\xbe\x87]:
+NFC:  ᾇ [\xe1\xbe\x87]
+NFKC: ᾇ [\xe1\xbe\x87]
+FCC:  ᾇ [\xe1\xbe\x87]
+NFD:  ᾇ [\xce\xb1\xcc\x94\xcd\x82\xcd\x85]
+NFKD: ᾇ [\xce\xb1\xcc\x94\xcd\x82\xcd\x85]
+FCD:  ᾇ [\xe1\xbe\x87]
+
+ᾇ [\xce\xb1\xcc\x94\xcd\x82\xcd\x85]:
+NFC:  ᾇ [\xe1\xbe\x87]
+NFKC: ᾇ [\xe1\xbe\x87]
+FCC:  ᾇ [\xe1\xbe\x87]
+NFD:  ᾇ [\xce\xb1\xcc\x94\xcd\x82\xcd\x85]
+NFKD: ᾇ [\xce\xb1\xcc\x94\xcd\x82\xcd\x85]
+FCD:  ᾇ [\xce\xb1\xcc\x94\xcd\x82\xcd\x85]
+
+ǅŀ [\xc7\x85\xc5\x80]: \x{1c5}\x{140}
+NFC:  ǅŀ [\xc7\x85\xc5\x80]
+NFKC: Džl· [\x44\xc5\xbe\x6c\xc2\xb7]
+FCC:  ǅŀ [\xc7\x85\xc5\x80]
+NFD:  ǅŀ [\xc7\x85\xc5\x80]
+NFKD: Džl· [\x44\x7a\xcc\x8c\x6c\xc2\xb7]
+FCD:  ǅŀ [\xc7\x85\xc5\x80]
+
+Džl· [\x44\xc5\xbe\x6c\xc2\xb7]:
+NFC:  Džl· [\x44\xc5\xbe\x6c\xc2\xb7]
+NFKC: Džl· [\x44\xc5\xbe\x6c\xc2\xb7]
+FCC:  Džl· [\x44\xc5\xbe\x6c\xc2\xb7]
+NFD:  Džl· [\x44\x7a\xcc\x8c\x6c\xc2\xb7]
+NFKD: Džl· [\x44\x7a\xcc\x8c\x6c\xc2\xb7]
+FCD:  Džl· [\x44\xc5\xbe\x6c\xc2\xb7]
+ */
+void test_norm_nfkc(void) {
+  const struct norms_t testids[] = {
+    {"abcd", "abcd", 0},
+    {"Cafe" "\xcc\x81", "Caf" "\xc3\xa9", -1}, // U+301 => U+E9
+    {"Caf" "\xc3\xa9", "Caf" "\xc3\xa9", 0},   // U+E9  => U+E9
+    // Greek Small Letter Alpha with Dasia and Perispomeni and Ypogegrammeni
+    {"\xce\xb1" "\xcc\x94" "\xcd\x85" "\xcd\x82", "\xe1\xbe\x87", -19}, // ᾇ => U+1f87 with reorder
+    {"\xc7\x85\xc5\x80", "\x44\xc5\xbe\x6c\xc2\xb7", 1}, // ǅŀ
+    {NULL, NULL, 0},
+  };
+  testnorm("NFKC", testids);
+}
+void test_norm_nfc(void) {
+  const struct norms_t testids[] = {
+    {"abcd", "abcd", 0},
+    {"Cafe" "\xcc\x81", "Caf" "\xc3\xa9", -1}, // U+301 => U+E9
+    {"Caf" "\xc3\xa9", "Caf" "\xc3\xa9", 0},   // U+E9  => U+E9
+    {"\xce\xb1" "\xcc\x94" "\xcd\x85" "\xcd\x82", "\xe1\xbe\x87", -19}, // => U+1f87 with reorder
+    {"\x44\x7a\xcc\x8c\x6c\xc2\xb7", "\x44\xc5\xbe\x6c\xc2\xb7", -75}, // ǅŀ
+    {NULL, NULL, 0},
+  };
+  u8ident_init(U8ID_NFC | U8ID_PROFILE_4);
+  testnorm("NFC", testids);
+}
+void test_norm_fcc(void) {
+  const struct norms_t testids[] = {
+    {"abcd", "abcd", 0},
+    {"Cafe" "\xcc\x81", "Caf" "\xc3\xa9", -1}, // U+301 => U+E9
+    {"Caf" "\xc3\xa9",  "Caf" "\xc3\xa9", 0},  // U+E9  => U+E9
+    {"\xce\xb1\xcc\x94\xcd\x82\xcd\x85", "\xe1\xbe\x87", -19},   // U+1f87
+    {"\xc7\x85\xc5\x80", "\xc7\x85\xc5\x80", 0}, // ǅŀ
+    {NULL, NULL, 0},
+  };
+  u8ident_init(U8ID_FCC | U8ID_PROFILE_4);
+  testnorm("FCC", testids);
+}
+void test_norm_nfkd(void) {
+  const struct norms_t testids[] = {
+    {"abcd", "abcd", 0},
+    {"Cafe" "\xcc\x81", "Cafe" "\xcc\x81", 0},  // U+301 => U+301
+    {"Caf" "\xc3\xa9",  "Cafe" "\xcc\x81", 94},  // U+E9  => U+301
+    {"\xe1\xbe\x87", "\xce\xb1\xcc\x94\xcd\x82\xcd\x85", 19}, // U+1f87 => exc: α U+03B1 U+0314 U+0342 U+0345
+    {"\xc7\x85\xc5\x80", "\x44\x7a\xcc\x8c\x6c\xc2\xb7", 1}, // ǅŀ
+    {"\x44\xc5\xbe\x6c\xc2\xb7", "\x44\x7a\xcc\x8c\x6c\xc2\xb7", 1}, // ǅŀ
+    {NULL, NULL, 0},
+  };
+  u8ident_init(U8ID_NFKD | U8ID_PROFILE_4);
+  testnorm("NFKD", testids);
+}
+void test_norm_nfd(void) {
+  const struct norms_t testids[] = {
+    {"abcd", "abcd", 0},
+    {"Cafe" "\xcc\x81", "Cafe" "\xcc\x81", 0},  // U+301 => U+301
+    {"Caf" "\xc3\xa9",  "Cafe" "\xcc\x81", 94}, // U+E9  => U+301
+    {"\xe1\xbe\x87", "\xce\xb1\xcc\x94\xcd\x82\xcd\x85", 19},   // U+1f87 => exc: α U+03B1 U+0314 U+0342 U+0345
+    {"\xc7\x85\xc5\x80", "\xc7\x85\xc5\x80", 0}, // ǅŀ
+    {"\x44\xc5\xbe\x6c\xc2\xb7", "\x44\x7a\xcc\x8c\x6c\xc2\xb7", 1}, // ǅŀ
+    {NULL, NULL, 0},
+  };
+  u8ident_init(U8ID_NFD | U8ID_PROFILE_4);
+  testnorm("NFD", testids);
+}
+void test_norm_fcd(void) {
+  const struct norms_t testids[] = {
+    {"abcd", "abcd", 0},
+    {"Cafe" "\xcc\x81", "Cafe" "\xcc\x81", 0}, // U+301 => U+301
+    {"Caf" "\xc3\xa9",  "Caf" "\xc3\xa9", 0},  // U+E9  => U+E9 TODO
+    {"\xe1\xbe\x87", "\xe1\xbe\x87", 0},       // U+1f87 TODO
+    {"\xce\xb1\xcc\x94\xcd\x82\xcd\x85", "\xce\xb1\xcc\x94\xcd\x82\xcd\x85", 0},   // U+1f87
+    {"\xc7\x85\xc5\x80", "\xc7\x85\xc5\x80", 0}, // ǅŀ
+    {NULL, NULL, 0},
+  };
+  u8ident_init(U8ID_FCD | U8ID_PROFILE_4);
+  testnorm("FCD", testids);
+}
+
+// TODO mixed-script check, contexts, options, XID.
 
 int main(void) {
   test_scripts_no_init();
+  test_norm_nfkc();
+  test_norm_nfc();
+  test_norm_fcc();
+  test_norm_nfkd();
+  test_norm_nfd();
+  test_norm_fcd();
   return 0;
 }
