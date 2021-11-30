@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include "u8ident.h"
-#define TEST
+#define EXT_SCRIPTS
 #include "scripts.h"
 
 #define ARRAY_SIZE(x) sizeof(x)/sizeof(*x)
@@ -258,6 +258,24 @@ void test_norm_fcd(void) {
 
 // TODO mixed-script check, contexts, options, XID.
 
+// latin plus just greek
+void test_mixed_scripts(void) {
+  u8ident_init(U8ID_DEFAULT_OPTS);
+  assert(u8ident_check((const uint8_t*)"abcd") == 0);
+  assert(u8ident_check((const uint8_t*)"abcᴧ") == 0);
+  assert(u8ident_check((const uint8_t*)"Cafe\xcc\x81") == 1);
+  if (u8ident_check((const uint8_t*)"abcᴧᴫ") != -2)  // Greek plus Cyrillic
+    printf("ERROR Greek plus Cyrillic\n");
+}
+
+// check if mixed scripts per ctx work
+void test_mixed_scripts_with_ctx(void) {
+  u8ident_init(U8ID_DEFAULT_OPTS);
+  int ctx = u8ident_new_ctx();
+  assert(u8ident_get_script(0x41) == 2);
+  assert(u8ident_get_script(0x5a) == 2);
+}
+
 int main(void) {
   test_scripts_no_init();
   test_norm_nfkc();
@@ -266,5 +284,7 @@ int main(void) {
   test_norm_nfkd();
   test_norm_nfd();
   test_norm_fcd();
+  test_mixed_scripts();
+  test_mixed_scripts_with_ctx();
   return 0;
 }

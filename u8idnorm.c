@@ -82,7 +82,7 @@ static int cp_len(const uint32_t cp) {
 }
 
 /* convert utf8 to unicode codepoint (to_cp) */
-static uint32_t dec_utf8(char** strp) {
+uint32_t dec_utf8(char** strp) {
     const unsigned char *str = (const unsigned char *)*strp;
     int bytes = utf8_len(*str);
     int shift;

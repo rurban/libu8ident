@@ -17,16 +17,9 @@
 
 extern unsigned s_u8id_options;
 // not yet thread-safe
+struct ctx_t ctx[5]; // pre-allocate 5 contexts
 static int i_ctx = 0;
-struct ctx_t {
-  uint8_t count;
-  union {
-    uint64_t scr64;   // room for 8 scripts
-    uint8_t  scr8[8];
-    uint8_t  *u8p;    // or if count > 8 
-  };
-} ctx[5]; // pre-allocate 5 contexts
-struct ctx_t *ctxp; // if more than 5 contexts
+struct ctx_t *ctxp = NULL; // if more than 5 contexts
 
 /* Generates a new identifier document/context/directory, which
    initializes a new list of seen scripts. */
@@ -53,6 +46,21 @@ EXTERN int u8ident_set_ctx(int i) {
   }
   else
     return -1;
+}
+
+/* Changes to the context previously generated with `u8ident_new_ctx`. */
+struct ctx_t * u8ident_ctx(void) {
+  return (i_ctx < 5) ? &ctx[i_ctx] : &ctxp[i_ctx];
+}
+
+bool u8ident_has_script(const uint8_t scr) {
+  struct ctx_t *ctx = u8ident_ctx();
+  uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
+  for (int i=0; i < ctx->count; i++) {
+    if (scr == u8p[i])
+      return true;
+  }
+  return false;
 }
 
 #if 0

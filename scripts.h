@@ -33,350 +33,351 @@ struct range_short {
 /* Provide a mapping of the 161 Script properties to an index byte.
    Sorted into usages.
  */
-#ifndef TEST
+#ifndef EXT_SCRIPTS
 const char* const all_scripts[] = {
   // Recommended Scripts (not need to add them)
   // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
-#define FIRST_RECOMMENDED_SCRIPT 0
-#define SC_Common     0
   "Common",
-#define SC_Inherited  1
   "Inherited",
-#define SC_Latin      2
   "Latin",
-#define SC_Arabic     3
   "Arabic",
-#define SC_Armenian   4
   "Armenian",
-#define SC_Bengali    5
   "Bengali",
-#define SC_Bopomofo   6
   "Bopomofo",
-#define SC_Cyrillic   7
   "Cyrillic",
-#define SC_Devanagari 8
   "Devanagari",
-#define SC_Ethiopic   9
   "Ethiopic",
-#define SC_Georgian   10
   "Georgian",
-#define SC_Greek      11
   "Greek",
-#define SC_Gujarati   12
   "Gujarati",
-#define SC_Gurmukhi   13
   "Gurmukhi",
-#define SC_Hangul     14
   "Hangul",
-#define SC_Han        15
   "Han",
-#define SC_Hebrew     16
   "Hebrew",
-#define SC_Hiragana   17
   "Hiragana",
-#define SC_Katakana   18
   "Katakana",
-#define SC_Kannada    19
   "Kannada",
-#define SC_Khmer      20
   "Khmer",
-#define SC_Lao        21
   "Lao",
-#define SC_Malayalam  22
   "Malayalam",
-#define SC_Myanmar    23
   "Myanmar",
-#define SC_Oriya      24
   "Oriya",
-#define SC_Sinhala    25
   "Sinhala",
-#define SC_Tamil      26
   "Tamil",
-#define SC_Telugu     27
   "Telugu",
-#define SC_Thaana     28
   "Thaana",
-#define SC_Thai       29
   "Thai",
-#define SC_Tibetan    30
   "Tibetan",
-#define FIRST_EXCLUDED_SCRIPT 31
   // Excluded Scripts (but can be added expliclitly)
   // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
-#define SC_Ahom       31
   "Ahom",
-#define SC_Anatolian_Hieroglyphs 32
   "Anatolian_Hieroglyphs",
-#define SC_Avestan    33
   "Avestan",
-#define SC_Bassa_Vah  34
   "Bassa_Vah",
-#define SC_Bhaiksuki  35
   "Bhaiksuki",
-#define SC_Brahmi     36
   "Brahmi",
-#define SC_Braille    37
   "Braille",
-#define SC_Buginese   38
   "Buginese",
-#define SC_Buhid      39
   "Buhid",
-#define SC_Carian     40
   "Carian",
-#define SC_Caucasian_Albanian 41
   "Caucasian_Albanian",
-#define SC_Chorasmian 42
   "Chorasmian",
-#define SC_Coptic     43
   "Coptic",
-#define SC_Cuneiform  44
   "Cuneiform",
-#define SC_Cypriot    45
   "Cypriot",
-#define SC_Cypro_Minoan 46
   "Cypro_Minoan",
-#define SC_Deseret    47
   "Deseret",
-#define SC_Dives_Akuru 48
   "Dives_Akuru",
-#define SC_Dogra      49
   "Dogra",
-#define SC_Duployan   50
   "Duployan",
-#define SC_Egyptian_Hieroglyphs 51
   "Egyptian_Hieroglyphs",
-#define SC_Elbasan    52
   "Elbasan",
-#define SC_Elymaic    53
   "Elymaic",
-#define SC_Glagolitic 54
   "Glagolitic",
-#define SC_Gothic     55
   "Gothic",
-#define SC_Grantha    56
   "Grantha",
-#define SC_Gunjala_Gondi 57
   "Gunjala_Gondi",
-#define SC_Hanunoo    58
   "Hanunoo",
-#define SC_Hatran     59
   "Hatran",
-#define SC_Imperial_Aramaic 60
   "Imperial_Aramaic",
-#define SC_Inscriptional_Pahlavi 61
   "Inscriptional_Pahlavi",
-#define SC_Inscriptional_Parthian 62
   "Inscriptional_Parthian",
-#define SC_Kaithi     63
   "Kaithi",
-#define SC_Kharoshthi 64
   "Kharoshthi",
-#define SC_Khitan_Small_Script 65
   "Khitan_Small_Script",
-#define SC_Khojki     66
   "Khojki",
-#define SC_Khudawadi  67
   "Khudawadi",
-#define SC_Linear_A   68
   "Linear_A",
-#define SC_Linear_B   69
   "Linear_B",
-#define SC_Lycian     70
   "Lycian",
-#define SC_Lydian     71
   "Lydian",
-#define SC_Mahajani   72
   "Mahajani",
-#define SC_Makasar    73
   "Makasar",
-#define SC_Manichaean 74
   "Manichaean",
-#define SC_Marchen    75
   "Marchen",
-#define SC_Masaram_Gondi 76
   "Masaram_Gondi",
-#define SC_Medefaidrin 77
   "Medefaidrin",
-#define SC_Mende_Kikakui 78
   "Mende_Kikakui",
-#define SC_Meroitic_Cursive 79
   "Meroitic_Cursive",
-#define SC_Meroitic_Hieroglyphs 80
   "Meroitic_Hieroglyphs",
-#define SC_Modi       81
   "Modi",
-#define SC_Mongolian  82
   "Mongolian",
-#define SC_Mro        83
   "Mro",
-#define SC_Multani    84
   "Multani",
-#define SC_Nabataean  85
   "Nabataean",
-#define SC_Nandinagari 86
   "Nandinagari",
-#define SC_Nushu      87
   "Nushu",
-#define SC_Ogham      88
   "Ogham",
-#define SC_Old_Hungarian 89
   "Old_Hungarian",
-#define SC_Old_Italic 90
   "Old_Italic",
-#define SC_Old_North_Arabian 91
   "Old_North_Arabian",
-#define SC_Old_Permic 92
   "Old_Permic",
-#define SC_Old_Persian 93
   "Old_Persian",
-#define SC_Old_Sogdian 94
   "Old_Sogdian",
-#define SC_Old_South_Arabian 95
   "Old_South_Arabian",
-#define SC_Old_Turkic 96
   "Old_Turkic",
-#define SC_Old_Uyghur 97
   "Old_Uyghur",
-#define SC_Osmanya    98
   "Osmanya",
-#define SC_Pahawh_Hmong 99
   "Pahawh_Hmong",
-#define SC_Palmyrene  100
   "Palmyrene",
-#define SC_Pau_Cin_Hau 101
   "Pau_Cin_Hau",
-#define SC_Phags_Pa   102
   "Phags_Pa",
-#define SC_Phoenician 103
   "Phoenician",
-#define SC_Psalter_Pahlavi 104
   "Psalter_Pahlavi",
-#define SC_Rejang     105
   "Rejang",
-#define SC_Runic      106
   "Runic",
-#define SC_Samaritan  107
   "Samaritan",
-#define SC_Sharada    108
   "Sharada",
-#define SC_Shavian    109
   "Shavian",
-#define SC_Siddham    110
   "Siddham",
-#define SC_SignWriting 111
   "SignWriting",
-#define SC_Sogdian    112
   "Sogdian",
-#define SC_Sora_Sompeng 113
   "Sora_Sompeng",
-#define SC_Soyombo    114
   "Soyombo",
-#define SC_Tagalog    115
   "Tagalog",
-#define SC_Tagbanwa   116
   "Tagbanwa",
-#define SC_Takri      117
   "Takri",
-#define SC_Tangsa     118
   "Tangsa",
-#define SC_Tangut     119
   "Tangut",
-#define SC_Tirhuta    120
   "Tirhuta",
-#define SC_Toto       121
   "Toto",
-#define SC_Ugaritic   122
   "Ugaritic",
-#define SC_Vithkuqi   123
   "Vithkuqi",
-#define SC_Warang_Citi 124
   "Warang_Citi",
-#define SC_Yezidi     125
   "Yezidi",
-#define SC_Zanabazar_Square 126
   "Zanabazar_Square",
-#define FIRST_LIMITED_USE_SCRIPT 127
   // Limited Use Scripts
   // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
-#define SC_Adlam      127
   "Adlam",
-#define SC_Balinese   128
   "Balinese",
-#define SC_Bamum      129
   "Bamum",
-#define SC_Batak      130
   "Batak",
-#define SC_Canadian_Aboriginal 131
   "Canadian_Aboriginal",
-#define SC_Chakma     132
   "Chakma",
-#define SC_Cham       133
   "Cham",
-#define SC_Cherokee   134
   "Cherokee",
-#define SC_Hanifi_Rohingya 135
   "Hanifi_Rohingya",
-#define SC_Javanese   136
   "Javanese",
-#define SC_Kayah_Li   137
   "Kayah_Li",
-#define SC_Lepcha     138
   "Lepcha",
-#define SC_Limbu      139
   "Limbu",
-#define SC_Lisu       140
   "Lisu",
-#define SC_Mandaic    141
   "Mandaic",
-#define SC_Meetei_Mayek 142
   "Meetei_Mayek",
-#define SC_Miao       143
   "Miao",
-#define SC_New_Tai_Lue 144
   "New_Tai_Lue",
-#define SC_Newa       145
   "Newa",
-#define SC_Nko        146
   "Nko",
-#define SC_Nyiakeng_Puachue_Hmong 147
   "Nyiakeng_Puachue_Hmong",
-#define SC_Ol_Chiki   148
   "Ol_Chiki",
-#define SC_Osage      149
   "Osage",
-#define SC_Saurashtra 150
   "Saurashtra",
-#define SC_Sundanese  151
   "Sundanese",
-#define SC_Syloti_Nagri 152
   "Syloti_Nagri",
-#define SC_Syriac     153
   "Syriac",
-#define SC_Tai_Le     154
   "Tai_Le",
-#define SC_Tai_Tham   155
   "Tai_Tham",
-#define SC_Tai_Viet   156
   "Tai_Viet",
-#define SC_Tifinagh   157
   "Tifinagh",
-#define SC_Vai        158
   "Vai",
-#define SC_Wancho     159
   "Wancho",
-#define SC_Yi         160
   "Yi",
-#define SC_Unknown    161
   "Unknown",
-#define LAST_SCRIPT 161
 };
 #else
 extern const char* const all_scripts[161];
 #endif
 
+#define FIRST_RECOMMENDED_SCRIPT 0
+#define SC_Common     0
+#define SC_Inherited  1
+#define SC_Latin      2
+#define SC_Arabic     3
+#define SC_Armenian   4
+#define SC_Bengali    5
+#define SC_Bopomofo   6
+#define SC_Cyrillic   7
+#define SC_Devanagari 8
+#define SC_Ethiopic   9
+#define SC_Georgian   10
+#define SC_Greek      11
+#define SC_Gujarati   12
+#define SC_Gurmukhi   13
+#define SC_Hangul     14
+#define SC_Han        15
+#define SC_Hebrew     16
+#define SC_Hiragana   17
+#define SC_Katakana   18
+#define SC_Kannada    19
+#define SC_Khmer      20
+#define SC_Lao        21
+#define SC_Malayalam  22
+#define SC_Myanmar    23
+#define SC_Oriya      24
+#define SC_Sinhala    25
+#define SC_Tamil      26
+#define SC_Telugu     27
+#define SC_Thaana     28
+#define SC_Thai       29
+#define SC_Tibetan    30
+#define FIRST_EXCLUDED_SCRIPT 31
+#define SC_Ahom       31
+#define SC_Anatolian_Hieroglyphs 32
+#define SC_Avestan    33
+#define SC_Bassa_Vah  34
+#define SC_Bhaiksuki  35
+#define SC_Brahmi     36
+#define SC_Braille    37
+#define SC_Buginese   38
+#define SC_Buhid      39
+#define SC_Carian     40
+#define SC_Caucasian_Albanian 41
+#define SC_Chorasmian 42
+#define SC_Coptic     43
+#define SC_Cuneiform  44
+#define SC_Cypriot    45
+#define SC_Cypro_Minoan 46
+#define SC_Deseret    47
+#define SC_Dives_Akuru 48
+#define SC_Dogra      49
+#define SC_Duployan   50
+#define SC_Egyptian_Hieroglyphs 51
+#define SC_Elbasan    52
+#define SC_Elymaic    53
+#define SC_Glagolitic 54
+#define SC_Gothic     55
+#define SC_Grantha    56
+#define SC_Gunjala_Gondi 57
+#define SC_Hanunoo    58
+#define SC_Hatran     59
+#define SC_Imperial_Aramaic 60
+#define SC_Inscriptional_Pahlavi 61
+#define SC_Inscriptional_Parthian 62
+#define SC_Kaithi     63
+#define SC_Kharoshthi 64
+#define SC_Khitan_Small_Script 65
+#define SC_Khojki     66
+#define SC_Khudawadi  67
+#define SC_Linear_A   68
+#define SC_Linear_B   69
+#define SC_Lycian     70
+#define SC_Lydian     71
+#define SC_Mahajani   72
+#define SC_Makasar    73
+#define SC_Manichaean 74
+#define SC_Marchen    75
+#define SC_Masaram_Gondi 76
+#define SC_Medefaidrin 77
+#define SC_Mende_Kikakui 78
+#define SC_Meroitic_Cursive 79
+#define SC_Meroitic_Hieroglyphs 80
+#define SC_Modi       81
+#define SC_Mongolian  82
+#define SC_Mro        83
+#define SC_Multani    84
+#define SC_Nabataean  85
+#define SC_Nandinagari 86
+#define SC_Nushu      87
+#define SC_Ogham      88
+#define SC_Old_Hungarian 89
+#define SC_Old_Italic 90
+#define SC_Old_North_Arabian 91
+#define SC_Old_Permic 92
+#define SC_Old_Persian 93
+#define SC_Old_Sogdian 94
+#define SC_Old_South_Arabian 95
+#define SC_Old_Turkic 96
+#define SC_Old_Uyghur 97
+#define SC_Osmanya    98
+#define SC_Pahawh_Hmong 99
+#define SC_Palmyrene  100
+#define SC_Pau_Cin_Hau 101
+#define SC_Phags_Pa   102
+#define SC_Phoenician 103
+#define SC_Psalter_Pahlavi 104
+#define SC_Rejang     105
+#define SC_Runic      106
+#define SC_Samaritan  107
+#define SC_Sharada    108
+#define SC_Shavian    109
+#define SC_Siddham    110
+#define SC_SignWriting 111
+#define SC_Sogdian    112
+#define SC_Sora_Sompeng 113
+#define SC_Soyombo    114
+#define SC_Tagalog    115
+#define SC_Tagbanwa   116
+#define SC_Takri      117
+#define SC_Tangsa     118
+#define SC_Tangut     119
+#define SC_Tirhuta    120
+#define SC_Toto       121
+#define SC_Ugaritic   122
+#define SC_Vithkuqi   123
+#define SC_Warang_Citi 124
+#define SC_Yezidi     125
+#define SC_Zanabazar_Square 126
+#define FIRST_LIMITED_USE_SCRIPT 127
+#define SC_Adlam      127
+#define SC_Balinese   128
+#define SC_Bamum      129
+#define SC_Batak      130
+#define SC_Canadian_Aboriginal 131
+#define SC_Chakma     132
+#define SC_Cham       133
+#define SC_Cherokee   134
+#define SC_Hanifi_Rohingya 135
+#define SC_Javanese   136
+#define SC_Kayah_Li   137
+#define SC_Lepcha     138
+#define SC_Limbu      139
+#define SC_Lisu       140
+#define SC_Mandaic    141
+#define SC_Meetei_Mayek 142
+#define SC_Miao       143
+#define SC_New_Tai_Lue 144
+#define SC_Newa       145
+#define SC_Nko        146
+#define SC_Nyiakeng_Puachue_Hmong 147
+#define SC_Ol_Chiki   148
+#define SC_Osage      149
+#define SC_Saurashtra 150
+#define SC_Sundanese  151
+#define SC_Syloti_Nagri 152
+#define SC_Syriac     153
+#define SC_Tai_Le     154
+#define SC_Tai_Tham   155
+#define SC_Tai_Viet   156
+#define SC_Tifinagh   157
+#define SC_Vai        158
+#define SC_Wancho     159
+#define SC_Yi         160
+#define SC_Unknown    161
+#define LAST_SCRIPT 161
+
 #ifndef DISABLE_CHECK_XID
 // The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or non-codepoints.
-#ifdef TEST
+#ifdef EXT_SCRIPTS
 extern const struct sc xid_script_list[942];
 #else
 const struct sc xid_script_list[] = {
@@ -1328,7 +1329,7 @@ const struct sc xid_script_list[] = {
 
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
 // as the parser already disallowed such codepoints.
-#ifdef TEST
+#ifdef EXT_SCRIPTS
 extern const struct sc nonxid_script_list[421];
 #else
 const struct sc nonxid_script_list[] = {
@@ -1758,7 +1759,7 @@ const struct sc nonxid_script_list[] = {
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
-#ifdef TEST
+#ifdef EXT_SCRIPTS
 extern const struct scx scx_script_list[121];
 #else
 const struct scx scx_list[] = {
@@ -1887,7 +1888,7 @@ const struct scx scx_list[] = {
 #endif
 
 // Allowed scripts from IdentifierStatus.txt.
-#ifndef TEST
+#ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
   {0x0027, 0x0027},
   {0x002D, 0x002E},
@@ -2303,7 +2304,7 @@ enum u8id_idtypes {
    Allowed: keep Recommended, Inclusion
    Maybe allow by request Technical
 */
-#ifndef TEST
+#ifndef EXT_SCRIPTS
 const struct range_short idtype_list[] = {
   {0x0009, 0x000D, U8ID_Not_XID },
   {0x0020, 0x0026, U8ID_Not_XID },

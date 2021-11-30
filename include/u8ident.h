@@ -23,16 +23,21 @@ enum u8id_options {
   U8ID_PROFILE_5 = 64, // Minimally Restrictive
   U8ID_PROFILE_6 = 128, // Unrestricted
 
+  U8ID_DEFAULT_OPTS = U8ID_NFKC + U8ID_PROFILE_4,
+
   U8ID_CHECK_XID = 256, // optional, the parser should do that. Without, the script checker
                         // can be much smaller.
   U8ID_WARN_CONFUSABLE  = 512,  // not yet implemented
   U8ID_ERROR_CONFUSABLE = 1024, //       -"-
 };
 #define U8ID_NFMASK 7
+#define U8ID_DEFAULT_OPTS (U8ID_NFKC + U8ID_PROFILE_4)
 
 /* Initialize the library with a bitmask of options, which define the
-   performed checks. Recommended is `U8ID_PROFILE_4` only. */
-int u8ident_init(enum u8id_options);
+   performed checks. Recommended is `U8ID_PROFILE_4` only.
+   return -1 on error, 0 if options are valid.
+*/
+int u8ident_init(unsigned options);
 
 /* maxlength of an identifier. Default: 1024. Beware that such longs identiers, are
    not really identifiable anymore, and keep them under 80 or even

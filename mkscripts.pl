@@ -299,22 +299,22 @@ struct range_short {
 /* Provide a mapping of the $num_scripts Script properties to an index byte.
    Sorted into usages.
  */
-#ifndef TEST
+#ifndef EXT_SCRIPTS
 const char* const all_scripts[] = {
   // Recommended Scripts (not need to add them)
   // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
-#define FIRST_RECOMMENDED_SCRIPT 0
 EOF
 my $i = 0;
+my $defines = "";
 for my $sc (@recommended) {
   my $ws = " " x (10-length($sc));
   $SC{$sc} = $i;
-  printf $H "#define SC_%s%s %d\n", $sc, $ws, $i;
+  $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
   printf $H "  \"%s\",\n", $sc, $i;
   $i++;
 }
+$defines .= "#define FIRST_EXCLUDED_SCRIPT $i\n";
 print $H <<"EOF";
-#define FIRST_EXCLUDED_SCRIPT $i
   // Excluded Scripts (but can be added expliclitly)
   // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
 EOF
@@ -323,34 +323,39 @@ for my $sc (sort keys %scripts) {
   unless ($other{$sc}) {
     my $ws = " " x (10-length($sc));
     $SC{$sc} = $i;
-    printf $H "#define SC_%s%s %d\n", $sc, $ws, $i;
+    $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
     printf $H "  \"%s\",\n", $sc, $i;
     $i++;
   }
 }
+$defines .= "#define FIRST_LIMITED_USE_SCRIPT $i\n";
 print $H <<"EOF";
-#define FIRST_LIMITED_USE_SCRIPT $i
   // Limited Use Scripts
   // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 EOF
 for my $sc (@limited) {
   my $ws = " " x (10-length($sc));
   $SC{$sc} = $i;
-  printf $H "#define SC_%s%s %d\n", $sc, $ws, $i;
+  $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
   printf $H "  \"%s\",\n", $sc, $i;
   $i++;
 }
 $i--;
-printf $H <<"EOF", $i, $i, scalar @SCR;
-#define LAST_SCRIPT %u
+printf $H <<"EOF", $i;
 };
 #else
 extern const char* const all_scripts[%u];
 #endif
 
+#define FIRST_RECOMMENDED_SCRIPT 0
+EOF
+print $H $defines;
+printf $H <<"EOF", $i, scalar @SCR;
+#define LAST_SCRIPT %u
+
 #ifndef DISABLE_CHECK_XID
 // The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or non-codepoints.
-#ifdef TEST
+#ifdef EXT_SCRIPTS
 extern const struct sc xid_script_list[%u];
 #else
 const struct sc xid_script_list[] = {
@@ -371,7 +376,7 @@ printf $H <<"EOF", $b, $s, scalar(@SCRF);
 
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
 // as the parser already disallowed such codepoints.
-#ifdef TEST
+#ifdef EXT_SCRIPTS
 extern const struct sc nonxid_script_list[%u];
 #else
 const struct sc nonxid_script_list[] = {
@@ -391,7 +396,7 @@ printf $H <<"EOF", $b, $s, scalar(@SCXR);
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
 // Remove all Limited Use SC's from the list.
-#ifdef TEST
+#ifdef EXT_SCRIPTS
 extern const struct scx scx_script_list[%u];
 #else
 const struct scx scx_list[] = {
@@ -416,7 +421,7 @@ printf $H <<"EOF", $b, $s;
 #endif
 
 // Allowed scripts from IdentifierStatus.txt.
-#ifndef TEST
+#ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
 EOF
 ($b, $s) = (0, 0);
@@ -457,7 +462,7 @@ print $H <<"EOF";
    Allowed: keep Recommended, Inclusion
    Maybe allow by request Technical
 */
-#ifndef TEST
+#ifndef EXT_SCRIPTS
 const struct range_short idtype_list[] = {
 EOF
 sub idtype_bits {

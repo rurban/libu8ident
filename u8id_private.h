@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <stdint.h>
 #include <inttypes.h>
 #include <errno.h>
 
@@ -17,3 +18,11 @@
 #define unlikely(expr) _expect((long)((expr) != 0), 0)
 #endif
 
+struct ctx_t {
+  uint8_t count;
+  union {
+    uint64_t scr64;   // room for 8 scripts
+    uint8_t  scr8[8];
+    uint8_t  *u8p;    // or if count > 8 
+  };
+};
