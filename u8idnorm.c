@@ -459,7 +459,7 @@ int u8id_decompose_s(char *restrict dest, long dmax,
                     dmax--;
                 }
                 else {
-                    size_t len = src - p;
+                    long len = src - p;
                     if (len > dmax) {
                         *dest = 0;
                         return ERR_NOSPACE;
@@ -497,7 +497,7 @@ int u8id_decompose_s(char *restrict dest, long dmax,
                     dmax--;
                 }
                 else {
-                    size_t len = src - p;
+                    long len = src - p;
                     if (len > dmax) {
                         *dest = 0;
                         return ERR_NOSPACE;
@@ -535,7 +535,7 @@ int u8id_reorder_s(unsigned char *restrict dest, long dmax, const char *restrict
     size_t cc_pos = 0;
     char *p = (char *)src;
     const char *e = p + len;
-    char *orig_dest = dest;
+    unsigned char *orig_dest = dest;
     size_t orig_dmax = dmax;
 
     while (p < e) {
@@ -575,7 +575,7 @@ int u8id_reorder_s(unsigned char *restrict dest, long dmax, const char *restrict
                 qsort((void *)seq_ptr, cc_pos, sizeof(UN8IF_cc), _compare_cc);
 
             for (size_t i = 0; i < cc_pos; i++) {
-                enc_utf8(dest, &dlen, seq_ptr[i].cp);
+                enc_utf8((char *)dest, &dlen, seq_ptr[i].cp);
                 dest += dlen;
                 dmax -= dlen;
             }

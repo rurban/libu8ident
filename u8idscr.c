@@ -77,8 +77,8 @@ void u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
   uint8_t *u8p = (i > 7) ? ctx->u8p : ctx->scr8;
   if ((i & 7) == 7)
     ctx->u8p = realloc(ctx->u8p, (i+1) * 2);
+  u8p[i] = scr;
   ctx->count++;
-  u8p[i+1] = scr;
   return;
 }
 
@@ -162,8 +162,8 @@ const char* u8ident_script_name(const int scr) {
 /* returns the failing codepoint, which failed in the last check. */
 uint32_t u8ident_failed_char(const int i) {
   if (i >= 0 && i <= i_ctx) {
-    const struct ctx_t *ctx = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
-    return ctx->last_cp;
+    const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
+    return c->last_cp;
   } else {
     return 0;
   }
@@ -171,8 +171,8 @@ uint32_t u8ident_failed_char(const int i) {
 /* returns the constant script name, which failed in the last check. */
 const char* u8ident_failed_script_name(const int i) {
   if (i >= 0 && i <= i_ctx) {
-    const struct ctx_t *ctx = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
-    const uint32_t cp = ctx->last_cp;
+    const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
+    const uint32_t cp = c->last_cp;
     if (cp > 0)
       return u8ident_script_name(u8ident_get_script(cp));
   }
@@ -243,12 +243,12 @@ EXTERN void u8ident_delete(void) {
 const char* u8ident_existing_scripts(const int i) {
   if (unlikely(i < 0 || i > i_ctx))
     return NULL;
-  const struct ctx_t *ctx = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
-  const uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
-  int len = ctx->count * 12;
+  const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
+  const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
+  int len = c->count * 12;
   char *res = malloc(len);
   *res = 0;
-  for (int j=0; j < ctx->count; j++) {
+  for (int j=0; j < c->count; j++) {
     const char* str = u8ident_script_name(u8p[j]);
     if (!str)
       return NULL;

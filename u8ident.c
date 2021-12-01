@@ -63,6 +63,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       ctx->last_cp = cp;
       return U8ID_ERR_ENCODING;
     }
+    // when should we check for allowed?
     if (unlikely(!u8ident_is_allowed(cp))) {
       struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
@@ -87,10 +88,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       // if excluded it must have been already manually added
       if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT)) {
         ctx->last_cp = cp;
-        return U8ID_ERR_SCRIPTS;
+        return U8ID_ERR_SCRIPT;
       }
       // allowed is only one, unless it is an allowed combination
-      if (ctx->count > 1) {
+      if (ctx->count) {
         // check allowed CJK combinations
         if (scr == SC_Bopomofo) {
           if (unlikely(!ctx->has_han)) {
