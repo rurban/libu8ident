@@ -92,6 +92,10 @@ int u8ident_delete_ctx(int);
 /* End this library, cleaning up all internal structures. */
 void u8ident_delete(void);
 
+/* Returns a freshly allocated normalized string, in the option defined at `u8ident_init`.
+   Defaults to U8ID_NFKC. */
+char* u8ident_normalize(const char* buf, int len);
+
 enum u8id_errors {
   U8ID_EOK = 0,
   U8ID_EOK_NORM = 1,
@@ -104,7 +108,8 @@ enum u8id_errors {
 };
 
 /* Two variants to check if this identifier is valid. The second avoids
-   allocating a fresh string from the parsed input.
+   allocating a fresh string from the parsed input. buf must not be
+   zero-terminated.
    Return values:
     * 0   - valid without need to normalize.
     * 1   - valid with need to normalize.
@@ -119,14 +124,23 @@ enum u8id_errors {
 enum u8id_errors u8ident_check(const uint8_t* string, char** outnorm);
 enum u8id_errors u8ident_check_buf(const char* buf, int len, char** outnorm);
 
-/* Returns a freshly allocated normalized string, in the option defined at `u8ident_init`.
-   Defaults to U8ID_NFKC. */
-char* u8ident_normalize(const char* buf, int len);
+/* returns the failing codepoint, which failed in the last check. */
+uint32_t u8ident_failed_char(const int ctx);
+/* returns the constant script name, which failed in the last check. */
+const char* u8ident_failed_script_name(const int ctx);
 
-/* Returns a string for the combinations of the seen scripts in this
-   context whenever a mixed script error occurs.  The default string may
-   be overridden by defining this function, otherwise the english message
-   "Invalid script %s, already have %s" with the latest script and
-   previous scripts is returned. The returned string needs to be freed by the user. */
-__attribute__((__weak__))
-const char* u8ident_script_error(int ctx);
+/* Returns a fresh string of the list of the seen scripts in this
+   context whenever a mixed script error occurs. Needed for the error message
+   "Invalid script %s, already have %s", where the 2nd %s is returned by this function.
+   The returned string needs to be freed by the user.
+   Usage:
+   if (u8id_check("wrongᴧᴫ") == U8ID_ERR_SCRIPTS) {
+     const char *errstr = u8ident_existing_scripts(ctx);
+     fprintf(stdout, "Invalid script %s, already have %s\n",
+       u8ident_failed_script_name(ctx),
+       u8ident_existing_scripts(ctx));
+     free(errstr);
+   }
+
+*/
+const char* u8ident_existing_scripts(int ctx);

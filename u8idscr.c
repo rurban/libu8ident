@@ -17,7 +17,7 @@
 
 extern unsigned s_u8id_options;
 // not yet thread-safe
-struct ctx_t ctx[5]; // pre-allocate 5 contexts
+struct ctx_t ctx[U8ID_CTX_TRESH] = {0}; // pre-allocate 5 contexts
 static int i_ctx = 0;
 struct ctx_t *ctxp = NULL; // if more than 5 contexts
 
@@ -27,9 +27,9 @@ EXTERN int u8ident_new_ctx(void) {
   // thread-safety later
   int i = i_ctx + 1;
   i_ctx++;
-  if (i == 5) {
-    ctxp = (struct ctx_t *)calloc(5, sizeof (struct ctx_t));
-  } else if (i > 5) {
+  if (i == U8ID_CTX_TRESH) {
+    ctxp = (struct ctx_t *)calloc(U8ID_CTX_TRESH, sizeof (struct ctx_t));
+  } else if (i > U8ID_CTX_TRESH) {
     ctxp = (struct ctx_t *)realloc(ctxp, i * sizeof (struct ctx_t));
   } else {
     ctxp = &ctx[i];
@@ -50,7 +50,7 @@ EXTERN int u8ident_set_ctx(int i) {
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
 struct ctx_t * u8ident_ctx(void) {
-  return (i_ctx < 5) ? &ctx[i_ctx] : &ctxp[i_ctx];
+  return (i_ctx < U8ID_CTX_TRESH) ? &ctx[i_ctx] : &ctxp[i_ctx];
 }
 
 bool u8ident_has_script(const uint8_t scr) {
@@ -65,7 +65,7 @@ bool u8ident_has_script(const uint8_t scr) {
 
 // search in linear vector of scripts per ctx
 bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
-  uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
+  const uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
   for (int i=0; i < ctx->count; i++) {
     if (scr == u8p[i])
       return true;
@@ -159,6 +159,26 @@ const char* u8ident_script_name(const int scr) {
   return all_scripts[scr];
 }
 
+/* returns the failing codepoint, which failed in the last check. */
+uint32_t u8ident_failed_char(const int i) {
+  if (i >= 0 && i <= i_ctx) {
+    const struct ctx_t *ctx = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
+    return ctx->last_cp;
+  } else {
+    return 0;
+  }
+}
+/* returns the constant script name, which failed in the last check. */
+const char* u8ident_failed_script_name(const int i) {
+  if (i >= 0 && i <= i_ctx) {
+    const struct ctx_t *ctx = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
+    const uint32_t cp = ctx->last_cp;
+    if (cp > 0)
+      return u8ident_script_name(u8ident_get_script(cp));
+  }
+  return NULL;
+}
+
 /* Optionally adds a script to the context, if it's known or declared
    beforehand. Such as `use utf8 "Greek";` in cperl.
    0, 1, 2 are always included by default.
@@ -201,19 +221,53 @@ EXTERN void u8ident_delete(void) {
   for (int i=0; i<=i_ctx; i++) {
     u8ident_delete_ctx(i);
   }
-  if (i_ctx >= 5) {
+  if (i_ctx >= U8ID_CTX_TRESH) {
     free (ctxp);
   }
 }
 
-/* Returns a string for the combinations of the seen scripts in this
-   context whenever a mixed script error occurs.  The default string may
-   be overridden by defining this function, otherwise the english message
-   "Invalid script %s, already have %s" with the latest script and
-   previous scripts is returned. The returned string needs to be freed by the user. */
-__attribute__((__weak__))
-const char* u8ident_script_error(int ctx) {
-  return "Invalid script %s, already have %s";
+/* Returns a fresh string of the list of the seen scripts in this
+   context whenever a mixed script error occurs. Needed for the error message
+   "Invalid script %s, already have %s", where the 2nd %s is returned by this function.
+   The returned string needs to be freed by the user.
+   Usage:
+   if (u8id_check("wrongᴧᴫ") == U8ID_ERR_SCRIPTS) {
+     const char *errstr = u8ident_existing_scripts(ctx);
+     fprintf(stdout, "Invalid script %s, already have %s\n",
+       u8ident_failed_script_name(ctx),
+       u8ident_existing_scripts(ctx));
+     free(errstr);
+   }
+
+*/
+const char* u8ident_existing_scripts(const int i) {
+  if (unlikely(i < 0 || i > i_ctx))
+    return NULL;
+  const struct ctx_t *ctx = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
+  const uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
+  int len = ctx->count * 12;
+  char *res = malloc(len);
+  *res = 0;
+  for (int j=0; j < ctx->count; j++) {
+    const char* str = u8ident_script_name(u8p[j]);
+    if (!str)
+      return NULL;
+    const int l = strlen(str);
+    if (*res) {
+      if (l + 3 > len) {
+        len = l + 3;
+        res = realloc(res, len);
+      }
+      strcat(res, ", ");
+    } else { // first name
+      if (l + 1 > len) {
+        len = l + 1;
+        res = realloc(res, len);
+      }
+    }
+    strcat(res, str);
+  }
+  return res;
 }
 
 // See also the Table 3. Unicode Script Property Values and ISO 15924 Codes

@@ -58,15 +58,24 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
   // check mixed scripts
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
-    if (unlikely(!cp))
+    if (unlikely(!cp)) {
+      struct ctx_t *ctx = u8ident_ctx();
+      ctx->last_cp = cp;
       return U8ID_ERR_ENCODING;
-    if (unlikely(!u8ident_is_allowed(cp)))
+    }
+    if (unlikely(!u8ident_is_allowed(cp))) {
+      struct ctx_t *ctx = u8ident_ctx();
+      ctx->last_cp = cp;
       return U8ID_ERR_CCLASS;
-    // TODO check if normalize is needed (mark ...)
+    }
+    // TODO check if normalize is needed (mark, ...)
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
-    if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT))
+    if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT)) {
+      struct ctx_t *ctx = u8ident_ctx();
+      ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
+    }
     // ignore some. they are never counted
     if (scr == SC_Latin || scr == SC_Common || scr == SC_Inherited)
       continue;
@@ -75,36 +84,45 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
     bool is_new = !u8ident_has_script_ctx(scr, ctx);
     // TODO check profile
     if (is_new) {
-      // if excluded it must already be manually added
-      if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT))
+      // if excluded it must have been already manually added
+      if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT)) {
+        ctx->last_cp = cp;
         return U8ID_ERR_SCRIPTS;
-      // TODO check profile
+      }
       // allowed is only one, unless it is an allowed combination
       if (ctx->count > 1) {
         // check allowed CJK combinations
         if (scr == SC_Bopomofo) {
-          if (unlikely(!ctx->has_han))
+          if (unlikely(!ctx->has_han)) {
+            ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
+          }
           else
             goto ok;
         }
         else if (scr == SC_Han) {
-          if (unlikely(!(ctx->is_chinese || ctx->is_japanese || ctx->is_korean)))
+          if (unlikely(!(ctx->is_chinese || ctx->is_japanese || ctx->is_korean))) {
+            ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
+          }
           else
             goto ok;
         }
         else if (scr == SC_Katakana || scr == SC_Hiragana) {
-          if (unlikely(!(ctx->is_japanese || ctx->has_han)))
+          if (unlikely(!(ctx->is_japanese || ctx->has_han))) {
+            ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
+          }
           else
             goto ok;
         }
         // and disallow all other combinations
-        else /* if (scr == SC_Greek && ctx->is_cyrillic)
+        else { /* if (scr == SC_Greek && ctx->is_cyrillic)
                 return U8ID_ERR_SCRIPTS;
                 else if (scr == SC_Cyrillic && u8ident_has_script_ctx(SC_Greek, ctx)) */
+          ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
+        }
       }
   ok:
       if (scr == SC_Han)
