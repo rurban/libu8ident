@@ -261,19 +261,33 @@ void test_norm_fcd(void) {
 // latin plus just greek
 void test_mixed_scripts(void) {
   u8ident_init(U8ID_DEFAULT_OPTS);
-  assert(u8ident_check((const uint8_t*)"abcd") == 0);
-  assert(u8ident_check((const uint8_t*)"abcᴧ") == 0);
-  assert(u8ident_check((const uint8_t*)"Cafe\xcc\x81") == 1);
-  if (u8ident_check((const uint8_t*)"abcᴧᴫ") != -2)  // Greek plus Cyrillic
+  assert(u8ident_check((const uint8_t*)"abcd", NULL) == U8ID_EOK);
+  assert(u8ident_check((const uint8_t*)"abc\xce\x86", NULL) == U8ID_EOK); // Latin + Greek ok
+  assert(u8ident_check((const uint8_t*)"Cafe\xcc\x81", NULL) == U8ID_EOK_NORM);
+  assert(u8ident_check((const uint8_t*)"\xc3\xb7", NULL) == U8ID_ERR_CCLASS); // division sign
+  //printf("ERROR U+F7 is not allowed\n");
+  assert(u8ident_check((const uint8_t*)"\xc6\x80", NULL) == U8ID_ERR_CCLASS); // small letter b with stroke
+  //printf("ERROR U+180 is not allowed\n");  
+  if (u8ident_check((const uint8_t*)"\xf0\x91\xb0\x80", NULL) != U8ID_ERR_SCRIPT) // U+11C00
+    printf("ERROR Bhaiksuki is excluded\n");
+  if (u8ident_check((const uint8_t*)"\xe1\xac\x85", NULL) != U8ID_ERR_SCRIPT) // U+1B05
+    printf("ERROR Balinese is limited\n");
+  if (u8ident_check((const uint8_t*)"abcᴧᴫ", NULL) != U8ID_ERR_SCRIPTS)
     printf("ERROR Greek plus Cyrillic\n");
+  if (u8ident_check((const uint8_t*)"ᴧঅ", NULL) != U8ID_ERR_SCRIPTS)
+    printf("ERROR Greek plus Bengali\n");
 }
 
 // check if mixed scripts per ctx work
 void test_mixed_scripts_with_ctx(void) {
+  assert(u8ident_check((const uint8_t*)"abcᴧ", NULL) == U8ID_EOK); // Greek
   u8ident_init(U8ID_DEFAULT_OPTS);
-  int ctx = u8ident_new_ctx();
-  assert(u8ident_get_script(0x41) == 2);
-  assert(u8ident_get_script(0x5a) == 2);
+  int ctx = u8ident_new_ctx(); // new ctx 1
+  assert(ctx == 1);
+  assert(u8ident_check((const uint8_t*)"abcᴫ", NULL) == U8ID_EOK);  // Cyrillic
+  assert(u8ident_delete_ctx(ctx) == 0);
+  // back to ctx 0
+  assert(u8ident_check((const uint8_t*)"abᴧᴦ", NULL) == U8ID_EOK); // next Greek
 }
 
 int main(void) {

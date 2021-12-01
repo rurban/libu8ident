@@ -7,12 +7,7 @@
 #include <stdlib.h>
 #include "u8ident.h"
 #include "u8id_private.h"
-#define EXT_SCRIPTS
-#include "scripts.h"
-
-uint32_t dec_utf8(char** strp);
-bool u8ident_has_script(const uint8_t scr);
-struct ctx_t * u8ident_ctx(void);
+#include "u8idscr.h"
 
 unsigned s_u8id_options = U8ID_NFKC | U8ID_PROFILE_4;
 unsigned s_maxlen = 1024;
@@ -56,37 +51,86 @@ unsigned u8ident_maxlength(void) {
     * -3  - invalid encoding
     * -4  - invalid because confusable (not yet implemented)
 */
-EXTERN int u8ident_check_buf(const char* buf, const int len) {
-  int ret = 0;
+EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char** outnorm) {
+  int ret = U8ID_EOK;
   char *s = (char*)buf;
   const char *e = (char*)&buf[len];
   // check mixed scripts
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
+    if (unlikely(!cp))
+      return U8ID_ERR_ENCODING;
+    if (unlikely(!u8ident_is_allowed(cp)))
+      return U8ID_ERR_CCLASS;
+    // TODO check if normalize is needed (mark ...)
     const uint8_t scr = u8ident_get_script(cp);
-    // ignore some
-    if (scr == SC_Latin || scr == SC_Common || SC_Inherited)
-      break;
-    // if not already have it, add it
+    // disallow Limited_Use if not already extra added
+    if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT))
+      return U8ID_ERR_SCRIPT;
+    // ignore some. they are never counted
+    if (scr == SC_Latin || scr == SC_Common || scr == SC_Inherited)
+      continue;
+    // if not already have it, add it. EXCLUDED_SCRIPT must already exist
     struct ctx_t *ctx = u8ident_ctx();
-    uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
-    for (int i=0; i < ctx->count; i++) {
-      // check mixed script
-      if (scr == u8p[i])
-        break;
-      // add if allowed
-      if ((i & 7) == 7)
-        ctx->u8p = realloc(ctx->u8p, (i+1) * 2);
-      ctx->u8p[i+1] = scr;
+    bool is_new = !u8ident_has_script_ctx(scr, ctx);
+    // TODO check profile
+    if (is_new) {
+      // if excluded it must already be manually added
+      if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT))
+        return U8ID_ERR_SCRIPTS;
+      // TODO check profile
+      // allowed is only one, unless it is an allowed combination
+      if (ctx->count > 1) {
+        // check allowed CJK combinations
+        if (scr == SC_Bopomofo) {
+          if (unlikely(!ctx->has_han))
+            return U8ID_ERR_SCRIPTS;
+          else
+            goto ok;
+        }
+        else if (scr == SC_Han) {
+          if (unlikely(!(ctx->is_chinese || ctx->is_japanese || ctx->is_korean)))
+            return U8ID_ERR_SCRIPTS;
+          else
+            goto ok;
+        }
+        else if (scr == SC_Katakana || scr == SC_Hiragana) {
+          if (unlikely(!(ctx->is_japanese || ctx->has_han)))
+            return U8ID_ERR_SCRIPTS;
+          else
+            goto ok;
+        }
+        // and disallow all other combinations
+        else /* if (scr == SC_Greek && ctx->is_cyrillic)
+                return U8ID_ERR_SCRIPTS;
+                else if (scr == SC_Cyrillic && u8ident_has_script_ctx(SC_Greek, ctx)) */
+          return U8ID_ERR_SCRIPTS;
+      }
+  ok:
+      if (scr == SC_Han)
+        ctx->has_han = 1;
+      else if (scr == SC_Bopomofo)
+        ctx->is_chinese = 1;
+      else if (scr == SC_Katakana || scr == SC_Hiragana)
+        ctx->is_japanese = 1;
+      else if (scr == SC_Hangul)
+        ctx->is_korean = 1;
+      //else if (scr == SC_Cyrillic)
+      //  ctx->is_cyrillic = 1;
+      u8ident_add_script_ctx(scr, ctx);
     }
   }
   // need to normalize?
   char *norm = u8ident_normalize((char*)buf, len);
   if (strcmp(norm, buf))
-    ret = 1;
+    ret = U8ID_EOK_NORM;
+  if (outnorm)
+    *outnorm = norm;
+  else
+    free (norm);
   return ret;
 }
 
-EXTERN int u8ident_check(const uint8_t* string) {
-  return u8ident_check_buf((char*)string, strlen((char*)string));
+EXTERN enum u8id_errors u8ident_check(const uint8_t* string, char** outnorm) {
+  return u8ident_check_buf((char*)string, strlen((char*)string), outnorm);
 }

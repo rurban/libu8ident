@@ -92,6 +92,16 @@ int u8ident_delete_ctx(int);
 /* End this library, cleaning up all internal structures. */
 void u8ident_delete(void);
 
+enum u8id_errors {
+  U8ID_EOK = 0,
+  U8ID_EOK_NORM = 1,
+  U8ID_EOK_WARN_CONFUS = 2,
+  U8ID_ERR_CCLASS = -1,
+  U8ID_ERR_SCRIPT = -2,
+  U8ID_ERR_SCRIPTS = -3,
+  U8ID_ERR_ENCODING = -4,
+  U8ID_ERR_CONFUS = -5,
+};
 
 /* Two variants to check if this identifier is valid. The second avoids
    allocating a fresh string from the parsed input.
@@ -101,11 +111,13 @@ void u8ident_delete(void);
     * 2   - warn about confusable (not yet implemented)
     * -1  - invalid character class
     * -2  - invalid script
-    * -3  - invalid encoding
-    * -4  - invalid because confusable (not yet implemented)
+    * -3  - invalid mixed scripts
+    * -4  - invalid encoding
+    * -5  - invalid because confusable (not yet implemented)
+    outnorm is set to a fresh normalized string if valid.
 */
-int u8ident_check(const uint8_t* string);
-int u8ident_check_buf(const char* buf, int len);
+enum u8id_errors u8ident_check(const uint8_t* string, char** outnorm);
+enum u8id_errors u8ident_check_buf(const char* buf, int len, char** outnorm);
 
 /* Returns a freshly allocated normalized string, in the option defined at `u8ident_init`.
    Defaults to U8ID_NFKC. */

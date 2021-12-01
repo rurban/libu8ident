@@ -63,6 +63,25 @@ bool u8ident_has_script(const uint8_t scr) {
   return false;
 }
 
+// search in linear vector of scripts per ctx
+bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
+  uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
+  for (int i=0; i < ctx->count; i++) {
+    if (scr == u8p[i])
+      return true;
+  }
+  return false;
+}
+void u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
+  int i = ctx->count;
+  uint8_t *u8p = (i > 7) ? ctx->u8p : ctx->scr8;
+  if ((i & 7) == 7)
+    ctx->u8p = realloc(ctx->u8p, (i+1) * 2);
+  ctx->count++;
+  u8p[i+1] = scr;
+  return;
+}
+
 #if 0
 static uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, const int len) {
   struct sc *s = (struct sc *)sc_list;
@@ -167,6 +186,10 @@ EXTERN int u8ident_delete_ctx(int i) {
     if (ctxp[i].count > 8)
       free (ctxp[i].u8p);
     ctxp[i].count = 0;
+    if (i > 0)
+      i_ctx = i - 1; // switch to the previous context
+    else
+      i_ctx = 0; // deleting 0 will lead to a reset
     return 0;
   }
   else

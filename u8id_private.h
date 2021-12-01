@@ -20,6 +20,11 @@
 
 struct ctx_t {
   uint8_t count;
+  uint8_t is_japanese :1;
+  uint8_t is_chinese :1;
+  uint8_t is_korean :1;
+  //uint8_t is_cyrillic :1;
+  uint8_t has_han :1;
   union {
     uint64_t scr64;   // room for 8 scripts
     uint8_t  scr8[8];
