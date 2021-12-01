@@ -17,7 +17,7 @@
 
 extern unsigned s_u8id_options;
 // not yet thread-safe
-struct ctx_t ctx[U8ID_CTX_TRESH] = {0}; // pre-allocate 5 contexts
+struct ctx_t ctx[U8ID_CTX_TRESH] = { 0 }; // pre-allocate 5 contexts
 static int i_ctx = 0;
 struct ctx_t *ctxp = NULL; // if more than 5 contexts
 

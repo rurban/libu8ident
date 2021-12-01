@@ -148,7 +148,7 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
     /* the new format generated with cperl Unicode-Normalize/mkheader -uni -ind -std
      */
     const UN8IF_canon_PLANE_T **plane, *row;
-    if (unlikely(dmax < 5)) {
+    if (unlikely(dmax < 8)) {
         *dest = 0;
         return ERR_NOSPACE;
     }
@@ -171,6 +171,10 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
                 sizeof(UN8IF_canon_exc[0]), _bsearch_exc);
             if (e) {
                 size_t l = strlen(e->v);
+                if (l + 1 > dmax) {
+                    *dest = 0;
+                    return ERR_NOSPACE;
+                }
                 memcpy(dest, e->v, l + 1); /* incl \0 */
                 return (int)l;
             }
@@ -226,6 +230,10 @@ static int _decomp_compat_s(char *dest, size_t dmax, uint32_t cp) {
                 sizeof(UN8IF_compat_exc[0]), _bsearch_exc);
             if (e) {
                 size_t l = strlen(e->v);
+                if (l + 1 > dmax) {
+                    *dest = 0;
+                    return ERR_NOSPACE;
+                }
                 memcpy(dest, e->v, l + 1); /* incl \0 */
                 return (int)l;
             }
@@ -452,12 +460,16 @@ int u8id_decompose_s(char *restrict dest, long dmax,
                 }
                 else {
                     size_t len = src - p;
+                    if (len > dmax) {
+                        *dest = 0;
+                        return ERR_NOSPACE;
+                    }
                     memcpy(dest, p, len);
                     dest += len;
                     dmax -= len;
                 }
             } else {
-                return -c;
+                return c;
             }
         }
     } else {
@@ -486,12 +498,16 @@ int u8id_decompose_s(char *restrict dest, long dmax,
                 }
                 else {
                     size_t len = src - p;
+                    if (len > dmax) {
+                        *dest = 0;
+                        return ERR_NOSPACE;
+                    }
                     memcpy(dest, p, len);
                     dest += len;
                     dmax -= len;
                 }
             } else {
-                return -c;
+                return c;
             }
         }
     }
@@ -715,6 +731,8 @@ int u8id_compose_s(char *restrict dest, long dmax,
 }
 
 int u8ident_may_normalize(const char* buf, int len) {
+    (void)buf;
+    (void)len;
     return 1;
 }
 
@@ -726,7 +744,7 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
     char *tmp = NULL;
     size_t tmp_size;
     const unsigned mode = u8ident_options() & U8ID_NFMASK;
-    const bool iscompat = mode == U8ID_NFKC || mode == U8ID_NFKD;
+    const bool iscompat = (mode == U8ID_NFKC || mode == U8ID_NFKD);
     
     size_t dmax = len;
     char *dest = NULL;
