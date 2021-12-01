@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <errno.h>
 #include "u8ident.h"
 #include "u8id_private.h"
 

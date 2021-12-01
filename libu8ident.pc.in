@@ -1,0 +1,12 @@
+# @configure_input@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE@
+Description: check unicode security guidelines for identifiers
+Version: @VERSION@
+URL: @PACKAGE_URL@
+Libs: -L${libdir} -lu8ident
+Cflags: -I${includedir}

@@ -3,6 +3,8 @@ GTAGS
 GPATH
 GRTAGS
 TAGS
+autom4te.cache
+config.h
 include/u8ident.h.bak
 libu8ident.a
 u8ident.o

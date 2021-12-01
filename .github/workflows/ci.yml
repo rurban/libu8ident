@@ -20,6 +20,8 @@ jobs:
       with:
         fetch-depth: 1
     - run: sudo apt-get install perl
+    - run: autoreconf -fi
+    - run: ./configure
     - run: make
     - run: make check
   macOS:
@@ -28,6 +30,9 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
+    - run: brew install automake
+    - run: autoreconf -fi
+    - run: ./configure
     - run: make
     - run: make check
   mingw:
@@ -55,6 +60,10 @@ jobs:
     - run: git config --global core.autocrlf input
     - name: checkout
       uses: actions/checkout@v2
+    - shell: msys2 {0}
+      run: autoreconf -fi
+    - shell: msys2 {0}
+      run: ./configure
     - shell: msys2 {0}
       run: make
     - shell: msys2 {0}
