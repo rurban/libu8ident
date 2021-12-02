@@ -18,20 +18,20 @@ enum u8id_options {
   U8ID_FCC  = 5,
 
   U8ID_PROFILE_2 = 8,  // Single Script only
-  U8ID_PROFILE_3 = 16,  // Highly Restrictive
+  U8ID_PROFILE_3 = 16, // Highly Restrictive
   U8ID_PROFILE_4 = 32, // Moderately Restrictive
   U8ID_PROFILE_5 = 64, // Minimally Restrictive
-  U8ID_PROFILE_6 = 128, // Unrestricted
+  U8ID_PROFILE_6 = 128,// Unrestricted
 
   U8ID_DEFAULT_OPTS = U8ID_NFKC + U8ID_PROFILE_4,
 
-  U8ID_CHECK_XID = 256, // optional, the parser should do that. Without, the script checker
-                        // can be much smaller.
+  U8ID_CHECK_XID = 256, // Optional, check for the allowed tr39 IdentifierStatus.
+                        // Note: The parser should do that. Without, the checker can be faster.
   U8ID_WARN_CONFUSABLE  = 512,  // not yet implemented
   U8ID_ERROR_CONFUSABLE = 1024, //       -"-
 };
 #define U8ID_NFMASK 7
-#define U8ID_DEFAULT_OPTS (U8ID_NFKC + U8ID_PROFILE_4)
+//#define U8ID_DEFAULT_OPTS (U8ID_NFKC + U8ID_PROFILE_4)
 
 /* Initialize the library with a bitmask of options, which define the
    performed checks. Recommended is `U8ID_PROFILE_4` only.
@@ -141,6 +141,5 @@ const char* u8ident_failed_script_name(const int ctx);
        u8ident_existing_scripts(ctx));
      free(errstr);
    }
-
 */
 const char* u8ident_existing_scripts(int ctx);

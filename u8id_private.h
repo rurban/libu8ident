@@ -18,6 +18,45 @@
 #define unlikely(expr) _expect((long)((expr) != 0), 0)
 #endif
 
+#ifdef U8ID_NORM
+# if U8ID_NORM == NFKC
+#  define U8ID_NORM_DEFAULT U8ID_NFKC
+# elif U8ID_NORM == NFKD
+#  define U8ID_NORM_DEFAULT U8ID_NFKD
+# elif U8ID_NORM == NFD
+#  define U8ID_NORM_DEFAULT U8ID_NFD
+# elif U8ID_NORM == NFC
+#  define U8ID_NORM_DEFAULT U8ID_NFC
+# elif U8ID_NORM == FCC
+#  define U8ID_NORM_DEFAULT U8ID_FCC
+# elif U8ID_NORM == FCD
+#  define U8ID_NORM_DEFAULT U8ID_FCD
+# else
+#  error "Invalid U8ID_NORM"
+# endif
+#else
+# define U8ID_NORM_DEFAULT U8ID_NFKC
+#endif
+
+#ifdef U8ID_PROFILE
+# if U8ID_PROFILE == 2
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_2
+# elif U8ID_PROFILE == 3
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_3
+# elif U8ID_PROFILE == 4
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
+# elif U8ID_PROFILE == 5
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_5
+# elif U8ID_PROFILE == 6
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_6
+# else
+#  error "Invalid U8ID_PROFILE"
+# endif
+#else
+// Moderately Restrictive
+# define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
+#endif
+
 #define U8ID_CTX_TRESH 5
 #define U8ID_SCR_TRESH 8
 struct ctx_t {
@@ -30,6 +69,8 @@ struct ctx_t {
   union {
     uint64_t scr64;   // room for 8 scripts
     uint8_t  scr8[U8ID_SCR_TRESH];
+    // TODO check if we really need more than 8. Very unlikely.
+    // Only if we manually add extra scripts.
     uint8_t  *u8p;    // or if count > 8 
   };
 };

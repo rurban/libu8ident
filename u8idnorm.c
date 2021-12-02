@@ -15,11 +15,19 @@
 #define STDCHAR char
 #define TRUE true
 #define FALSE false
+#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC
 #include "un8ifcan.h" /* for NFD Canonical Decomposition */
-#include "un8ifcmb.h" /* for reorder Canonical_Combining_Class_Values */
-#include "un8ifcmp.h" /* for NFC Canonical Composition lists */
-#include "un8ifexc.h" /* for NFC Composite exclusions */
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
 #include "un8ifcpt.h" /* for NFKD/NFKC Compat. Decomposition. */
+#endif
+#if !defined U8ID_NORM || U8ID_NORM != FCD
+#include "un8ifcmb.h" /* for reorder Canonical_Combining_Class_Values */
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC || U8ID_NORM == FCC
+#include "un8ifexc.h" /* for NFC Composite exclusions */
+#include "un8ifcmp.h" /* for NFC Canonical Composition lists */
+#endif
 #include "hangul.h"   /* Korean/Hangul has special (easy) normalization rules */
 
 unsigned u8ident_options(void);
@@ -141,6 +149,7 @@ static int _bsearch_exc(const void *ptr1, const void *ptr2) {
     return e1->cp > e2->cp ? 1 : e1->cp == e2->cp ? 0 : -1;
 }
 
+#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC
 /* Note that we can generate two versions of the tables.  The old format as
  * used in Unicode::Normalize, and the new 3x smaller NORMALIZE_IND_TBL cperl
  * variant, as used here and in cperl core since 5.27.2.
@@ -207,7 +216,9 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
         return 0;
     }
 }
+#endif // NFC or NFD
 
+#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
 static int _decomp_compat_s(char *dest, size_t dmax, uint32_t cp) {
     /* the new format generated with cperl Unicode-Normalize/mkheader -uni -ind -std
      */
@@ -260,6 +271,7 @@ static int _decomp_compat_s(char *dest, size_t dmax, uint32_t cp) {
         return 0;
     }
 }
+#endif // NFKC or NFKD
 
 static int _decomp_hangul_s(char *dest, size_t dmax, uint32_t cp) {
     uint32_t sindex = cp - Hangul_SBase;
@@ -295,8 +307,16 @@ static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
     if (Hangul_IsS(cp)) {
         return _decomp_hangul_s(dest, dmax, cp);
     } else {
+#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD
+	assert(!iscompat);
+	return _decomp_canonical_s(dest, dmax, cp);
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
+	assert(iscompat);
+        return _decomp_compat_s(dest, dmax, cp);
+#else
         return iscompat ? _decomp_compat_s(dest, dmax, cp)
                         : _decomp_canonical_s(dest, dmax, cp);
+#endif
     }
 }
 
@@ -600,6 +620,7 @@ int u8id_reorder_s(unsigned char *restrict dest, long dmax, const char *restrict
     return 0;
 }
 
+#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == FCC
 /**
  * @def u8id_compose_s(dest,dmax,src,lenp,iscontig)
  *    Combine all decomposed sequences in a wide string to NFC,
@@ -730,6 +751,7 @@ int u8id_compose_s(char *restrict dest, long dmax,
     *lenp = orig_dmax - dmax;
     return 0;
 }
+#endif // NFC or FCC
 
 int u8ident_may_normalize(const char* buf, int len) {
     (void)buf;
@@ -763,8 +785,14 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
         free(dest);
         return NULL;
     }
+#if !defined U8ID_NORM || U8ID_NORM == FCD
+    if (1)
+#else
     if (mode == U8ID_FCD)
+#endif
         return dest;
+
+#if !defined U8ID_NORM || U8ID_NORM != FCD
    /* temp. scratch space, on stack or heap */
     if (destlen + 2 < 128) {
         tmp_ptr = tmp_stack;
@@ -774,7 +802,6 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
         tmp_size = destlen + 2;
         tmp_ptr = tmp = (char *)malloc(tmp_size);
     }
-
     // now reorder for some canonalization
     err = u8id_reorder_s((unsigned char *)tmp_ptr, tmp_size, dest, destlen);
     while (err == ERR_NOSPACE) {
@@ -787,7 +814,12 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
     }
 
     // if decomposed
-    if (mode == U8ID_NFD || mode == U8ID_NFKD) {
+#if !defined U8ID_NORM || U8ID_NORM == NFD || U8ID_NORM == NFKD
+    if (1)
+#else
+    if (mode == U8ID_NFD || mode == U8ID_NFKD)
+#endif // NFD or NFKD
+    {
         free(dest);
         if (tmp) // on heap
             return (char*)tmp_ptr;
@@ -798,6 +830,7 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
         }
     }
 
+#if !defined U8ID_NORM || !(U8ID_NORM == NFD || U8ID_NORM == NFKD)
     // now compose to a shorter sequence
     err = u8id_compose_s(dest, dmax, tmp_ptr, &destlen, mode == U8ID_FCC);
     if (tmp)
@@ -807,4 +840,6 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
         return NULL;
     }
     return dest;
+#endif // !(NFD or NFKD)
+#endif // !FCD
 }

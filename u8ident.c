@@ -9,7 +9,8 @@
 #include "u8id_private.h"
 #include "u8idscr.h"
 
-unsigned s_u8id_options = U8ID_NFKC | U8ID_PROFILE_4;
+// defaults to U8ID_NFKC | U8ID_PROFILE_4
+unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
 /* Initialize the library with a bitmask of options, which define the
@@ -64,10 +65,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       return U8ID_ERR_ENCODING;
     }
     // when should we check for allowed?
-    if (unlikely(!u8ident_is_allowed(cp))) {
-      struct ctx_t *ctx = u8ident_ctx();
-      ctx->last_cp = cp;
-      return U8ID_ERR_CCLASS;
+    if (s_u8id_options & U8ID_CHECK_XID) {
+      if (unlikely(!u8ident_is_allowed(cp))) {
+	struct ctx_t *ctx = u8ident_ctx();
+	ctx->last_cp = cp;
+	return U8ID_ERR_CCLASS;
+      }
     }
     // TODO check if normalize is needed (mark, ...)
     const uint8_t scr = u8ident_get_script(cp);

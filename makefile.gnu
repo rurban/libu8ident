@@ -30,8 +30,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	./test-asan
 
 clean:
-	rm u8ident.o u8idnorm.o u8idscr.o libu8ident.a test
-	rm test-asan
+	-rm -f u8ident.o u8idnorm.o u8idscr.o libu8ident.a test test-asan
 
 # Create the normalization headers via a current perl
 Unicode-Normalize: un8ifcan.h
