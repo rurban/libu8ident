@@ -1,18 +1,22 @@
-# Autoconf requirements
+# configure.ac - Process with autoconf to produce a configure script
+# (C) 2021  Reini Urban <rurban@cpan.org>
+# See LICENSE
 AC_PREREQ([2.69])
 AC_INIT([libu8ident],
         [0.1],
         [https://github.com/rurban/libu8ident/issues],[libu8ident],[http://github.com/rurban/libu8ident/])
 AC_CONFIG_SRCDIR([u8ident.c])
+AC_CONFIG_MACRO_DIR([m4])
 AC_SUBST([LIBU8IDENT_SO_VERSION], [0:0:0])
 
 AM_INIT_AUTOMAKE([1.10 no-define foreign dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+#dnl m4_pattern_allow
 AC_CHECK_TOOLS([AR], [gcc-ar ar])
 AC_CHECK_TOOLS([RANLIB], [gcc-ranlib ranlib])
 AC_CHECK_TOOLS([NM], [gcc-nm nm])
 LT_INIT
-# Initialize pkg-config since we are installing a .pc file
+#dnl Initialize pkg-config since we are installing a .pc file
 PKG_INSTALLDIR
 AM_CPPFLAGS="-I\$(top_srcdir)/include"
 
@@ -36,7 +40,7 @@ AC_ARG_WITH([norm],
 	)
 if test -n "$U8ID_NORM"; then
   CFLAGS="$CFLAGS -DU8ID_NORM=$U8ID_NORM"
-  #AC_DEFINE([U8ID_NORM],[$U8ID_NORM],[Define to NF{K,}{C,D} to support only this Unicode normalization])
+  dnl AC_DEFINE([U8ID_NORM],[$U8ID_NORM],[Define to NF{K,}{C,D} to support only this Unicode normalization])
 fi
 AC_SUBST([U8ID_NORM])
 
@@ -54,7 +58,7 @@ AC_ARG_WITH([profile],
 	)
 if test -n "$U8ID_PROFILE"; then
   CFLAGS="$CFLAGS -DU8ID_PROFILE=$U8ID_PROFILE"
-  #AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 0-5 to support only this Unicode security profile])
+  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 0-5 to support only this Unicode security profile])
 fi
 AC_SUBST([U8ID_PROFILE])
 
@@ -68,7 +72,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
 AC_PROG_CC_C99
-#AC_PROG_CC_C11
+dnl AC_PROG_CC_C11
 if test "x$ac_cv_prog_cc_c11" != "xno"; then
    AC_DEFINE([HAVE_C11], 1,
         [Defined to 1 when the compiler supports c11])
@@ -78,6 +82,17 @@ if test "x$ac_cv_prog_cc_c11" != "xno"; then
    fi
 fi
 AC_SUBST(HAVE_C11)
+
+if test x$ac_compiler_gnu = xyes; then
+  WARN_CFLAGS="-Wall -Wextra -Werror -Wno-return-local-addr"
+else
+  WARN_CFLAGS="-Wall -Wextra"
+fi
+dnl older non-c99 g++ complain about __VA_ARGS__, for();
+if test "x$ac_cv_prog_cc_c99" = "xno"; then
+    WARN_CFLAGS=`echo $WARN_CFLAGS | sed -e"s,-Werror ,,"`
+fi
+AC_SUBST(WARN_CFLAGS)
 
 AC_MSG_NOTICE([Check header files])
 # ===============================================
@@ -105,7 +120,7 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
-#AC_TYPE_UINTPTR_T
+dnl AC_TYPE_UINTPTR_T
 AC_CHECK_SIZEOF(size_t)
 
 AC_CHECK_FUNCS([ memset strcmp ])

@@ -18,6 +18,15 @@
 #define unlikely(expr) _expect((long)((expr) != 0), 0)
 #endif
 
+#define NFKC 0
+#define NFD  1
+#define NFC  2
+#define NFKD 3
+#define FCD  4
+#define FCC  5
+#define _XSTR(s) _STR(s)
+#define _STR(s)  #s
+
 #ifdef U8ID_NORM
 # if U8ID_NORM == NFKC
 #  define U8ID_NORM_DEFAULT U8ID_NFKC
@@ -32,7 +41,7 @@
 # elif U8ID_NORM == FCD
 #  define U8ID_NORM_DEFAULT U8ID_FCD
 # else
-#  error "Invalid U8ID_NORM"
+#  error "Invalid U8ID_NORM "_XSTR(U8ID_NORM)
 # endif
 #else
 # define U8ID_NORM_DEFAULT U8ID_NFKC
@@ -50,7 +59,7 @@
 # elif U8ID_PROFILE == 6
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_6
 # else
-#  error "Invalid U8ID_PROFILE"
+#  error "Invalid U8ID_PROFILE "_XSTR(U8ID_PROFILE)
 # endif
 #else
 // Moderately Restrictive

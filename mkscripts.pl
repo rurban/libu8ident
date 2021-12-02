@@ -491,6 +491,11 @@ extern const struct range_short idtype_list[%u];
 EOF
 close $H;
 
+# TODO
+# MARK: 1963 mark characters (Combining, Overlay, ...) \p{IsM}
+# DECOMPOSED_REST: The remaining 869 non-mark and non-hangul normalizables.
+
+
 # patch our header
 my $inc = "include/u8ident.h";
 open my $INC, "<", $inc or die "$inc $!";

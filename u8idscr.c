@@ -270,6 +270,31 @@ const char* u8ident_existing_scripts(const int i) {
   return res;
 }
 
+// TODO. Generate either if-trees, or sorted lists of those.
+static bool _is_MARK(const uint32_t cp) {
+  (void)cp;
+  return true;
+}
+static bool _is_DECOMPOSED_REST(const uint32_t cp) {
+  (void)cp;
+  return false;
+}
+
+/*
+  Check for the right-hand-side of the Decomposition_Mapping property,
+  which means the codepoint can be normalized, if the sequence is
+  decomposed (NFD or NFKD).
+  This is equivalent to all 1963 C<\p{IsM}> Mark characters,
+  plus the remaining 869 non-mark and non-hangul normalizables.
+*/
+
+bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr)
+{
+    if (scr == SC_Hangul || _is_MARK(cp))
+        return true;
+    return _is_DECOMPOSED_REST(cp);
+}
+
 // See also the Table 3. Unicode Script Property Values and ISO 15924 Codes
 // https://www.unicode.org/reports/tr24/tr24-32.html#Relation_To_ISO15924
 

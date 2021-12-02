@@ -1,9 +1,11 @@
+# -*- Makefile -*-
 CC := cc
 CFLAGS := -Wall -Wextra -O2
 AR := ar
 RANLIB := ranlib
 # This should to be a recent perl, matching the target unicode version
 PERL := perl
+WGET := wget
 
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
@@ -29,6 +31,14 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS) -g -fsanitize=address -I. -Iinclude test.c u8ident.c u8idscr.c u8idnorm.c -o test-asan
 	./test-asan
 
+# Check coverage and sizes for all --with-norm configure combinations
+check-norms: $(SRC) $(HEADER) $(HDRS)
+	for n in NFC NFD NFKC NFKD FCC FCD; do \
+            echo $$n; \
+            cc -DU8ID_NORM=$$n -O3 -Wall -Wno-return-local-addr -Wfatal-errors -Iinclude -c u8idnorm.c -o u8idnorm.o && \
+            ls -gGh u8idnorm.o; \
+        done
+
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o libu8ident.a test test-asan
 
@@ -46,7 +56,7 @@ regen-norm: Unicode-Normalize un8ifcan.h
 	  cd - && cp Unicode-Normalize/un8if*.h .
 # Download some UCD files and create scripts.h
 regen-scripts:
-	wget -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
-	wget -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
-	wget -N http://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
+	$(WGET) -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
+	$(WGET) -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
+	$(WGET) -N http://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
 	$(PERL) mkscripts.pl

@@ -15,7 +15,20 @@
 #define STDCHAR char
 #define TRUE true
 #define FALSE false
-#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC
+
+//#pragma message "U8ID_NORM="_XSTR(U8ID_NORM)
+//#pragma message "U8ID_NORM_DEFAULT="_XSTR(U8ID_NORM_DEFAULT)
+//#if !defined U8ID_NORM || U8ID_NORM == NFKD
+//#pragma message "NFKD"_XSTR(U8ID_NORM)
+//#endif
+//#if !defined U8ID_NORM || U8ID_NORM == NFD
+//#pragma message "NFD:"_XSTR(U8ID_NORM)
+//#endif
+//#if !defined U8ID_NORM || U8ID_NORM_DEFAULT == U8ID_NFD
+//#pragma message "NFD1:"_XSTR(U8ID_NORM_DEFAULT)
+//#endif
+
+#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC || U8ID_NORM == FCD
 #include "un8ifcan.h" /* for NFD Canonical Decomposition */
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
@@ -143,13 +156,23 @@ static char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
 #define ERR_INVAL   -1
 #define EOK         0
 
+#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
+
 static int _bsearch_exc(const void *ptr1, const void *ptr2) {
     UN8IF_compat_exc_t *e1 = (UN8IF_compat_exc_t *)ptr1;
     UN8IF_compat_exc_t *e2 = (UN8IF_compat_exc_t *)ptr2;
     return e1->cp > e2->cp ? 1 : e1->cp == e2->cp ? 0 : -1;
 }
+#elif !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC || U8ID_NORM == FCD
 
-#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC
+static int _bsearch_exc(const void *ptr1, const void *ptr2) {
+    UN8IF_canon_exc_t *e1 = (UN8IF_canon_exc_t *)ptr1;
+    UN8IF_canon_exc_t *e2 = (UN8IF_canon_exc_t *)ptr2;
+    return e1->cp > e2->cp ? 1 : e1->cp == e2->cp ? 0 : -1;
+}
+#endif
+
+#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC || U8ID_NORM == FCD
 /* Note that we can generate two versions of the tables.  The old format as
  * used in Unicode::Normalize, and the new 3x smaller NORMALIZE_IND_TBL cperl
  * variant, as used here and in cperl core since 5.27.2.
@@ -216,7 +239,7 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
         return 0;
     }
 }
-#endif // NFC or NFD
+#endif // NFC, NFD, FCC, FCD
 
 #if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
 static int _decomp_compat_s(char *dest, size_t dmax, uint32_t cp) {
@@ -307,10 +330,10 @@ static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
     if (Hangul_IsS(cp)) {
         return _decomp_hangul_s(dest, dmax, cp);
     } else {
-#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD
+#if defined U8ID_NORM && (U8ID_NORM == NFC || U8ID_NORM == NFD || U8ID_NORM == FCC || U8ID_NORM == FCD)
 	assert(!iscompat);
 	return _decomp_canonical_s(dest, dmax, cp);
-#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
+#elif defined U8ID_NORM && (U8ID_NORM == NFKC || U8ID_NORM == NFKD)
 	assert(iscompat);
         return _decomp_compat_s(dest, dmax, cp);
 #else
@@ -318,96 +341,6 @@ static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
                         : _decomp_canonical_s(dest, dmax, cp);
 #endif
     }
-}
-
-/* canonical ordering of combining characters (c.c.). */
-typedef struct {
-    uint8_t cc;  /* combining class */
-    uint32_t cp; /* codepoint */
-    size_t pos;  /* position */
-} UN8IF_cc;
-
-/* rc = u8id_reorder_s(tmp, len+1, dest); */
-static int _compare_cc(const void *a, const void *b) {
-    int ret_cc;
-    ret_cc = ((UN8IF_cc *)a)->cc - ((UN8IF_cc *)b)->cc;
-    if (ret_cc)
-        return ret_cc;
-
-    return (((UN8IF_cc *)a)->pos > ((UN8IF_cc *)b)->pos) -
-           (((UN8IF_cc *)a)->pos < ((UN8IF_cc *)b)->pos);
-}
-
-static uint32_t _composite_cp(uint32_t cp, uint32_t cp2) {
-    const UN8IF_complist_s ***plane, **row, *cell;
-
-    if (unlikely(!cp2)) {
-        return EOK;
-    }
-    if (unlikely((_UNICODE_MAX < cp) || (_UNICODE_MAX < cp2))) {
-        return ERR_ILSEQ;
-    }
-
-    if (Hangul_IsL(cp) && Hangul_IsV(cp2)) {
-        uint32_t lindex = cp - Hangul_LBase;
-        uint32_t vindex = cp2 - Hangul_VBase;
-        return (Hangul_SBase +
-                (lindex * Hangul_VCount + vindex) * Hangul_TCount);
-    }
-    if (Hangul_IsLV(cp) && Hangul_IsT(cp2)) {
-        uint32_t tindex = cp2 - Hangul_TBase;
-        return (cp + tindex);
-    }
-    plane = UN8IF_compos[cp >> 16];
-    if (!plane) { /* only 3 of 16 are defined */
-        return 0;
-    }
-    row = plane[(cp >> 8) & 0xff];
-    if (!row) { /* the zero plane is pretty filled, the others sparse */
-        return 0;
-    }
-    cell = row[cp & 0xff];
-    if (!cell) {
-        return 0;
-    }
-    /* no indirection here, but search in the composition lists */
-    /* only 16 lists 011099-01d1bc need uint32, the rest can be short, uint16 */
-    /* TODO: above which length is bsearch faster?
-       But then we'd need to store the lengths also */
-    if (likely(cp < UN8IF_COMPLIST_FIRST_LONG)) {
-        UN8IF_complist_s *i;
-        for (i = (UN8IF_complist_s *)cell; i->nextchar; i++) {
-            if ((uint16_t)cp2 == i->nextchar) {
-                return (uint32_t)(i->composite);
-            } else if ((uint16_t)cp2 < i->nextchar) { /* nextchar is sorted */
-                break;
-            }
-        }
-    } else {
-        UN8IF_complist *i;
-        //GCC_DIAG_IGNORE(-Wcast-align)
-        for (i = (UN8IF_complist *)cell; i->nextchar; i++) {
-            //GCC_DIAG_RESTORE
-            if (cp2 == i->nextchar) {
-                return i->composite;
-            } else if (cp2 < i->nextchar) { /* nextchar is sorted */
-                break;
-            }
-        }
-    }
-    return 0;
-}
-
-static uint8_t _combin_class(uint32_t cp) {
-    const STDCHAR **plane, *row;
-    plane = UN8IF_combin[cp >> 16];
-    if (!plane)
-        return 0;
-    row = plane[(cp >> 8) & 0xff];
-    if (row)
-        return row[cp & 0xff];
-    else
-        return 0;
 }
 
 /**
@@ -540,6 +473,38 @@ done:
     return dmax >= 0 ? 0 : ERR_NOSPACE;
 }
 
+#if !defined U8ID_NORM || U8ID_NORM != FCD
+
+/* canonical ordering of combining characters (c.c.). */
+typedef struct {
+    uint8_t cc;  /* combining class */
+    uint32_t cp; /* codepoint */
+    size_t pos;  /* position */
+} UN8IF_cc;
+
+/* rc = u8id_reorder_s(tmp, len+1, dest); */
+static int _compare_cc(const void *a, const void *b) {
+    int ret_cc;
+    ret_cc = ((UN8IF_cc *)a)->cc - ((UN8IF_cc *)b)->cc;
+    if (ret_cc)
+        return ret_cc;
+
+    return (((UN8IF_cc *)a)->pos > ((UN8IF_cc *)b)->pos) -
+           (((UN8IF_cc *)a)->pos < ((UN8IF_cc *)b)->pos);
+}
+
+static uint8_t _combin_class(uint32_t cp) {
+    const STDCHAR **plane, *row;
+    plane = UN8IF_combin[cp >> 16];
+    if (!plane)
+        return 0;
+    row = plane[(cp >> 8) & 0xff];
+    if (row)
+        return row[cp & 0xff];
+    else
+        return 0;
+}
+
 /**
  * @def u8id_reorder_s(dest,dmax,src,len)
  *    Reorder all decomposed sequences in a UTF-8 string to NFD,
@@ -619,8 +584,71 @@ int u8id_reorder_s(unsigned char *restrict dest, long dmax, const char *restrict
     //memset(dest, 0, dmax); // clear the slack?
     return 0;
 }
+#endif // != FCD
 
-#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == FCC
+#if !defined U8ID_NORM || !(U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD)
+//#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == FCC
+
+static uint32_t _composite_cp(uint32_t cp, uint32_t cp2) {
+    const UN8IF_complist_s ***plane, **row, *cell;
+
+    if (unlikely(!cp2)) {
+        return EOK;
+    }
+    if (unlikely((_UNICODE_MAX < cp) || (_UNICODE_MAX < cp2))) {
+        return ERR_ILSEQ;
+    }
+
+    if (Hangul_IsL(cp) && Hangul_IsV(cp2)) {
+        uint32_t lindex = cp - Hangul_LBase;
+        uint32_t vindex = cp2 - Hangul_VBase;
+        return (Hangul_SBase +
+                (lindex * Hangul_VCount + vindex) * Hangul_TCount);
+    }
+    if (Hangul_IsLV(cp) && Hangul_IsT(cp2)) {
+        uint32_t tindex = cp2 - Hangul_TBase;
+        return (cp + tindex);
+    }
+    plane = UN8IF_compos[cp >> 16];
+    if (!plane) { /* only 3 of 16 are defined */
+        return 0;
+    }
+    row = plane[(cp >> 8) & 0xff];
+    if (!row) { /* the zero plane is pretty filled, the others sparse */
+        return 0;
+    }
+    cell = row[cp & 0xff];
+    if (!cell) {
+        return 0;
+    }
+    /* no indirection here, but search in the composition lists */
+    /* only 16 lists 011099-01d1bc need uint32, the rest can be short, uint16 */
+    /* TODO: above which length is bsearch faster?
+       But then we'd need to store the lengths also */
+    if (likely(cp < UN8IF_COMPLIST_FIRST_LONG)) {
+        UN8IF_complist_s *i;
+        for (i = (UN8IF_complist_s *)cell; i->nextchar; i++) {
+            if ((uint16_t)cp2 == i->nextchar) {
+                return (uint32_t)(i->composite);
+            } else if ((uint16_t)cp2 < i->nextchar) { /* nextchar is sorted */
+                break;
+            }
+        }
+    } else {
+        UN8IF_complist *i;
+        //GCC_DIAG_IGNORE(-Wcast-align)
+        for (i = (UN8IF_complist *)cell; i->nextchar; i++) {
+            //GCC_DIAG_RESTORE
+            if (cp2 == i->nextchar) {
+                return i->composite;
+            } else if (cp2 < i->nextchar) { /* nextchar is sorted */
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
 /**
  * @def u8id_compose_s(dest,dmax,src,lenp,iscontig)
  *    Combine all decomposed sequences in a wide string to NFC,
@@ -751,7 +779,7 @@ int u8id_compose_s(char *restrict dest, long dmax,
     *lenp = orig_dmax - dmax;
     return 0;
 }
-#endif // NFC or FCC
+#endif // !(NFD, NFKD, FCD)
 
 int u8ident_may_normalize(const char* buf, int len) {
     (void)buf;
@@ -762,10 +790,12 @@ int u8ident_may_normalize(const char* buf, int len) {
 /* Returns a freshly allocated normalized string, in the option defined at `u8ident_init`. */
 /* TODO: more stack allocations for dest throughout */
 EXTERN char *u8ident_normalize(const char* buf, int len) {
+#if !defined U8ID_NORM || U8ID_NORM != FCD
     char tmp_stack[128];
     char *tmp_ptr;
     char *tmp = NULL;
     size_t tmp_size;
+#endif
     const unsigned mode = u8ident_options() & U8ID_NFMASK;
     const bool iscompat = (mode == U8ID_NFKC || mode == U8ID_NFKD);
     
@@ -785,14 +815,14 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
         free(dest);
         return NULL;
     }
-#if !defined U8ID_NORM || U8ID_NORM == FCD
-    if (1)
-#else
+#if !defined U8ID_NORM || (U8ID_NORM != FCD)
     if (mode == U8ID_FCD)
+#else
+    if (1)
 #endif
         return dest;
 
-#if !defined U8ID_NORM || U8ID_NORM != FCD
+#if !defined U8ID_NORM || (U8ID_NORM != FCD)
    /* temp. scratch space, on stack or heap */
     if (destlen + 2 < 128) {
         tmp_ptr = tmp_stack;
@@ -814,10 +844,10 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
     }
 
     // if decomposed
-#if !defined U8ID_NORM || U8ID_NORM == NFD || U8ID_NORM == NFKD
-    if (1)
-#else
+#if !defined U8ID_NORM || !(U8ID_NORM == NFD || U8ID_NORM == NFKD)
     if (mode == U8ID_NFD || mode == U8ID_NFKD)
+#else
+    if (1)
 #endif // NFD or NFKD
     {
         free(dest);

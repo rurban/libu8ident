@@ -56,6 +56,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
   int ret = U8ID_EOK;
   char *s = (char*)buf;
   const char *e = (char*)&buf[len];
+  bool need_normalize = false;
   // check mixed scripts
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
@@ -72,7 +73,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
 	return U8ID_ERR_CCLASS;
       }
     }
-    // TODO check if normalize is needed (mark, ...)
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
     if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT)) {
@@ -81,6 +81,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       return U8ID_ERR_SCRIPT;
     }
     // ignore some. they are never counted
+    if (!need_normalize) {
+      need_normalize = u8ident_is_decomposed(cp, scr);
+    }
     if (scr == SC_Latin || scr == SC_Common || scr == SC_Inherited)
       continue;
     // if not already have it, add it. EXCLUDED_SCRIPT must already exist
@@ -142,14 +145,15 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       u8ident_add_script_ctx(scr, ctx);
     }
   }
-  // need to normalize?
-  char *norm = u8ident_normalize((char*)buf, len);
-  if (strcmp(norm, buf))
-    ret = U8ID_EOK_NORM;
-  if (outnorm)
-    *outnorm = norm;
-  else
-    free (norm);
+  if (need_normalize) {
+    char *norm = u8ident_normalize((char*)buf, len);
+    if (strcmp(norm, buf))
+      ret = U8ID_EOK_NORM;
+    if (outnorm)
+      *outnorm = norm;
+    else
+      free (norm);
+  }
   return ret;
 }
 
