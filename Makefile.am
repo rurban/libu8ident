@@ -1,10 +1,11 @@
 PERL = @PERL@
 WGET = @WGET@
-EXTRA_DIST = mkscripts.pl mktest-norm.pl
-AM_CFLAGS = -I$(top_builddir)/include -I$(srcdir)
+EXTRA_DIST = mkscripts.pl mktest-norm.pl \
+	hangul.h scripts.h u8id_private.h u8idscr.h un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
+AM_CFLAGS = -I$(srcdir)/include -I$(srcdir) -I$(builddir)
 lib_LTLIBRARIES = libu8ident.la
 include_HEADERS = include/u8ident.h
-libu8ident_la_SOURCES = u8ident.c  u8idnorm.c  u8idscr.c
+libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
 libu8ident_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
 	-no-undefined \
@@ -48,6 +49,8 @@ regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
 	$(PERL) mkscripts.pl
 
+.PHONY: regen-scripts regen-norm check-asan scan-build man
+
 EXTRA_PROGRAMS = test
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
@@ -63,6 +66,15 @@ SCAN_BUILD = scan-build
 scan-build: clean
 	$(SCAN_BUILD) -V -o $(srcdir)/.analysis $(MAKE) -j4 &
 
+MANPAGES = man/u8ident.h.3
+man: $(MANPAGES)
+
+RONN_ARGS=--manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
+man/u8ident.h.3 : README.md
+	@mkdir -p man
+	ronn $(RONN_ARGS) < $< > $@
+
+DISTCLEANFILES  = test$(EXEEXT)
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
