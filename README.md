@@ -123,6 +123,33 @@ for that use-case.
 
 Recommended is Level 4, the *Moderately Restrictive level*.
 
+configure options
+-----------------
+
+* --with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD. Default: none (at run-time NFKC is the default)
+
+* --with-profile=2,3,4,5,6. Default: none (at run-time 4 is the default)
+
+* --with-check-xid (Default) or --without-check-xid
+
+If to check for the Allowed [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt) or not.
+A proper parser might does this already, but you cannot really trust parsers to check unicode identifiers;
+in the decades up to 2020 at least.
+It might get better starting with 2025.
+
+When you know beforehand which normalization or profile you will need, define that
+via `./configure --with-norm=NFKC --with-profile=4 --with-check-xid`
+This skips a lot of unused code and branches.
+The generic shared library has all the code for all normalizations and profiles, 
+and branches at run-time.
+
+e.g codesizes for u8idnorm.o with -Os
+
+    amd64-gcc:   NFKC 217K, NFC+FCC 182K, NFD 113K, NFD 78K, FCD 52K
+    amd64-clang: NFKC 218K, NFC+FCC 183K, NFD 114K, NFD 78K, FCD 52K
+
+default: 365K with -g with amd64-gcc
+
 
 API
 ---

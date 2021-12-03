@@ -10,7 +10,8 @@
 #include "u8idscr.h"
 
 // defaults to U8ID_NFKC | U8ID_PROFILE_4
-unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT;
+unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT | U8ID_CHECK_XID;
+unsigned s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
 /* Initialize the library with a bitmask of options, which define the
@@ -20,6 +21,16 @@ EXTERN int u8ident_init(unsigned options) {
     return -1;
   if ((options & U8ID_NFMASK) > 5)
     return -1;
+  s_u8id_profile = 0;
+  for (unsigned i = U8ID_PROFILE_2; i <= U8ID_PROFILE_6; i *= 2) {
+    if (options & i) {
+      if (s_u8id_profile)
+        return -1; // error. another profile already defined
+      s_u8id_profile = i;
+    }
+  }
+  if (!s_u8id_profile)
+    return -1; // error. no profile defined
   s_u8id_options = options;
   return 0;
 }
@@ -63,9 +74,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
     if (unlikely(!cp)) {
       struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
-      return U8ID_ERR_ENCODING;
+      return U8ID_ERR_ENCODING; // not well-formed UTF-8
     }
-    // when should we check for allowed?
+    // check for the Allowed IdentifierStatus (tr39)
     if (s_u8id_options & U8ID_CHECK_XID) {
       if (unlikely(!u8ident_is_allowed(cp))) {
 	struct ctx_t *ctx = u8ident_ctx();
@@ -75,7 +86,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
     }
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
-    if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT)) {
+    if (unlikely(s_u8id_profile < U8ID_PROFILE_5 && scr >= FIRST_LIMITED_USE_SCRIPT)) {
       struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
@@ -91,8 +102,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
     bool is_new = !u8ident_has_script_ctx(scr, ctx);
     // TODO check profile
     if (is_new) {
+      if (s_u8id_profile == U8ID_PROFILE_2) { // single script only
+        ctx->last_cp = cp;
+        return U8ID_ERR_SCRIPT;
+      }
       // if excluded it must have been already manually added
-      if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT)) {
+      if (unlikely(s_u8id_profile < U8ID_PROFILE_5 && scr >= FIRST_EXCLUDED_SCRIPT)) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }

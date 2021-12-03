@@ -202,7 +202,7 @@ void test_norm_nfc(void) {
     {"\x44\x7a\xcc\x8c\x6c\xc2\xb7", "\x44\xc5\xbe\x6c\xc2\xb7", -75}, // ǅŀ
     {NULL, NULL, 0},
   };
-  u8ident_init(U8ID_NFC | U8ID_PROFILE_4);
+  assert(!u8ident_init(U8ID_NFC | U8ID_PROFILE_4));
   testnorm("NFC", testids);
 }
 void test_norm_fcc(void) {
@@ -214,7 +214,7 @@ void test_norm_fcc(void) {
     {"\xc7\x85\xc5\x80", "\xc7\x85\xc5\x80", 0}, // ǅŀ
     {NULL, NULL, 0},
   };
-  u8ident_init(U8ID_FCC | U8ID_PROFILE_4);
+  assert(!u8ident_init(U8ID_FCC | U8ID_PROFILE_4));
   testnorm("FCC", testids);
 }
 void test_norm_nfkd(void) {
@@ -227,7 +227,7 @@ void test_norm_nfkd(void) {
     {"\x44\xc5\xbe\x6c\xc2\xb7", "\x44\x7a\xcc\x8c\x6c\xc2\xb7", 1}, // ǅŀ
     {NULL, NULL, 0},
   };
-  u8ident_init(U8ID_NFKD | U8ID_PROFILE_4);
+  assert(!u8ident_init(U8ID_NFKD | U8ID_PROFILE_4));
   testnorm("NFKD", testids);
 }
 void test_norm_nfd(void) {
@@ -240,7 +240,7 @@ void test_norm_nfd(void) {
     {"\x44\xc5\xbe\x6c\xc2\xb7", "\x44\x7a\xcc\x8c\x6c\xc2\xb7", 1}, // ǅŀ
     {NULL, NULL, 0},
   };
-  u8ident_init(U8ID_NFD | U8ID_PROFILE_4);
+  assert(!u8ident_init(U8ID_NFD | U8ID_PROFILE_4));
   testnorm("NFD", testids);
 }
 void test_norm_fcd(void) {
@@ -253,7 +253,7 @@ void test_norm_fcd(void) {
     {"\xc7\x85\xc5\x80", "\xc7\x85\xc5\x80", 0}, // ǅŀ
     {NULL, NULL, 0},
   };
-  u8ident_init(U8ID_FCD | U8ID_PROFILE_4);
+  assert(!u8ident_init(U8ID_FCD | U8ID_PROFILE_4));
   testnorm("FCD", testids);
 }
 
@@ -296,7 +296,7 @@ void test_mixed_scripts(int xid_check) {
 // check if mixed scripts per ctx work
 void test_mixed_scripts_with_ctx(void) {
   assert(u8ident_check((const uint8_t*)"abcͻ", NULL) == U8ID_EOK); // Greek
-  u8ident_init(U8ID_DEFAULT_OPTS);
+  assert(!u8ident_init(U8ID_DEFAULT_OPTS));
   int ctx = u8ident_new_ctx(); // new ctx 1
   assert(ctx == 1);
   assert(u8ident_check((const uint8_t*)"abcѝ", NULL) == U8ID_EOK);  // Cyrillic
@@ -305,8 +305,21 @@ void test_mixed_scripts_with_ctx(void) {
   assert(u8ident_check((const uint8_t*)"abͻώ", NULL) == U8ID_EOK); // next Greek
 }
 
+void test_init(void) {
+  // wrong inits
+  assert(u8ident_init(0));                               // missing profile
+  assert(u8ident_init(6));
+  assert(u8ident_init(2048));
+  assert(u8ident_init(U8ID_CHECK_XID));                  // missing PROFILE
+  assert(!u8ident_init(U8ID_CHECK_XID | U8ID_PROFILE_4));// defaults to NFKC
+  assert(u8ident_init(U8ID_FCC));                        // missing PROFILE
+  assert(u8ident_init(U8ID_PROFILE_2 | U8ID_PROFILE_4)); // multiple profiles
+  assert(u8ident_init(2048));
+}
+
 int main(void) {
   test_scripts_no_init();
+  test_init();
   test_norm_nfkc();
   test_norm_nfc();
   test_norm_fcc();
