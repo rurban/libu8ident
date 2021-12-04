@@ -47,20 +47,33 @@ AC_SUBST([U8ID_NORM])
 # Recommended: --with-profile=4
 AC_MSG_CHECKING([for --with-profile=])
 AC_ARG_WITH([profile],
-	[AS_HELP_STRING([--with-profile={0,1,2,3,4,5}],
+	[AS_HELP_STRING([--with-profile={2,3,4,5,6}],
 		[support only this Unicode security profile. @<:@default=4@:>@
 		 Recommended: --with-profile=4])],
 	[case "${with_profile}" in
-	0|1|2|3|4|5) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
-	*)    AC_MSG_RESULT([invalid ${with_profile}: only 0,1,2,3,4,5]) ;;
+	2|3|4|5|6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
+	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6]) ;;
 	esac],
         [ U8ID_PROFILE=; AC_MSG_RESULT([none. support all (default). Recommended: 4]) ]
 	)
 if test -n "$U8ID_PROFILE"; then
   CFLAGS="$CFLAGS -DU8ID_PROFILE=$U8ID_PROFILE"
-  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 0-5 to support only this Unicode security profile])
+  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 2-6 to support only this Unicode security profile])
 fi
 AC_SUBST([U8ID_PROFILE])
+
+AC_MSG_CHECKING([for --{dis,en}able-check-xid])
+AC_ARG_ENABLE([check_xid],
+        [AS_HELP_STRING([--enable-check-xid],
+	  [en- or disable checking for valid XID's, i.e Allowed IdentifierStatus. @<:@default=none@:>@])],
+	[case "${enableval}" in
+	yes) enable_check_xid=yes; AC_MSG_RESULT([enable]); CFLAGS="$CFLAGS -DENABLE_CHECK_XID" ;;
+	no)  enable_check_xid=no ; AC_MSG_RESULT([disable]); CFLAGS="$CFLAGS -DDISABLE_CHECK_XID" ;; 
+	*)   ;;
+	esac], [enable_check_xid= ])
+if test -z "$enable_check_xid"; then
+  AC_MSG_RESULT([none])
+fi
 
 AC_MSG_NOTICE([
 
@@ -73,6 +86,12 @@ AC_PROG_INSTALL
 AM_PROG_CC_C_O
 AC_PROG_CC_C99
 dnl AC_PROG_CC_C11
+dnl optional for packaging or maintainance
+AC_CHECK_TOOLS([WGET], [wget2 wget])
+# dnf install rubygem-ronn-ng
+AC_CHECK_TOOLS([RONN], [ronn])
+AC_CHECK_TOOLS([PERL], [cperl perl])
+
 if test "x$ac_cv_prog_cc_c11" != "xno"; then
    AC_DEFINE([HAVE_C11], 1,
         [Defined to 1 when the compiler supports c11])
@@ -84,7 +103,8 @@ fi
 AC_SUBST(HAVE_C11)
 
 if test x$ac_compiler_gnu = xyes; then
-  WARN_CFLAGS="-Wall -Wextra -Werror -Wno-return-local-addr"
+  WARN_CFLAGS="-Wall -Wextra -Werror"
+  # -Wno-return-local-addr
 else
   WARN_CFLAGS="-Wall -Wextra"
 fi

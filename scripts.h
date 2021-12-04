@@ -1887,6 +1887,7 @@ const struct scx scx_list[] = {
 }; // 56 ranges, 65 single codepoints
 #endif
 
+#ifndef DISABLE_CHECK_XID
 // Allowed scripts from IdentifierStatus.txt.
 #ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
@@ -3939,4 +3940,5 @@ const struct range_short idtype_list[] = {
 #else
 extern const struct range_short idtype_list[1629];
 #endif
-//#endif
+
+#endif // DISABLE_CHECK_XID

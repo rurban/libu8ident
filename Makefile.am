@@ -14,6 +14,7 @@ libu8ident_la_LDFLAGS = \
 	$(LDFLAGS) $(AM_LDFLAGS)
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc
+man_DIST = u8ident.3
 doc_DIST = README.md NOTICE
 
 .c.i:
@@ -79,13 +80,12 @@ SCAN_BUILD = scan-build
 scan-build: clean
 	$(SCAN_BUILD) -V -o $(srcdir)/.analysis $(MAKE) -j4 &
 
-MANPAGES = man/u8ident.h.3
+MANPAGES = u8ident.h.3
 man: $(MANPAGES)
 
-RONN_ARGS=--manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
-man/u8ident.h.3 : README.md
-	@mkdir -p man
-	ronn $(RONN_ARGS) < $< > $@
+RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
+u8ident.h.3 : README.md
+	$(RONN) $(RONN_ARGS) < $< > $@
 
 DISTCLEANFILES  = test$(EXEEXT)
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile

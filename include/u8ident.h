@@ -26,13 +26,14 @@ enum u8id_profile {
 };
 enum u8id_options {
   U8ID_DEFAULT_OPTS = U8ID_NFKC + U8ID_PROFILE_4,
-  U8ID_CHECK_XID    = 256, // Optional, check for the allowed tr39 IdentifierStatus.
+  U8ID_FOLDCASE     = 256,
+  U8ID_CHECK_XID    = 512, // Optional, check for the allowed tr39 IdentifierStatus.
+                           // hard-coded with --{en,dis}able-check-xid
                            // Note: The parser should do that. Without, the checker can be faster.
-  U8ID_WARN_CONFUSABLE  = 512,  // not yet implemented
-  U8ID_ERROR_CONFUSABLE = 1024, //       -"-
+  U8ID_WARN_CONFUSABLE  = 1024,  // not yet implemented
+  U8ID_ERROR_CONFUSABLE = 2048, //       -"-
 };
 #define U8ID_NFMASK   7
-#define U8ID_PROFMASK 255
 
 /* Initialize the library with a bitmask of options, which define the
    performed checks. Recommended is `U8ID_PROFILE_4` only.

@@ -54,14 +54,6 @@ unsigned u8ident_maxlength(void) {
 
 /* Two variants to check if this identifier is valid. The second avoids
    allocating a fresh string from the parsed input.
-   Return values:
-    * 0   - valid without need to normalize.
-    * 1   - valid with need to normalize.
-    * 2   - warn about confusable (not yet implemented)
-    * -1  - invalid character class
-    * -2  - invalid script
-    * -3  - invalid encoding
-    * -4  - invalid because confusable (not yet implemented)
 */
 EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char** outnorm) {
   int ret = U8ID_EOK;
@@ -76,14 +68,22 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       ctx->last_cp = cp;
       return U8ID_ERR_ENCODING; // not well-formed UTF-8
     }
+#ifndef DISABLE_CHECK_XID
     // check for the Allowed IdentifierStatus (tr39)
-    if (s_u8id_options & U8ID_CHECK_XID) {
+    if
+#ifdef ENABLE_CHECK_XID
+      (1)
+#else
+      (s_u8id_options & U8ID_CHECK_XID)
+#endif
+    {
       if (unlikely(!u8ident_is_allowed(cp))) {
 	struct ctx_t *ctx = u8ident_ctx();
 	ctx->last_cp = cp;
 	return U8ID_ERR_CCLASS;
       }
     }
+#endif
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
     if (unlikely(s_u8id_profile < U8ID_PROFILE_5 && scr >= FIRST_LIMITED_USE_SCRIPT)) {

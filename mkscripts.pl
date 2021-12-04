@@ -420,6 +420,7 @@ printf $H <<"EOF", $b, $s;
 }; // %u ranges, %u single codepoints
 #endif
 
+#ifndef DISABLE_CHECK_XID
 // Allowed scripts from IdentifierStatus.txt.
 #ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
@@ -487,14 +488,14 @@ printf $H <<"EOF", $b, $s, scalar(@IDTYPES);
 #else
 extern const struct range_short idtype_list[%u];
 #endif
-//#endif
+
+#endif // DISABLE_CHECK_XID
 EOF
 close $H;
 
 # TODO
 # MARK: 1963 mark characters (Combining, Overlay, ...) \p{IsM}
 # DECOMPOSED_REST: The remaining 869 non-mark and non-hangul normalizables.
-
 
 # patch our header
 my $inc = "include/u8ident.h";
