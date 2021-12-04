@@ -46,11 +46,12 @@ void test_scripts_no_init(void) {
   assert(strlen(scx) == 2);
   assert(scx[0] == 0x03);   // Arab
   assert(scx[1] == '\x99'); // Syrc, signed!
+#ifndef DISABLE_CHECK_XID
   assert(u8ident_is_allowed(0x27));
   assert(!u8ident_is_allowed(0x26));
   assert(u8ident_is_allowed(0x40e));
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
-
+#endif
   // check that no list elements can be merged
 #ifndef DISABLE_CHECK_XID
   for (size_t i=0; i < ARRAY_SIZE(xid_script_list) - 1; i++) {
@@ -70,6 +71,7 @@ void test_scripts_no_init(void) {
     if (r->to + 1 >= n->from)
       assert(r->scr != n->scr);  // can not be merged
   }
+#ifndef DISABLE_CHECK_XID
   for (size_t i=0; i < ARRAY_SIZE(allowed_id_list) - 1; i++) {
     const struct range_bool* r = &allowed_id_list[i];
     const struct range_bool* n = &allowed_id_list[i+1];
@@ -84,6 +86,7 @@ void test_scripts_no_init(void) {
     if (r->to + 1 >= n->from)
       assert(r->types != n->types);  // can not be merged
   }
+#endif
 }
 
 static int sign(int i) {
@@ -295,7 +298,11 @@ void test_mixed_scripts(int xid_check) {
 
 // check if mixed scripts per ctx work
 void test_mixed_scripts_with_ctx(void) {
+#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
   assert(u8ident_check((const uint8_t*)"abcͻ", NULL) == U8ID_EOK); // Greek
+#elif U8ID_PROFILE == 2
+  assert(u8ident_check((const uint8_t*)"abcͻ", NULL) == U8ID_ERR_SCRIPT);
+#endif
   assert(!u8ident_init(U8ID_DEFAULT_OPTS));
   int ctx = u8ident_new_ctx(); // new ctx 1
   assert(ctx == 1);
@@ -317,17 +324,31 @@ void test_init(void) {
   assert(u8ident_init(2048));
 }
 
-int main(void) {
-  test_scripts_no_init();
-  test_init();
-  test_norm_nfkc();
-  test_norm_nfc();
-  test_norm_fcc();
-  test_norm_nfkd();
-  test_norm_nfd();
-  test_norm_fcd();
-  test_mixed_scripts(0);
-  test_mixed_scripts(U8ID_CHECK_XID);
+int main(int argc, char** argv) {
+  const int norm = (argc > 1 && !strcmp(argv[0], "norm"));
+  const int profile = (argc > 1 && !strcmp(argv[0], "profile"));
+  const int xid = (argc > 1 && !strcmp(argv[0], "xid"));
+  
+  if (argc == 1) {
+    test_scripts_no_init();
+    test_init();
+  }
+  if (norm || argc == 1) {
+      test_norm_nfkc();
+      test_norm_nfc();
+      test_norm_fcc();
+      test_norm_nfkd();
+      test_norm_nfd();
+      test_norm_fcd();
+  }
+  if (norm)
+    return 0;
+  if (profile || argc == 1) {
+    test_mixed_scripts(0);
+  }
+  if (profile || xid || argc == 1) {
+    test_mixed_scripts(U8ID_CHECK_XID);
+  }
   test_mixed_scripts_with_ctx();
   return 0;
 }

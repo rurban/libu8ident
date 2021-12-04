@@ -62,6 +62,8 @@ test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
 TESTS = test
 
+check-all: check check-asan check-norms check-profiles check-xid
+
 check-asan: test.c $(libu8ident_la_SOURCES)
 	$(CC) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address test.c $(libu8ident_la_SOURCES) \
 	  -o test-asan$(EXEEXT)
@@ -74,8 +76,22 @@ check-asan: test.c $(libu8ident_la_SOURCES)
 check-norms:
 	for n in NFKC NFC FCC NFKD NFD FCD; do \
             echo $$n; \
-            $(CC) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors -c u8idnorm.c -o u8idnorm.o && \
+            $(CC) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors -c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
             ls -gGh u8idnorm.o; \
+        done
+check-profiles: $(SRC) $(HEADER) $(HDRS)
+	for n in 2 3 4 5 6; do \
+            echo PROFILE_$${n}; \
+	    $(CC) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c -o test-profiles && \
+	    ./test-profiles profile; \
+        done
+check-xid: $(SRC) $(HEADER) $(HDRS)
+	for n in DISABLE ENABLE; do \
+            echo $${n}_CHECK_XID; \
+	    $(CC) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c -o test-xid && \
+	    ./test-xid xid; \
         done
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
@@ -89,7 +105,8 @@ RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu
 u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < $< > $@
 
-DISTCLEANFILES  = test$(EXEEXT)
+CLEANFILES = test$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) test-xid$(EXEEXT)
+DISTCLEANFILES = config.log
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \

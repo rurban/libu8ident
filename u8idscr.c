@@ -141,6 +141,7 @@ const char * u8ident_get_scx(const uint32_t cp) {
   return scx ? scx->list : NULL;
 }
 
+#ifndef DISABLE_CHECK_XID
 bool u8ident_is_allowed(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, sizeof(allowed_id_list) / sizeof(*allowed_id_list));
 }
@@ -151,6 +152,7 @@ uint16_t u8ident_get_idtypes(const uint32_t cp) {
                                            sizeof(idtype_list) / sizeof(*idtype_list), sizeof(*idtype_list));
   return id ? id->types : 0;
 }
+#endif
 
 const char* u8ident_script_name(const int scr) {
   if (scr < 0 || scr > LAST_SCRIPT)

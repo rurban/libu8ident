@@ -24,8 +24,7 @@ jobs:
     - run: ./configure
     - run: make
     - run: make check
-    - run: make check-asan
-    - run: make check-norms
+    - run: make check-all
   macOS:
     name: macOS
     runs-on: macOS-latest
@@ -37,6 +36,7 @@ jobs:
     - run: ./configure
     - run: make
     - run: make check
+    - run: make check-all
   mingw:
     name: mingw
     runs-on: windows-latest
@@ -70,3 +70,5 @@ jobs:
       run: make
     - shell: msys2 {0}
       run: make check
+    - shell: msys2 {0}
+      run: make check-all
