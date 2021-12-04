@@ -6,6 +6,8 @@ CROARING_PATH = @CROARING_PATH@
 AM_CFLAGS = -I$(srcdir)/include -I$(builddir) -I$(srcdir) $(WARN_CFLAGS)
 lib_LTLIBRARIES = libu8ident.la
 include_HEADERS = include/u8ident.h
+HDRS = scripts.h u8id_private.h u8idscr.h \
+	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
 libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
 if HAVE_CROARING
 AM_CFLAGS += -I$(CROARING_PATH)
@@ -19,7 +21,7 @@ pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc
 man_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE
+doc_DATA = README.md NOTICE LICENSE TODO
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h
@@ -121,6 +123,11 @@ check-xid: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 SCAN_BUILD = scan-build
 scan-build: clean
 	$(SCAN_BUILD) -V -o $(srcdir)/.analysis $(MAKE) -j4 &
+
+TODO: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS) README.md NOTICE LICENSE \
+		mkscripts.pl mktest-norm.pl makefile.gnu
+	git ls-tree -r --name-only HEAD|grep -v Makefile.am|grep -v makefile.gnu | xargs grep -n TODO > TODO
+	cat TODO
 
 man: $(man_MANS)
 

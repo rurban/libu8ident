@@ -28,7 +28,7 @@ ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
 endif
 LIB = libu8ident.a
-DOCS = README.md NOTICE LICENSE
+DOCS = README.md NOTICE LICENSE TODO
 MAN = u8ident.3
 PREFIX = usr
 PKG = libu8ident-$(VERSION)
@@ -162,3 +162,7 @@ install: $(LIB) $(MAN)
 	install -m0644 $(LIB) $(DESTDIR)/$(PREFIX)/lib
 	install -m0644 $(MAN) $(DESTDIR)/$(PREFIX)/share/man/man3
 	install -m0644 $(DOCS) $(DESTDIR)/$(PREFIX)/share/doc/libu8ident
+
+TODO: $(HEADER) $(NORMHDRS) $(HDRS) $(SRC) README.md NOTICE LICENSE
+	git ls-tree -r --name-only HEAD|grep -v Makefile.am|grep -v makefile.gnu | xargs grep -n TODO > TODO
+	cat TODO
