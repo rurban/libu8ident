@@ -1,8 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4 --install ${ACLOCAL_FLAGS}
 PERL = @PERL@
 WGET = @WGET@
-EXTRA_DIST = mkscripts.pl mktest-norm.pl \
-	hangul.h scripts.h u8id_private.h u8idscr.h un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 WARN_CFLAGS = @WARN_CFLAGS@
 AM_CFLAGS = -I$(srcdir)/include -I$(srcdir) -I$(builddir) $(WARN_CFLAGS)
 lib_LTLIBRARIES = libu8ident.la
@@ -14,8 +12,13 @@ libu8ident_la_LDFLAGS = \
 	$(LDFLAGS) $(AM_LDFLAGS)
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc
-man_DIST = u8ident.3
-doc_DIST = README.md NOTICE
+man_MANS = u8ident.3
+docdir = $(datadir)/libu8ident
+doc_DATA = README.md NOTICE LICENSE
+EXTRA_DIST = mkscripts.pl mktest-norm.pl makefile.gnu \
+	scripts.h u8id_private.h u8idscr.h \
+	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
+	$(doc_DATA)
 
 .c.i:
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -80,11 +83,10 @@ SCAN_BUILD = scan-build
 scan-build: clean
 	$(SCAN_BUILD) -V -o $(srcdir)/.analysis $(MAKE) -j4 &
 
-MANPAGES = u8ident.h.3
-man: $(MANPAGES)
+man: $(man_MANS)
 
 RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
-u8ident.h.3 : README.md
+u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < $< > $@
 
 DISTCLEANFILES  = test$(EXEEXT)
