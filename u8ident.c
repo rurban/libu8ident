@@ -60,6 +60,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
   char *s = (char*)buf;
   const char *e = (char*)&buf[len];
   bool need_normalize = false;
+#ifdef HAVE_SCX
+  char scx[32]; // combination of all scx
+  scx[0] = '\0';
+#endif
   // check mixed scripts
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
@@ -71,16 +75,16 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
 #ifndef DISABLE_CHECK_XID
     // check for the Allowed IdentifierStatus (tr39)
     if
-#ifdef ENABLE_CHECK_XID
+# ifdef ENABLE_CHECK_XID
       (1)
-#else
+# else
       (s_u8id_options & U8ID_CHECK_XID)
-#endif
+# endif
     {
       if (unlikely(!u8ident_is_allowed(cp))) {
 	struct ctx_t *ctx = u8ident_ctx();
 	ctx->last_cp = cp;
-	return U8ID_ERR_CCLASS;
+	return U8ID_ERR_XID;
       }
     }
 #endif
@@ -91,12 +95,22 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
     }
-    // ignore some. they are never counted
     if (!need_normalize) {
       need_normalize = u8ident_is_decomposed(cp, scr);
     }
+#ifdef HAVE_SCX
+    // check scx on Common or Inherited, keep list of possible scripts, and reduce them
+    if (scr == SC_Common || scr == SC_Inherited) {
+      const char *this_scx = u8ident_get_scx(cp);
+      // TODO check this_scx against the existing scripts, ...
+    }
+    // ignore Latin. This is compatible with everything
+    else if (scr == SC_Latin)
+      continue;
+#else
     if (scr == SC_Latin || scr == SC_Common || scr == SC_Inherited)
       continue;
+#endif
     // if not already have it, add it. EXCLUDED_SCRIPT must already exist
     struct ctx_t *ctx = u8ident_ctx();
     bool is_new = !u8ident_has_script_ctx(scr, ctx);

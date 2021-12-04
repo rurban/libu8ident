@@ -260,26 +260,29 @@ void test_norm_fcd(void) {
   testnorm("FCD", testids);
 }
 
-// TODO mixed-script check, contexts, options, XID.
+// TODO profiles, contexts, XID.
 
 // latin plus just greek is allowed, but not greek + cyrillic. and so on
 void test_mixed_scripts(int xid_check) {
   u8ident_init(U8ID_DEFAULT_OPTS | xid_check);
   assert(u8ident_check((const uint8_t*)"abcd", NULL) == U8ID_EOK);
   assert(u8ident_check((const uint8_t*)"abc\xce\x86", NULL) == U8ID_EOK); // Latin + Greek ok
-  assert(u8ident_check((const uint8_t*)"Cafe\xcc\x81", NULL) == U8ID_EOK_NORM);
+  int ret = u8ident_check((const uint8_t*)"Cafe\xcc\x81", NULL);
+  if (ret != U8ID_EOK_NORM)
+    printf("ERROR U+301 with xid_check %d does not return EOK_NORM, but %d\n", xid_check, ret);
+  assert(ret == U8ID_EOK_NORM);
 
-  int err = u8ident_check((const uint8_t*)"\xc3\xb7", NULL);
+  ret = u8ident_check((const uint8_t*)"\xc3\xb7", NULL);
   if (u8ident_options() & U8ID_CHECK_XID) {
-      assert(err == U8ID_ERR_CCLASS); // division sign U+F7 forbidden as XID
+      assert(ret == U8ID_ERR_XID); // division sign U+F7 forbidden as XID
       //printf("ERROR U+F7 is not allowed\n");
-      assert(u8ident_check((const uint8_t*)"\xc6\x80", NULL) == U8ID_ERR_CCLASS); // small letter b with stroke
+      assert(u8ident_check((const uint8_t*)"\xc6\x80", NULL) == U8ID_ERR_XID); // small letter b with stroke
       //printf("ERROR U+180 is not allowed\n");
-      if (u8ident_check((const uint8_t*)"\xe1\xac\x85", NULL) != U8ID_ERR_CCLASS) // U+1B05
+      if (u8ident_check((const uint8_t*)"\xe1\xac\x85", NULL) != U8ID_ERR_XID) // U+1B05
 	  printf("ERROR Balinese is limited\n");
   }
   else {
-     assert(err == U8ID_EOK); // division sign U+F7 allowed without XID check
+     assert(ret == U8ID_EOK); // division sign U+F7 allowed without XID check
      assert(u8ident_check((const uint8_t*)"\xc6\x80", NULL) == U8ID_EOK); // U+180
      //printf("U+1B05: %d\n", u8ident_check((const uint8_t*)"\xe1\xac\x85", NULL));
      assert(u8ident_check((const uint8_t*)"\xe1\xac\x85", NULL) == U8ID_ERR_SCRIPT); // U+1B05 is limited

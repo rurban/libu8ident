@@ -395,9 +395,9 @@ printf $H <<"EOF", $b, $s, scalar(@SCXR);
 #endif
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
-// Remove all Limited Use SC's from the list.
+//                 Remove all Limited Use SC's from the list on hardcoded profiles 3-5
 #ifdef EXT_SCRIPTS
-extern const struct scx scx_script_list[%u];
+extern const struct scx scx_list[%u];
 #else
 const struct scx scx_list[] = {
 EOF

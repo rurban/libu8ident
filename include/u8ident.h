@@ -102,7 +102,7 @@ enum u8id_errors {
   U8ID_EOK = 0,
   U8ID_EOK_NORM = 1,
   U8ID_EOK_WARN_CONFUS = 2,
-  U8ID_ERR_CCLASS = -1,
+  U8ID_ERR_XID = -1,
   U8ID_ERR_SCRIPT = -2,
   U8ID_ERR_SCRIPTS = -3,
   U8ID_ERR_ENCODING = -4,
@@ -116,7 +116,7 @@ enum u8id_errors {
     * 0   - valid without need to normalize.
     * 1   - valid with need to normalize.
     * 2   - warn about confusable (not yet implemented)
-    * -1  - invalid character class. disallowed via IdentifierStatus.txt
+    * -1  - invalid xid, disallowed via IdentifierStatus.txt
     * -2  - invalid script
     * -3  - invalid mixed scripts
     * -4  - invalid encoding

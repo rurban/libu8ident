@@ -1758,9 +1758,9 @@ const struct sc nonxid_script_list[] = {
 #endif
 
 // FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
-// Remove all Limited Use SC's from the list.
+//                 Remove all Limited Use SC's from the list on hardcoded profiles 3-5
 #ifdef EXT_SCRIPTS
-extern const struct scx scx_script_list[121];
+extern const struct scx scx_list[121];
 #else
 const struct scx scx_list[] = {
   {0x0342, 0x0342, "\x0b"},	// Grek

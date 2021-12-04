@@ -81,9 +81,9 @@ profile, the Restriction Levels 1-5.
 
 1. **ASCII-Only**
 
-All characters in the string are in the ASCII range. You dont need this library
-for that use-case.
-        
+All characters in the string are in the ASCII range. You don't need this library
+for that use-case. (*Maybe still allow that for conformance testing*)
+
 2. **Single Script**
 
 * The string qualifies as ASCII-Only, or
@@ -123,14 +123,14 @@ for that use-case.
   value indicating that the string does not match any of the levels
   1-5.
 
-Recommended is Level 4, the *Moderately Restrictive level*.
+Recommended is Level 4, the **Moderately Restrictive level**.
 
 configure options
 -----------------
 
-* --with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD. Default: none (at run-time NFKC is the default)
+* --with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD. Default: none (at run-time, NFKC is the default)
 
-* --with-profile=2,3,4,5,6. Default: none (at run-time 4 is the default)
+* --with-profile=2,3,4,5,6. Default: none (at run-time, 4 is the default)
 
 * --enable-check-xid, --disable-check-xid or none
 
@@ -143,7 +143,7 @@ When you know beforehand which normalization or profile you will need, and your 
 knows about allowed identifier codepoints, define that
 via `./configure --with-norm=NFKC --with-profile=4 --disable-check-xid`
 This skips a lot of unused code and branches.
-The generic shared library has all the code for all normalizations and profiles, 
+The generic shared library has all the code for all normalizations, profiles, xid check
 and branches at run-time.
 
 e.g codesizes for u8idnorm.o with -Os
@@ -151,7 +151,7 @@ e.g codesizes for u8idnorm.o with -Os
     amd64-gcc:   NFKC 217K, NFC+FCC 182K, NFD 113K, NFD 78K, FCD 52K
     amd64-clang: NFKC 218K, NFC+FCC 183K, NFD 114K, NFD 78K, FCD 52K
 
-default: 365K with -g with amd64-gcc
+default: 365K with -g on amd64-gcc
 
 
 API
@@ -285,7 +285,7 @@ profile and xid options.  E.g. via cmake or submodule integration.
 Because the size and run-time varies wildly between all the possible
 and needed options, and this is in the hot path of a parser.
 
-A shared library needs to provide all the options at run=time,
+A shared library needs to provide all the options at run-time,
 i.e. empty configure options.
 
 Build dependencies: ronn (`dnf install rubygem-ronn-ng`)
