@@ -791,11 +791,11 @@ int u8ident_may_normalize(const char *buf, int len) {
 /* TODO: more stack allocations for dest throughout */
 EXTERN char *u8ident_normalize(const char *buf, int len) {
 #if !defined U8ID_NORM || U8ID_NORM != FCD
-// clang-format off
+  // clang-format off
 GCC_DIAG_IGNORE (-Wreturn-local-addr)
-// clang-format on
+  // clang-format on
   char tmp_stack[128];
-GCC_DIAG_POP
+  GCC_DIAG_POP
   char *tmp_ptr;
   char *tmp = NULL;
   size_t tmp_size;

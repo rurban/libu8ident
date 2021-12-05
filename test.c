@@ -261,8 +261,8 @@ void test_norm_fcd(void) {
       // clang-format off
     {"abcd", "abcd", 0},
     {"Cafe" "\xcc\x81", "Cafe" "\xcc\x81", 0}, // U+301 => U+301
-    {"Caf" "\xc3\xa9",  "Caf" "\xc3\xa9", 0},  // U+E9  => U+E9 TODO
-    {"\xe1\xbe\x87", "\xe1\xbe\x87", 0},       // U+1f87 TODO
+    {"Caf" "\xc3\xa9",  "Caf" "\xc3\xa9", 0},  // U+E9  => U+E9
+    {"\xe1\xbe\x87", "\xe1\xbe\x87", 0},       // U+1f87
     {"\xce\xb1\xcc\x94\xcd\x82\xcd\x85", "\xce\xb1\xcc\x94\xcd\x82\xcd\x85", 0},   // U+1f87
     {"\xc7\x85\xc5\x80", "\xc7\x85\xc5\x80", 0}, // ǅŀ
     {NULL, NULL, 0},

@@ -44,9 +44,9 @@ Normalization
 -------------
 
 All utf8 identifiers and literals are parsed and stored as normalized
-NFKC variants (as in Python 3), which prevents from various TR39 and TR36 unicode
-confusable and spoofing security problems. See
-http://www.unicode.org/reports/tr36/ and http://www.unicode.org/reports/tr39.
+NFKC variants (as in Python 3), which prevents from various TR39 and TR36
+unicode confusable and spoofing security problems. See
+http://www.unicode.org/reports/tr36/ and http://www.unicode.org/reports/tr39
 Optionally we also support the NFC and NFD formats.
 
 Mixed Scripts
@@ -105,14 +105,14 @@ for that use-case. (*Maybe still allow that for conformance testing*)
 * The string qualifies as Highly Restrictive, or
 * The string is covered by Latin and any one other Recommended script, except
   Cyrillic, Greek.
-        
+
 5. **Minimally Restrictive**
 
 * There are no restrictions on the set of scripts that cover the string.
 * The only restrictions are the identifier well-formedness criteria
   and Identifier Profile, allowing arbitrary mixtures of scripts such
   as Ωmega, Teχ, HλLF-LIFE, Toys-Я-Us.
-        
+
 6. **Unrestricted**
 
 * There are no restrictions on the script coverage of the string.
@@ -124,27 +124,30 @@ for that use-case. (*Maybe still allow that for conformance testing*)
   1-5.
 
 Recommended is Level 4, the **Moderately Restrictive level**.
+It is always easier to widen restrictions than narrow them.
 
 configure options
 -----------------
 
-* --with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD. Default: none (at run-time, NFKC is the default)
+* --with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD. Default: none (at run-time,
+  NFKC is the default)
 
 * --with-profile=2,3,4,5,6. Default: none (at run-time, 4 is the default)
 
 * --enable-check-xid, --disable-check-xid or none
 
-If to check for the Allowed [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt) or not.
-A proper parser might does this already, but you cannot really trust
-parsers to check unicode identifiers; in the decades up to 2020 at
-least.  It might get better starting with 2025.
+If to check for the Allowed [IdentifierStatus]
+(https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
+or not.  A proper parser might does this already, but you cannot
+really trust parsers to check unicode identifiers; in the decades up
+to 2020 at least.  It might get better starting with 2025.
 
-When you know beforehand which normalization or profile you will need, and your parsers
-knows about allowed identifier codepoints, define that
-via `./configure --with-norm=NFKC --with-profile=4 --disable-check-xid`
-This skips a lot of unused code and branches.
-The generic shared library has all the code for all normalizations, profiles, xid check
-and branches at run-time.
+When you know beforehand which normalization or profile you will need,
+and your parsers knows about allowed identifier codepoints, define
+that via `./configure --with-norm=NFKC --with-profile=4
+--disable-check-xid` This skips a lot of unused code and branches.
+The generic shared library has all the code for all normalizations,
+profiles, xid check and branches at run-time.
 
 e.g codesizes for u8idnorm.o with -Os
 
@@ -161,8 +164,8 @@ API
 
 **u8id_options** is an enum of the following bits:
 
-    U8ID_NFKC = 0  // by the default the compatibility composed normalization, as in Python 3
-    U8ID_NFD  = 1  // the longer, decomposed normalization, as in the previous Apple HPFS filesystem
+    U8ID_NFKC = 0  // by the default the compatibility composed normalization
+    U8ID_NFD  = 1  // the longer, decomposed normalization
     U8ID_NFC  = 2  // the shorter composed normalization
     U8ID_NFKD = 3  // the longer compatibility decomposed normalization
     U8ID_FCD  = 4,  // the faster variants
@@ -174,10 +177,13 @@ API
     U8ID_PROFILE_5 = 64 // Minimally Restrictive
     U8ID_PROFILE_6 = 128 // Unrestricted
 
-    U8ID_FOLDCASE  = 256, // optional for case-insensitive idents. case-folded when normalized.
-    U8ID_CHECK_XID = 512, // optional, check for the allowed tr39 IdentifierStatus.
+    U8ID_FOLDCASE  = 256, // optional for case-insensitive idents. case-folded
+                          // when normalized.
+    U8ID_CHECK_XID = 512, // optional, check for the allowed tr39
+                          // IdentifierStatus.
                           // hard-coded with --{en,dis}able-check-xid
-                          // Note: The parser should do that. Without, the checker can be faster.
+                          // Note: The parser should do that. Without, the
+                          // checker can be faster.
     U8ID_WARN_CONFUSABLE  = 1024,  // not yet implemented
     U8ID_ERROR_CONFUSABLE = 2048, //       -"-
 
@@ -264,10 +270,10 @@ Returns the constant script name, which failed in the last check.
 
 `const char* u8ident_existing_scripts(int ctx)`
 
-Returns a fresh string of the list of the seen scripts in this
-context whenever a mixed script error occurs. Needed for the error message
-"Invalid script %s, already have %s", where the 2nd %s is returned by this function.
-The returned string needs to be freed by the user.
+Returns a fresh string of the list of the seen scripts in this context
+whenever a mixed script error occurs. Needed for the error message
+"Invalid script %s, already have %s", where the 2nd %s is returned by
+this function.  The returned string needs to be freed by the user.
 
 Usage:
 
@@ -309,19 +315,21 @@ of each utf-8 character.  With `U8ID_NFC` also the canonical composition (NFC)
 tables and the reorder logic.  With `U8ID_NFKC` even the larger compatibility
 composition tables and the reorder logic.
 
-The NFC strings are always shorter, but need a 2nd table set (2x memory) and 3x
-longer lookup times. If compiled with `--with-norm=NFD` the library is smaller and
-faster, but the resulting identifiers maybe a bit longer. The NFD table is very
-sparse, only 3 of 17 initial planes are needed.  Some rare overlong entries (296
-codepoints with > 5 byte of UTF-8) are searched in an extra list to keep static
-memory usage low, contrary to most other unicode libs.
+The NFC strings are always shorter, but need a 2nd table set (2x
+memory) and 3x longer lookup times. If compiled with `--with-norm=NFD`
+the library is smaller and faster, but the resulting identifiers maybe
+a bit longer. The NFD table is very sparse, only 3 of 17 initial
+planes are needed.  Some rare overlong entries (296 codepoints with >
+5 byte of UTF-8) are searched in an extra list to keep static memory
+usage low, contrary to most other unicode libs.
 
 We don't support the normalization variants FCC nor FCD yet.
 
-The character to script lookup is done with a sorted list of ranges, for less
-space.  This is also generated from the current UCD.  The internally used script
-indices are arbitrarily created via `mkscripts.pl` from the current UCD, sorted
-into *Recommended Scripts* (sorted by codepoints), *Not Recommended Scripts* (sorted
+The character to script lookup is done with a sorted list of ranges,
+for less space.  This is also generated from the current UCD.  The
+internally used script indices are arbitrarily created via
+`mkscripts.pl` from the current UCD, sorted into *Recommended Scripts*
+(sorted by codepoints), *Not Recommended Scripts* (sorted
 alphabetically) and *Limited Use Scripts* (sorted by codepoint).
 
 With the optional `-DDISABLE_CHECK_XID` define, all identifiers need
@@ -332,3 +340,32 @@ non-identifier characters. A normal unicode-aware parser should do
 this already, but in 2021 99% of all parsers still do the wrong thing
 for unicode identifiers, even for this siple static check. Not yet
 talking about allowed scripts, mixed scripts or confusables.
+
+TODO
+----
+
+* **SCX variants**: Some codepoints are combinations, valid for a number of
+  scripts.  These appear with the Common and Inherited scripts. When
+  an SCX appears with more than one script, such as e.g. U+60C with
+  `Arab Nkoo Rohg Syrc Thaa Yezi`, the variants need to be checked
+  against the existing scripts in the current context.  If one of them
+  already exists, the SCX list is collapsed to this. But if none
+  exists we need to the list and check it against the next yet unseen
+  script, and check for mixed-script violations.
+
+* **[IdentifierType]
+(http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
+  The list of idtypes is provided, but not yet integrated into any API.
+  E.g. if someone wants to allow the Technical idtype.
+  Then you have to use `u8ident_get_idtypes()` by yourself, and it is
+  not exported (ie. unusable from the shared library)
+  We only optionally check the IdentifierStatus Allowed with CHECK_XID.
+
+* **Security Profiles**: There's not much code yet to check for Profile 3 vs 4,
+  i.e. if to allow only Asian CFK combinations, or all combinations with Latin.
+
+* **FCD**: This normalization is broken.
+
+* The **testsuite** does not yet check for known UTF-8 or other Unicode
+  spoofing exploits.
+  The testsuite does not yet check the profile 2-6 differences.
