@@ -86,12 +86,6 @@ AC_PROG_INSTALL
 AM_PROG_CC_C_O
 AC_PROG_CC_C99
 dnl AC_PROG_CC_C11
-dnl optional for packaging or maintainance
-AC_CHECK_TOOLS([WGET], [wget2 wget])
-# dnf install rubygem-ronn-ng
-AC_CHECK_TOOLS([RONN], [ronn])
-AC_CHECK_TOOLS([PERL], [cperl perl])
-
 if test "x$ac_cv_prog_cc_c11" != "xno"; then
    AC_DEFINE([HAVE_C11], 1,
         [Defined to 1 when the compiler supports c11])
@@ -101,8 +95,19 @@ if test "x$ac_cv_prog_cc_c11" != "xno"; then
    fi
 fi
 AC_SUBST(HAVE_C11)
+AC_CACHE_CHECK([if compiling with clang], [ax_cv_cc_target_clang],
+[
+    CFLAGS="$TARGET_CFLAGS"
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([], [[
+#ifdef __clang__
+#error "is clang"
+#endif
+        ]])],
+        [ax_cv_cc_target_clang=no], [ax_cv_cc_target_clang=yes])])
 
-if test x$ac_compiler_gnu = xyes; then
+# clang has no broken return-local-addr detection
+if test x$ac_cv_c_compiler_gnu = xyes -a $ax_cv_cc_target_clang = xno; then
    case $host_os in
      mingw*|cygwin*|msys*)
         WARN_CFLAGS="-Wall -Wextra" ;;
@@ -110,14 +115,22 @@ if test x$ac_compiler_gnu = xyes; then
         if test "x$ac_cv_prog_cc_c99" = "xno"; then
           WARN_CFLAGS="-Wall -Wextra"
         else
-          WARN_CFLAGS="-Wall -Wextra -Werror"
+          WARN_CFLAGS="-Wall -Wextra -Werror -Wno-return-local-addr"
         fi
         ;;
      esac
+elif test $ax_cv_cc_target_clang = xyes; then
+  WARN_CFLAGS="-Wall -Wextra -Werror"
 else
   WARN_CFLAGS="-Wall -Wextra"
 fi
 AC_SUBST(WARN_CFLAGS)
+
+dnl optional for packaging or maintainance
+AC_CHECK_TOOLS([WGET], [wget2 wget])
+# dnf install rubygem-ronn-ng
+AC_CHECK_TOOLS([RONN], [ronn])
+AC_CHECK_TOOLS([PERL], [cperl perl])
 
 AC_MSG_NOTICE([Check header files])
 # ===============================================
