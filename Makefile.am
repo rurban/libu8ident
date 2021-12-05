@@ -67,7 +67,8 @@ TESTS = test
 check-all: check check-asan check-norms check-profiles check-xid
 
 check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	$(CC) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address test.c $(libu8ident_la_SOURCES) \
+	$(CC) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
+	  $(srcdir)/test.c $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
 	  -o test-asan$(EXEEXT)
 	./test-asan$(EXEEXT)
 
