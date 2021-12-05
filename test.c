@@ -8,18 +8,13 @@
 #include <assert.h>
 #include <stdbool.h>
 #include "u8ident.h"
-#define EXT_SCRIPTS
-#include "scripts.h"
+#include "u8idscr.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 static char buf[128]; // for hex display
 
 // private access
 unsigned u8ident_options(void);
-uint8_t u8ident_get_script(uint32_t cp);
-bool u8ident_is_allowed(const uint32_t cp);
-const char *u8ident_get_scx(const uint32_t cp);
-uint16_t u8ident_get_idtypes(const uint32_t cp);
 
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
@@ -347,6 +342,40 @@ void test_init(void) {
   assert(u8ident_init(2048));
 }
 
+void test_scx_singles(void) {
+  // check scripts of all scx singles, if really only Common and Inherited. (Yes with UCD 14)
+  // Ideally we would have none, they would all be merged into the sc_list, splitting it up.
+  int c = u8ident_new_ctx();
+  struct ctx_t *ctx = u8ident_ctx();
+  //uint8_t oldscr = 0;
+  for (size_t i = 0; i < ARRAY_SIZE(scx_list); i++) {
+    if (strlen(scx_list[i].list) == 1) {
+      uint8_t scrx = (uint8_t)scx_list[i].list[0];
+      for (uint32_t j = scx_list[i].from; j <= scx_list[i].from; j++) {
+        uint8_t scr = u8ident_get_script(j);
+        if (!u8ident_has_script_ctx(scr, ctx)) {
+          u8ident_add_script_ctx(scr, ctx);
+          //oldscr = 0;
+        }
+        //if (scr != oldscr)
+        printf("SCX single: U+%X %s => %s\n", (unsigned)j,
+               u8ident_script_name(scr),
+               u8ident_script_name(scrx));
+        //oldscr = scr;
+        if (scx_list[i].from == scx_list[i].to)
+          break;
+      }
+    }
+  }
+  for (uint8_t scr = 0; scr <= LAST_SCRIPT; scr++) {
+    if (u8ident_has_script_ctx(scr, ctx)) {
+        printf("SC: %s\n", u8ident_script_name(scr));
+        assert(scr == SC_Common || scr == SC_Inherited);
+    }
+  }
+  u8ident_delete_ctx(c);
+}
+
 int main(int argc, char **argv) {
   const int norm = (argc > 1 && !strcmp(argv[0], "norm"));
   const int profile = (argc > 1 && !strcmp(argv[0], "profile"));
@@ -373,5 +402,6 @@ int main(int argc, char **argv) {
     test_mixed_scripts(U8ID_CHECK_XID);
   }
   test_mixed_scripts_with_ctx();
+  test_scx_singles();
   return 0;
 }

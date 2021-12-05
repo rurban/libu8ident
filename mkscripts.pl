@@ -182,7 +182,7 @@ while (<$SC>) {
 }
 close $SC;
 
-# neded for the SCX short -> name lookup
+# needed for the SCX short -> name lookup
 my %PVA;
 $started = 0;
 open my $PVA, "<", $pva or die "$pva $!";
