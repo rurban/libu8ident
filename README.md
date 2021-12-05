@@ -37,7 +37,7 @@ null-terminated identifier.  Optionally we can check for proper
 optimization `-DDISABLE_CHECK_XID`. 
 
 With the `U8ID_CHECK_XID` option we check for valid UTF-8 encoding, valid
-XID properties amnd allowed Script of each character. We do this by checking
+XID properties and allowed script of each character. We do this by checking
 for the Allowed IdentifierStatus.
 
 Normalization
