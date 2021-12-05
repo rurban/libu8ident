@@ -123,12 +123,15 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
       (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
   return sc ? sc->scr : 255;
 }
+
+#ifndef DISABLE_CHECK_XID
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
   const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
   return r ? true : false;
 }
+#endif
 
 uint8_t u8ident_get_script(const uint32_t cp) {
 #ifndef DISABLE_CHECK_XID
