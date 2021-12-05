@@ -103,14 +103,19 @@ fi
 AC_SUBST(HAVE_C11)
 
 if test x$ac_compiler_gnu = xyes; then
-  WARN_CFLAGS="-Wall -Wextra -Werror"
-  # -Wno-return-local-addr
+   case $host_os in
+     mingw*|cygwin*|msys*)
+        WARN_CFLAGS="-Wall -Wextra" ;;
+     *) dnl older non-c99 g++ complain about __VA_ARGS__, for();
+        if test "x$ac_cv_prog_cc_c99" = "xno"; then
+          WARN_CFLAGS="-Wall -Wextra"
+        else
+          WARN_CFLAGS="-Wall -Wextra -Werror"
+        fi
+        ;;
+     esac
 else
   WARN_CFLAGS="-Wall -Wextra"
-fi
-dnl older non-c99 g++ complain about __VA_ARGS__, for();
-if test "x$ac_cv_prog_cc_c99" = "xno"; then
-    WARN_CFLAGS=`echo $WARN_CFLAGS | sed -e"s,-Werror ,,"`
 fi
 AC_SUBST(WARN_CFLAGS)
 

@@ -114,12 +114,12 @@ static void testnorm(const char* name, const struct norms_t *testids) {
     char *norm = u8ident_normalize(p->id, strlen(p->id));
     assert(norm);
     if (strcmp(p->norm, norm) != 0) {
-      printf("%s[%ld]: %s [%s] != ", name, p - testids,
+      printf("%s[%ld]: %s [%s] != ", name, (long)(p - testids),
              p->norm, xstr(p->norm));
       printf("%s [%s]\n", norm, xstr(norm));
     }
     if (sign(strcmp(p->id, norm)) != sign(p->result))
-      printf("%s[%ld]: %s [%s] => %d\n", name, p - testids,
+      printf("%s[%ld]: %s [%s] => %d\n", name, (long)(p - testids),
              p->id, xstr(p->id), strcmp(p->id, norm));
     if (strcmp(name, "FCD")) {
       assert(strcmp(norm, p->norm) == 0);

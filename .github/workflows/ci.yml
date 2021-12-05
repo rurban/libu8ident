@@ -70,5 +70,3 @@ jobs:
       run: make
     - shell: msys2 {0}
       run: make check
-    - shell: msys2 {0}
-      run: make check-all

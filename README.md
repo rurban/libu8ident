@@ -157,6 +157,8 @@ default: 365K with -g on amd64-gcc
 API
 ---
 
+    #include "u8ident.h"
+
 **u8id_options** is an enum of the following bits:
 
     U8ID_NFKC = 0  // by the default the compatibility composed normalization, as in Python 3

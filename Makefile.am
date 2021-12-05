@@ -15,10 +15,9 @@ pcdata_DATA = libu8ident.pc
 man_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE
-EXTRA_DIST = mkscripts.pl mktest-norm.pl makefile.gnu \
-	scripts.h u8id_private.h u8idscr.h \
-	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	$(doc_DATA)
+HDRS = scripts.h u8id_private.h u8idscr.h \
+	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
+EXTRA_DIST = mkscripts.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
 
 .c.i:
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -64,7 +63,7 @@ TESTS = test
 
 check-all: check check-asan check-norms check-profiles check-xid
 
-check-asan: test.c $(libu8ident_la_SOURCES)
+check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	$(CC) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address test.c $(libu8ident_la_SOURCES) \
 	  -o test-asan$(EXEEXT)
 	./test-asan$(EXEEXT)
@@ -79,14 +78,14 @@ check-norms:
             $(CC) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors -c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
             ls -gGh u8idnorm.o; \
         done
-check-profiles: $(SRC) $(HEADER) $(HDRS)
+check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c -o test-profiles && \
 	    ./test-profiles profile; \
         done
-check-xid: $(SRC) $(HEADER) $(HDRS)
+check-xid: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in DISABLE ENABLE; do \
             echo $${n}_CHECK_XID; \
 	    $(CC) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \

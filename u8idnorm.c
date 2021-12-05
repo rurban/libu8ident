@@ -373,7 +373,8 @@ int u8id_decompose_s(char *restrict dest, long dmax,
     if (unlikely(dest == NULL)) {
         return ERR_INVAL;
     }
-    if (unlikely(src == NULL || dest == NULL || dmax == 0 || dmax < 5 || dmax > u8ident_maxlength())) {
+    if (unlikely(src == NULL || dest == NULL || dmax == 0 || dmax < 5
+                 || (unsigned)dmax > u8ident_maxlength())) {
         *dest = 0;
         return ERR_INVAL;
     }
@@ -674,7 +675,7 @@ int u8id_compose_s(char *restrict dest, long dmax,
     //char *orig_dest = dest;
     const long orig_dmax = dmax;
 
-    if (unlikely(dmax > u8ident_maxlength())) {
+    if (unlikely((unsigned)dmax > u8ident_maxlength())) {
       *lenp = 0;
       return ERR_INVAL;
     }
@@ -789,6 +790,7 @@ int u8ident_may_normalize(const char* buf, int len) {
 
 /* Returns a freshly allocated normalized string, in the option defined at `u8ident_init`. */
 /* TODO: more stack allocations for dest throughout */
+GCC_DIAG_IGNORE(-Wreturn-local-addr)
 EXTERN char *u8ident_normalize(const char* buf, int len) {
 #if !defined U8ID_NORM || U8ID_NORM != FCD
     char tmp_stack[128];
@@ -873,3 +875,4 @@ EXTERN char *u8ident_normalize(const char* buf, int len) {
 #endif // !(NFD or NFKD)
 #endif // !FCD
 }
+GCC_DIAG_POP
