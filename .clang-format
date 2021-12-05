@@ -1,0 +1,8 @@
+---
+Language:      Cpp
+BasedOnStyle:  LLVM
+IndentPPDirectives: AfterHash
+SortIncludes:    false
+SortUsingDeclarations: false
+...
+

@@ -10,7 +10,8 @@
 #include "u8idscr.h"
 
 // defaults to U8ID_NFKC | U8ID_PROFILE_4
-unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT | U8ID_CHECK_XID;
+unsigned s_u8id_options =
+    U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT | U8ID_CHECK_XID;
 unsigned s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
@@ -35,30 +36,27 @@ EXTERN int u8ident_init(unsigned options) {
   return 0;
 }
 
-unsigned u8ident_options(void) {
-  return s_u8id_options;
-}
+unsigned u8ident_options(void) { return s_u8id_options; }
 
-/* maxlength of an identifier. Default: 1024. Beware that such long identiers are
-   not really identifiable anymore, and keep them under 80 or even
-   less. Some filesystems do allow now 32K identifiers, which is a
-   glaring security hole, waiting to be exploited. */
+/* maxlength of an identifier. Default: 1024. Beware that such long identiers
+   are not really identifiable anymore, and keep them under 80 or even less.
+   Some filesystems do allow now 32K identifiers, which is a glaring security
+   hole, waiting to be exploited. */
 EXTERN void u8ident_set_maxlength(unsigned maxlen) {
   if (maxlen > 1)
     s_maxlen = maxlen;
 }
 
-unsigned u8ident_maxlength(void) {
-  return s_maxlen;
-}
+unsigned u8ident_maxlength(void) { return s_maxlen; }
 
 /* Two variants to check if this identifier is valid. The second avoids
    allocating a fresh string from the parsed input.
 */
-EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char** outnorm) {
+EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
+                                          char **outnorm) {
   int ret = U8ID_EOK;
-  char *s = (char*)buf;
-  const char *e = (char*)&buf[len];
+  char *s = (char *)buf;
+  const char *e = (char *)&buf[len];
   bool need_normalize = false;
 #ifdef HAVE_SCX
   char scx[32]; // combination of all scx
@@ -75,22 +73,23 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
 #ifndef DISABLE_CHECK_XID
     // check for the Allowed IdentifierStatus (tr39)
     if
-# ifdef ENABLE_CHECK_XID
-      (1)
-# else
-      (s_u8id_options & U8ID_CHECK_XID)
-# endif
+#  ifdef ENABLE_CHECK_XID
+        (1)
+#  else
+        (s_u8id_options & U8ID_CHECK_XID)
+#  endif
     {
       if (unlikely(!u8ident_is_allowed(cp))) {
-	struct ctx_t *ctx = u8ident_ctx();
-	ctx->last_cp = cp;
-	return U8ID_ERR_XID;
+        struct ctx_t *ctx = u8ident_ctx();
+        ctx->last_cp = cp;
+        return U8ID_ERR_XID;
       }
     }
 #endif
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
-    if (unlikely(s_u8id_profile < U8ID_PROFILE_5 && scr >= FIRST_LIMITED_USE_SCRIPT)) {
+    if (unlikely(s_u8id_profile < U8ID_PROFILE_5 &&
+                 scr >= FIRST_LIMITED_USE_SCRIPT)) {
       struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
@@ -99,7 +98,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
       need_normalize = u8ident_is_decomposed(cp, scr);
     }
 #ifdef HAVE_SCX
-    // check scx on Common or Inherited, keep list of possible scripts, and reduce them
+    // check scx on Common or Inherited, keep list of possible scripts, and
+    // reduce them
     if (scr == SC_Common || scr == SC_Inherited) {
       const char *this_scx = u8ident_get_scx(cp);
       // TODO check this_scx against the existing scripts, ...
@@ -121,7 +121,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
         return U8ID_ERR_SCRIPT;
       }
       // if excluded it must have been already manually added
-      if (unlikely(s_u8id_profile < U8ID_PROFILE_5 && scr >= FIRST_EXCLUDED_SCRIPT)) {
+      if (unlikely(s_u8id_profile < U8ID_PROFILE_5 &&
+                   scr >= FIRST_EXCLUDED_SCRIPT)) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }
@@ -132,35 +133,32 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
           if (unlikely(!ctx->has_han)) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
-          }
-          else
+          } else
             goto ok;
-        }
-        else if (scr == SC_Han) {
-          if (unlikely(!(ctx->is_chinese || ctx->is_japanese || ctx->is_korean))) {
+        } else if (scr == SC_Han) {
+          if (unlikely(
+                  !(ctx->is_chinese || ctx->is_japanese || ctx->is_korean))) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
-          }
-          else
+          } else
             goto ok;
-        }
-        else if (scr == SC_Katakana || scr == SC_Hiragana) {
+        } else if (scr == SC_Katakana || scr == SC_Hiragana) {
           if (unlikely(!(ctx->is_japanese || ctx->has_han))) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
-          }
-          else
+          } else
             goto ok;
         }
         // and disallow all other combinations
         else { /* if (scr == SC_Greek && ctx->is_cyrillic)
                 return U8ID_ERR_SCRIPTS;
-                else if (scr == SC_Cyrillic && u8ident_has_script_ctx(SC_Greek, ctx)) */
+                else if (scr == SC_Cyrillic &&
+                u8ident_has_script_ctx(SC_Greek, ctx)) */
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         }
       }
-  ok:
+    ok:
       if (scr == SC_Han)
         ctx->has_han = 1;
       else if (scr == SC_Bopomofo)
@@ -169,23 +167,23 @@ EXTERN enum u8id_errors u8ident_check_buf(const char* buf, const int len, char**
         ctx->is_japanese = 1;
       else if (scr == SC_Hangul)
         ctx->is_korean = 1;
-      //else if (scr == SC_Cyrillic)
-      //  ctx->is_cyrillic = 1;
+      // else if (scr == SC_Cyrillic)
+      //   ctx->is_cyrillic = 1;
       u8ident_add_script_ctx(scr, ctx);
     }
   }
   if (need_normalize) {
-    char *norm = u8ident_normalize((char*)buf, len);
+    char *norm = u8ident_normalize((char *)buf, len);
     if (strcmp(norm, buf))
       ret = U8ID_EOK_NORM;
     if (outnorm)
       *outnorm = norm;
     else
-      free (norm);
+      free(norm);
   }
   return ret;
 }
 
-EXTERN enum u8id_errors u8ident_check(const uint8_t* string, char** outnorm) {
-  return u8ident_check_buf((char*)string, strlen((char*)string), outnorm);
+EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
+  return u8ident_check_buf((char *)string, strlen((char *)string), outnorm);
 }

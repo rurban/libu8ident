@@ -10,7 +10,7 @@
 	HANGUL (Korean) has special normalization rules.
         Unicode 9.0
 */
-
+// clang-format off
 #define Hangul_SBase  0xAC00
 #define Hangul_SFinal 0xD7A3
 #define Hangul_SCount  11172
@@ -55,4 +55,5 @@
     ( ( 0xFFD2 <= cp && cp <= 0xFFD7 ) || ( 0xFFDA <= cp && cp <= 0xFFDC ) \
     )))))))))))))))))))))))))) )
 
+// clang-format on
 #endif /* H_HANGUL */

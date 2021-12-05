@@ -276,7 +276,7 @@ print $H <<"EOF";
 struct sc {
   uint32_t from;
   uint32_t to;
-  uint8_t  scr; // index
+  uint8_t scr; // index
 };
 
 struct scx {
@@ -300,9 +300,10 @@ struct range_short {
    Sorted into usages.
  */
 #ifndef EXT_SCRIPTS
-const char* const all_scripts[] = {
-  // Recommended Scripts (not need to add them)
-  // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
+const char *const all_scripts[] = {
+    // clang-format off
+    // Recommended Scripts (not need to add them)
+    // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 EOF
 my $i = 0;
 my $defines = "";
@@ -310,13 +311,13 @@ for my $sc (@recommended) {
   my $ws = " " x (10-length($sc));
   $SC{$sc} = $i;
   $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-  printf $H "  \"%s\",\n", $sc, $i;
+  printf $H "    \"%s\",\n", $sc, $i;
   $i++;
 }
 $defines .= "#define FIRST_EXCLUDED_SCRIPT $i\n";
 print $H <<"EOF";
-  // Excluded Scripts (but can be added expliclitly)
-  // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
+    // Excluded Scripts (but can be added expliclitly)
+    // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
 EOF
 my %other = map {$_ => 1} @recommended, @limited;
 for my $sc (sort keys %scripts) {
@@ -324,41 +325,46 @@ for my $sc (sort keys %scripts) {
     my $ws = " " x (10-length($sc));
     $SC{$sc} = $i;
     $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-    printf $H "  \"%s\",\n", $sc, $i;
+    printf $H "    \"%s\",\n", $sc, $i;
     $i++;
   }
 }
 $defines .= "#define FIRST_LIMITED_USE_SCRIPT $i\n";
 print $H <<"EOF";
-  // Limited Use Scripts
-  // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
+    // Limited Use Scripts
+    // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 EOF
 for my $sc (@limited) {
   my $ws = " " x (10-length($sc));
   $SC{$sc} = $i;
   $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-  printf $H "  \"%s\",\n", $sc, $i;
+  printf $H "    \"%s\",\n", $sc, $i;
   $i++;
 }
 $i--;
 printf $H <<"EOF", $i;
+    // clang-format on
 };
 #else
-extern const char* const all_scripts[%u];
+extern const char *const all_scripts[%u];
 #endif
 
 #define FIRST_RECOMMENDED_SCRIPT 0
+// clang-format off
 EOF
 print $H $defines;
 printf $H <<"EOF", $i, scalar @SCR;
+// clang-format on
 #define LAST_SCRIPT %u
 
 #ifndef DISABLE_CHECK_XID
-// The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or non-codepoints.
-#ifdef EXT_SCRIPTS
+// The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or
+// non-codepoints.
+#  ifdef EXT_SCRIPTS
 extern const struct sc xid_script_list[%u];
-#else
+#  else
 const struct sc xid_script_list[] = {
+    // clang-format off
 EOF
 my ($b, $s);
 for my $r (@SCR) {
@@ -367,19 +373,21 @@ for my $r (@SCR) {
   } else {
     $b++;
   }
-  printf $H "  {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  printf $H "    {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
 };
 printf $H <<"EOF", $b, $s, scalar(@SCRF);
+    // clang-format on
 }; // %u ranges, %u single codepoints
-#endif
+#  endif
 #endif
 
-// The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or non-codepoints needed,
-// as the parser already disallowed such codepoints.
+// The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or
+// non-codepoints needed, as the parser already disallowed such codepoints.
 #ifdef EXT_SCRIPTS
 extern const struct sc nonxid_script_list[%u];
 #else
 const struct sc nonxid_script_list[] = {
+    // clang-format off
 EOF
 ($b, $s) = (0, 0);
 for my $r (@SCRF) {
@@ -388,18 +396,22 @@ for my $r (@SCRF) {
   } else {
     $b++;
   }
-  printf $H "  {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  printf $H "    {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
 };
 printf $H <<"EOF", $b, $s, scalar(@SCXR);
+    // clang-format on
 }; // %u ranges, %u single codepoints
 #endif
 
-// FIXME SCX list: Replace SC Common/Inherited with a single SCX (e.g. U+342 Greek, U+363 Latin)
-//                 Remove all Limited Use SC's from the list on hardcoded profiles 3-5
+// FIXME SCX list:
+//   Replace SC Common/Inherited with a single SCX
+//   (e.g. U+342 Greek, U+363 Latin)
+//   Remove all Limited Use SC's from the list on hardcoded profiles 3-5
 #ifdef EXT_SCRIPTS
 extern const struct scx scx_list[%u];
 #else
 const struct scx scx_list[] = {
+    // clang-format off
 EOF
 ($b, $s) = (0, 0);
 for my $r (@SCXR) {
@@ -414,16 +426,18 @@ for my $r (@SCXR) {
   } else {
     $b++;
   }
-  printf $H "  {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
+  printf $H "    {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
 };
 printf $H <<"EOF", $b, $s;
+    // clang-format on
 }; // %u ranges, %u single codepoints
 #endif
 
 #ifndef DISABLE_CHECK_XID
 // Allowed scripts from IdentifierStatus.txt.
-#ifndef EXT_SCRIPTS
+#  ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
+    // clang-format off
 EOF
 ($b, $s) = (0, 0);
 for my $r (@ALLOWED) {
@@ -432,13 +446,14 @@ for my $r (@ALLOWED) {
   } else {
     $b++;
   }
-  printf $H "  {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+  printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
 };
 printf $H <<"EOF", $b, $s, scalar(@ALLOWED);
+    // clang-format on
 }; // %u ranges, %u single codepoints
-#else
+#  else
 extern const struct range_bool allowed_id_list[%u];
-#endif
+#  endif
 
 // IdentifierType bit-values
 enum u8id_idtypes {
@@ -459,12 +474,15 @@ print $H <<"EOF";
 
 //#if 0
 /* IdentifierType
-   Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable, Deprecated
+   Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC,
+   Default_Ignorable, Deprecated
+
    Allowed: keep Recommended, Inclusion
    Maybe allow by request Technical
 */
-#ifndef EXT_SCRIPTS
+#  ifndef EXT_SCRIPTS
 const struct range_short idtype_list[] = {
+    // clang-format off
 EOF
 sub idtype_bits {
   my $s = shift;
@@ -481,13 +499,14 @@ for my $r (@IDTYPES) {
   } else {
     $b++;
   }
-  printf $H "  {0x%04X, 0x%04X, %s },\n", $r->[0], $r->[1], idtype_bits($r->[2]);
+  printf $H "    {0x%04X, 0x%04X, %s},\n", $r->[0], $r->[1], idtype_bits($r->[2]);
 };
 printf $H <<"EOF", $b, $s, scalar(@IDTYPES);
+    // clang-format on
 }; // %u ranges, %u single codepoints
-#else
+#  else
 extern const struct range_short idtype_list[%u];
-#endif
+#  endif
 
 #endif // DISABLE_CHECK_XID
 EOF

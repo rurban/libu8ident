@@ -27,13 +27,16 @@ EXTRA_DIST = mkscripts.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -E -P -o $@ $<
 
-scripts.h: mkscripts.pl
-	$(PERL) mkscripts.pl
+$(srcdir)/scripts.h: $(srcdir)/mkscripts.pl
+	cd $(srcdir) && $(PERL) mkscripts.pl
 # emacs flymake-mode
 check-syntax:
 	test -n "$(CHK_SOURCES)" && \
 	  $(COMPILE) -o /dev/null -S $(CHK_SOURCES)
-.PHONY: check-syntax
+.PHONY: check-syntax clang-format
+
+clang-format:
+	clang-format -i $(srcdir)/*.c $(srcdir)/include/*.h $(srcdir)/scripts.h $(srcdir)/u8id*.h
 
 # Create the normalization headers via a current perl
 Unicode-Normalize: un8ifcan.h

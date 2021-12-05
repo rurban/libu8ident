@@ -2,8 +2,9 @@
    Copyright 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
-  Classify and search for the script property https://www.unicode.org/reports/tr24/tr24-32.html
-  Implement http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
+  Classify and search for the script property
+  https://www.unicode.org/reports/tr24/tr24-32.html Implement
+  http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 */
 
 #include "u8ident.h"
@@ -17,7 +18,7 @@
 
 extern unsigned s_u8id_options;
 // not yet thread-safe
-struct ctx_t ctx[U8ID_CTX_TRESH] = { 0 }; // pre-allocate 5 contexts
+struct ctx_t ctx[U8ID_CTX_TRESH] = {0}; // pre-allocate 5 contexts
 static int i_ctx = 0;
 struct ctx_t *ctxp = NULL; // if more than 5 contexts
 
@@ -28,13 +29,13 @@ EXTERN int u8ident_new_ctx(void) {
   int i = i_ctx + 1;
   i_ctx++;
   if (i == U8ID_CTX_TRESH) {
-    ctxp = (struct ctx_t *)calloc(U8ID_CTX_TRESH, sizeof (struct ctx_t));
+    ctxp = (struct ctx_t *)calloc(U8ID_CTX_TRESH, sizeof(struct ctx_t));
   } else if (i > U8ID_CTX_TRESH) {
-    ctxp = (struct ctx_t *)realloc(ctxp, i * sizeof (struct ctx_t));
+    ctxp = (struct ctx_t *)realloc(ctxp, i * sizeof(struct ctx_t));
   } else {
     ctxp = &ctx[i];
   }
-  memset(ctxp, 0, sizeof( struct ctx_t ));
+  memset(ctxp, 0, sizeof(struct ctx_t));
   return i_ctx;
 }
 
@@ -43,20 +44,19 @@ EXTERN int u8ident_set_ctx(int i) {
   if (i >= 0 && i <= i_ctx) {
     i_ctx = i;
     return 0;
-  }
-  else
+  } else
     return -1;
 }
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
-struct ctx_t * u8ident_ctx(void) {
+struct ctx_t *u8ident_ctx(void) {
   return (i_ctx < U8ID_CTX_TRESH) ? &ctx[i_ctx] : &ctxp[i_ctx];
 }
 
 bool u8ident_has_script(const uint8_t scr) {
   struct ctx_t *ctx = u8ident_ctx();
   uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
-  for (int i=0; i < ctx->count; i++) {
+  for (int i = 0; i < ctx->count; i++) {
     if (scr == u8p[i])
       return true;
   }
@@ -66,7 +66,7 @@ bool u8ident_has_script(const uint8_t scr) {
 // search in linear vector of scripts per ctx
 bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
   const uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
-  for (int i=0; i < ctx->count; i++) {
+  for (int i = 0; i < ctx->count; i++) {
     if (scr == u8p[i])
       return true;
   }
@@ -76,7 +76,7 @@ void u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
   int i = ctx->count;
   uint8_t *u8p = (i > 7) ? ctx->u8p : ctx->scr8;
   if ((i & 7) == 7)
-    ctx->u8p = realloc(ctx->u8p, (i+1) * 2);
+    ctx->u8p = realloc(ctx->u8p, (i + 1) * 2);
   u8p[i] = scr;
   ctx->count++;
   return;
@@ -98,7 +98,8 @@ static uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, con
 }
 #endif
 
-static struct sc * binary_search(const uint32_t cp, const char *list, const size_t len, const size_t size) {
+static struct sc *binary_search(const uint32_t cp, const char *list,
+                                const size_t len, const size_t size) {
   int n = (int)len;
   const char *p = list;
   struct sc *pos;
@@ -109,52 +110,61 @@ static struct sc * binary_search(const uint32_t cp, const char *list, const size
     else if (cp < pos->from)
       n /= 2;
     else {
-      p = (char*)pos + size;
+      p = (char *)pos + size;
       n -= (n / 2) + 1;
     }
   }
   return NULL;
 }
 
-static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list, const size_t len) {
-  const struct sc* sc = (struct sc*)binary_search(cp, (char*)sc_list, len, sizeof(*sc_list));
+static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
+                                const size_t len) {
+  const struct sc *sc =
+      (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
   return sc ? sc->scr : 255;
 }
-static inline bool range_bool_search(const uint32_t cp, const struct range_bool *list, const size_t len) {
-  const char* r = (char*)binary_search(cp, (char*)list, len, sizeof(*list));
+static inline bool range_bool_search(const uint32_t cp,
+                                     const struct range_bool *list,
+                                     const size_t len) {
+  const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
   return r ? true : false;
 }
 
 uint8_t u8ident_get_script(const uint32_t cp) {
 #ifndef DISABLE_CHECK_XID
   if (s_u8id_options & U8ID_CHECK_XID)
-    return sc_search(cp, xid_script_list, sizeof(xid_script_list)/sizeof(*xid_script_list));
+    return sc_search(cp, xid_script_list,
+                     sizeof(xid_script_list) / sizeof(*xid_script_list));
   else
 #endif
-    return sc_search(cp, nonxid_script_list, sizeof(nonxid_script_list)/sizeof(*nonxid_script_list));
+    return sc_search(cp, nonxid_script_list,
+                     sizeof(nonxid_script_list) / sizeof(*nonxid_script_list));
 }
 
 /* list of script indices */
-const char * u8ident_get_scx(const uint32_t cp) {
-  const struct scx* scx = (struct scx*)binary_search(cp, (char*)scx_list,
-                                           sizeof(scx_list)/sizeof(*scx_list), sizeof(*scx_list));
+const char *u8ident_get_scx(const uint32_t cp) {
+  const struct scx *scx = (struct scx *)binary_search(
+      cp, (char *)scx_list, sizeof(scx_list) / sizeof(*scx_list),
+      sizeof(*scx_list));
   return scx ? scx->list : NULL;
 }
 
 #ifndef DISABLE_CHECK_XID
 bool u8ident_is_allowed(const uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list, sizeof(allowed_id_list) / sizeof(*allowed_id_list));
+  return range_bool_search(cp, allowed_id_list,
+                           sizeof(allowed_id_list) / sizeof(*allowed_id_list));
 }
 
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp) {
-  const struct range_short* id = (struct range_short*)binary_search(cp, (char*)idtype_list,
-                                           sizeof(idtype_list) / sizeof(*idtype_list), sizeof(*idtype_list));
+  const struct range_short *id = (struct range_short *)binary_search(
+      cp, (char *)idtype_list, sizeof(idtype_list) / sizeof(*idtype_list),
+      sizeof(*idtype_list));
   return id ? id->types : 0;
 }
 #endif
 
-const char* u8ident_script_name(const int scr) {
+const char *u8ident_script_name(const int scr) {
   if (scr < 0 || scr > LAST_SCRIPT)
     return NULL;
   assert(scr >= 0 && scr <= LAST_SCRIPT);
@@ -171,7 +181,7 @@ uint32_t u8ident_failed_char(const int i) {
   }
 }
 /* returns the constant script name, which failed in the last check. */
-const char* u8ident_failed_script_name(const int i) {
+const char *u8ident_failed_script_name(const int i) {
   if (i >= 0 && i <= i_ctx) {
     const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
     const uint32_t cp = c->last_cp;
@@ -194,7 +204,7 @@ EXTERN int u8ident_add_script(uint8_t scr) {
     ctxp[i].scr8[c] = scr;
   } else {
     if ((c & 7) == 7) // add a new word
-      ctxp[i].u8p = realloc(ctxp[i].u8p, (c+1) * 2);
+      ctxp[i].u8p = realloc(ctxp[i].u8p, (c + 1) * 2);
     ctxp[i].u8p[c] = scr;
   }
   ctxp[i].count++;
@@ -206,43 +216,43 @@ EXTERN int u8ident_add_script(uint8_t scr) {
 EXTERN int u8ident_delete_ctx(int i) {
   if (i >= 0 && i <= i_ctx) {
     if (ctxp[i].count > 8)
-      free (ctxp[i].u8p);
+      free(ctxp[i].u8p);
     ctxp[i].count = 0;
     if (i > 0)
       i_ctx = i - 1; // switch to the previous context
     else
       i_ctx = 0; // deleting 0 will lead to a reset
     return 0;
-  }
-  else
+  } else
     return -1;
 }
 
 /* End this library, cleaning up all internal structures. */
 EXTERN void u8ident_delete(void) {
-  for (int i=0; i<=i_ctx; i++) {
+  for (int i = 0; i <= i_ctx; i++) {
     u8ident_delete_ctx(i);
   }
   if (i_ctx >= U8ID_CTX_TRESH) {
-    free (ctxp);
+    free(ctxp);
   }
 }
 
 /* Returns a fresh string of the list of the seen scripts in this
    context whenever a mixed script error occurs. Needed for the error message
-   "Invalid script %s, already have %s", where the 2nd %s is returned by this function.
-   The returned string needs to be freed by the user.
+   "Invalid script %s, already have %s", where the 2nd %s is returned by this
+   function. The returned string needs to be freed by the user.
+
    Usage:
+
    if (u8id_check("wrongᴧᴫ") == U8ID_ERR_SCRIPTS) {
-     const char *errstr = u8ident_existing_scripts(ctx);
-     fprintf(stdout, "Invalid script %s, already have %s\n",
-       u8ident_failed_script_name(ctx),
-       u8ident_existing_scripts(ctx));
+       const char *errstr = u8ident_existing_scripts(ctx);
+       fprintf(stdout, "Invalid script %s, already have %s\n",
+           u8ident_failed_script_name(ctx),
+           u8ident_existing_scripts(ctx));
      free(errstr);
    }
-
 */
-const char* u8ident_existing_scripts(const int i) {
+const char *u8ident_existing_scripts(const int i) {
   if (unlikely(i < 0 || i > i_ctx))
     return NULL;
   const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
@@ -250,8 +260,8 @@ const char* u8ident_existing_scripts(const int i) {
   int len = c->count * 12;
   char *res = malloc(len);
   *res = 0;
-  for (int j=0; j < c->count; j++) {
-    const char* str = u8ident_script_name(u8p[j]);
+  for (int j = 0; j < c->count; j++) {
+    const char *str = u8ident_script_name(u8p[j]);
     if (!str)
       return NULL;
     const int l = strlen(str);
@@ -290,11 +300,10 @@ static bool _is_DECOMPOSED_REST(const uint32_t cp) {
   plus the remaining 869 non-mark and non-hangul normalizables.
 */
 
-bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr)
-{
-    if (scr == SC_Hangul || _is_MARK(cp))
-        return true;
-    return _is_DECOMPOSED_REST(cp);
+bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr) {
+  if (scr == SC_Hangul || _is_MARK(cp))
+    return true;
+  return _is_DECOMPOSED_REST(cp);
 }
 
 // See also the Table 3. Unicode Script Property Values and ISO 15924 Codes
@@ -314,8 +323,9 @@ We add some aliases for languages using multiple scripts:
    :Hanb     => Han Bopomofo
 
 These three aliases need not to be declared. They are allowed scripts
-in the [Highly Restriction Level](http://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
-for identifiers.
+in the [Highly Restriction
+Level](http://www.unicode.org/reports/tr39/#Restriction_Level_Detection) for
+identifiers.
 
 Certain scripts don't need to be declared.
 

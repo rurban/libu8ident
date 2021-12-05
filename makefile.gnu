@@ -8,11 +8,12 @@ RANLIB := ranlib
 # dnf install rubygem-ronn-ng
 RONN := ronn
 # Maintainer only
+VERSION = 0.0
 # This should to be a recent perl, matching the target unicode version
 PERL := perl
 WGET := wget
+# End Maintainer-only
 
-VERSION = 0.0
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h
@@ -36,7 +37,8 @@ $(LIB): $(SRC) $(HEADER) $(HDRS)
 scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt
 	$(PERL) mkscripts.pl
 
-.PHONY: check check-asan clean regen-scripts regen-norm install man dist
+.PHONY: check check-asan check-norms check-profiles check-xid \
+	clean regen-scripts regen-norm install man dist-src dist-bin clang-format
 check: test
 test: test.c $(LIB)
 	$(CC) $(CFLAGS) $(DEFINES) -g -I. -Iinclude test.c -L. -lu8ident -o test
@@ -90,6 +92,9 @@ regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkscripts.pl
+
+clang-format:
+	clang-format -i *.c include/*.h scripts.h u8id*.h
 
 # End Maintainer-only
 
