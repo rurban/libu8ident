@@ -392,7 +392,7 @@ int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
   }
 
   /* hold base of dest in case src was not copied */
-  orig_dmax = dmax;
+  orig_dmax = (size_t)dmax;
 
   if (dest < src) {
     overlap_bumper = src;
@@ -472,7 +472,7 @@ int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
 
 done:
   if (lenp)
-    *lenp = orig_dmax - dmax;
+    *lenp = (size_t)((long)orig_dmax - dmax);
   *dest = 0;
   return dmax >= 0 ? 0 : ERR_NOSPACE;
 }
