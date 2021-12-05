@@ -240,7 +240,7 @@ undef $oldsc;
 my $oldscf;
 for my $r (@SCR) {
   ($from, $to, $sc) = ($r->[0], $r->[1], $r->[2]);
-  # the full list, with all holes. TODO skip disallowed id types
+  # the full list, with all holes.
   if (($from != $oldto + 1) or ($oldsc ne $sc)) { # honor holes
     push @_SCR, [$from, $to, $sc];
     $oldsc = $sc;

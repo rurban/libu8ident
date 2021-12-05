@@ -20,7 +20,8 @@ Remember, the meaning of identifiers is to be **identifiable**. A user
 should not confuse one identifier with another. Only a program, IDE or
 library can properly check unicode identifiers, humans certainly not.
 Leaving such checks to a linter is not recommended. (_The C 20 Standard
-commitee is wrong. They believe the whole UCD is needed for those checks._)
+commitee is wrong. They believe the whole UCD is needed for those checks.
+So they rather ignore the problem._)
 
 Valid characters
 ----------------
@@ -352,6 +353,11 @@ TODO
   already exists, the SCX list is collapsed to this. But if none
   exists we need to the list and check it against the next yet unseen
   script, and check for mixed-script violations.
+
+* Faster **maybe_normalize** check. I.e. search for MARK and DECOMPOSED codepoints.
+  We only need to normalize, if the codepoint in question is different under NFKC,
+  resp. the current normalization option. I have that in cperl to great effect, but
+  with NFC only.
 
 * **[IdentifierType]
 (http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
