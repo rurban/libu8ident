@@ -12,6 +12,7 @@ u8idnorm.o
 u8idscr.o
 /test
 /test-asan
+/build*
 /Scripts.txt
 /ScriptExtensions.txt
 /PropertyValueAliases.txt
@@ -19,3 +20,5 @@ u8idscr.o
 /IdentifierStatus.txt
 /confusables.txt
 Unicode-Normalize
+libu8ident-*.tar.gz
+libu8ident-*.tar.xz

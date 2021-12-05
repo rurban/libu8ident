@@ -8,12 +8,15 @@ on: [push, pull_request]
 jobs:
   linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
         CFLAGS:
+          -
+          - -DU8ID_NORM=NFD
           - -DDISABLE_CHECK_XID 
+          - -DENABLE_CHECK_XID
           - -march=native -Wall -Wextra -O2
     steps:
     - uses: actions/checkout@v2
@@ -70,3 +73,38 @@ jobs:
       run: make
     - shell: msys2 {0}
       run: make check
+  linux-cmake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - run: cmake .
+    - run: make
+    - run: make test
+    - run: sudo make install DESTDIR=`pwd`/inst
+  macos-cmake:
+    runs-on: macOS-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - run: cmake .
+    - run: make
+    - run: make test
+  windows-cmake:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    #- uses: microsoft/setup-msbuild@v1.1
+    - run: cmake .
+    - run: cmake --build . --config Release
+    - run: cmake --build . --target RUN_TESTS --config Release
+    # currently -G for "Visual Studio 16 2019"
+    #- run: msbuild libu8ident.sln
+    #- run: Debug\u8idtest
