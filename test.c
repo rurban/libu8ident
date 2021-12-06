@@ -50,7 +50,7 @@ void test_scripts_no_init(void) {
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
 #endif
   // check that no list elements can be merged
-#ifndef DISABLE_CHECK_XID
+#ifndef ENABLE_CHECK_XID
   for (size_t i = 0; i < ARRAY_SIZE(xid_script_list) - 1; i++) {
     const struct sc *r = &xid_script_list[i];
     const struct sc *n = &xid_script_list[i + 1];
@@ -60,6 +60,7 @@ void test_scripts_no_init(void) {
       assert(r->scr != n->scr); // can not be merged
   }
 #endif
+#ifndef DISABLE_CHECK_XID
   for (size_t i = 0; i < ARRAY_SIZE(nonxid_script_list) - 1; i++) {
     const struct sc *r = &nonxid_script_list[i];
     const struct sc *n = &nonxid_script_list[i + 1];
@@ -68,6 +69,7 @@ void test_scripts_no_init(void) {
     if (r->to + 1 >= n->from)
       assert(r->scr != n->scr); // can not be merged
   }
+#endif
 #ifndef DISABLE_CHECK_XID
   for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list) - 1; i++) {
     const struct range_bool *r = &allowed_id_list[i];
@@ -380,6 +382,7 @@ int main(int argc, char **argv) {
   const int norm = (argc > 1 && !strcmp(argv[0], "norm"));
   const int profile = (argc > 1 && !strcmp(argv[0], "profile"));
   const int xid = (argc > 1 && !strcmp(argv[0], "xid"));
+  const int scx = (argc > 1 && !strcmp(argv[0], "scx"));
 
   if (argc == 1) {
     test_scripts_no_init();
@@ -402,6 +405,8 @@ int main(int argc, char **argv) {
     test_mixed_scripts(U8ID_CHECK_XID);
   }
   test_mixed_scripts_with_ctx();
-  test_scx_singles();
+  if (scx) {
+    test_scx_singles();
+  }
   return 0;
 }

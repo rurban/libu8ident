@@ -50,7 +50,8 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	./test-asan
 
 clean:
-	-rm -f u8ident.o u8idnorm.o u8idscr.o libu8ident.a test test-asan
+	-rm -f u8ident.o u8idnorm.o u8idscr.o libu8ident.a test test-asan \
+	       test-xid-{EN,DIS}ABLE test-prof{2,3,4,5,6} test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
 # Maintainer-only
 # Check coverage and sizes for all configure combinations
@@ -59,16 +60,20 @@ check-norms: $(SRC) $(HEADER) $(HDRS)
             echo $$n; \
             cc -DU8ID_NORM=$$n -O3 -Wall -Wno-return-local-addr -Wfatal-errors -Iinclude -c u8idnorm.c -o u8idnorm.o && \
             ls -gGh u8idnorm.o; \
+	    $(CC) $(CFLAGS) $(DEFINES) -DU8ID_NORM=$$n -Wno-return-local-addr -I. -Iinclude test.c $(SRC) \
+	      -o test-norm-$$n && ./test-norm-$$n norm; \
         done
 check-profiles: $(SRC) $(HEADER) $(HDRS)
 	for n in 2 3 4 5 6; do \
             echo PROFILE_$${n}; \
-	    $(CC) $(CFLAGS) $(DEFINES) -DU8ID_PROFILE=$$n -Wno-return-local-addr -I. -Iinclude test.c $(SRC) -o test && ./test profile; \
+	    $(CC) $(CFLAGS) $(DEFINES) -DU8ID_PROFILE=$$n -Wno-return-local-addr -I. -Iinclude test.c $(SRC) \
+	      -o test-prof$$n && ./test-prof$$n profile; \
         done
 check-xid: $(SRC) $(HEADER) $(HDRS)
 	for n in DISABLE ENABLE; do \
             echo $${n}_CHECK_XID; \
-	    $(CC) $(CFLAGS) $(DEFINES) -D$${n}_CHECK_XID -Wno-return-local-addr -I. -Iinclude test.c $(SRC) -o test && ./test xid; \
+	    $(CC) $(CFLAGS) $(DEFINES) -D$${n}_CHECK_XID -Wno-return-local-addr -I. -Iinclude test.c $(SRC) \
+	      -o test-xid-$$n && ./test-xid-$$n xid; \
         done
 
 # Create the normalization headers via a current perl
