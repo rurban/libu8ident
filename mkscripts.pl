@@ -233,6 +233,70 @@ die if $num_scripts > 255;
 @SCR = sort { $a->[0] <=> $b->[0] } @SCR;
 @SCXR = sort { $a->[0] <=> $b->[0] } @SCXR;
 
+# splice l2 into l1
+sub merge {
+  my ($l1, $l2) = @_;
+  my @r = ();
+  while (@$l1) {
+    my $e1 = $l1->[0];
+    if (!@$l2) {
+      push @r, $e1;
+      shift @$l1;
+      next;
+    }
+    my $e2 = $l2->[0];
+    if ($e1->[0] < $e2->[0]) {
+      # [0,10,a] + [1,9,b]  => [0,1,a], [1,9,b], [9,10,a]
+      # [0,9,a]  + [1,10,b] => [0,1,a], [1,10,b]
+      if ($e1->[1] < $e2->[1]) {
+        if (@r > 0 and $r[$#r][2] eq $e1->[2] and $r[$#r][1] == $e1->[0] - 1) {
+          warn "combine 1 $r[$#r][1] with $e1->[1] $e1->[2]";
+          $r[$#r][1] = $e1->[1]; # we can combine it with the last
+        } else {
+          push @r, $e1;
+        }
+        shift @$l1;
+      } else { # splice e2 int e1
+        push @r, [$e1->[0], $e2->[0] - 1, $e1->[2]] if $e1->[0] <= $e2->[0] - 1;
+        push @r, [$e2->[0], $e2->[1], $e2->[2], $e1->[2]] if $e2->[0] <= $e2->[1]; # add the old SC also
+        if ($e2->[1] + 1 <= $e1->[1]) {
+          $l1->[0] = [$e2->[1] + 1, $e1->[1], $e1->[2]];
+         } else {
+           shift @$l1;
+        }
+        shift @$l2;
+      }
+    } else {
+      if ($e1->[1] >= $e2->[1]) {
+        if ($r[$#r][2] eq $e2->[2] and $r[$#r][1] == $e2->[0] - 1) {
+          warn "combine 2 $r[$#r][1] with $e2->[1] $e2->[2]";
+          $r[$#r][1] = $e2->[1]; # we can combine it with the last
+        } else {
+          push @r, $e2;
+        }
+        shift @$l2;
+        shift @$l1; # replace
+      } else { # splice
+        # [2,10,a] + [1,9,b]  => [0,1,a], [1,9,b], [9,10,a]
+        push @r, [$e2->[0], $e2->[1], $e2->[2], $e1->[2]];
+        push @r, [$e2->[1] + 1, $e1->[1], $e1->[2]] if $e2->[1] + 1 <= $e1->[1];
+        shift @$l1;
+        shift @$l2;
+      }
+    }
+    # can we merge the last two? (1DBF, 303C)
+    if (@r > 1 && $r[$#r-1][2] eq $r[$#r][2] && $r[$#r-1][1] == $r[$#r]->[0] + 1) {
+      warn "combine end $r[$#r-1][1] with $r[$#r][0] $r[$#r][2]";
+      $r[$#r-1][1] = $r[$#r]->[1];
+      shift @r;
+    }
+  }
+  while (my $e2 = shift @$l2) {
+    push @r, $e2;
+  }
+  return @r;
+}
+
 $oldto = 0;
 # Collapse neighbors, generate a fast SCRF variant without holes.
 my @_SCR;
@@ -261,6 +325,38 @@ for my $r (@SCR) {
   }
 }
 @SCR = @_SCR;
+
+my $i = 0;
+my %scname;
+for my $sc (@recommended) {
+  $SC{$sc} = $i;
+  $scname{$i} = $sc;
+  $i++;
+}
+my %other = map {$_ => 1} @recommended, @limited;
+for my $sc (sort keys %scripts) {
+  unless ($other{$sc}) {
+    $SC{$sc} = $i;
+    $scname{$i} = $sc;
+    $i++;
+  }
+}
+for my $sc (@limited) {
+  $SC{$sc} = $i;
+  $scname{$i} = $sc;
+  $i++;
+}
+$i--;
+# find single script SCX's (e.g. Han as Common)
+my @single_scx = grep {$_->[2] !~ / /} @SCXR;
+for (@single_scx) {
+  $_->[2] = $scname{$SC{$PVA{$_->[2]}}}; # expand short to long script name
+}
+# and merge them into @SC, replacing Common or Inherited
+if (@single_scx) {
+  @SCR = merge(\@SCR, \@single_scx);
+  @SCRF = merge(\@SCRF, \@single_scx);
+}
 
 open my $H, ">", "scripts.h" or die "writing scripts.h $!";
 print $H <<"EOF";
@@ -305,11 +401,10 @@ const char *const all_scripts[] = {
     // Recommended Scripts (not need to add them)
     // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 EOF
-my $i = 0;
+$i = 0;
 my $defines = "";
 for my $sc (@recommended) {
   my $ws = " " x (10-length($sc));
-  $SC{$sc} = $i;
   $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
   printf $H "    \"%s\",\n", $sc, $i;
   $i++;
@@ -319,11 +414,9 @@ print $H <<"EOF";
     // Excluded Scripts (but can be added expliclitly)
     // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
 EOF
-my %other = map {$_ => 1} @recommended, @limited;
 for my $sc (sort keys %scripts) {
   unless ($other{$sc}) {
     my $ws = " " x (10-length($sc));
-    $SC{$sc} = $i;
     $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
     printf $H "    \"%s\",\n", $sc, $i;
     $i++;
@@ -336,7 +429,6 @@ print $H <<"EOF";
 EOF
 for my $sc (@limited) {
   my $ws = " " x (10-length($sc));
-  $SC{$sc} = $i;
   $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
   printf $H "    \"%s\",\n", $sc, $i;
   $i++;
@@ -353,6 +445,7 @@ extern const char *const all_scripts[%u];
 // clang-format off
 EOF
 print $H $defines;
+
 printf $H <<"EOF", $i, scalar @SCR;
 // clang-format on
 #define LAST_SCRIPT %u
@@ -373,7 +466,12 @@ for my $r (@SCR) {
   } else {
     $b++;
   }
-  printf $H "    {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  printf $H "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  if (@$r == 4) {
+    printf $H ", originally SC %s\n", $r->[3];
+  } else {
+    printf $H "\n";
+  }
 };
 printf $H <<"EOF", $b, $s, scalar(@SCRF);
     // clang-format on
@@ -397,7 +495,12 @@ for my $r (@SCRF) {
   } else {
     $b++;
   }
-  printf $H "    {0x%04X, 0x%04X, %d},\t// %s\n", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  printf $H "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  if (@$r == 4) {
+    printf $H ", from SC %s\n", $r->[3];
+  } else {
+    printf $H "\n";
+  }
 };
 printf $H <<"EOF", $b, $s, scalar(@SCXR);
     // clang-format on
@@ -405,10 +508,8 @@ printf $H <<"EOF", $b, $s, scalar(@SCXR);
 #  endif
 #endif // DISABLE_CHECK_XID
 
-// FIXME SCX list:
-//   Replace SC Common/Inherited with a single SCX
-//   (e.g. U+342 Greek, U+363 Latin)
-//   Remove all Limited Use SC's from the list on hardcoded profiles 3-5
+// Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
+// TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5
 #ifdef EXT_SCRIPTS
 extern const struct scx scx_list[%u];
 #else
@@ -420,7 +521,7 @@ for my $r (@SCXR) {
   my $code;
   my @list = split " ", $r->[2];
   for my $short (@list) {
-    my $long = $PVA{$short};
+    my $long = @list == 1 ? $short : $PVA{$short};
     $code .= sprintf("\\x%02x", $SC{$long});
   }
   if ($r->[0] == $r->[1]) {
@@ -428,7 +529,11 @@ for my $r (@SCXR) {
   } else {
     $b++;
   }
-  printf $H "    {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
+  if (@list == 1) {
+    printf $H "    // {0x%04X, 0x%04X, \"%s\"},\t// %s, moved to sc proper\n", $r->[0], $r->[1], $code, $r->[2];
+  } else {
+    printf $H "    {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
+  }
 };
 printf $H <<"EOF", $b, $s;
     // clang-format on

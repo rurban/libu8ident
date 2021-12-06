@@ -381,9 +381,9 @@ extern const char *const all_scripts[161];
 
 #ifndef ENABLE_CHECK_XID
 // The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or
-// non-codepoints. Always check all.
+// non-codepoints.
 #  ifdef EXT_SCRIPTS
-extern const struct sc xid_script_list[942];
+extern const struct sc xid_script_list[951];
 #  else
 const struct sc xid_script_list[] = {
     // clang-format off
@@ -406,7 +406,12 @@ const struct sc xid_script_list[] = {
     {0x02E5, 0x02E9, 0},	// Common
     {0x02EA, 0x02EB, 6},	// Bopomofo
     {0x02EC, 0x02FF, 0},	// Common
-    {0x0300, 0x036F, 1},	// Inherited
+    {0x0300, 0x0341, 1},	// Inherited
+    {0x0342, 0x0342, 11},	// Greek, originally SC Inherited
+    {0x0343, 0x0344, 1},	// Inherited
+    {0x0345, 0x0345, 11},	// Greek, originally SC Inherited
+    {0x0346, 0x0362, 1},	// Inherited
+    {0x0363, 0x036F, 2},	// Latin, originally SC Inherited
     {0x0370, 0x0373, 11},	// Greek
     {0x0374, 0x0374, 0},	// Common
     {0x0375, 0x0377, 11},	// Greek
@@ -697,18 +702,21 @@ const struct sc xid_script_list[] = {
     {0x1C90, 0x1CBA, 10},	// Georgian
     {0x1CBD, 0x1CBF, 10},	// Georgian
     {0x1CC0, 0x1CC7, 151},	// Sundanese
-    {0x1CD0, 0x1CD2, 1},	// Inherited
+    {0x1CD0, 0x1CD0, 1},	// Inherited
+    {0x1CD1, 0x1CD1, 8},	// Devanagari, originally SC Inherited
+    {0x1CD2, 0x1CD2, 1},	// Inherited
     {0x1CD3, 0x1CD3, 0},	// Common
-    {0x1CD4, 0x1CE0, 1},	// Inherited
-    {0x1CE1, 0x1CE1, 0},	// Common
-    {0x1CE2, 0x1CE8, 1},	// Inherited
-    {0x1CE9, 0x1CEC, 0},	// Common
-    {0x1CED, 0x1CED, 1},	// Inherited
-    {0x1CEE, 0x1CF3, 0},	// Common
+    {0x1CD4, 0x1CD4, 8},	// Devanagari
+    {0x1CDB, 0x1CDB, 8},	// Devanagari
+    {0x1CDE, 0x1CDF, 8},	// Devanagari
+    {0x1CE2, 0x1CE8, 8},	// Devanagari
+    {0x1CEB, 0x1CEC, 8},	// Devanagari
+    {0x1CEE, 0x1CF1, 8},	// Devanagari
     {0x1CF4, 0x1CF4, 1},	// Inherited
-    {0x1CF5, 0x1CF7, 0},	// Common
+    {0x1CF5, 0x1CF6, 0},	// Common
+    {0x1CF7, 0x1CF7, 5},	// Bengali, originally SC Common
     {0x1CF8, 0x1CF9, 1},	// Inherited
-    {0x1CFA, 0x1CFA, 0},	// Common
+    {0x1CFA, 0x1CFA, 86},	// Nandinagari
     {0x1D00, 0x1D25, 2},	// Latin
     {0x1D26, 0x1D2A, 11},	// Greek
     {0x1D2B, 0x1D2B, 7},	// Cyrillic
@@ -719,9 +727,8 @@ const struct sc xid_script_list[] = {
     {0x1D6B, 0x1D77, 2},	// Latin
     {0x1D78, 0x1D78, 7},	// Cyrillic
     {0x1D79, 0x1DBE, 2},	// Latin
-    {0x1DBF, 0x1DBF, 11},	// Greek
-    {0x1DC0, 0x1DFF, 1},	// Inherited
-    {0x1E00, 0x1EFF, 2},	// Latin
+    {0x1DBF, 0x1DC1, 11},	// Greek
+    {0x1DFA, 0x1DFA, 153},	// Syriac
     {0x1F00, 0x1F15, 11},	// Greek
     {0x1F18, 0x1F1D, 11},	// Greek
     {0x1F20, 0x1F45, 11},	// Greek
@@ -793,16 +800,15 @@ const struct sc xid_script_list[] = {
     {0x2F00, 0x2FD5, 15},	// Han
     {0x2FF0, 0x2FFB, 0},	// Common
     {0x3000, 0x3004, 0},	// Common
-    {0x3005, 0x3005, 15},	// Han
-    {0x3006, 0x3006, 0},	// Common
-    {0x3007, 0x3007, 15},	// Han
+    {0x3005, 0x3007, 15},	// Han
     {0x3008, 0x3020, 0},	// Common
     {0x3021, 0x3029, 15},	// Han
     {0x302A, 0x302D, 1},	// Inherited
     {0x302E, 0x302F, 14},	// Hangul
     {0x3030, 0x3037, 0},	// Common
     {0x3038, 0x303B, 15},	// Han
-    {0x303C, 0x303F, 0},	// Common
+    {0x303C, 0x303D, 0},	// Common
+    {0x303E, 0x303F, 15},	// Han, originally SC Common
     {0x3041, 0x3096, 17},	// Hiragana
     {0x3099, 0x309A, 1},	// Inherited
     {0x309B, 0x309C, 0},	// Common
@@ -813,20 +819,24 @@ const struct sc xid_script_list[] = {
     {0x30FD, 0x30FF, 18},	// Katakana
     {0x3105, 0x312F, 6},	// Bopomofo
     {0x3131, 0x318E, 14},	// Hangul
-    {0x3190, 0x319F, 0},	// Common
+    {0x3190, 0x319F, 15},	// Han
     {0x31A0, 0x31BF, 6},	// Bopomofo
-    {0x31C0, 0x31E3, 0},	// Common
+    {0x31C0, 0x31E3, 15},	// Han
     {0x31F0, 0x31FF, 18},	// Katakana
     {0x3200, 0x321E, 14},	// Hangul
-    {0x3220, 0x325F, 0},	// Common
+    {0x3220, 0x3247, 15},	// Han
     {0x3260, 0x327E, 14},	// Hangul
-    {0x327F, 0x32CF, 0},	// Common
+    {0x327F, 0x327F, 0},	// Common
+    {0x3280, 0x32B0, 15},	// Han, originally SC Common
+    {0x32B1, 0x32BF, 0},	// Common
+    {0x32C0, 0x32CB, 15},	// Han, originally SC Common
+    {0x32CC, 0x32CF, 0},	// Common
     {0x32D0, 0x32FE, 18},	// Katakana
-    {0x32FF, 0x32FF, 0},	// Common
+    {0x32FF, 0x32FF, 15},	// Han
     {0x3300, 0x3357, 18},	// Katakana
-    {0x3358, 0x33FF, 0},	// Common
-    {0x3400, 0x4DBF, 15},	// Han
-    {0x4DC0, 0x4DFF, 0},	// Common
+    {0x3358, 0x3370, 15},	// Han
+    {0x337B, 0x337F, 15},	// Han
+    {0x33E0, 0x33FE, 15},	// Han
     {0x4E00, 0x9FFF, 15},	// Han
     {0xA000, 0xA48C, 160},	// Yi
     {0xA490, 0xA4C6, 160},	// Yi
@@ -1176,8 +1186,7 @@ const struct sc xid_script_list[] = {
     {0x1BC70, 0x1BC7C, 50},	// Duployan
     {0x1BC80, 0x1BC88, 50},	// Duployan
     {0x1BC90, 0x1BC99, 50},	// Duployan
-    {0x1BC9C, 0x1BC9F, 50},	// Duployan
-    {0x1BCA0, 0x1BCA3, 0},	// Common
+    {0x1BC9C, 0x1BCA3, 50},	// Duployan
     {0x1CF00, 0x1CF2D, 1},	// Inherited
     {0x1CF30, 0x1CF46, 1},	// Inherited
     {0x1CF50, 0x1CFC3, 0},	// Common
@@ -1195,7 +1204,7 @@ const struct sc xid_script_list[] = {
     {0x1D200, 0x1D245, 11},	// Greek
     {0x1D2E0, 0x1D2F3, 0},	// Common
     {0x1D300, 0x1D356, 0},	// Common
-    {0x1D360, 0x1D378, 0},	// Common
+    {0x1D360, 0x1D371, 15},	// Han
     {0x1D400, 0x1D454, 0},	// Common
     {0x1D456, 0x1D49C, 0},	// Common
     {0x1D49E, 0x1D49F, 0},	// Common
@@ -1290,7 +1299,7 @@ const struct sc xid_script_list[] = {
     {0x1F201, 0x1F202, 0},	// Common
     {0x1F210, 0x1F23B, 0},	// Common
     {0x1F240, 0x1F248, 0},	// Common
-    {0x1F250, 0x1F251, 0},	// Common
+    {0x1F250, 0x1F251, 15},	// Han
     {0x1F260, 0x1F265, 0},	// Common
     {0x1F300, 0x1F6D7, 0},	// Common
     {0x1F6DD, 0x1F6EC, 0},	// Common
@@ -1330,14 +1339,13 @@ const struct sc xid_script_list[] = {
     {0xE0020, 0xE007F, 0},	// Common
     {0xE0100, 0xE01EF, 1},	// Inherited
     // clang-format on
-}; // 812 ranges, 130 single codepoints
+}; // 817 ranges, 134 single codepoints
 #  endif
 #endif // ENABLE_CHECK_XID
 
 #ifndef DISABLE_CHECK_XID
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or
 // non-codepoints needed, as the parser already disallowed such codepoints.
-// Skip non-xid's.
 #  ifdef EXT_SCRIPTS
 extern const struct sc nonxid_script_list[421];
 #  else
@@ -1769,18 +1777,16 @@ const struct sc nonxid_script_list[] = {
 #  endif
 #endif // DISABLE_CHECK_XID
 
-// FIXME SCX list:
-//   Replace SC Common/Inherited with a single SCX
-//   (e.g. U+342 Greek, U+363 Latin)
-//   Remove all Limited Use SC's from the list on hardcoded profiles 3-5
+// Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
+// TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5
 #ifdef EXT_SCRIPTS
 extern const struct scx scx_list[121];
 #else
 const struct scx scx_list[] = {
     // clang-format off
-    {0x0342, 0x0342, "\x0b"},	// Grek
-    {0x0345, 0x0345, "\x0b"},	// Grek
-    {0x0363, 0x036F, "\x02"},	// Latn
+    // {0x0342, 0x0342, "\x0b"},	// Greek, moved to sc proper
+    // {0x0345, 0x0345, "\x0b"},	// Greek, moved to sc proper
+    // {0x0363, 0x036F, "\x02"},	// Latin, moved to sc proper
     {0x0483, 0x0483, "\x07\x5c"},	// Cyrl Perm
     {0x0484, 0x0484, "\x07\x36"},	// Cyrl Glag
     {0x0485, 0x0486, "\x07\x02"},	// Cyrl Latn
@@ -1810,42 +1816,42 @@ const struct scx scx_list[] = {
     {0x1802, 0x1803, "\x52\x66"},	// Mong Phag
     {0x1805, 0x1805, "\x52\x66"},	// Mong Phag
     {0x1CD0, 0x1CD0, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
-    {0x1CD1, 0x1CD1, "\x08"},	// Deva
+    // {0x1CD1, 0x1CD1, "\x08"},	// Devanagari, moved to sc proper
     {0x1CD2, 0x1CD2, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
     {0x1CD3, 0x1CD3, "\x08\x38"},	// Deva Gran
-    {0x1CD4, 0x1CD4, "\x08"},	// Deva
+    // {0x1CD4, 0x1CD4, "\x08"},	// Devanagari, moved to sc proper
     {0x1CD5, 0x1CD6, "\x05\x08"},	// Beng Deva
     {0x1CD7, 0x1CD7, "\x08\x6c"},	// Deva Shrd
     {0x1CD8, 0x1CD8, "\x05\x08"},	// Beng Deva
     {0x1CD9, 0x1CD9, "\x08\x6c"},	// Deva Shrd
     {0x1CDA, 0x1CDA, "\x08\x13\x16\x18\x1a\x1b"},	// Deva Knda Mlym Orya Taml Telu
-    {0x1CDB, 0x1CDB, "\x08"},	// Deva
+    // {0x1CDB, 0x1CDB, "\x08"},	// Devanagari, moved to sc proper
     {0x1CDC, 0x1CDD, "\x08\x6c"},	// Deva Shrd
-    {0x1CDE, 0x1CDF, "\x08"},	// Deva
+    // {0x1CDE, 0x1CDF, "\x08"},	// Devanagari, moved to sc proper
     {0x1CE0, 0x1CE0, "\x08\x6c"},	// Deva Shrd
     {0x1CE1, 0x1CE1, "\x05\x08"},	// Beng Deva
-    {0x1CE2, 0x1CE8, "\x08"},	// Deva
+    // {0x1CE2, 0x1CE8, "\x08"},	// Devanagari, moved to sc proper
     {0x1CE9, 0x1CE9, "\x08\x56"},	// Deva Nand
     {0x1CEA, 0x1CEA, "\x05\x08"},	// Beng Deva
-    {0x1CEB, 0x1CEC, "\x08"},	// Deva
+    // {0x1CEB, 0x1CEC, "\x08"},	// Devanagari, moved to sc proper
     {0x1CED, 0x1CED, "\x05\x08"},	// Beng Deva
-    {0x1CEE, 0x1CF1, "\x08"},	// Deva
+    // {0x1CEE, 0x1CF1, "\x08"},	// Devanagari, moved to sc proper
     {0x1CF2, 0x1CF2, "\x05\x08\x38\x13\x56\x18\x1b\x78"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
     {0x1CF3, 0x1CF3, "\x08\x38"},	// Deva Gran
     {0x1CF4, 0x1CF4, "\x08\x38\x13"},	// Deva Gran Knda
     {0x1CF5, 0x1CF6, "\x05\x08"},	// Beng Deva
-    {0x1CF7, 0x1CF7, "\x05"},	// Beng
+    // {0x1CF7, 0x1CF7, "\x05"},	// Bengali, moved to sc proper
     {0x1CF8, 0x1CF9, "\x08\x38"},	// Deva Gran
-    {0x1CFA, 0x1CFA, "\x56"},	// Nand
-    {0x1DC0, 0x1DC1, "\x0b"},	// Grek
+    // {0x1CFA, 0x1CFA, "\x56"},	// Nandinagari, moved to sc proper
+    // {0x1DC0, 0x1DC1, "\x0b"},	// Greek, moved to sc proper
     {0x1DF8, 0x1DF8, "\x07\x99"},	// Cyrl Syrc
-    {0x1DFA, 0x1DFA, "\x99"},	// Syrc
+    // {0x1DFA, 0x1DFA, "\x99"},	// Syriac, moved to sc proper
     {0x202F, 0x202F, "\x02\x52"},	// Latn Mong
     {0x20F0, 0x20F0, "\x08\x38\x02"},	// Deva Gran Latn
     {0x2E43, 0x2E43, "\x07\x36"},	// Cyrl Glag
     {0x3001, 0x3002, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
     {0x3003, 0x3003, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x3006, 0x3006, "\x0f"},	// Hani
+    // {0x3006, 0x3006, "\x0f"},	// Han, moved to sc proper
     {0x3008, 0x3011, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
     {0x3013, 0x3013, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
     {0x3014, 0x301B, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
@@ -1855,20 +1861,20 @@ const struct scx scx_list[] = {
     {0x3031, 0x3035, "\x11\x12"},	// Hira Kana
     {0x3037, 0x3037, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
     {0x303C, 0x303D, "\x0f\x11\x12"},	// Hani Hira Kana
-    {0x303E, 0x303F, "\x0f"},	// Hani
+    // {0x303E, 0x303F, "\x0f"},	// Han, moved to sc proper
     {0x3099, 0x309C, "\x11\x12"},	// Hira Kana
     {0x30A0, 0x30A0, "\x11\x12"},	// Hira Kana
     {0x30FB, 0x30FB, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
     {0x30FC, 0x30FC, "\x11\x12"},	// Hira Kana
-    {0x3190, 0x319F, "\x0f"},	// Hani
-    {0x31C0, 0x31E3, "\x0f"},	// Hani
-    {0x3220, 0x3247, "\x0f"},	// Hani
-    {0x3280, 0x32B0, "\x0f"},	// Hani
-    {0x32C0, 0x32CB, "\x0f"},	// Hani
-    {0x32FF, 0x32FF, "\x0f"},	// Hani
-    {0x3358, 0x3370, "\x0f"},	// Hani
-    {0x337B, 0x337F, "\x0f"},	// Hani
-    {0x33E0, 0x33FE, "\x0f"},	// Hani
+    // {0x3190, 0x319F, "\x0f"},	// Han, moved to sc proper
+    // {0x31C0, 0x31E3, "\x0f"},	// Han, moved to sc proper
+    // {0x3220, 0x3247, "\x0f"},	// Han, moved to sc proper
+    // {0x3280, 0x32B0, "\x0f"},	// Han, moved to sc proper
+    // {0x32C0, 0x32CB, "\x0f"},	// Han, moved to sc proper
+    // {0x32FF, 0x32FF, "\x0f"},	// Han, moved to sc proper
+    // {0x3358, 0x3370, "\x0f"},	// Han, moved to sc proper
+    // {0x337B, 0x337F, "\x0f"},	// Han, moved to sc proper
+    // {0x33E0, 0x33FE, "\x0f"},	// Han, moved to sc proper
     {0xA66F, 0xA66F, "\x07\x36"},	// Cyrl Glag
     {0xA700, 0xA707, "\x0f\x02"},	// Hani Latn
     {0xA830, 0xA832, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x16\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
@@ -1896,9 +1902,9 @@ const struct scx scx_list[] = {
     {0x1133B, 0x1133C, "\x38\x1a"},	// Gran Taml
     {0x11FD0, 0x11FD1, "\x38\x1a"},	// Gran Taml
     {0x11FD3, 0x11FD3, "\x38\x1a"},	// Gran Taml
-    {0x1BCA0, 0x1BCA3, "\x32"},	// Dupl
-    {0x1D360, 0x1D371, "\x0f"},	// Hani
-    {0x1F250, 0x1F251, "\x0f"},	// Hani
+    // {0x1BCA0, 0x1BCA3, "\x32"},	// Duployan, moved to sc proper
+    // {0x1D360, 0x1D371, "\x0f"},	// Han, moved to sc proper
+    // {0x1F250, 0x1F251, "\x0f"},	// Han, moved to sc proper
     // clang-format on
 }; // 56 ranges, 65 single codepoints
 #endif

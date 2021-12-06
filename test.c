@@ -56,8 +56,11 @@ void test_scripts_no_init(void) {
     const struct sc *n = &xid_script_list[i + 1];
     assert(r->from <= r->to);
     assert(r->to <= n->from);
-    if (r->to + 1 >= n->from)
+    if (r->to + 1 >= n->from) {
+      if (r->scr == n->scr)
+        printf("ERROR U+%X .. U+%X both with SC %d\n", r->to, n->from, r->scr);
       assert(r->scr != n->scr); // can not be merged
+    }
   }
 #endif
 #ifndef DISABLE_CHECK_XID
@@ -66,8 +69,11 @@ void test_scripts_no_init(void) {
     const struct sc *n = &nonxid_script_list[i + 1];
     assert(r->from <= r->to);
     assert(r->to <= n->from);
-    if (r->to + 1 >= n->from)
+    if (r->to + 1 >= n->from) {
+      if (r->scr == n->scr)
+        printf("ERROR U+%X .. U+%X both with SC %d\n", r->to, n->from, r->scr);
       assert(r->scr != n->scr); // can not be merged
+    }
   }
 #endif
 #ifndef DISABLE_CHECK_XID
