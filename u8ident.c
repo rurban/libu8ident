@@ -77,6 +77,8 @@ EXTERN void u8ident_set_maxlength(unsigned maxlen) {
 
 unsigned u8ident_maxlength(void) { return s_maxlen; }
 
+#define HAVE_SCX
+
 /* Two variants to check if this identifier is valid. The second avoids
    allocating a fresh string from the parsed input.
 */
@@ -87,8 +89,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   const char *e = (char *)&buf[len];
   bool need_normalize = false;
 #ifdef HAVE_SCX
-  char scx[32]; // combination of all scx
-  scx[0] = '\0';
+  //char scx[32]; // combination of all scx
+  //scx[0] = '\0';
 #endif
   // check mixed scripts
   while (s < e) {
@@ -125,12 +127,23 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (!need_normalize) {
       need_normalize = u8ident_is_decomposed(cp, scr);
     }
+    bool is_new = false;
 #ifdef HAVE_SCX
-    // check scx on Common or Inherited, keep list of possible scripts, and
+    struct ctx_t *ctx = u8ident_ctx();
+    // check scx on Common or Inherited. keep list of possible scripts, and
     // reduce them
     if (scr == SC_Common || scr == SC_Inherited) {
       const char *this_scx = u8ident_get_scx(cp);
-      // TODO check this_scx against the existing scripts, ...
+      char *x = (char*)this_scx;
+      int n = 0;
+      while (x) {
+        bool has = u8ident_has_script_ctx(*x, ctx);
+        n +=  has ? 1 : 0;
+        x++;
+      }
+      if (this_scx && !n) {  // We have SCX and none of the SCX occured yet. so we have a new one.
+        is_new = true; // we dont know which yet, but we can set is_new.
+      }
     }
     // ignore Latin. This is compatible with everything
     else if (scr == SC_Latin)
@@ -138,10 +151,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #else
     if (scr == SC_Latin || scr == SC_Common || scr == SC_Inherited)
       continue;
+    struct ctx_t *ctx = u8ident_ctx();
 #endif
     // if not already have it, add it. EXCLUDED_SCRIPT must already exist
-    struct ctx_t *ctx = u8ident_ctx();
-    bool is_new = !u8ident_has_script_ctx(scr, ctx);
+    if (!is_new && !(scr == SC_Common || scr == SC_Inherited))
+      is_new = !u8ident_has_script_ctx(scr, ctx);
     // TODO check profile
     if (is_new) {
       if (s_u8id_profile == U8ID_PROFILE_2) { // single script only

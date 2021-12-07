@@ -407,10 +407,10 @@ void test_scx_singles(void) {
 }
 
 int main(int argc, char **argv) {
-  const int norm = (argc > 1 && !strcmp(argv[0], "norm"));
-  const int profile = (argc > 1 && !strcmp(argv[0], "profile"));
-  const int xid = (argc > 1 && !strcmp(argv[0], "xid"));
-  const int scx = (argc > 1 && !strcmp(argv[0], "scx"));
+  const int norm = (argc > 1 && !strcmp(argv[1], "norm"));
+  const int profile = (argc > 1 && !strcmp(argv[1], "profile"));
+  const int xid = (argc > 1 && !strcmp(argv[1], "xid"));
+  const int scx = (argc > 1 && !strcmp(argv[1], "scx"));
 
   if (argc == 1) {
     test_scripts_no_init();

@@ -299,8 +299,7 @@ static bool _is_MARK(const uint32_t cp) {
   return true;
 }
 static bool _is_DECOMPOSED_REST(const uint32_t cp) {
-  (void)cp;
-  return false;
+  return cp < 128 || (cp >> 11) > 2 ? false : true;
 }
 
 /*
