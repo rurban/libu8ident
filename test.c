@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include "u8id_private.h"
 #include "u8ident.h"
 #include "u8idscr.h"
 
@@ -187,6 +188,7 @@ static void testnorm(const char *name, const struct norms_t *testids) {
   NFKD: Džl· [\x44\x7a\xcc\x8c\x6c\xc2\xb7]
   FCD:  Džl· [\x44\xc5\xbe\x6c\xc2\xb7]
 */
+#if !defined U8ID_NORM || U8ID_NORM == NFKC
 void test_norm_nfkc(void) {
   const struct norms_t testids[] = {
       // clang-format off
@@ -201,6 +203,8 @@ void test_norm_nfkc(void) {
   };
   testnorm("NFKC", testids);
 }
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFC
 void test_norm_nfc(void) {
   const struct norms_t testids[] = {
       // clang-format off
@@ -215,6 +219,8 @@ void test_norm_nfc(void) {
   assert(!u8ident_init(U8ID_NFC | U8ID_PROFILE_4));
   testnorm("NFC", testids);
 }
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == FCC
 void test_norm_fcc(void) {
   const struct norms_t testids[] = {
       // clang-format off
@@ -229,6 +235,8 @@ void test_norm_fcc(void) {
   assert(!u8ident_init(U8ID_FCC | U8ID_PROFILE_4));
   testnorm("FCC", testids);
 }
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFKD
 void test_norm_nfkd(void) {
   const struct norms_t testids[] = {
       // clang-format off
@@ -244,6 +252,8 @@ void test_norm_nfkd(void) {
   assert(!u8ident_init(U8ID_NFKD | U8ID_PROFILE_4));
   testnorm("NFKD", testids);
 }
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFD
 void test_norm_nfd(void) {
   const struct norms_t testids[] = {
       // clang-format off
@@ -259,6 +269,8 @@ void test_norm_nfd(void) {
   assert(!u8ident_init(U8ID_NFD | U8ID_PROFILE_4));
   testnorm("NFD", testids);
 }
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == FCD
 void test_norm_fcd(void) {
   const struct norms_t testids[] = {
       // clang-format off
@@ -274,6 +286,7 @@ void test_norm_fcd(void) {
   assert(!u8ident_init(U8ID_FCD | U8ID_PROFILE_4));
   testnorm("FCD", testids);
 }
+#endif
 
 // TODO profiles, contexts, XID.
 
@@ -281,8 +294,7 @@ void test_norm_fcd(void) {
 void test_mixed_scripts(int xid_check) {
   u8ident_init(U8ID_DEFAULT_OPTS | xid_check);
   assert(u8ident_check((const uint8_t *)"abcd", NULL) == U8ID_EOK);
-  assert(u8ident_check((const uint8_t *)"abc\xce\x86", NULL) ==
-         U8ID_EOK); // Latin + Greek ok
+  assert(u8ident_check((const uint8_t *)"abc\xce\x86", NULL) >= 0); // Latin + Greek ok
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
   if (ret != U8ID_EOK_NORM)
     printf("ERROR U+301 with xid_check %d does not return EOK_NORM, but %d\n",
@@ -328,14 +340,21 @@ void test_mixed_scripts_with_ctx(void) {
 #elif U8ID_PROFILE == 2
   assert(u8ident_check((const uint8_t *)"abcͻ", NULL) == U8ID_ERR_SCRIPT);
 #endif
-  assert(!u8ident_init(U8ID_DEFAULT_OPTS));
+  assert(!u8ident_init(u8ident_options()));
   int ctx = u8ident_new_ctx(); // new ctx 1
   assert(ctx == 1);
-  assert(u8ident_check((const uint8_t *)"abcѝ", NULL) == U8ID_EOK); // Cyrillic
+#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
+  assert(u8ident_check((const uint8_t *)"abcѝ", NULL) >= 0); // Cyrillic
+#else
+  assert(u8ident_check((const uint8_t *)"abcѝ", NULL) == U8ID_ERR_SCRIPT); // Cyrillic disallowed
+#endif
   assert(u8ident_delete_ctx(ctx) == 0);
   // back to ctx 0
-  assert(u8ident_check((const uint8_t *)"abͻώ", NULL) ==
-         U8ID_EOK); // next Greek
+#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
+  assert(u8ident_check((const uint8_t *)"abͻώ", NULL) >= 0); // next Greek
+#else
+  assert(u8ident_check((const uint8_t *)"abͻώ", NULL) == U8ID_ERR_SCRIPT); // Greek disallowed
+#endif
 }
 
 void test_init(void) {
@@ -344,7 +363,7 @@ void test_init(void) {
   assert(u8ident_init(6));
   assert(u8ident_init(2048));
   assert(u8ident_init(U8ID_CHECK_XID));                   // missing PROFILE
-  assert(!u8ident_init(U8ID_CHECK_XID | U8ID_PROFILE_4)); // defaults to NFKC
+  assert(!u8ident_init(U8ID_NORM_DEFAULT | U8ID_CHECK_XID | U8ID_PROFILE_DEFAULT));
   assert(u8ident_init(U8ID_FCC));                         // missing PROFILE
   assert(u8ident_init(U8ID_PROFILE_2 | U8ID_PROFILE_4));  // multiple profiles
   assert(u8ident_init(2048));
@@ -395,15 +414,27 @@ int main(int argc, char **argv) {
     test_init();
   }
   if (norm || argc == 1) {
+#if !defined U8ID_NORM || U8ID_NORM == NFKC
     test_norm_nfkc();
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFC
     test_norm_nfc();
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == FCC
     test_norm_fcc();
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFKD
     test_norm_nfkd();
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFD
     test_norm_nfd();
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == FCD
     test_norm_fcd();
+#endif
+    if (norm)
+      return 0;
   }
-  if (norm)
-    return 0;
   if (profile || argc == 1) {
     test_mixed_scripts(0);
   }

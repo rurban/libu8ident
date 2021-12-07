@@ -22,6 +22,34 @@ EXTERN int u8ident_init(unsigned options) {
     return -1;
   if ((options & U8ID_NFMASK) > 5)
     return -1;
+#if defined U8ID_NORM
+  enum u8id_norm norm = options & U8ID_NFMASK;
+  // only one is allowed, else fail
+#  if U8ID_NORM == NFD
+  if (!((norm != U8ID_NFD || norm != U8ID_FCD)))
+    return -1;
+#  endif
+#  if U8ID_NORM == NFC
+  if (!((norm == U8ID_NFD || norm == U8ID_FCD || norm == U8ID_NFC)))
+    return -1;
+#  endif
+#  if U8ID_NORM == NFKC
+  if (!((norm != U8ID_NFKD || norm != U8ID_NFKC)))
+    return -1;
+#  endif
+#  if U8ID_NORM == NFKD
+  if (norm != U8ID_NFKD)
+    return -1;
+#  endif
+#  if U8ID_NORM == FCD
+  if (norm != U8ID_FCD)
+    return -1;
+#  endif
+#  if U8ID_NORM == FCC
+  if (norm != U8ID_FCC)
+    return -1;
+#  endif
+#endif
   s_u8id_profile = 0;
   for (unsigned i = U8ID_PROFILE_2; i <= U8ID_PROFILE_6; i *= 2) {
     if (options & i) {
@@ -174,7 +202,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   }
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);
-    if (strcmp(norm, buf))
+    if (!norm || strcmp(norm, buf))
       ret = U8ID_EOK_NORM;
     if (outnorm)
       *outnorm = norm;

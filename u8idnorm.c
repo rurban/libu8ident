@@ -331,7 +331,7 @@ static int _decomp_hangul_s(char *dest, size_t dmax, uint32_t cp) {
 */
 static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
                      const bool iscompat) {
-  assert(dmax > 4);
+  assert(dmax > 1);
   /* The costly is_HANGUL_cp_high(cp) checks also all composing chars.
      Hangul_IsS only for the valid start points. Which we can do here. */
   if (Hangul_IsS(cp)) {
@@ -378,7 +378,7 @@ int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
   if (unlikely(dest == NULL)) {
     return ERR_INVAL;
   }
-  if (unlikely(src == NULL || dest == NULL || dmax == 0 || dmax < 5 ||
+  if (unlikely(src == NULL || dest == NULL || dmax == 0 || dmax < 2 ||
                (unsigned)dmax > u8ident_maxlength())) {
     *dest = 0;
     return ERR_INVAL;
@@ -800,7 +800,7 @@ GCC_DIAG_IGNORE (-Wreturn-local-addr)
   char *tmp = NULL;
   size_t tmp_size;
 #endif
-  const unsigned mode = u8ident_options() & U8ID_NFMASK;
+  const enum u8id_norm mode = u8ident_options() & U8ID_NFMASK;
   const bool iscompat = (mode == U8ID_NFKC || mode == U8ID_NFKD);
 
   size_t dmax = len;
