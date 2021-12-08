@@ -70,6 +70,8 @@
 #define U8ID_SCR_TRESH 8
 struct ctx_t {
   uint8_t count;
+  uint8_t has_latin : 1;
+  uint8_t has_han : 1;
   uint8_t is_japanese : 1;
   uint8_t is_chinese : 1;
   uint8_t is_korean : 1;
@@ -77,7 +79,6 @@ struct ctx_t {
   uint8_t is_cyrillic : 1;
   uint8_t is_greek : 1;
 #endif
-  uint8_t has_han : 1;
   uint32_t last_cp; // only set on errors
   union {
     uint64_t scr64; // room for 8 scripts

@@ -13,7 +13,7 @@
 // defaults to U8ID_NFKC | U8ID_PROFILE_4
 unsigned s_u8id_options =
     U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT | U8ID_CHECK_XID;
-unsigned s_u8id_profile = U8ID_PROFILE_DEFAULT;
+enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
 /* Initialize the library with a bitmask of options, which define the
@@ -78,8 +78,6 @@ EXTERN void u8ident_set_maxlength(unsigned maxlen) {
 
 unsigned u8ident_maxlength(void) { return s_maxlen; }
 
-#define HAVE_SCX
-
 /* Two variants to check if this identifier is valid. The second avoids
    allocating a fresh string from the parsed input.
 */
@@ -89,10 +87,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   char *s = (char *)buf;
   const char *e = (char *)&buf[len];
   bool need_normalize = false;
-#ifdef HAVE_SCX
   //char scx[32]; // combination of all scx
   //scx[0] = '\0';
-#endif
   // check mixed scripts
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
@@ -125,8 +121,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
-    if (unlikely(s_u8id_profile < U8ID_PROFILE_5 &&
-                 scr >= FIRST_LIMITED_USE_SCRIPT)) {
+    if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
+                 s_u8id_profile < U8ID_PROFILE_5)) {
       struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
@@ -140,7 +136,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
       goto normalize; // skip all mixed scripts checks
     bool is_new = false;
-#ifdef HAVE_SCX
     struct ctx_t *ctx = u8ident_ctx();
     // check scx on Common or Inherited. keep list of possible scripts, and
     // reduce them
@@ -158,13 +153,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       }
     }
     // ignore Latin. This is compatible with everything
-    else if (scr == SC_Latin)
+    else if (scr == SC_Latin) {
+      ctx->has_latin = 1;
       continue;
-#else
-    if (scr == SC_Latin || scr == SC_Common || scr == SC_Inherited)
-      continue;
-    struct ctx_t *ctx = u8ident_ctx();
-#endif
+    }
 
     // if not already have it, add it. EXCLUDED_SCRIPT must already exist
     if (!is_new && !(scr == SC_Common || scr == SC_Inherited))
@@ -178,8 +170,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         return U8ID_ERR_SCRIPT;
       }
       // if excluded it must have been already manually added
-      if (unlikely(s_u8id_profile < U8ID_PROFILE_5 &&
-                   scr >= FIRST_EXCLUDED_SCRIPT)) {
+      if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
+                   s_u8id_profile < U8ID_PROFILE_5)) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }
@@ -213,7 +205,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           return U8ID_ERR_SCRIPTS;
         }
 #endif
-        // PROFILE_4: any Recommended but Greek/Cyrillic
+        // PROFILE_4: allow adding any Recommended to Latin,
+        // but not Greek/Cyrillic.
         // the only remaining profile
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 4
         else if (scr == SC_Greek && ctx->is_cyrillic
@@ -228,6 +221,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           return U8ID_ERR_SCRIPTS;
         } else {
           assert(s_u8id_profile == U8ID_PROFILE_4);
+          // but not more than 2
+          if (ctx->has_latin && ctx->count >= 1) {
+            ctx->last_cp = cp;
+            return U8ID_ERR_SCRIPTS;
+          }
         }
 #endif
       }

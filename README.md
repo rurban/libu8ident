@@ -373,10 +373,6 @@ TODO
   not exported (ie. unusable from the shared library)
   We only optionally check the IdentifierStatus Allowed with CHECK_XID.
 
-* **Security Profiles**: There's not much code yet to check for Profile 2,3,5,6 vs 4,
-  i.e. if to allow only Asian CFK combinations, or all combinations with Latin.
-  See the `scx` branch.
-
 * **FCD**: This normalization is broken.
 
 * The **testsuite** does not yet check for known UTF-8 or other Unicode
