@@ -336,27 +336,27 @@ void test_mixed_scripts(int xid_check) {
 // check if mixed scripts per ctx work
 void test_mixed_scripts_with_ctx(void) {
   int ret = u8ident_check((const uint8_t *)"abcͻ", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
+#if !defined U8ID_PROFILE || U8ID_PROFILE > 3
   assert(ret == U8ID_EOK); // Greek
-#elif U8ID_PROFILE == 2
-  assert(ret == U8ID_ERR_SCRIPT);
+#elif U8ID_PROFILE <= 3
+  assert(ret == U8ID_ERR_SCRIPT); // Single Script or Highly Restrictive with Latin + Greek
 #endif
   assert(!u8ident_init(u8ident_options()));
   int ctx = u8ident_new_ctx(); // new ctx 1
   assert(ctx == 1);
   ret = u8ident_check((const uint8_t *)"abcѝ", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
+#if !defined U8ID_PROFILE || U8ID_PROFILE > 3
   assert(ret >= 0); // Cyrillic
 #else
-  assert(ret == U8ID_ERR_SCRIPT); // Cyrillic disallowed
+  assert(ret == U8ID_ERR_SCRIPT); // Cyrillic disallowed in 2 and 3
 #endif
   assert(u8ident_delete_ctx(ctx) == 0);
   // back to ctx 0
   ret = u8ident_check((const uint8_t *)"abͻώ", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
+#if !defined U8ID_PROFILE || U8ID_PROFILE > 3
   assert(ret >= 0); // next Greek
 #else
-  assert(ret == U8ID_ERR_SCRIPT); // Greek disallowed
+  assert(ret == U8ID_ERR_SCRIPT); // Greek disallowed in 2 and 3
 #endif
 }
 
