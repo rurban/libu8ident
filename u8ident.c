@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "u8ident.h"
 #include "u8id_private.h"
 #include "u8idscr.h"
@@ -116,6 +117,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       }
     }
 #endif
+
+#if !defined U8ID_PROFILE || U8ID_PROFILE != 6
+    if  (s_u8id_profile == U8ID_PROFILE_6)
+#endif
+      goto normalize; // skip all script checks
+
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
     if (unlikely(s_u8id_profile < U8ID_PROFILE_5 &&
@@ -127,6 +134,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (!need_normalize) {
       need_normalize = u8ident_is_decomposed(cp, scr);
     }
+
+#if !defined U8ID_PROFILE || U8ID_PROFILE != 5
+    if  (s_u8id_profile == U8ID_PROFILE_5)
+#endif
+      goto normalize; // skip all mixed scripts checks
     bool is_new = false;
 #ifdef HAVE_SCX
     struct ctx_t *ctx = u8ident_ctx();
@@ -153,12 +165,15 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       continue;
     struct ctx_t *ctx = u8ident_ctx();
 #endif
+
     // if not already have it, add it. EXCLUDED_SCRIPT must already exist
     if (!is_new && !(scr == SC_Common || scr == SC_Inherited))
       is_new = !u8ident_has_script_ctx(scr, ctx);
-    // TODO check profile
     if (is_new) {
-      if (s_u8id_profile == U8ID_PROFILE_2) { // single script only
+#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
+      if  (s_u8id_profile == U8ID_PROFILE_2)
+#endif
+      { // single script only
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }
@@ -192,13 +207,29 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             goto ok;
         }
         // and disallow all other combinations
-        else { /* if (scr == SC_Greek && ctx->is_cyrillic)
-                return U8ID_ERR_SCRIPTS;
-                else if (scr == SC_Cyrillic &&
-                u8ident_has_script_ctx(SC_Greek, ctx)) */
+#if !defined U8ID_PROFILE || U8ID_PROFILE == 3
+        else if (s_u8id_profile == U8ID_PROFILE_3) {
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         }
+#endif
+        // PROFILE_4: any Recommended but Greek/Cyrillic
+        // the only remaining profile
+#if !defined U8ID_PROFILE || U8ID_PROFILE == 4
+        else if (scr == SC_Greek && ctx->is_cyrillic
+                   /*u8ident_has_script_ctx(SC_Cyrillic, ctx)*/) {
+          assert(s_u8id_profile == U8ID_PROFILE_4);
+          ctx->last_cp = cp;
+          return U8ID_ERR_SCRIPTS;
+        } else if (scr == SC_Cyrillic && ctx->is_greek
+                   /*u8ident_has_script_ctx(SC_Greek, ctx)*/) {
+          assert(s_u8id_profile == U8ID_PROFILE_4);
+          ctx->last_cp = cp;
+          return U8ID_ERR_SCRIPTS;
+        } else {
+          assert(s_u8id_profile == U8ID_PROFILE_4);
+        }
+#endif
       }
     ok:
       if (scr == SC_Han)
@@ -209,11 +240,16 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         ctx->is_japanese = 1;
       else if (scr == SC_Hangul)
         ctx->is_korean = 1;
-      // else if (scr == SC_Cyrillic)
-      //   ctx->is_cyrillic = 1;
+#if !defined U8ID_PROFILE || U8ID_PROFILE == 4
+      else if (scr == SC_Cyrillic)
+        ctx->is_cyrillic = 1;
+      else if (scr == SC_Greek)
+        ctx->is_greek = 1;
+#endif
       u8ident_add_script_ctx(scr, ctx);
     }
   }
+ normalize:
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);
     if (!norm || strcmp(norm, buf))
