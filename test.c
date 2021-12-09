@@ -16,6 +16,7 @@ static char buf[128]; // for hex display
 
 // private access
 unsigned u8ident_options(void);
+unsigned u8ident_profile(void);
 
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
@@ -288,22 +289,36 @@ void test_norm_fcd(void) {
 }
 #endif
 
-// TODO profiles, contexts, XID.
-
-// latin plus just greek is allowed, but not greek + cyrillic. and so on
+// latin plus greek or cyrillic is disallowed with profile 4
+// https://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 void test_mixed_scripts(int xid_check) {
   int ret;
   u8ident_init(U8ID_DEFAULT_OPTS | xid_check);
   ret = u8ident_check((const uint8_t *)"abcd", NULL);
   assert (ret == U8ID_EOK); // Latin only
-  ret = u8ident_check((const uint8_t *)"a\xce\x86", NULL); // U+386
-#if !defined U8ID_PROFILE || U8ID_PROFILE > 2
-  assert(ret == U8ID_EOK); // Greek
+
+  ret = u8ident_check((const uint8_t *)"aঅ", NULL); // Latin + Bengali U+985
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 4
+  if (ret != U8ID_ERR_SCRIPTS)
+    printf("ERROR Bengali U+985 %d in profile %u\n", ret, u8ident_profile());
+  assert(ret == U8ID_ERR_SCRIPTS);
 #else
-  if (ret != U8ID_ERR_SCRIPT)
-    printf("ERROR Greek %d\n", ret);
-  assert(ret == U8ID_ERR_SCRIPT); // Single Script or Highly Restrictive with Latin + Greek
+  if (ret != U8ID_EOK)
+    printf("ERROR Bengali U+985 %d in profile %u\n", ret, u8ident_profile());
+  assert(ret == U8ID_EOK);
 #endif
+
+  ret = u8ident_check((const uint8_t *)"a\xce\x86", NULL); // Latin + U+386 Greek
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
+  if (ret != U8ID_ERR_SCRIPTS)
+    printf("ERROR Latin + U+386 Greek %d in profile %u\n", ret, u8ident_profile());
+  assert(ret == U8ID_ERR_SCRIPTS); // Greek
+#else
+  if (ret != U8ID_EOK)
+    printf("ERROR Latin + U+386 Greek %d in profile %u\n", ret, u8ident_profile());
+  assert(ret == U8ID_EOK);
+#endif
+
   ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
   if (ret != U8ID_EOK_NORM)
     printf("ERROR U+301 with xid_check %d does not return EOK_NORM, but %d\n",
@@ -350,11 +365,11 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE > 3
   if (ret != U8ID_ERR_SCRIPTS)
-    printf("ERROR Greek plus Bengali %d/%d\n", ret, xid_check);
+    printf("ERROR Greek plus Bengali %d/%d in profile %u\n", ret, xid_check, u8ident_profile());
   assert(ret == U8ID_ERR_SCRIPTS);
 #else
   if (ret != U8ID_ERR_SCRIPT)
-    printf("ERROR Greek plus Bengali %d/%d\n", ret, xid_check);
+    printf("ERROR Greek plus Bengali %d/%d in profile %u\n", ret, xid_check, u8ident_profile());
   assert(ret == U8ID_ERR_SCRIPT); // multi-scripts disallowed in 2 and 3
 #endif
   // han + hangul is allowed, ditto hangul + han

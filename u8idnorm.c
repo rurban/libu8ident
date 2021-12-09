@@ -9,8 +9,8 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <errno.h>
-#include "u8ident.h"
 #include "u8id_private.h"
+#include <u8ident.h>
 
 #define STDCHAR char
 #define TRUE true

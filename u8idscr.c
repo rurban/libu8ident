@@ -7,12 +7,12 @@
   http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 */
 
-#include "u8ident.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
 #include "u8id_private.h"
+#include <u8ident.h>
 
 #include "scripts.h"
 

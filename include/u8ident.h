@@ -26,8 +26,16 @@ enum u8id_profile {
   U8ID_PROFILE_5 = 64, // Minimally Restrictive
   U8ID_PROFILE_6 = 128 // Unrestricted
 };
+
+#ifndef U8ID_PROFILE_DEFAULT
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
+#endif
+#ifndef U8ID_NORM_DEFAULT
+#  define U8ID_NORM_DEFAULT U8ID_NFKC
+#endif
+
 enum u8id_options {
-  U8ID_DEFAULT_OPTS = U8ID_NFKC + U8ID_PROFILE_4,
+  U8ID_DEFAULT_OPTS = U8ID_NORM_DEFAULT + U8ID_PROFILE_DEFAULT,
   U8ID_FOLDCASE = 256,
   U8ID_CHECK_XID = 512, // Optional, check for the allowed tr39
                         // IdentifierStatus. hard-coded with
