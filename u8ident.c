@@ -173,7 +173,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
       { // single script only
         ctx->last_cp = cp;
-        return U8ID_ERR_SCRIPT;
+        return U8ID_ERR_SCRIPTS;
       }
       // if excluded it must have been already manually added
       if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
