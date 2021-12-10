@@ -78,9 +78,13 @@ bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
 }
 void u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
   int i = ctx->count;
-  uint8_t *u8p = (i > 7) ? ctx->u8p : ctx->scr8;
-  if ((i & 7) == 7)
-    ctx->u8p = realloc(ctx->u8p, (i + 1) * 2);
+  if (unlikely(i > 8 && (i & 7) == 7)) {
+    ctx->u8p = realloc(ctx->u8p, i + 8);
+  } else if (i == 9) {
+    ctx->u8p = malloc(16);
+    memcpy(ctx->u8p, ctx->scr8, 8);
+  }
+  uint8_t *u8p = (i > 8) ? ctx->u8p : ctx->scr8;
   u8p[i] = scr;
   ctx->count++;
   return;

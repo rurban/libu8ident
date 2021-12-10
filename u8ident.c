@@ -145,8 +145,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 5
 #else
     if  (s_u8id_profile == U8ID_PROFILE_5)
-#endif
       goto normalize; // skip all mixed scripts checks
+#endif
     bool is_new = false;
     struct ctx_t *ctx = u8ident_ctx();
     // check scx on Common or Inherited. keep list of possible scripts, and
@@ -166,7 +166,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
     // ignore Latin. This is compatible with everything
     else if (scr == SC_Latin) {
-      ctx->has_latin = 1;
+      if (!u8ident_has_script_ctx(scr, ctx))
+        u8ident_add_script_ctx(scr, ctx);
       continue;
     }
 
@@ -218,23 +219,17 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         }
 #endif
         // PROFILE_4: allow adding any Recommended to Latin,
-        // but not Greek/Cyrillic.
+        // but not Greek nor Cyrillic.
         // the only remaining profile
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 4
-        else if (scr == SC_Greek && ctx->is_cyrillic
-                   /*u8ident_has_script_ctx(SC_Cyrillic, ctx)*/) {
-          assert(s_u8id_profile == U8ID_PROFILE_4);
-          ctx->last_cp = cp;
-          return U8ID_ERR_SCRIPTS;
-        } else if (scr == SC_Cyrillic && ctx->is_greek
-                   /*u8ident_has_script_ctx(SC_Greek, ctx)*/) {
+        else if (scr == SC_Greek || scr == SC_Cyrillic) {
           assert(s_u8id_profile == U8ID_PROFILE_4);
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         } else {
           assert(s_u8id_profile == U8ID_PROFILE_4);
           // but not more than 2
-          if (ctx->has_latin && ctx->count >= 1) {
+          if (ctx->count >= 1) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           }
@@ -250,16 +245,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         ctx->is_japanese = 1;
       else if (scr == SC_Hangul)
         ctx->is_korean = 1;
-#if !defined U8ID_PROFILE || U8ID_PROFILE == 4
-      else if (scr == SC_Cyrillic)
-        ctx->is_cyrillic = 1;
-      else if (scr == SC_Greek)
-        ctx->is_greek = 1;
-#endif
       u8ident_add_script_ctx(scr, ctx);
     }
   }
+#if !defined U8ID_PROFILE || U8ID_PROFILE > 4
  normalize:
+#endif
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);
     if (!norm || strcmp(norm, buf))
