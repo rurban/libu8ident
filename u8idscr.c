@@ -55,6 +55,8 @@ struct ctx_t *u8ident_ctx(void) {
 
 bool u8ident_has_script(const uint8_t scr) {
   struct ctx_t *ctx = u8ident_ctx();
+  if (!ctx->count)
+    return false;
   uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
   for (int i = 0; i < ctx->count; i++) {
     if (scr == u8p[i])
@@ -65,6 +67,8 @@ bool u8ident_has_script(const uint8_t scr) {
 
 // search in linear vector of scripts per ctx
 bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
+  if (!ctx->count)
+    return false;
   const uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
   for (int i = 0; i < ctx->count; i++) {
     if (scr == u8p[i])

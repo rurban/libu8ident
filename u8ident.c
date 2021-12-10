@@ -120,10 +120,13 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #endif
 
-#if !defined U8ID_PROFILE || U8ID_PROFILE != 6
-    if  (s_u8id_profile == U8ID_PROFILE_6)
+#if defined U8ID_PROFILE && U8ID_PROFILE == 6
+    goto normalize; // skip all script checks
+#elif defined U8ID_PROFILE && U8ID_PROFILE != 6
+#else
+    if (s_u8id_profile == U8ID_PROFILE_6)
+      goto normalize;
 #endif
-      goto normalize; // skip all script checks
 
     const uint8_t scr = u8ident_get_script(cp);
     // disallow Limited_Use if not already extra added
@@ -137,7 +140,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       need_normalize = u8ident_is_decomposed(cp, scr);
     }
 
-#if !defined U8ID_PROFILE || U8ID_PROFILE != 5
+#if defined U8ID_PROFILE && U8ID_PROFILE == 5
+    goto normalize; // skip all mixed scripts checks
+#elif defined U8ID_PROFILE && U8ID_PROFILE != 5
+#else
     if  (s_u8id_profile == U8ID_PROFILE_5)
 #endif
       goto normalize; // skip all mixed scripts checks
@@ -168,13 +174,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (!is_new && !(scr == SC_Common || scr == SC_Inherited))
       is_new = !u8ident_has_script_ctx(scr, ctx);
     if (is_new) {
-#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
-      if  (s_u8id_profile == U8ID_PROFILE_2)
-#endif
-      { // single script only
-        ctx->last_cp = cp;
-        return U8ID_ERR_SCRIPTS;
-      }
       // if excluded it must have been already manually added
       if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
                    s_u8id_profile < U8ID_PROFILE_5)) {
@@ -183,6 +182,13 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       }
       // allowed is only one, unless it is an allowed combination
       if (ctx->count) {
+#if !defined U8ID_PROFILE || U8ID_PROFILE != 2
+        if (s_u8id_profile == U8ID_PROFILE_2)
+#endif
+        { // single script only
+          ctx->last_cp = cp;
+          return U8ID_ERR_SCRIPTS;
+        }
         // check allowed CJK combinations
         if (scr == SC_Bopomofo) {
           if (unlikely(!ctx->has_han)) {
