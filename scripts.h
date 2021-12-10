@@ -1779,9 +1779,7 @@ const struct sc nonxid_script_list[] = {
 
 // Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
 // TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5
-#ifdef EXT_SCRIPTS
-extern const struct scx scx_list[121];
-#else
+#ifndef EXT_SCRIPTS
 const struct scx scx_list[] = {
     // clang-format off
     // {0x0342, 0x0342, "\x0b"},	// Greek, moved to sc proper
@@ -1895,7 +1893,7 @@ const struct scx scx_list[] = {
     {0x10102, 0x10102, "\x2d\x45"},	// Cprt Linb
     {0x10107, 0x10133, "\x2d\x44\x45"},	// Cprt Lina Linb
     {0x10137, 0x1013F, "\x2d\x45"},	// Cprt Linb
-    {0x102E0, 0x102FB, "\x03\x00"},	// Arab Copt
+    {0x102E0, 0x102FB, "\x03\x00"},	// Arab Copt // !!!! 43 not 0
     {0x10AF2, 0x10AF2, "\x4a\x61"},	// Mani Ougr
     {0x11301, 0x11301, "\x38\x1a"},	// Gran Taml
     {0x11303, 0x11303, "\x38\x1a"},	// Gran Taml
@@ -1907,6 +1905,8 @@ const struct scx scx_list[] = {
     // {0x1F250, 0x1F251, "\x0f"},	// Han, moved to sc proper
     // clang-format on
 }; // 56 ranges, 65 single codepoints
+#else
+extern const struct scx scx_list[93];
 #endif
 
 #ifndef DISABLE_CHECK_XID

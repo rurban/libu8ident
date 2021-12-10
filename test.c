@@ -447,13 +447,13 @@ void test_init(void) {
 
 void test_scx_singles(void) {
   // check scripts of all scx singles, if really only Common and Inherited. (Yes
-  // with UCD 14) Ideally we would have none, they would all be merged into the
+  // with UCD 14.0) Ideally we would have none, they would all be merged into the
   // sc_list, splitting it up.
   int c = u8ident_new_ctx();
   struct ctx_t *ctx = u8ident_ctx();
   // uint8_t oldscr = 0;
   for (size_t i = 0; i < ARRAY_SIZE(scx_list); i++) {
-    if (strlen(scx_list[i].list) == 1) {
+    if (scx_list[i].list && strlen(scx_list[i].list) == 1) {
       uint8_t scrx = (uint8_t)scx_list[i].list[0];
       for (uint32_t j = scx_list[i].from; j <= scx_list[i].from; j++) {
         uint8_t scr = u8ident_get_script(j);
@@ -475,6 +475,15 @@ void test_scx_singles(void) {
       printf("SC: %s\n", u8ident_script_name(scr));
       assert(scr == SC_Common || scr == SC_Inherited);
     }
+  }
+  u8ident_delete_ctx(c);
+}
+
+void test_add_scripts(void) {
+  int c = u8ident_new_ctx();
+  for (uint8_t i=2; i<FIRST_LIMITED_USE_SCRIPT; i++) {
+    assert(u8ident_add_script(i) == U8ID_EOK);
+    assert(u8ident_has_script(i));
   }
   u8ident_delete_ctx(c);
 }
@@ -520,6 +529,7 @@ int main(int argc, char **argv) {
   test_mixed_scripts_with_ctx();
   if (scx) {
     test_scx_singles();
+    test_add_scripts();
   }
   return 0;
 }

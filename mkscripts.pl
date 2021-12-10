@@ -510,13 +510,12 @@ printf $H <<"EOF", $b, $s, scalar(@SCXR);
 
 // Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
 // TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5
-#ifdef EXT_SCRIPTS
-extern const struct scx scx_list[%u];
-#else
+#ifndef EXT_SCRIPTS
 const struct scx scx_list[] = {
     // clang-format off
 EOF
-($b, $s) = (0, 0);
+my $size;
+($b, $s, $size) = (0, 0, scalar @SCXR);
 for my $r (@SCXR) {
   my $code;
   my @list = split " ", $r->[2];
@@ -530,14 +529,17 @@ for my $r (@SCXR) {
     $b++;
   }
   if (@list == 1) {
+    $size--;
     printf $H "    // {0x%04X, 0x%04X, \"%s\"},\t// %s, moved to sc proper\n", $r->[0], $r->[1], $code, $r->[2];
   } else {
     printf $H "    {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
   }
 };
-printf $H <<"EOF", $b, $s;
+printf $H <<"EOF", $b, $s, $size;
     // clang-format on
 }; // %u ranges, %u single codepoints
+#else
+extern const struct scx scx_list[%u];
 #endif
 
 #ifndef DISABLE_CHECK_XID
