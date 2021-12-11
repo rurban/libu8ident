@@ -237,14 +237,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
       }
     ok:
-      if (scr == SC_Han)
-        ctx->has_han = 1;
-      else if (scr == SC_Bopomofo)
-        ctx->is_chinese = 1;
-      else if (scr == SC_Katakana || scr == SC_Hiragana)
-        ctx->is_japanese = 1;
-      else if (scr == SC_Hangul)
-        ctx->is_korean = 1;
       u8ident_add_script_ctx(scr, ctx);
     }
   }

@@ -226,6 +226,14 @@ EXTERN int u8ident_add_script(uint8_t scr) {
       ctxp[i].u8p = realloc(ctxp[i].u8p, (c + 1) * 2);
     ctxp[i].u8p[c] = scr;
   }
+  if (scr == SC_Han)
+    ctxp[i].has_han = 1;
+  else if (scr == SC_Bopomofo)
+    ctxp[i].is_chinese = 1;
+  else if (scr == SC_Katakana || scr == SC_Hiragana)
+    ctxp[i].is_japanese = 1;
+  else if (scr == SC_Hangul)
+    ctxp[i].is_korean = 1;
   ctxp[i].count++;
   return 0;
 }
