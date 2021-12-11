@@ -8,7 +8,7 @@
 uint32_t dec_utf8(char **strp);
 bool u8ident_has_script(const uint8_t scr);
 bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx);
-void u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx);
+int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx);
 struct ctx_t *u8ident_ctx(void);
 uint8_t u8ident_get_script(const uint32_t cp);
 /* list of script indices */

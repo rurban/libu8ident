@@ -481,9 +481,11 @@ void test_scx_singles(void) {
 
 void test_add_scripts(void) {
   int c = u8ident_new_ctx();
+  struct ctx_t *ctx = u8ident_ctx();
   for (uint8_t i=2; i<FIRST_LIMITED_USE_SCRIPT; i++) {
     assert(u8ident_add_script(i) == U8ID_EOK);
     assert(u8ident_has_script(i));
+    assert(u8ident_has_script_ctx(i, ctx));
   }
   u8ident_delete_ctx(c);
 }
@@ -531,5 +533,6 @@ int main(int argc, char **argv) {
     test_scx_singles();
     test_add_scripts();
   }
+  u8ident_delete();
   return 0;
 }

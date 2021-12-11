@@ -53,18 +53,6 @@ struct ctx_t *u8ident_ctx(void) {
   return (i_ctx < U8ID_CTX_TRESH) ? &ctx[i_ctx] : &ctxp[i_ctx];
 }
 
-bool u8ident_has_script(const uint8_t scr) {
-  struct ctx_t *ctx = u8ident_ctx();
-  if (!ctx->count)
-    return false;
-  uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
-  for (int i = 0; i < ctx->count; i++) {
-    if (scr == u8p[i])
-      return true;
-  }
-  return false;
-}
-
 // search in linear vector of scripts per ctx
 bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
   if (!ctx->count)
@@ -76,18 +64,37 @@ bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
   }
   return false;
 }
-void u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
+
+bool u8ident_has_script(const uint8_t scr) {
+  return u8ident_has_script_ctx(scr, u8ident_ctx());
+}
+
+int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
+  if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
+    return -1;
   int i = ctx->count;
   if (unlikely(i > 8 && (i & 7) == 7)) {
     ctx->u8p = realloc(ctx->u8p, i + 8);
+    ctx->u8p[i] = scr;
   } else if (i == 9) {
-    ctx->u8p = malloc(16);
-    memcpy(ctx->u8p, ctx->scr8, 8);
+    uint8_t *p = malloc(16);
+    memcpy(p, ctx->scr8, 8);
+    ctx->u8p = p;
+    ctx->u8p[i] = scr;
+  } else {
+    uint8_t *u8p = (i > 8) ? ctx->u8p : ctx->scr8;
+    u8p[i] = scr;
   }
-  uint8_t *u8p = (i > 8) ? ctx->u8p : ctx->scr8;
-  u8p[i] = scr;
+  if (scr == SC_Han)
+    ctx->has_han = 1;
+  else if (scr == SC_Bopomofo)
+    ctx->is_chinese = 1;
+  else if (scr == SC_Katakana || scr == SC_Hiragana)
+    ctx->is_japanese = 1;
+  else if (scr == SC_Hangul)
+    ctx->is_korean = 1;
   ctx->count++;
-  return;
+  return 0;
 }
 
 #if 0
@@ -215,27 +222,7 @@ const char *u8ident_failed_script_name(const int i) {
    0, 1, 2 are always included by default.
 */
 EXTERN int u8ident_add_script(uint8_t scr) {
-  if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
-    return -1;
-  int i = i_ctx;
-  int c = ctxp[i].count;
-  if (c < 8) {
-    ctxp[i].scr8[c] = scr;
-  } else {
-    if ((c & 7) == 7) // add a new word
-      ctxp[i].u8p = realloc(ctxp[i].u8p, (c + 1) * 2);
-    ctxp[i].u8p[c] = scr;
-  }
-  if (scr == SC_Han)
-    ctxp[i].has_han = 1;
-  else if (scr == SC_Bopomofo)
-    ctxp[i].is_chinese = 1;
-  else if (scr == SC_Katakana || scr == SC_Hiragana)
-    ctxp[i].is_japanese = 1;
-  else if (scr == SC_Hangul)
-    ctxp[i].is_korean = 1;
-  ctxp[i].count++;
-  return 0;
+  return u8ident_add_script_ctx(scr, u8ident_ctx());
 }
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
