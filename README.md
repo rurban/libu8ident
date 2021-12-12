@@ -143,9 +143,23 @@ configure options
 
 If to check for the Allowed
 [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
-or not.  A proper parser might does this already, but you cannot
-really trust parsers to check unicode identifiers; in the decades up
-to 2020 at least.  It might get better starting with 2025.
+or not. `--disable-check-xid` sets `-DDISABLE_CHECK_XID`, `--enable-check-xid`
+sets `-DENABLE_CHECK_XID`.
+A normal unicode-aware parser might check for the XID property
+this already, but in 2021 99% of all parsers still do the wrong thing
+for unicode identifiers, even for this simple static check. Not yet
+talking about allowed scripts, mixed scripts or confusables.
+
+With the optional `-DDISABLE_CHECK_XID` define, all identifiers need
+to contain valid codepoints, XID_Start/Continue characters, and accept
+only Allowed Identifier codepoints. This can then use a shorter script
+list to check against, skipping all the undefined holes or
+non-identifier characters.
+
+With the optional `-DENABLE_CHECK_XID` define, this library ensures that
+all identifiers accept only Allowed Identifier codepoints. It can use the
+same optimizations as `-DDISABLE_CHECK_XID`, it just adds the mandatory
+is_allowed check at run-time.
 
 When you know beforehand which normalization or profile you will need,
 and your parsers knows about allowed identifier codepoints, define
@@ -338,14 +352,9 @@ internally used script indices are arbitrarily created via
 (sorted by codepoints), *Not Recommended Scripts* (sorted
 alphabetically) and *Limited Use Scripts* (sorted by codepoint).
 
-With the optional `-DDISABLE_CHECK_XID` define, all identifiers need
-to contain valid codepoints, XID_Start/Continue characters, and accept
-only Allowed Identifier codepoints. This can then use a shorter script
-list to check against, skipping all the undefined holes or
-non-identifier characters. A normal unicode-aware parser should do
-this already, but in 2021 99% of all parsers still do the wrong thing
-for unicode identifiers, even for this simple static check. Not yet
-talking about allowed scripts, mixed scripts or confusables.
+With `-DDISABLE_CHECK_XID` and `-DENABLE_CHECK_XID` we can use the
+shorter `nonxid_script_list[]`, as we know that only valid XID's are
+checked.
 
 TODO
 ----

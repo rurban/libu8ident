@@ -379,9 +379,10 @@ extern const char *const all_scripts[161];
 // clang-format on
 #define LAST_SCRIPT 161
 
-#ifndef ENABLE_CHECK_XID
-// The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or
-// non-codepoints.
+#if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
+// The slow variant without U8ID_CHECK_XID. Add all holes for non-identifiers or
+// non-codepoints. Not needed with U8ID_CHECK_XID or when the parser checks
+// all XID's properly.
 #  ifdef EXT_SCRIPTS
 extern const struct sc xid_script_list[951];
 #  else
@@ -1341,14 +1342,14 @@ const struct sc xid_script_list[] = {
     // clang-format on
 }; // 817 ranges, 134 single codepoints
 #  endif
-#endif // ENABLE_CHECK_XID
+#endif // DISABLE_CHECK_XID
 
-#ifndef DISABLE_CHECK_XID
-// The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or
-// non-codepoints needed, as the parser already disallowed such codepoints.
-#  ifdef EXT_SCRIPTS
+// The fast variant with U8ID_CHECK_XID. No holes for non-identifiers or
+// non-codepoints needed, as the parser or our XID check already disallowed such
+// codepoints.
+#ifdef EXT_SCRIPTS
 extern const struct sc nonxid_script_list[421];
-#  else
+#else
 const struct sc nonxid_script_list[] = {
     // clang-format off
     {0x0000, 0x0040, 0},	// Common
@@ -1774,8 +1775,7 @@ const struct sc nonxid_script_list[] = {
     {0xE0100, 0xE01EF, 1},	// Inherited
     // clang-format on
 }; // 367 ranges, 54 single codepoints
-#  endif
-#endif // DISABLE_CHECK_XID
+#endif
 
 // Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
 // TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5

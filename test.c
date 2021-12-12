@@ -67,7 +67,7 @@ void test_scripts_no_init(void) {
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
 #endif
   // check that no list elements can be merged
-#ifndef ENABLE_CHECK_XID
+#if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
   for (size_t i = 0; i < ARRAY_SIZE(xid_script_list) - 1; i++) {
     const struct sc *r = &xid_script_list[i];
     const struct sc *n = &xid_script_list[i + 1];
@@ -80,7 +80,6 @@ void test_scripts_no_init(void) {
     }
   }
 #endif
-#ifndef DISABLE_CHECK_XID
   for (size_t i = 0; i < ARRAY_SIZE(nonxid_script_list) - 1; i++) {
     const struct sc *r = &nonxid_script_list[i];
     const struct sc *n = &nonxid_script_list[i + 1];
@@ -92,7 +91,6 @@ void test_scripts_no_init(void) {
       assert(r->scr != n->scr); // can not be merged
     }
   }
-#endif
 #ifndef DISABLE_CHECK_XID
   for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list) - 1; i++) {
     const struct range_bool *r = &allowed_id_list[i];

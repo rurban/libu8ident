@@ -149,16 +149,12 @@ static inline bool range_bool_search(const uint32_t cp,
 #endif
 
 uint8_t u8ident_get_script(const uint32_t cp) {
-#ifdef DISABLE_CHECK_XID
-    // slower check, as we have NON-xid's */
-    return sc_search(cp, xid_script_list,
-                     sizeof(xid_script_list) / sizeof(*xid_script_list));
-#elif defined ENABLE_CHECK_XID
+#if defined DISABLE_CHECK_XID || defined ENABLE_CHECK_XID
     // faster check, as we have no NON-xid's
     return sc_search(cp, nonxid_script_list,
                      sizeof(nonxid_script_list) / sizeof(*nonxid_script_list));
 #else
-  if (s_u8id_options & U8ID_CHECK_XID) // we alreay checked for allowed
+  if (s_u8id_options & U8ID_CHECK_XID) // we already checked for allowed
     return sc_search(cp, nonxid_script_list,
                      sizeof(nonxid_script_list) / sizeof(*nonxid_script_list));
   else

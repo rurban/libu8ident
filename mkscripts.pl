@@ -450,9 +450,10 @@ printf $H <<"EOF", $i, scalar @SCR;
 // clang-format on
 #define LAST_SCRIPT %u
 
-#ifndef DISABLE_CHECK_XID
-// The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or
-// non-codepoints.
+#if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
+// The slow variant without U8ID_CHECK_XID. Add all holes for non-identifiers or
+// non-codepoints. Not needed with U8ID_CHECK_XID or when the parser checks
+// all XID's properly.
 #  ifdef EXT_SCRIPTS
 extern const struct sc xid_script_list[%u];
 #  else
@@ -477,14 +478,14 @@ printf $H <<"EOF", $b, $s, scalar(@SCRF);
     // clang-format on
 }; // %u ranges, %u single codepoints
 #  endif
+#endif // DISABLE_CHECK_XID
 
-#else // DISABLE_CHECK_XID
-
-// The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or
-// non-codepoints needed, as the parser already disallowed such codepoints.
-#  ifdef EXT_SCRIPTS
+// The fast variant with U8ID_CHECK_XID. No holes for non-identifiers or
+// non-codepoints needed, as the parser or our XID check already disallowed such
+// codepoints.
+#ifdef EXT_SCRIPTS
 extern const struct sc nonxid_script_list[%u];
-#  else
+#else
 const struct sc nonxid_script_list[] = {
     // clang-format off
 EOF
@@ -505,8 +506,7 @@ for my $r (@SCRF) {
 printf $H <<"EOF", $b, $s, scalar(@SCXR);
     // clang-format on
 }; // %u ranges, %u single codepoints
-#  endif
-#endif // DISABLE_CHECK_XID
+#endif
 
 // Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
 // TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5
