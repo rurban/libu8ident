@@ -341,12 +341,18 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"a\xce\x86", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#else
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC || U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
 #endif
 
   ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
+#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC || U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
+#else
+  CHECK_RET(ret, U8ID_EOK, 0); // U+301
+#endif
 
   ret = u8ident_check((const uint8_t *)"\xc3\xb7", NULL);
   if (u8ident_options() & U8ID_CHECK_XID) {
@@ -373,12 +379,16 @@ void test_mixed_scripts(int xid_check) {
 #else
   CHECK_RET(ret, U8ID_EOK, 0);
 #endif
+
   ret = u8ident_check((const uint8_t *)"abcͻѝ", NULL); // Greek + Cyrillic
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#else
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC || U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #endif
+
   // U+37B Greek, U+985 Bengali
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5

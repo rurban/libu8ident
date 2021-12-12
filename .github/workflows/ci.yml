@@ -28,6 +28,8 @@ jobs:
     - run: make
     - run: make check
     - run: make check-all
+    - if: matrix.CFLAGS == ''
+      run: ./test-all-fast.sh
   macOS:
     name: macOS
     runs-on: macOS-latest
