@@ -229,7 +229,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         } else {
           assert(s_u8id_profile == U8ID_PROFILE_4);
           // but not more than 2
-          if (ctx->count >= 1) {
+          if (ctx->count >= 2) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           }
