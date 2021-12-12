@@ -285,9 +285,9 @@ Usage:
 
     if (u8id_check("wrongᴧᴫ") == U8ID_ERR_SCRIPTS) {
       const char *errstr = u8ident_existing_scripts(ctx);
-      fprintf(stdout, "Invalid script %s, already have %s\n",
+      fprintf(stdout, "Invalid script %s for U+%X, already have %s.\n",
          u8ident_failed_script_name(ctx),
-         u8ident_existing_scripts(ctx));
+         u8ident_failed_char(ctx), errstr);
       free(errstr);
     }
 

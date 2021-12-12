@@ -304,6 +304,24 @@ void test_norm_fcd(void) {
 }
 #endif
 
+#define CHECK_RET(ret, wanted, ctx)  \
+  check_ret(ret, wanted, ctx); assert(ret == wanted)
+
+static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
+  if (ret != wanted) {
+    const char *scripts = u8ident_existing_scripts(ctx);
+    if (ret) {
+      printf("ERROR %s U+%X %s in profile %u, expected %s. Have scripts: %s\n",
+             u8ident_failed_script_name(ctx), u8ident_failed_char(ctx),
+             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
+    } else {
+      printf("ERROR %s in profile %u, expected %s. Have scripts: %s\n",
+             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
+    }
+    free((void*)scripts);
+  }
+}
+
 // latin plus greek or cyrillic is disallowed with profile 4
 // only CFK or any Recommended script. No ctx here so Latin is first, and Bengali 2nd/
 // https://www.unicode.org/reports/tr39/#Mixed_Script_Detection
@@ -311,84 +329,52 @@ void test_mixed_scripts(int xid_check) {
   int ret;
   u8ident_init(U8ID_DEFAULT_OPTS | xid_check);
   ret = u8ident_check((const uint8_t *)"abcd", NULL);
-  assert(ret == U8ID_EOK); // Latin only
+  CHECK_RET(ret, U8ID_EOK, 0); // Latin only
 
   ret = u8ident_check((const uint8_t *)"aঅ", NULL); // Latin + Bengali U+985
 #if defined U8ID_PROFILE && U8ID_PROFILE < 4
   // 2 single script, 3 +CFK.
-  if (ret != U8ID_ERR_SCRIPTS)
-    printf("ERROR Latin + Bengali U+985 %s violates profile %u,"
-           " expected ERR_SCRIPTS\n", errstr(ret), u8ident_profile());
-  assert(ret == U8ID_ERR_SCRIPTS);
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
-  if (ret != U8ID_EOK)
-    printf("ERROR Bengali U+985 %s in profile %u, expected EOK\n", errstr(ret),
-           u8ident_profile());
-  assert(ret == U8ID_EOK);
+  CHECK_RET(ret, U8ID_EOK, 0);
 #endif
 
   // Latin + U+386 Greek
   ret = u8ident_check((const uint8_t *)"a\xce\x86", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
-  if (ret != U8ID_ERR_SCRIPTS)
-    printf("ERROR Latin + Greek U+386 %s in profile %u, expected ERR_SCRIPTS\n", errstr(ret),
-           u8ident_profile());
-  assert(ret == U8ID_ERR_SCRIPTS);
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
-  if (ret != U8ID_EOK)
-    printf("ERROR Latin + Greek U+386 %s in profile %u, expected EOK\n", errstr(ret),
-           u8ident_profile());
-  assert(ret == U8ID_EOK);
+  CHECK_RET(ret, U8ID_EOK, 0);
 #endif
 
   ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
-  if (ret != U8ID_EOK_NORM)
-    printf("ERROR U+301 with xid_check %d %s, expected EOK_NORM\n",
-           xid_check, errstr(ret));
-  assert(ret == U8ID_EOK_NORM);
+  CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
 
   ret = u8ident_check((const uint8_t *)"\xc3\xb7", NULL);
   if (u8ident_options() & U8ID_CHECK_XID) {
-    assert(ret == U8ID_ERR_XID); // division sign U+F7 forbidden as XID
-    // printf("ERROR U+F7 is not allowed\n");
-    assert(u8ident_check((const uint8_t *)"\xc6\x80", NULL) ==
-           U8ID_ERR_XID); // small letter b with stroke
-    // printf("ERROR U+180 is not allowed\n");
-    if ((ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL)) !=
-        U8ID_ERR_XID) { // U+1B05
-      printf("ERROR Balinese is limited %s, expected ERR_XID\n", errstr(ret));
-      assert(ret == U8ID_ERR_XID);
-    }
-  } else {
-    assert(ret == U8ID_EOK); // division sign U+F7 allowed without XID check
-    assert(u8ident_check((const uint8_t *)"\xc6\x80", NULL) ==
-           U8ID_EOK); // U+180
-    // printf("U+1B05: %d\n", u8ident_check((const uint8_t*)"\xe1\xac\x85",
-    // NULL));
+    CHECK_RET(ret, U8ID_ERR_XID, 0); // division sign U+F7 forbidden as XID
+    ret= u8ident_check((const uint8_t *)"\xc6\x80", NULL);
+    CHECK_RET(ret, U8ID_ERR_XID, 0); // small letter b with stroke U+180 is not allowed
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
-    if (ret != U8ID_ERR_SCRIPT)
-      printf("ERROR U+1B05 Balinese is limited %s, expected ERR_SCRIPT\n",
-             errstr(ret));
-    assert(ret == U8ID_ERR_SCRIPT);
+    CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
+  } else {
+    CHECK_RET(ret, U8ID_EOK, 0); // division sign U+F7 allowed without XID check
+    ret= u8ident_check((const uint8_t *)"\xc6\x80", NULL);
+    CHECK_RET(ret, U8ID_EOK, 0); // small letter b with stroke U+180
+    ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
+    CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+1B05 Balinese is limited
   }
 
-  ret = u8ident_check((const uint8_t *)"abcͻѝ", NULL);
-  if (ret != U8ID_ERR_SCRIPTS)
-    printf("ERROR Greek %s/%d, expected ERR_SCRIPTS\n", errstr(ret), xid_check);
-  assert(ret == U8ID_ERR_SCRIPTS); // Greek + Cyrillic
-
+  ret = u8ident_check((const uint8_t *)"abcͻ", NULL); // Greek
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+  ret = u8ident_check((const uint8_t *)"abcͻѝ", NULL); // Greek + Cyrillic
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
   // U+37B Greek, U+985 Bengali
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
-  if (ret != U8ID_ERR_SCRIPTS)
-    printf("ERROR Greek %s/%d in profile %u, expected ERR_SCRIPTS\n", errstr(ret),
-           xid_check, u8ident_profile());
-  assert(ret == U8ID_ERR_SCRIPTS);
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
-  if (ret != U8ID_EOK)
-    printf("ERROR Greek and Bengali %s/%d in profile %u, expected EOK\n", errstr(ret),
-           xid_check, u8ident_profile());
-  assert(ret == U8ID_EOK); // multi-scripts allowed in 5 and 6
+  CHECK_RET(ret, U8ID_EOK, 0); // multi-scripts allowed in 5 and 6
 #endif
 
   // han + hangul is allowed, ditto hangul + han
@@ -401,34 +387,28 @@ void test_mixed_scripts_with_ctx(void) {
   int ctx = u8ident_new_ctx(); // new ctx 1 (no Latin)
   // U+37B Greek
   int ret = u8ident_check((const uint8_t *)"ͻ", NULL);
-  if (ret != U8ID_EOK)
-    printf("ERROR Greek alone %s in profile %u, expected EOK\n", errstr(ret),
-           u8ident_profile());
-  assert(ret == U8ID_EOK);
+  CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
   assert(u8ident_delete_ctx(ctx) == 0);
 
   assert(!u8ident_init(u8ident_options()));
   ctx = u8ident_new_ctx();
   assert(ctx == 1);
-  // Cyrillic alone
   ret = u8ident_check((const uint8_t *)"ѝ", NULL);
-  assert(ret == U8ID_EOK);
+  CHECK_RET(ret, U8ID_EOK, ctx); // Cyrillic alone
   assert(u8ident_delete_ctx(ctx) == 0);
 
   // back to old ctx 0 (which has latin already)
   ret = u8ident_check((const uint8_t *)"abͻώ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
-  assert(ret == U8ID_ERR_SCRIPTS); // Latin + Greek disallowed in 2-4
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0); // Latin + Greek disallowed in 2-4
 #else
-  assert(ret >= 0); // Latin + Greek
+  CHECK_RET(ret, U8ID_EOK, 0); // Latin + Greek
+  //assert(ret >= 0); // Latin + Greek
 #endif
 
   ctx = u8ident_new_ctx(); // new ctx
-  if ((ret = u8ident_check((const uint8_t *)"\xf0\x91\x8c\x81", NULL)) !=
-      U8ID_ERR_SCRIPT) { // U+11301 Grantha
-    printf("ERROR Grantha is excluded %s, expected ERR_SCRIPT\n", errstr(ret));
-    assert(ret == U8ID_ERR_SCRIPT);
-  }
+  ret = u8ident_check((const uint8_t *)"\xf0\x91\x8c\x81", NULL);
+  CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+11301 Grantha is excluded
   assert(u8ident_delete_ctx(ctx) == 0);
 }
 

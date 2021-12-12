@@ -69,7 +69,7 @@ unsigned u8ident_options(void) { return s_u8id_options; }
 unsigned u8ident_profile(void) {
   assert(s_u8id_profile >= U8ID_PROFILE_2 && s_u8id_profile <= U8ID_PROFILE_6);
   // 8>>4: 0, 16>>4: 1, 32>>4: 2, 64>>4: 4, 128>>4: 8
-  static const uint8_t _profiles[] = {2,3,4,0,5,0,0,6};
+  static const uint8_t _profiles[] = {2,3,4,0,5,0,0,0,6};
   return (unsigned)_profiles[(unsigned)s_u8id_profile >> 4];
 }
 
