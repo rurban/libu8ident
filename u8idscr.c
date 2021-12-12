@@ -228,6 +228,8 @@ EXTERN int u8ident_add_script(uint8_t scr) {
 /* Deletes the context generated with `u8ident_new_ctx`. This is
    optional, all remaining contexts are deleted by `u8ident_delete` */
 EXTERN int u8ident_delete_ctx(int i) {
+  if (i_ctx < U8ID_CTX_TRESH)
+    ctxp = &ctx[0];
   if (i >= 0 && i <= i_ctx) {
     if (ctxp[i].count > 8)
       free(ctxp[i].u8p);
