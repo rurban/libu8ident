@@ -45,9 +45,10 @@ Normalization
 -------------
 
 All utf8 identifiers and literals are parsed and stored as normalized
-NFKC variants (as in Python 3), which prevents from various TR39 and TR36
-unicode confusable and spoofing security problems. See
-http://www.unicode.org/reports/tr36/ and http://www.unicode.org/reports/tr39
+NFKC variants (as in Python 3), which prevents from various TR31, TR36 and TR39
+unicode confusable and spoofing security problems with identifiers. See
+http://www.unicode.org/reports/tr31/, http://www.unicode.org/reports/tr36/
+and http://www.unicode.org/reports/tr39
 Optionally we also support the NFC and NFD formats.
 
 Mixed Scripts
@@ -77,13 +78,16 @@ automatically allowed, similar to the need to declare mixed scripts.
 General Security Profiles
 -------------------------
 
-Certain combinations of mixed scripts are defined with a user-defined security
-profile, the Restriction Levels 1-5.
+Certain combinations of mixed scripts are defined with a user-defined
+identifier security profile, the Restriction Levels 1-6.
+https://www.unicode.org/reports/tr39/#Restriction_Level_Detection
 
 1. **ASCII-Only**
 
 All characters in the string are in the ASCII range. You don't need this library
-for that use-case. (*Maybe still allow that for conformance testing*)
+for that use-case. (*Maybe still allow that for conformance testing*.
+This is the recommended profile, don't fall into the unicode identifier trap.
+*E.g. zig was right, rejecting those proposals.*)
 
 2. **Single Script**
 
@@ -105,7 +109,7 @@ for that use-case. (*Maybe still allow that for conformance testing*)
 
 * The string qualifies as Highly Restrictive, or
 * The string is covered by Latin and any one other Recommended script, except
-  Cyrillic, Greek.
+  Cyrillic or Greek.
 
 5. **Minimally Restrictive**
 
@@ -137,16 +141,17 @@ configure options
 
 * --enable-check-xid, --disable-check-xid or none
 
-If to check for the Allowed [IdentifierStatus]
-(https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
+If to check for the Allowed
+[IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
 or not.  A proper parser might does this already, but you cannot
 really trust parsers to check unicode identifiers; in the decades up
 to 2020 at least.  It might get better starting with 2025.
 
 When you know beforehand which normalization or profile you will need,
 and your parsers knows about allowed identifier codepoints, define
-that via `./configure --with-norm=NFKC --with-profile=4
---disable-check-xid` This skips a lot of unused code and branches.
+that via `./configure --with-norm=NFKC --with-profile=4 --disable-check-xid`,
+resp. `cmake -DLIBU8IDENT_NORM=NFKC -DLIBU8IDENT_PROFILE=4 -DBUILD_SHARED_LIBS=OFF`.
+This skips a lot of unused code and branches.
 The generic shared library has all the code for all normalizations,
 profiles, xid check and branches at run-time.
 
@@ -214,7 +219,7 @@ contexts with usernames to avoid mixups.
 
 Changes to the context generated with `u8ident_new_ctx`.
 
-`int u8ident_add_script_name(const char *name)`
+`int u8ident_add_script_name (const char *name)`
 `int u8ident_add_script (uint8_t script)`
 
 Adds the script to the context, if it's known or declared
@@ -261,15 +266,15 @@ Return values (`enum u8id_errors`):
 Returns a freshly allocated normalized string, with the options defined at
 `u8ident_init`.
 
-`uint32_t u8ident_failed_char(const int ctx)`
+`uint32_t u8ident_failed_char (const int ctx)`
 
 Returns the failing codepoint, which failed in the last check.
 
-`const char* u8ident_failed_script_name(const int ctx)`
+`const char* u8ident_failed_script_name (const int ctx)`
 
 Returns the constant script name, which failed in the last check.
 
-`const char* u8ident_existing_scripts(int ctx)`
+`const char* u8ident_existing_scripts (int ctx)`
 
 Returns a fresh string of the list of the seen scripts in this context
 whenever a mixed script error occurs. Needed for the error message
@@ -299,7 +304,7 @@ i.e. empty configure options.
 
 Build dependencies: ronn (`dnf install rubygem-ronn-ng`)
 
-Maintainer dependencies: wget, perl. Every year, when the UCD changes.
+Maintainer dependencies: wget, perl. Needed every year when the UCD changes.
 
 Internals
 ---------
@@ -339,7 +344,7 @@ only Allowed Identifier codepoints. This can then use a shorter script
 list to check against, skipping all the undefined holes or
 non-identifier characters. A normal unicode-aware parser should do
 this already, but in 2021 99% of all parsers still do the wrong thing
-for unicode identifiers, even for this siple static check. Not yet
+for unicode identifiers, even for this simple static check. Not yet
 talking about allowed scripts, mixed scripts or confusables.
 
 TODO
@@ -351,27 +356,31 @@ TODO
   `Arab Nkoo Rohg Syrc Thaa Yezi`, the variants need to be checked
   against the existing scripts in the current context.  If one of them
   already exists, the SCX list is collapsed to this. But if none
-  exists we need to the list and check it against the next yet unseen
-  script, and check for mixed-script violations.
+  exists we need to store the list and check it against the next yet unseen
+  script, and check for mixed-script violations. Currently we only check if
+  none of the SCX variants exist yet, and only then we have a new script.
+  Which exactly is unknown, but the new script might lead to a mixed-script violation.
 
 * Faster **maybe_normalize** check. I.e. search for MARK and DECOMPOSED codepoints.
   We only need to normalize, if the codepoint in question is different under NFKC,
   resp. the current normalization option. I have that in cperl to great effect, but
   with NFC only.
 
-* **[IdentifierType]
-(http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
+* **[IdentifierType](http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
   The list of idtypes is provided, but not yet integrated into any API.
   E.g. if someone wants to allow the Technical idtype.
-  Then you have to use `u8ident_get_idtypes()` by yourself, and it is
+  Then you have to use `u8ident_get_idtypes ()` by yourself, and it is
   not exported (ie. unusable from the shared library)
   We only optionally check the IdentifierStatus Allowed with CHECK_XID.
 
-* **Security Profiles**: There's not much code yet to check for Profile 3 vs 4,
+* **Security Profiles**: There's not much code yet to check for Profile 2,3,5,6 vs 4,
   i.e. if to allow only Asian CFK combinations, or all combinations with Latin.
+  See the `scx` branch.
 
 * **FCD**: This normalization is broken.
 
 * The **testsuite** does not yet check for known UTF-8 or other Unicode
   spoofing exploits.
   The testsuite does not yet check the profile 2-6 differences.
+
+* Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
