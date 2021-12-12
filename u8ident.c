@@ -121,17 +121,17 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
 
 #if defined U8ID_PROFILE && U8ID_PROFILE == 6
-    goto normalize; // skip all script checks
+    continue; // skip all script checks
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 6
 #else
     if (s_u8id_profile == U8ID_PROFILE_6)
-      goto normalize;
+      continue;
 #endif
 
     const uint8_t scr = u8ident_get_script(cp);
-    // disallow Limited_Use if not already extra added
-    if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
-                 s_u8id_profile < U8ID_PROFILE_5)) {
+    // disallow Excluded
+    if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
+                 s_u8id_profile < U8ID_PROFILE_6)) {
       struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
@@ -141,11 +141,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 
 #if defined U8ID_PROFILE && U8ID_PROFILE == 5
-    goto normalize; // skip all mixed scripts checks
+    continue; // skip all mixed scripts checks
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 5
 #else
-    if  (s_u8id_profile == U8ID_PROFILE_5)
-      goto normalize; // skip all mixed scripts checks
+    if (s_u8id_profile == U8ID_PROFILE_5)
+      continue; // skip all mixed scripts checks
 #endif
     bool is_new = false;
     struct ctx_t *ctx = u8ident_ctx();
@@ -175,8 +175,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (!is_new && !(scr == SC_Common || scr == SC_Inherited))
       is_new = !u8ident_has_script_ctx(scr, ctx);
     if (is_new) {
-      // if excluded it must have been already manually added
-      if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
+      // if Limited Use it must have been already manually added
+      if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
                    s_u8id_profile < U8ID_PROFILE_5)) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
@@ -240,8 +240,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       u8ident_add_script_ctx(scr, ctx);
     }
   }
-#if !defined U8ID_PROFILE || U8ID_PROFILE > 4
- normalize:
+#if defined U8ID_PROFILE && U8ID_PROFILE == 6
+  need_normalize = true;
+#elif defined U8ID_PROFILE && U8ID_PROFILE != 6
+#else
+  if (s_u8id_profile == U8ID_PROFILE_6)
+    need_normalize = true;
 #endif
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);

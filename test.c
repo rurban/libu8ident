@@ -362,13 +362,25 @@ void test_mixed_scripts(int xid_check) {
     ret= u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_EOK, 0); // small letter b with stroke U+180
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 6
     CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+1B05 Balinese is limited
+#else
+    CHECK_RET(ret, U8ID_EOK, 0);
+#endif
   }
 
   ret = u8ident_check((const uint8_t *)"abcͻ", NULL); // Greek
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK, 0);
+#endif
   ret = u8ident_check((const uint8_t *)"abcͻѝ", NULL); // Greek + Cyrillic
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK, 0);
+#endif
   // U+37B Greek, U+985 Bengali
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
@@ -408,7 +420,11 @@ void test_mixed_scripts_with_ctx(void) {
 
   ctx = u8ident_new_ctx(); // new ctx
   ret = u8ident_check((const uint8_t *)"\xf0\x91\x8c\x81", NULL);
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 6
   CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+11301 Grantha is excluded
+#else
+  CHECK_RET(ret, U8ID_EOK, 0); // 6 allows even these
+#endif
   assert(u8ident_delete_ctx(ctx) == 0);
 }
 
