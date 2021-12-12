@@ -489,7 +489,9 @@ void test_add_scripts(void) {
 int main(int argc, char **argv) {
   const int norm = (argc > 1 && !strcmp(argv[1], "norm"));
   const int profile = (argc > 1 && !strcmp(argv[1], "profile"));
+#ifndef DISABLE_CHECK_XID
   const int xid = (argc > 1 && !strcmp(argv[1], "xid"));
+#endif
   const int scx = (argc > 1 && !strcmp(argv[1], "scx"));
 
   if (argc == 1) {
@@ -518,12 +520,20 @@ int main(int argc, char **argv) {
     if (norm)
       return 0;
   }
+#ifndef ENABLE_CHECK_XID
   if (profile || argc == 1) {
     test_mixed_scripts(0);
   }
+#endif
+#ifndef DISABLE_CHECK_XID
   if (profile || xid || argc == 1) {
     test_mixed_scripts(U8ID_CHECK_XID);
-  }
+  } else
+#endif
+#ifdef ENABLE_CHECK_XID
+    test_mixed_scripts(U8ID_CHECK_XID);
+#endif
+
   test_mixed_scripts_with_ctx();
   if (scx) {
     test_scx_singles();

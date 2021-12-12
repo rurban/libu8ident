@@ -11,8 +11,11 @@
 #include "u8idscr.h"
 
 // defaults to U8ID_NFKC | U8ID_PROFILE_4
-unsigned s_u8id_options =
-    U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT | U8ID_CHECK_XID;
+unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT
+#ifndef DISABLE_CHECK_XID
+                          | U8ID_CHECK_XID
+#endif
+    ;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
