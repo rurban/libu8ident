@@ -188,7 +188,7 @@ $started = 0;
 open my $PVA, "<", $pva or die "$pva $!";
 while (<$PVA>) {
   if (/^# Script \(sc\)/) { $started++; }
-  if (/^sc ; (\w+?)\s+; (\w+)$/) {
+  if (/^sc ; (\w+?)\s+; (\w+)/) {
     $PVA{$1} = $2; # Zinh is not in SCX
   }
 }
@@ -450,7 +450,7 @@ printf $H <<"EOF", $i, scalar @SCR;
 // clang-format on
 #define LAST_SCRIPT %u
 
-#ifndef ENABLE_CHECK_XID
+#ifndef DISABLE_CHECK_XID
 // The slow variant for U8ID_CHECK_XID. Add all holes for non-identifiers or
 // non-codepoints.
 #  ifdef EXT_SCRIPTS
@@ -477,9 +477,9 @@ printf $H <<"EOF", $b, $s, scalar(@SCRF);
     // clang-format on
 }; // %u ranges, %u single codepoints
 #  endif
-#endif // ENABLE_CHECK_XID
 
-#ifndef DISABLE_CHECK_XID
+#else // DISABLE_CHECK_XID
+
 // The fast variant without U8ID_CHECK_XID. No holes for non-identifiers or
 // non-codepoints needed, as the parser already disallowed such codepoints.
 #  ifdef EXT_SCRIPTS
@@ -521,6 +521,7 @@ for my $r (@SCXR) {
   my @list = split " ", $r->[2];
   for my $short (@list) {
     my $long = @list == 1 ? $short : $PVA{$short};
+    warn "Wrong $short at U+".sprintf("%X",$r->[0]) unless $SC{$long};
     $code .= sprintf("\\x%02x", $SC{$long});
   }
   if ($r->[0] == $r->[1]) {

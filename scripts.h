@@ -1893,7 +1893,7 @@ const struct scx scx_list[] = {
     {0x10102, 0x10102, "\x2d\x45"},	// Cprt Linb
     {0x10107, 0x10133, "\x2d\x44\x45"},	// Cprt Lina Linb
     {0x10137, 0x1013F, "\x2d\x45"},	// Cprt Linb
-    {0x102E0, 0x102FB, "\x03\x00"},	// Arab Copt // !!!! 43 not 0
+    {0x102E0, 0x102FB, "\x03\x2b"},	// Arab Copt
     {0x10AF2, 0x10AF2, "\x4a\x61"},	// Mani Ougr
     {0x11301, 0x11301, "\x38\x1a"},	// Gran Taml
     {0x11303, 0x11303, "\x38\x1a"},	// Gran Taml
