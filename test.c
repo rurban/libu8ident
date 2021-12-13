@@ -119,6 +119,24 @@ static char *xstr(const char *s) {
   // buf[i] = 0;
   return buf;
 }
+#define CHECK_RET(ret, wanted, ctx)                                            \
+  check_ret(ret, wanted, ctx);                                                 \
+  assert(ret == wanted)
+
+static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
+  if (ret != wanted) {
+    const char *scripts = u8ident_existing_scripts(ctx);
+    if (ret) {
+      printf("ERROR %s U+%X %s in profile %u, expected %s. Have scripts: %s\n",
+             u8ident_failed_script_name(ctx), u8ident_failed_char(ctx),
+             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
+    } else {
+      printf("ERROR %s in profile %u, expected %s. Have scripts: %s\n",
+             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
+    }
+    free((void *)scripts);
+  }
+}
 
 struct norms_t {
   const char *id;
@@ -215,7 +233,14 @@ void test_norm_nfkc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+  char *norm;
+  assert(!u8ident_init(U8ID_NFKC | U8ID_PROFILE_4));
   testnorm("NFKC", testids);
+
+  int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+  assert(strcmp(norm, "Caf\xc3\xa9") == 0);
+  free(norm);
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFC
@@ -230,8 +255,14 @@ void test_norm_nfc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+  char *norm;
   assert(!u8ident_init(U8ID_NFC | U8ID_PROFILE_4));
   testnorm("NFC", testids);
+
+  int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+  assert(strcmp(norm, "Caf\xc3\xa9") == 0);
+  free(norm);
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == FCC
@@ -263,8 +294,14 @@ void test_norm_nfkd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+  char *norm;
   assert(!u8ident_init(U8ID_NFKD | U8ID_PROFILE_4));
   testnorm("NFKD", testids);
+
+  int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+  assert(strcmp(norm, "Cafe\xcc\x81") == 0);
+  free(norm);
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFD
@@ -280,8 +317,14 @@ void test_norm_nfd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+  char *norm;
   assert(!u8ident_init(U8ID_NFD | U8ID_PROFILE_4));
   testnorm("NFD", testids);
+
+  int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+  assert(strcmp(norm, "Cafe\xcc\x81") == 0);
+  free(norm);
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == FCD
@@ -302,27 +345,9 @@ void test_norm_fcd(void) {
 }
 #endif
 
-#define CHECK_RET(ret, wanted, ctx)  \
-  check_ret(ret, wanted, ctx); assert(ret == wanted)
-
-static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
-  if (ret != wanted) {
-    const char *scripts = u8ident_existing_scripts(ctx);
-    if (ret) {
-      printf("ERROR %s U+%X %s in profile %u, expected %s. Have scripts: %s\n",
-             u8ident_failed_script_name(ctx), u8ident_failed_char(ctx),
-             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
-    } else {
-      printf("ERROR %s in profile %u, expected %s. Have scripts: %s\n",
-             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
-    }
-    free((void*)scripts);
-  }
-}
-
 // latin plus greek or cyrillic is disallowed with profile 4
-// only CFK or any Recommended script. No ctx here so Latin is first, and Bengali 2nd/
-// https://www.unicode.org/reports/tr39/#Mixed_Script_Detection
+// only CFK or any Recommended script. No ctx here so Latin is first, and
+// Bengali 2nd/ https://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 void test_mixed_scripts(int xid_check) {
   int ret;
   u8ident_init(U8ID_DEFAULT_OPTS | xid_check);
@@ -341,14 +366,16 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"a\xce\x86", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC || U8ID_NORM == FCC
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
+    U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
 #else
   CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
 #endif
 
   ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
-#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC || U8ID_NORM == FCC
+#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||             \
+    U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // U+301
@@ -357,13 +384,14 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"\xc3\xb7", NULL);
   if (u8ident_options() & U8ID_CHECK_XID) {
     CHECK_RET(ret, U8ID_ERR_XID, 0); // division sign U+F7 forbidden as XID
-    ret= u8ident_check((const uint8_t *)"\xc6\x80", NULL);
-    CHECK_RET(ret, U8ID_ERR_XID, 0); // small letter b with stroke U+180 is not allowed
+    ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
+    CHECK_RET(ret, U8ID_ERR_XID,
+              0); // small letter b with stroke U+180 is not allowed
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
     CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
   } else {
     CHECK_RET(ret, U8ID_EOK, 0); // division sign U+F7 allowed without XID check
-    ret= u8ident_check((const uint8_t *)"\xc6\x80", NULL);
+    ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_EOK, 0); // small letter b with stroke U+180
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 6
@@ -383,7 +411,8 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"abcͻѝ", NULL); // Greek + Cyrillic
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC || U8ID_NORM == FCC
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
+    U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
 #else
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
@@ -423,7 +452,7 @@ void test_mixed_scripts_with_ctx(void) {
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0); // Latin + Greek disallowed in 2-4
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // Latin + Greek
-  //assert(ret >= 0); // Latin + Greek
+  // assert(ret >= 0); // Latin + Greek
 #endif
 
   ctx = u8ident_new_ctx(); // new ctx
@@ -451,8 +480,8 @@ void test_init(void) {
 
 void test_scx_singles(void) {
   // check scripts of all scx singles, if really only Common and Inherited. (Yes
-  // with UCD 14.0) Ideally we would have none, they would all be merged into the
-  // sc_list, splitting it up.
+  // with UCD 14.0) Ideally we would have none, they would all be merged into
+  // the sc_list, splitting it up.
   int c = u8ident_new_ctx();
   struct ctx_t *ctx = u8ident_ctx();
   // uint8_t oldscr = 0;
@@ -486,7 +515,7 @@ void test_scx_singles(void) {
 void test_add_scripts(void) {
   int c = u8ident_new_ctx();
   struct ctx_t *ctx = u8ident_ctx();
-  for (uint8_t i=2; i<FIRST_LIMITED_USE_SCRIPT; i++) {
+  for (uint8_t i = 2; i < FIRST_LIMITED_USE_SCRIPT; i++) {
     assert(u8ident_add_script(i) == U8ID_EOK);
     assert(u8ident_has_script(i));
     assert(u8ident_has_script_ctx(i, ctx));
