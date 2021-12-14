@@ -4,6 +4,8 @@
 
    use roaring bitmaps for some sets.
 */
+#ifdef HAVE_CROARING
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -38,3 +40,5 @@ bool u8ident_roar_is_allowed(const uint32_t cp) {
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return roaring_bitmap_contains(rc, cp);
 }
+
+#endif

@@ -5,8 +5,17 @@
 #define __U8ID_CONF_H__
 
 
+/* Defined to the path to the CRoaring library */
+#undef CROARING_PATH
+
 /* Defined to 1 when the compiler supports c11 */
 #undef HAVE_C11
+
+/* Defined to 1 to add the confusable API */
+#undef HAVE_CONFUS
+
+/* Defined to 1 when to use the CRoaring library */
+#undef HAVE_CROARING
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H

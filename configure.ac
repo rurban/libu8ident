@@ -80,11 +80,67 @@ AC_ARG_ENABLE([confus],
         [AS_HELP_STRING([--enable-confus],
 	  [add the confusables set @<:@default=no@:>@])],
 	[case "${enableval}" in
-	yes) HAVE_CONFUS=1; AC_MSG_RESULT([yes]) ;;
+	yes) HAVE_CONFUS=1;
+             AC_DEFINE([HAVE_CONFUS], 1,
+               [Defined to 1 to add the confusable API])
+             AC_MSG_RESULT([yes])
+             ;;
 	no)  AC_MSG_RESULT([no]) ;;
 	*)   ;;
 	esac], [HAVE_CONFUS= ])
 AC_SUBST([HAVE_CONFUS])
+
+download_croaring() {
+  git clone https://github.com/RoaringBitmap/CRoaring
+}
+
+AC_MSG_CHECKING([for --with-croaring])
+AC_ARG_WITH([croaring],
+	[AS_HELP_STRING([--with-croaring=optional_path],
+		[Use the CRoaring library.])],
+	[case "${with_croaring}" in
+        yes) HAVE_CROARING=1
+             AC_MSG_RESULT([$with_croaring])
+             AC_CHECK_TOOLS([XXD], [xxd])
+             # in a parallel dir?
+             with_croaring="$srcdir/../CRoaring"
+             if test -d "${with_croaring}" && \
+                test -e "${with_croaring}/roaring.c" && \
+                test -e "${with_croaring}/roaring.h"
+             then
+               CROARING_PATH="\"$srcdir/../CRoaring\""
+               AC_MSG_RESULT([found "$srcdir/../CRoaring"])
+             else
+               download_croaring && CROARING_PATH="CRoaring"
+             fi
+             ;;
+        *)   if test -d "${with_croaring}" && \
+                test -e "${with_croaring}/roaring.c" && \
+                test -e "${with_croaring}/roaring.h"
+             then
+                HAVE_CROARING=1
+                CROARING_PATH="\"${with_croaring}\""
+                AC_MSG_RESULT(["$with_croaring"])
+             else
+                AC_MSG_RESULT([invalid ${with_profile} path])
+             fi
+             ;;
+	esac],
+        [ HAVE_CROARING=; AC_MSG_RESULT([no]) ]
+	)
+
+if test -n "$HAVE_CROARING"; then
+   AC_DEFINE([HAVE_CROARING], 1,
+        [Defined to 1 when to use the CRoaring library])
+fi
+AC_SUBST([HAVE_CROARING])
+AC_SUBST([CROARING_PATH])
+if test -n "$CROARING_PATH"; then
+   AC_DEFINE_UNQUOTED([CROARING_PATH], $CROARING_PATH,
+        [Defined to the path to the CRoaring library])
+fi
+AM_CONDITIONAL([HAVE_CONFUS], [test x$HAVE_CONFUS = x1])
+AM_CONDITIONAL([HAVE_CROARING], [test x$HAVE_CROARING = x1])
 
 AC_MSG_NOTICE([
 

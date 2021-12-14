@@ -134,14 +134,16 @@ It is always easier to widen restrictions than narrow them.
 configure options
 -----------------
 
-* --with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD. Default: none (at run-time,
+* `--with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD`. Default: none (at run-time,
   NFKC is the default)
 
-* --with-profile=2,3,4,5,6. Default: none (at run-time, 4 is the default)
+* `--with-profile=2,3,4,5,6`. Default: none (at run-time, 4 is the default)
 
-* --enable-confus
+* `--enable-confus`
 
-* --enable-check-xid, --disable-check-xid or none
+* `--with-croaring[=path-to-CRoaring]`
+
+* `--enable-check-xid`, `--disable-check-xid` or none
 
 If to check for the Allowed
 [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
@@ -178,6 +180,9 @@ e.g codesizes for u8idnorm.o with -Os
 
 default: 365K with -g on amd64-gcc
 
+With `confus` enabled, the confusable API is added.
+With `croaring` this is about twice as fast.
+
 See the likewise **cmake** options: 
 
 * `-DBUILD_SHARED_LIBS=ON,OFF`
@@ -186,6 +191,7 @@ See the likewise **cmake** options:
 * `-DLIBU8IDENT_ENABLE_CHECK_XID=On`
 * `-DLIBU8IDENT_DISABLE_CHECK_XID=On`
 * `-DHAVE_CONFUS=ON`
+* `-DHAVE_CROARING=ON`
 
 API
 ---

@@ -2,10 +2,14 @@ ACLOCAL_AMFLAGS = -I m4 --install ${ACLOCAL_FLAGS}
 PERL = @PERL@
 WGET = @WGET@
 WARN_CFLAGS = @WARN_CFLAGS@
+CROARING_PATH = @CROARING_PATH@
 AM_CFLAGS = -I$(srcdir)/include -I$(srcdir) -I$(builddir) $(WARN_CFLAGS)
 lib_LTLIBRARIES = libu8ident.la
 include_HEADERS = include/u8ident.h
 libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
+if HAVE_CROARING
+libu8ident_la_SOURCES += u8idroar.c
+endif
 libu8ident_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
 	-no-undefined \
@@ -17,7 +21,8 @@ docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE
 HDRS = scripts.h confus.h u8id_private.h u8idscr.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA) \
+	confus_croar.h
 
 .c.i:
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

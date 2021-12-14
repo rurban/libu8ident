@@ -17,7 +17,15 @@ WGET := wget
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h
-SRC = u8ident.c u8idscr.c u8idnorm.c u8idroar.c roaring.c
+SRC = u8ident.c u8idscr.c u8idnorm.c
+ifeq (${HAVE_CONFUS}, 1)
+SRC += u8idroar.c
+DEFINES += -DHAVE_CONFUS
+endif
+ifeq (${HAVE_CROARING}, 1)
+SRC += roaring.c
+DEFINES += -DHAVE_CROARING
+endif
 LIB = libu8ident.a
 DOCS = README.md NOTICE LICENSE
 MAN = u8ident.3
