@@ -147,15 +147,13 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
   return sc ? sc->scr : 255;
 }
 
-#ifndef HAVE_CROARING
-#if !defined DISABLE_CHECK_XID && !defined HAVE_CONFUS
+#if !defined DISABLE_CHECK_XID
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
   const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
   return r ? true : false;
 }
-#endif
 #endif
 
 uint8_t u8ident_get_script(const uint32_t cp) {
@@ -182,12 +180,12 @@ const char *u8ident_get_scx(const uint32_t cp) {
 }
 
 #ifndef DISABLE_CHECK_XID
-#ifndef HAVE_CROARING
+//#ifndef HAVE_CROARING
 bool u8ident_is_allowed(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list,
                            sizeof(allowed_id_list) / sizeof(*allowed_id_list));
 }
-#endif
+//#endif
 
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp) {
@@ -198,12 +196,10 @@ uint16_t u8ident_get_idtypes(const uint32_t cp) {
 }
 #endif
 
-#ifndef HAVE_CROARING
 #ifdef HAVE_CONFUS
+#ifndef HAVE_CROARING
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
-  return range_bool_search(cp, confusables_list,
-                           sizeof(confusables_list) /
-                               sizeof(*confusables_list));
+  return bsearch(&cp, confusables, sizeof(confusables) / sizeof(*confusables), 4, compar32) : true ? false;
 }
 #endif
 #endif

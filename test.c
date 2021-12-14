@@ -11,7 +11,11 @@
 #include "u8ident.h"
 #include "u8idscr.h"
 #ifdef HAVE_CROARING
-#include "u8idroar.h"
+#  include "u8idroar.h"
+#endif
+#ifdef HAVE_CONFUS
+#  undef EXT_SCRIPTS
+#  include "confus.h"
 #endif
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
@@ -530,6 +534,22 @@ void test_add_scripts(void) {
   u8ident_free_ctx(c);
 }
 
+#ifdef HAVE_CONFUS
+static int compar32(const void *a, const void *b) {
+  const uint32_t ai = *(const uint32_t*)a;
+  const uint32_t bi = *(const uint32_t*)b;
+  return ai < bi ? -1 : ai == bi ? 0 : 1;
+}
+
+void test_confus(void) {
+  for (int i = 0; i < ARRAY_SIZE(confusables); i++) {
+    const uint32_t cp = confusables[i];
+    assert(u8ident_is_confusable(cp));
+    assert(bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
+  }
+}
+#endif
+
 int main(int argc, char **argv) {
   const int norm = (argc > 1 && !strcmp(argv[1], "norm"));
   const int profile = (argc > 1 && !strcmp(argv[1], "profile"));
@@ -583,6 +603,11 @@ int main(int argc, char **argv) {
     test_scx_singles();
     test_add_scripts();
   }
+
+#ifdef HAVE_CONFUS
+  test_confus();
+#endif
+
   u8ident_free();
   return 0;
 }
