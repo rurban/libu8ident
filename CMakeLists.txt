@@ -47,12 +47,19 @@ if(CMAKE_MAJOR_VERSION GREATER 2)
   endif()
 endif()
 
-# Supported options -DU8ID_NORM=NFC,NFKC,NFD,NFKD
-#                   -DU8ID_PROFILE=2,3,4,5,6
-#                   -DU8ID_CHECK_XID=On,Off
+# Supported options:
+#  -DBUILD_SHARED_LIBS=ON,OFF
+#  -DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD
+#  -DLIBU8IDENT_PROFILE=2,3,4,5,6
+#  -DENABLE_CHECK_XID=On
+#  -DDISABLE_CHECK_XID=On
+#  -DHAVE_CONFUS=ON
 option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
 option(LIBU8IDENT_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
 option(LIBU8IDENT_PROFILE "force a single profile: 2-6" OFF)
+option(ENABLE_CHECK_XID "en- or disabled check_xid" OFF)
+option(DISABLE_CHECK_XID "en- or disabled check_xid" OFF)
+option(HAVE_CONFUS "add confus.h set" OFF)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release"
@@ -132,6 +139,20 @@ add_custom_target(
   COMMAND wget -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
   COMMAND wget -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
   COMMAND perl mkscripts.pl
+  BYPRODUCTS scripts.h
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_custom_target(
+  regen-confus
+  COMMAND wget -N https://www.unicode.org/Public/security/latest/confusables.txt
+  COMMAND perl mkconfus.pl
+  BYPRODUCTS confus.h
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_custom_target(
+  regen-all
+  MAIN_DEPENDENCY regen-scripts
+  DEPENDS regen-confus
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_custom_target(

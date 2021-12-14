@@ -110,6 +110,10 @@ void u8ident_delete(void);
    `u8ident_init`. Defaults to U8ID_NFKC. */
 char *u8ident_normalize(const char *buf, int len);
 
+/* Lookup if the codepoint is a confusable.
+   Only with --enable-confus/-DHAVE_CONFUS */
+bool u8ident_is_confusable(const uint32_t cp);
+
 enum u8id_errors {
   U8ID_EOK = 0,
   U8ID_EOK_NORM = 1,

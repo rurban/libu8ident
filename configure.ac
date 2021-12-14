@@ -75,6 +75,17 @@ if test -z "$enable_check_xid"; then
   AC_MSG_RESULT([none])
 fi
 
+AC_MSG_CHECKING([for --enable-confus])
+AC_ARG_ENABLE([confus],
+        [AS_HELP_STRING([--enable-confus],
+	  [add the confusables set @<:@default=no@:>@])],
+	[case "${enableval}" in
+	yes) HAVE_CONFUS=1; AC_MSG_RESULT([yes]) ;;
+	no)  AC_MSG_RESULT([no]) ;;
+	*)   ;;
+	esac], [HAVE_CONFUS= ])
+AC_SUBST([HAVE_CONFUS])
+
 AC_MSG_NOTICE([
 
 Check programs])

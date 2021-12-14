@@ -15,9 +15,9 @@ pcdata_DATA = libu8ident.pc
 man_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE
-HDRS = scripts.h u8id_private.h u8idscr.h \
+HDRS = scripts.h confus.h u8id_private.h u8idscr.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
-EXTRA_DIST = mkscripts.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
 
 .c.i:
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -29,6 +29,8 @@ EXTRA_DIST = mkscripts.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
 
 $(srcdir)/scripts.h: $(srcdir)/mkscripts.pl
 	cd $(srcdir) && $(PERL) mkscripts.pl
+$(srcdir)/confus.h: $(srcdir)/mkconfus.pl
+	cd $(srcdir) && $(PERL) mkconfus.pl
 # emacs flymake-mode
 check-syntax:
 	test -n "$(CHK_SOURCES)" && \
@@ -36,7 +38,7 @@ check-syntax:
 .PHONY: check-syntax clang-format
 
 clang-format:
-	clang-format -i $(srcdir)/*.c $(srcdir)/include/*.h $(srcdir)/scripts.h $(srcdir)/u8id*.h
+	clang-format -i $(srcdir)/*.c $(srcdir)/include/*.h $(srcdir)/scripts.h $(srcdir)/confus.h $(srcdir)/u8id*.h
 
 # Create the normalization headers via a current perl
 Unicode-Normalize: un8ifcan.h
@@ -56,8 +58,13 @@ regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
 	$(PERL) mkscripts.pl
+# Download some UCD files and create confus.h
+regen-confus:
+	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
+	$(PERL) mkconfus.pl
+regen-all: regen-scripts regen-norm regen-confus
 
-.PHONY: regen-scripts regen-norm check-asan check-norm scan-build man
+.PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man
 
 EXTRA_PROGRAMS = test
 test_SOURCES = test.c

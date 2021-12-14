@@ -23,14 +23,11 @@
 #endif   
 
 /* Define to force a single check_xid option. */
-#cmakedefine LIBU8IDENT_CHECK_XID
-#ifdef LIBU8IDENT_CHECK_XID
-#  if LIBU8IDENT_CHECK_XID = ON
-#    define ENABLE_CHECK_XID
-#  else
-#    define DISABLE_CHECK_XID
-#  endif
-#endif   
+#cmakedefine ENABLE_CHECK_XID
+#cmakedefine DISABLE_CHECK_XID
+
+/* Define to enable confus.h. */
+#cmakedefine HAVE_CONFUS
 
 /* Define if a shared library will be built */
 #define ENABLE_SHARED @BUILD_SHARED_LIBS@

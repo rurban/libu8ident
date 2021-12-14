@@ -15,6 +15,10 @@
 #include <u8ident.h>
 
 #include "scripts.h"
+// optional. default: disabled
+#ifdef HAVE_CONFUS
+#  include "confus.h"
+#endif
 
 extern unsigned s_u8id_options;
 // not yet thread-safe
@@ -139,7 +143,7 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
   return sc ? sc->scr : 255;
 }
 
-#ifndef DISABLE_CHECK_XID
+#if !defined DISABLE_CHECK_XID && !defined HAVE_CONFUS
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
@@ -150,9 +154,9 @@ static inline bool range_bool_search(const uint32_t cp,
 
 uint8_t u8ident_get_script(const uint32_t cp) {
 #if defined DISABLE_CHECK_XID || defined ENABLE_CHECK_XID
-    // faster check, as we have no NON-xid's
-    return sc_search(cp, nonxid_script_list,
-                     sizeof(nonxid_script_list) / sizeof(*nonxid_script_list));
+  // faster check, as we have no NON-xid's
+  return sc_search(cp, nonxid_script_list,
+                   sizeof(nonxid_script_list) / sizeof(*nonxid_script_list));
 #else
   if (s_u8id_options & U8ID_CHECK_XID) // we already checked for allowed
     return sc_search(cp, nonxid_script_list,
@@ -183,6 +187,14 @@ uint16_t u8ident_get_idtypes(const uint32_t cp) {
       cp, (char *)idtype_list, sizeof(idtype_list) / sizeof(*idtype_list),
       sizeof(*idtype_list));
   return id ? id->types : 0;
+}
+#endif
+
+#ifdef HAVE_CONFUS
+EXTERN bool u8ident_is_confusable(const uint32_t cp) {
+  return range_bool_search(cp, confusables_list,
+                           sizeof(confusables_list) /
+                               sizeof(*confusables_list));
 }
 #endif
 

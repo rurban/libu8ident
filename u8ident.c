@@ -72,7 +72,7 @@ unsigned u8ident_options(void) { return s_u8id_options; }
 unsigned u8ident_profile(void) {
   assert(s_u8id_profile >= U8ID_PROFILE_2 && s_u8id_profile <= U8ID_PROFILE_6);
   // 8>>4: 0, 16>>4: 1, 32>>4: 2, 64>>4: 4, 128>>4: 8
-  static const uint8_t _profiles[] = {2,3,4,0,5,0,0,0,6};
+  static const uint8_t _profiles[] = {2, 3, 4, 0, 5, 0, 0, 0, 6};
   return (unsigned)_profiles[(unsigned)s_u8id_profile >> 4];
 }
 
@@ -96,9 +96,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   char *s = (char *)buf;
   const char *e = (char *)&buf[len];
   bool need_normalize = false;
-  //char scx[32]; // combination of all scx
-  //scx[0] = '\0';
-  // check mixed scripts
+  // char scx[32]; // combination of all scx
+  // scx[0] = '\0';
+  //  check mixed scripts
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
     if (unlikely(!cp)) {
@@ -156,15 +156,16 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     // reduce them
     if (scr == SC_Common || scr == SC_Inherited) {
       const char *this_scx = u8ident_get_scx(cp);
-      char *x = (char*)this_scx;
+      char *x = (char *)this_scx;
       int n = 0;
       while (x) {
         bool has = u8ident_has_script_ctx(*x, ctx);
-        n +=  has ? 1 : 0;
+        n += has ? 1 : 0;
         x++;
       }
-      if (this_scx && !n) {  // We have SCX and none of the SCX occured yet. so we have a new one.
-        is_new = true; // we dont know which yet, but we can set is_new.
+      if (this_scx && !n) { // We have SCX and none of the SCX occured yet. so
+                            // we have a new one.
+        is_new = true;      // we dont know which yet, but we can set is_new.
       }
     }
     // ignore Latin. This is compatible with everything

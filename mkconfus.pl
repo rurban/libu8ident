@@ -4,6 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Create confus.h from https://www.unicode.org/Public/security/latest/confusables.txt
+#
+# Note that this is just a binary-search in an unoptimized,
+# uncompressed array, without any values.  It might be smaller and
+# faster with gperf or cbitset/croaring.
 
 use strict;
 my $conf = "confusables.txt";

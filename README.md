@@ -139,6 +139,8 @@ configure options
 
 * --with-profile=2,3,4,5,6. Default: none (at run-time, 4 is the default)
 
+* --enable-confus
+
 * --enable-check-xid, --disable-check-xid or none
 
 If to check for the Allowed
@@ -176,6 +178,14 @@ e.g codesizes for u8idnorm.o with -Os
 
 default: 365K with -g on amd64-gcc
 
+See the likewise **cmake** options: 
+
+* `-DBUILD_SHARED_LIBS=ON,OFF`
+* `-DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD`
+* `-DLIBU8IDENT_PROFILE=2,3,4,5,6`
+* `-DLIBU8IDENT_ENABLE_CHECK_XID=On`
+* `-DLIBU8IDENT_DISABLE_CHECK_XID=On`
+* `-DHAVE_CONFUS=ON`
 
 API
 ---
@@ -255,6 +265,10 @@ Lookup the script property for a codepoint.
 `const char* u8ident_script_name (const int scr)`
 
 Lookup the long script name for the internal script byte/index.
+
+`bool u8ident_is_confusable (const uint32_t cp)`
+
+Lookup if the codepoint is a confusable. Only with `--enable-confus/-DHAVE_CONFUS`.
 
 `enum u8id_errors u8ident_check (const u8* string, char** outnorm)`
 
@@ -390,7 +404,7 @@ TODO
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
 
-* Optional **confusables** lookups. The table consists of a `uint32_t cp` -> 
+* Optional **confusables** values. The table consists of a `uint32_t cp` -> 
   list of 1-3 `uint32_t cp's`. 6311 entries, gperf or binary-search.
-  Probably behind a `--enable-confusable`. Not sure if we need the value at all,
-  just the keys. CRoaring or cbitmap then.
+  Probably behind a `--enable-confus`. Not sure if we need the value at all,
+  just the keys. Check CRoaring, gperf or cbitmap optims.
