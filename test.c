@@ -10,6 +10,9 @@
 #include "u8id_private.h"
 #include "u8ident.h"
 #include "u8idscr.h"
+#ifdef HAVE_CROARING
+#include "u8idroar.h"
+#endif
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 static char buf[128]; // for hex display
@@ -35,6 +38,10 @@ static const char *errstr(int errcode) {
 
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
+#ifdef HAVE_CROARING
+  // well, this needs an init
+  assert(!u8ident_roar_init());
+#endif
   assert(u8ident_get_script(0x41) == 2);
   assert(u8ident_get_script(0x5a) == 2);
   assert(strcmp(u8ident_script_name(0), "Common") == 0);
@@ -437,14 +444,14 @@ void test_mixed_scripts_with_ctx(void) {
   // U+37B Greek
   int ret = u8ident_check((const uint8_t *)"ͻ", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
-  assert(u8ident_delete_ctx(ctx) == 0);
+  assert(u8ident_free_ctx(ctx) == 0);
 
   assert(!u8ident_init(u8ident_options()));
   ctx = u8ident_new_ctx();
   assert(ctx == 1);
   ret = u8ident_check((const uint8_t *)"ѝ", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Cyrillic alone
-  assert(u8ident_delete_ctx(ctx) == 0);
+  assert(u8ident_free_ctx(ctx) == 0);
 
   // back to old ctx 0 (which has latin already)
   ret = u8ident_check((const uint8_t *)"abͻώ", NULL);
@@ -462,7 +469,7 @@ void test_mixed_scripts_with_ctx(void) {
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // 6 allows even these
 #endif
-  assert(u8ident_delete_ctx(ctx) == 0);
+  assert(u8ident_free_ctx(ctx) == 0);
 }
 
 void test_init(void) {
@@ -509,7 +516,7 @@ void test_scx_singles(void) {
       assert(scr == SC_Common || scr == SC_Inherited);
     }
   }
-  u8ident_delete_ctx(c);
+  u8ident_free_ctx(c);
 }
 
 void test_add_scripts(void) {
@@ -520,7 +527,7 @@ void test_add_scripts(void) {
     assert(u8ident_has_script(i));
     assert(u8ident_has_script_ctx(i, ctx));
   }
-  u8ident_delete_ctx(c);
+  u8ident_free_ctx(c);
 }
 
 int main(int argc, char **argv) {
@@ -576,6 +583,6 @@ int main(int argc, char **argv) {
     test_scx_singles();
     test_add_scripts();
   }
-  u8ident_delete();
+  u8ident_free();
   return 0;
 }

@@ -9,6 +9,9 @@
 #include "u8id_private.h"
 #include <u8ident.h>
 #include "u8idscr.h"
+#ifdef HAVE_CROARING
+#include "u8idroar.h"
+#endif
 
 // defaults to U8ID_NFKC | U8ID_PROFILE_4
 unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT
@@ -65,6 +68,10 @@ EXTERN int u8ident_init(unsigned options) {
   if (!s_u8id_profile)
     return -1; // error. no profile defined
   s_u8id_options = options;
+#ifdef HAVE_CROARING
+  if (u8ident_roar_init())
+    return -1;
+#endif
   return 0;
 }
 

@@ -17,7 +17,7 @@ WGET := wget
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h
-SRC = u8ident.c u8idscr.c u8idnorm.c
+SRC = u8ident.c u8idscr.c u8idnorm.c u8idroar.c roaring.c
 LIB = libu8ident.a
 DOCS = README.md NOTICE LICENSE
 MAN = u8ident.3
@@ -31,7 +31,8 @@ $(LIB): $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8ident.c -o u8ident.o
 	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idscr.c -o u8idscr.o
 	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o u8idnorm.o
-	$(AR) $(ARFLAGS) $@ u8ident.o u8idscr.o u8idnorm.o
+	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o u8idroar.o
+	$(AR) $(ARFLAGS) $@ u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 	$(RANLIB) $@
 
 scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt

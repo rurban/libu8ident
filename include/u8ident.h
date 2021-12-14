@@ -100,11 +100,11 @@ uint8_t u8ident_get_script(const uint32_t cp);
 const char *u8ident_script_name(const int scr);
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
-   optional, all remaining contexts are deleted by `u8ident_delete` */
-int u8ident_delete_ctx(int);
+   optional, all remaining contexts are deleted by `u8ident_free` */
+int u8ident_free_ctx(int);
 
 /* End this library, cleaning up all internal structures. */
-void u8ident_delete(void);
+void u8ident_free(void);
 
 /* Returns a freshly allocated normalized string, in the option defined at
    `u8ident_init`. Defaults to U8ID_NFKC. */

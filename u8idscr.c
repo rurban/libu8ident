@@ -15,9 +15,13 @@
 #include <u8ident.h>
 
 #include "scripts.h"
+#ifndef HAVE_CROARING
 // optional. default: disabled
-#ifdef HAVE_CONFUS
-#  include "confus.h"
+#  ifdef HAVE_CONFUS
+#    include "confus.h"
+#  endif
+#else
+#  include "u8idroar.h"
 #endif
 
 extern unsigned s_u8id_options;
@@ -143,6 +147,7 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
   return sc ? sc->scr : 255;
 }
 
+#ifndef HAVE_CROARING
 #if !defined DISABLE_CHECK_XID && !defined HAVE_CONFUS
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
@@ -150,6 +155,7 @@ static inline bool range_bool_search(const uint32_t cp,
   const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
   return r ? true : false;
 }
+#endif
 #endif
 
 uint8_t u8ident_get_script(const uint32_t cp) {
@@ -176,10 +182,12 @@ const char *u8ident_get_scx(const uint32_t cp) {
 }
 
 #ifndef DISABLE_CHECK_XID
+#ifndef HAVE_CROARING
 bool u8ident_is_allowed(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list,
                            sizeof(allowed_id_list) / sizeof(*allowed_id_list));
 }
+#endif
 
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp) {
@@ -190,12 +198,14 @@ uint16_t u8ident_get_idtypes(const uint32_t cp) {
 }
 #endif
 
+#ifndef HAVE_CROARING
 #ifdef HAVE_CONFUS
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return range_bool_search(cp, confusables_list,
                            sizeof(confusables_list) /
                                sizeof(*confusables_list));
 }
+#endif
 #endif
 
 const char *u8ident_script_name(const int scr) {
@@ -234,8 +244,8 @@ EXTERN int u8ident_add_script(uint8_t scr) {
 }
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
-   optional, all remaining contexts are deleted by `u8ident_delete` */
-EXTERN int u8ident_delete_ctx(int i) {
+   optional, all remaining contexts are deleted by `u8ident_free` */
+EXTERN int u8ident_free_ctx(int i) {
   if (i_ctx < U8ID_CTX_TRESH)
     ctxp = &ctx[0];
   if (i >= 0 && i <= i_ctx) {
@@ -252,13 +262,16 @@ EXTERN int u8ident_delete_ctx(int i) {
 }
 
 /* End this library, cleaning up all internal structures. */
-EXTERN void u8ident_delete(void) {
+EXTERN void u8ident_free(void) {
   for (int i = 0; i <= i_ctx; i++) {
-    u8ident_delete_ctx(i);
+    u8ident_free_ctx(i);
   }
   if (i_ctx >= U8ID_CTX_TRESH) {
     free(ctxp);
   }
+#ifdef HAVE_CROARING
+  u8ident_roar_free();
+#endif
 }
 
 /* Returns a fresh string of the list of the seen scripts in this

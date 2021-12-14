@@ -10,6 +10,7 @@
 # faster with gperf or cbitset/croaring.
 
 use strict;
+use Config;
 my $conf = "confusables.txt";
 for ($conf) {
   if (!-e $_) {
@@ -135,3 +136,20 @@ extern const uint32_t confusables[$i];
 #endif
 EOF
 close $H1;
+
+print "Create serialized roaring bitmaps:\n";
+if ($^O =~ /Win32/) {
+  system($Config{cc}." mkroar.c -o mkroar.exe");
+  system("mkroar.exe");
+} else {
+  system($Config{cc}." mkroar.c -o mkroar");
+  system("./mkroar");
+}
+print "\n";
+# not optimized. stayed with 816 array
+system("xxd -i allowed_croar.bin > allowed_croar.h");
+print "Created allowed_croar.h\n";
+
+# optimized from 8552 byte to 4731 byte (3 run-length encoded containers)
+system("xxd -i confus_croar.bin > confus_croar.h");
+print "Created confus_croar.h\n";
