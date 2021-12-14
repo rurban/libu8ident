@@ -389,3 +389,8 @@ TODO
   The testsuite does not yet check the profile 2-6 differences.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
+
+* Optional **confusables** lookups. The table consists of a `uint32_t cp` -> 
+  list of 1-3 `uint32_t cp's`. 6311 entries, gperf or binary-search.
+  Probably behind a `--enable-confusable`. Not sure if we need the value at all,
+  just the keys. CRoaring or cbitmap then.
