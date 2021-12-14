@@ -54,12 +54,27 @@ endif()
 #  -DENABLE_CHECK_XID=On
 #  -DDISABLE_CHECK_XID=On
 #  -DHAVE_CONFUS=ON
+#  -DHAVE_CROARING=ON
 option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
 option(LIBU8IDENT_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
 option(LIBU8IDENT_PROFILE "force a single profile: 2-6" OFF)
 option(ENABLE_CHECK_XID "en- or disabled check_xid" OFF)
 option(DISABLE_CHECK_XID "en- or disabled check_xid" OFF)
 option(HAVE_CONFUS "add confus.h set" OFF)
+option(HAVE_CROARING "use CRoaring bitsets" ON)
+
+if (HAVE_CONFUS)
+  if (HAVE_CROARING)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
+    find_package(CRoaring)
+    if (CRoaring_FOUND)
+      add_definitions(-DHAVE_CROARING)
+      add_definitions(-DCROARING_PATH="${CROARING_LIBRARY}")
+    else()
+      unset(HAVE_CROARING)
+    endif()
+  endif()
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release"
@@ -139,7 +154,6 @@ add_custom_target(
   COMMAND wget -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
   COMMAND wget -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
   COMMAND perl mkscripts.pl
-  BYPRODUCTS scripts.h
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_custom_target(
