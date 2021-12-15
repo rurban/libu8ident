@@ -8,7 +8,7 @@ lib_LTLIBRARIES = libu8ident.la
 include_HEADERS = include/u8ident.h
 libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
 if HAVE_CROARING
-libu8ident_la_CFLAGS = $(CFLAGS) $(AM_CFLAGS) -I$(CROARING_PATH)
+AM_CFLAGS += -I$(CROARING_PATH)
 libu8ident_la_SOURCES += u8idroar.c
 endif
 libu8ident_la_LDFLAGS = \

@@ -24,6 +24,8 @@
 #  include "u8idroar.h"
 #endif
 
+#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
+
 extern unsigned s_u8id_options;
 // not yet thread-safe
 struct ctx_t ctx[U8ID_CTX_TRESH] = {0}; // pre-allocate 5 contexts
@@ -159,49 +161,48 @@ static inline bool range_bool_search(const uint32_t cp,
 uint8_t u8ident_get_script(const uint32_t cp) {
 #if defined DISABLE_CHECK_XID || defined ENABLE_CHECK_XID
   // faster check, as we have no NON-xid's
-  return sc_search(cp, nonxid_script_list,
-                   sizeof(nonxid_script_list) / sizeof(*nonxid_script_list));
+  return sc_search(cp, nonxid_script_list, ARRAY_SIZE(nonxid_script_list));
 #else
   if (s_u8id_options & U8ID_CHECK_XID) // we already checked for allowed
-    return sc_search(cp, nonxid_script_list,
-                     sizeof(nonxid_script_list) / sizeof(*nonxid_script_list));
+    return sc_search(cp, nonxid_script_list, ARRAY_SIZE(nonxid_script_list));
   else
-    return sc_search(cp, xid_script_list,
-                     sizeof(xid_script_list) / sizeof(*xid_script_list));
+    return sc_search(cp, xid_script_list, ARRAY_SIZE(xid_script_list));
 #endif
 }
 
 /* list of script indices */
 const char *u8ident_get_scx(const uint32_t cp) {
   const struct scx *scx = (struct scx *)binary_search(
-      cp, (char *)scx_list, sizeof(scx_list) / sizeof(*scx_list),
-      sizeof(*scx_list));
+      cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
   return scx ? scx->list : NULL;
 }
 
 #ifndef DISABLE_CHECK_XID
 //#ifndef HAVE_CROARING
 bool u8ident_is_allowed(const uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list,
-                           sizeof(allowed_id_list) / sizeof(*allowed_id_list));
+  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
 //#endif
 
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp) {
   const struct range_short *id = (struct range_short *)binary_search(
-      cp, (char *)idtype_list, sizeof(idtype_list) / sizeof(*idtype_list),
-      sizeof(*idtype_list));
+      cp, (char *)idtype_list, ARRAY_SIZE(idtype_list), sizeof(*idtype_list));
   return id ? id->types : 0;
 }
 #endif
 
 #ifdef HAVE_CONFUS
 #  ifndef HAVE_CROARING
+static int compar32(const void *a, const void *b) {
+  const uint32_t ai = *(const uint32_t *)a;
+  const uint32_t bi = *(const uint32_t *)b;
+  return ai < bi ? -1 : ai == bi ? 0 : 1;
+}
+
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
-  return bsearch(&cp, confusables, sizeof(confusables) / sizeof(*confusables),
-                 4, compar32)
-      : true ? false;
+  return bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32) != NULL
+    ? true : false;
 }
 #  endif
 #endif

@@ -85,9 +85,11 @@ AC_ARG_ENABLE([confus],
                [Defined to 1 to add the confusable API])
              AC_MSG_RESULT([yes])
              ;;
-	no)  AC_MSG_RESULT([no]) ;;
-	*)   ;;
+	*)  AC_MSG_RESULT([no]) ;;
 	esac], [HAVE_CONFUS= ])
+if test -z "$HAVE_CONFUS"; then
+  AC_MSG_RESULT([no])
+fi
 AC_SUBST([HAVE_CONFUS])
 
 download_croaring() {

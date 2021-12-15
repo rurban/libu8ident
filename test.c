@@ -14,7 +14,7 @@
 #  include "u8idroar.h"
 #endif
 #ifdef HAVE_CONFUS
-#  undef EXT_SCRIPTS
+#  define EXT_SCRIPTS
 #  include "confus.h"
 #endif
 
