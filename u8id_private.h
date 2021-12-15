@@ -1,5 +1,7 @@
 #pragma once
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include <stddef.h>
 #include <stdint.h>
 #include <inttypes.h>

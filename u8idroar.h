@@ -4,7 +4,6 @@
 
    use roaring bitmaps for some sets.
 */
-#include "config.h"
 
 int u8ident_roar_init(void);
 int u8ident_roar_free(void);

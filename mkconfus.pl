@@ -76,7 +76,7 @@ print $H <<"EOF";
 */
 
 #include <string.h>
-#include "config.h"
+#include "u8id_private.h"
 
 // v3.1 changed len type from unsigned int to size_t (gperf d519d1a821511eaa22eae6d9019a548aea21e6)
 #ifdef GPERF_VERSION

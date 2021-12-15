@@ -3,7 +3,7 @@ PERL = @PERL@
 WGET = @WGET@
 WARN_CFLAGS = @WARN_CFLAGS@
 CROARING_PATH = @CROARING_PATH@
-AM_CFLAGS = -I$(srcdir)/include -I$(srcdir) -I$(builddir) $(WARN_CFLAGS)
+AM_CFLAGS = -I$(srcdir)/include -I$(builddir) -I$(srcdir) $(WARN_CFLAGS)
 lib_LTLIBRARIES = libu8ident.la
 include_HEADERS = include/u8ident.h
 libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
@@ -78,7 +78,7 @@ test_LDADD = $(lib_LTLIBRARIES)
 if HAVE_CROARING
 test_LDADD += u8idroar.lo
 EXTRA_PROGRAMS += perf
-perf_CFLAGS = $(CFLAGS) $(AM_CFLAGS) -I$(CROARING_PATH)
+perf_CFLAGS = $(DEFS) $(CFLAGS) $(AM_CFLAGS) -I$(CROARING_PATH)
 perf_SOURCES = perf.c
 perf_LDADD = u8idroar.lo
 endif
@@ -87,7 +87,7 @@ TESTS = test
 check-all: check check-asan check-norms check-profiles check-xid
 
 check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	$(CC) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
+	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
 	  $(srcdir)/test.c $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c \
 	  -o test-asan$(EXEEXT)
 	./test-asan$(EXEEXT)
@@ -99,20 +99,20 @@ check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 check-norms:
 	for n in NFKC NFC FCC NFKD NFD FCD; do \
             echo $$n; \
-            $(CC) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors -c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
+            $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors -c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
             ls -gGh u8idnorm.o; \
         done
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6; do \
             echo PROFILE_$${n}; \
-	    $(CC) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
+	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles && \
 	    ./test-profiles profile; \
         done
 check-xid: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in DISABLE ENABLE; do \
             echo $${n}_CHECK_XID; \
-	    $(CC) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \
+	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-xid && \
 	    ./test-xid xid; \
         done

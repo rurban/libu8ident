@@ -4,13 +4,11 @@
 
    use roaring bitmaps for some sets.
 */
-#include "config.h"
-#ifdef HAVE_CROARING
 
+#include "u8id_private.h"
+#ifdef HAVE_CROARING
 #  include <stdio.h>
-#  include <stdint.h>
 #  include <stdbool.h>
-#  include "u8id_private.h"
 #  include "roaring.c"
 #  include "confus_croar.h"
 #  include "allowed_croar.h"
