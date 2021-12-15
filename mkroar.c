@@ -11,10 +11,7 @@
 #include "confus.h"
 
 #define ARR_SIZE(x) sizeof(x) / sizeof(*x)
-enum what_list {
-  ALLOWED_ID_LIST,
-  CONFUSABLES
-};
+enum what_list { ALLOWED_ID_LIST, CONFUSABLES };
 
 int serialize(size_t size, const uint32_t *list, enum what_list what) {
   FILE *f;
@@ -26,7 +23,8 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
       roaring_bitmap_add(rb, list[i]);
     file = "confus_croar.bin";
   } else if (what == ALLOWED_ID_LIST) { // struct range_bool allowed_id_list[]
-    const struct range_bool *blist = (const struct range_bool *)list;;
+    const struct range_bool *blist = (const struct range_bool *)list;
+    ;
     for (uint32_t i = 0; i < size; i++) {
       for (uint32_t cp = blist[i].from; cp <= blist[i].to; cp++) {
         roaring_bitmap_add(rb, cp);
@@ -43,10 +41,10 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
   roaring_bitmap_portable_serialize(rb, serializedbytes);
   fwrite(serializedbytes, 1, sizeafter, f);
   fclose(f);
-  free (serializedbytes);
+  free(serializedbytes);
   printf("\nwrote %u serialized bytes to %s\n", sizeafter, file);
 
-  printf("cardinality = %d\n", (int) roaring_bitmap_get_cardinality(rb));
+  printf("cardinality = %d\n", (int)roaring_bitmap_get_cardinality(rb));
   printf("size before/after optim: %u/%u\n", sizebefore, sizeafter);
   roaring_bitmap_statistics(rb, &stat);
   printf("n_bitset_containers = %u\n", stat.n_bitset_containers);
@@ -63,7 +61,8 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
 }
 
 int main() {
-  serialize(ARR_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list, ALLOWED_ID_LIST);
+  serialize(ARR_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list,
+            ALLOWED_ID_LIST);
   serialize(ARR_SIZE(confusables), confusables, CONFUSABLES);
   return 0;
 }

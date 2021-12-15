@@ -353,6 +353,7 @@ void test_norm_fcd(void) {
   };
   assert(!u8ident_init(U8ID_FCD | U8ID_PROFILE_4));
   testnorm("FCD", testids);
+  u8ident_free();
 }
 #endif
 
@@ -440,6 +441,7 @@ void test_mixed_scripts(int xid_check) {
   // han + hangul is allowed, ditto hangul + han
   // han + katakana is allowed, ditto katakana + han
   // hiragana + katakana is allowed, ditto katakana + hiragana, ...
+  u8ident_free();
 }
 
 // check if mixed scripts per ctx work
@@ -474,6 +476,7 @@ void test_mixed_scripts_with_ctx(void) {
   CHECK_RET(ret, U8ID_EOK, 0); // 6 allows even these
 #endif
   assert(u8ident_free_ctx(ctx) == 0);
+  u8ident_free();
 }
 
 void test_init(void) {
@@ -487,6 +490,7 @@ void test_init(void) {
   assert(u8ident_init(U8ID_FCC));                        // missing PROFILE
   assert(u8ident_init(U8ID_PROFILE_2 | U8ID_PROFILE_4)); // multiple profiles
   assert(u8ident_init(2048));
+  u8ident_free();
 }
 
 void test_scx_singles(void) {
@@ -536,17 +540,23 @@ void test_add_scripts(void) {
 
 #ifdef HAVE_CONFUS
 static int compar32(const void *a, const void *b) {
-  const uint32_t ai = *(const uint32_t*)a;
-  const uint32_t bi = *(const uint32_t*)b;
+  const uint32_t ai = *(const uint32_t *)a;
+  const uint32_t bi = *(const uint32_t *)b;
   return ai < bi ? -1 : ai == bi ? 0 : 1;
 }
 
 void test_confus(void) {
-  for (int i = 0; i < ARRAY_SIZE(confusables); i++) {
+#  ifdef HAVE_CROARING
+  u8ident_roar_init();
+#  endif
+  for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     const uint32_t cp = confusables[i];
     assert(u8ident_is_confusable(cp));
     assert(bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
   }
+#  ifdef HAVE_CROARING
+  u8ident_roar_free();
+#  endif
 }
 #endif
 

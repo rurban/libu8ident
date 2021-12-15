@@ -1,5 +1,6 @@
 # -*- Makefile -*-
 #DEFINES = -DU8ID_NORM=NFKC -DU8ID_PROFILE=4 -DDISABLE_CHECK_XID
+HAVE_CONFUS := 1
 DEFINES :=
 CC := cc
 CFLAGS := -Wall -Wextra -O2
@@ -53,15 +54,15 @@ confus.h: mkconfus.pl # confusables.txt
 	$(PERL) mkconfus.pl
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
-	clean regen-scripts regen-norm install man dist-src dist-bin clang-format
+	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
 check: test
+	./test
 test: test.c $(LIB)
 	$(CC) $(CFLAGS) $(DEFINES) -g -I. -Iinclude test.c -L. -lu8ident -o test
-	./test
-check-all: test check-norms check-profiles check-xid check-asan
+check-all: check check-norms check-profiles check-xid check-asan
 
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS) $(DEFINES) -g -fsanitize=address -I. -Iinclude test.c u8ident.c u8idscr.c u8idnorm.c -o test-asan
+	$(CC) $(CFLAGS) $(DEFINES) -g -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
 
 perf: perf.c $(SRC)
@@ -69,8 +70,9 @@ perf: perf.c $(SRC)
 	./perf
 
 clean:
-	-rm -f u8ident.o u8idnorm.o u8idscr.o libu8ident.a test test-asan \
-	       test-xid-{EN,DIS}ABLE test-prof{2,3,4,5,6} test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
+	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
+	       perf mkroar allowed_croar.bin confus_croar.bin \
+	       test test-asan test-xid-{EN,DIS}ABLE test-prof{2,3,4,5,6} test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
 # Maintainer-only
 # Check coverage and sizes for all configure combinations
@@ -114,11 +116,13 @@ regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
 	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
 	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
-	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkscripts.pl
+regen-confus:
+	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
+	$(PERL) mkconfus.pl
 
 clang-format:
-	clang-format -i *.c include/*.h scripts.h u8id*.h
+	clang-format -i *.c include/*.h scripts.h confus.h u8id*.h
 
 # End Maintainer-only
 

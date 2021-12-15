@@ -197,11 +197,13 @@ uint16_t u8ident_get_idtypes(const uint32_t cp) {
 #endif
 
 #ifdef HAVE_CONFUS
-#ifndef HAVE_CROARING
+#  ifndef HAVE_CROARING
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
-  return bsearch(&cp, confusables, sizeof(confusables) / sizeof(*confusables), 4, compar32) : true ? false;
+  return bsearch(&cp, confusables, sizeof(confusables) / sizeof(*confusables),
+                 4, compar32)
+      : true ? false;
 }
-#endif
+#  endif
 #endif
 
 const char *u8ident_script_name(const int scr) {

@@ -4,33 +4,36 @@
 
    use roaring bitmaps for some sets.
 */
+#include "config.h"
 #ifdef HAVE_CROARING
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include "u8id_private.h"
-#ifdef CROARING_PATH
-#  include CROARING_PATH"/roaring.c"
-#else
+#  include <stdio.h>
+#  include <stdint.h>
+#  include <stdbool.h>
+#  include "u8id_private.h"
 #  include "roaring.c"
-#endif
-#include "confus_croar.h"
-#include "allowed_croar.h"
+#  include "confus_croar.h"
+#  include "allowed_croar.h"
 
-static roaring_bitmap_t *ra, *rc;
+static roaring_bitmap_t *ra = NULL, *rc = NULL;
 
 int u8ident_roar_init(void) {
-  rc = roaring_bitmap_portable_deserialize_safe((char*)confus_croar_bin,
-                                                confus_croar_bin_len);
-  ra = roaring_bitmap_portable_deserialize_safe((char*)allowed_croar_bin,
-                                                allowed_croar_bin_len);
+  if (!rc)
+    rc = roaring_bitmap_portable_deserialize_safe((char *)confus_croar_bin,
+                                                  confus_croar_bin_len);
+  if (!ra)
+    ra = roaring_bitmap_portable_deserialize_safe((char *)allowed_croar_bin,
+                                                  allowed_croar_bin_len);
   return (rc && ra) ? 0 : -1;
 }
 
 void u8ident_roar_free(void) {
-  roaring_bitmap_free(rc);
-  roaring_bitmap_free(ra);
+  if (rc)
+    roaring_bitmap_free(rc);
+  if (ra)
+    roaring_bitmap_free(ra);
+  rc = NULL;
+  ra = NULL;
 }
 
 bool u8ident_roar_is_allowed(const uint32_t cp) {

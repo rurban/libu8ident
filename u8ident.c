@@ -10,7 +10,7 @@
 #include <u8ident.h>
 #include "u8idscr.h"
 #ifdef HAVE_CROARING
-#include "u8idroar.h"
+#  include "u8idroar.h"
 #endif
 
 // defaults to U8ID_NFKC | U8ID_PROFILE_4

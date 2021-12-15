@@ -2,8 +2,8 @@
    Copyright 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
-   Measure binary_search in array vs croaring for confusables[] and allowed_id_list[] sets.
-   croaring is from 10 to 100% faster.
+   Measure binary_search in array vs croaring for confusables[] and
+   allowed_id_list[] sets. croaring is from 10 to 100% faster.
 */
 #include <stdlib.h>
 #include <stdio.h>
@@ -103,8 +103,8 @@ static inline bool range_bool_search(const uint32_t cp,
 
 // without croaring
 static int compar32(const void *a, const void *b) {
-  const uint32_t ai = *(const uint32_t*)a;
-  const uint32_t bi = *(const uint32_t*)b;
+  const uint32_t ai = *(const uint32_t *)a;
+  const uint32_t bi = *(const uint32_t *)b;
   return ai < bi ? -1 : ai == bi ? 0 : 1;
 }
 
