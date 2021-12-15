@@ -11,20 +11,27 @@
 #include "confus.h"
 
 #define ARR_SIZE(x) sizeof(x) / sizeof(*x)
+enum what_list {
+  ALLOWED_ID_LIST,
+  CONFUSABLES
+};
 
-int serialize(size_t size, const uint32_t *list, int is_int32) {
+int serialize(size_t size, const uint32_t *list, enum what_list what) {
   FILE *f;
   roaring_bitmap_t *rb = roaring_bitmap_create_with_capacity(size);
   roaring_statistics_t stat;
   const char *file;
-  if (is_int32) { // simple confusables uint32_t confusable[]
+  if (what == CONFUSABLES) { // simple confusables uint32_t confusable[]
     for (uint32_t i = 0; i < size; i++)
       roaring_bitmap_add(rb, list[i]);
     file = "confus_croar.bin";
-  } else { // struct range_bool allowed_id_list[]
+  } else if (what == ALLOWED_ID_LIST) { // struct range_bool allowed_id_list[]
     const struct range_bool *blist = (const struct range_bool *)list;;
-    for (uint32_t i = 0; i < size; i++)
-      roaring_bitmap_add(rb, blist[i].from);
+    for (uint32_t i = 0; i < size; i++) {
+      for (uint32_t cp = blist[i].from; cp <= blist[i].to; cp++) {
+        roaring_bitmap_add(rb, cp);
+      }
+    }
     file = "allowed_croar.bin";
   }
   f = fopen(file, "w");
@@ -56,7 +63,7 @@ int serialize(size_t size, const uint32_t *list, int is_int32) {
 }
 
 int main() {
-  serialize(ARR_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list, 0);
-  serialize(ARR_SIZE(confusables), confusables, 1);
+  serialize(ARR_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list, ALLOWED_ID_LIST);
+  serialize(ARR_SIZE(confusables), confusables, CONFUSABLES);
   return 0;
 }

@@ -19,10 +19,10 @@ pcdata_DATA = libu8ident.pc
 man_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE
-HDRS = scripts.h confus.h u8id_private.h u8idscr.h \
-	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA) \
+HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
+	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
 
 .c.i:
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -74,6 +74,10 @@ regen-all: regen-scripts regen-norm regen-confus
 EXTRA_PROGRAMS = test
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
+if HAVE_CROARING
+EXTRA_PROGRAMS += perf
+perf_SOURCES = perf.c u8idroar.lo
+endif
 TESTS = test
 
 check-all: check check-asan check-norms check-profiles check-xid
@@ -133,5 +137,10 @@ LIBTOOL_DISTCLEAN_FILES = \
 	depcomp \
 	install-sh \
 	ltmain.sh \
-	missing
+	missing \
+	m4/libtool.m4 \
+	m4/ltoptions.m4 \
+	m4/ltsugar.m4 \
+	m4/ltversion.m4 \
+	m4/lt~obsolete.m4
 

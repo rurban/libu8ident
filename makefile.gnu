@@ -20,10 +20,10 @@ HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h
 SRC = u8ident.c u8idscr.c u8idnorm.c
 ifeq (${HAVE_CONFUS}, 1)
 SRC += u8idroar.c
+HDRS += u8idroar.h confus.h
 DEFINES += -DHAVE_CONFUS
 endif
-ifeq (${HAVE_CROARING}, 1)
-SRC += roaring.c
+ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
 endif
 LIB = libu8ident.a
@@ -32,6 +32,10 @@ MAN = u8ident.3
 PREFIX = usr
 PKG = libu8ident-$(VERSION)
 PKG_BIN = $(PKG)-`uname -m`
+
+ifeq (x86_64,$(shell uname -m))
+CFLAGS += -march=native
+endif
 
 all: $(LIB) $(MAN)
 
@@ -45,6 +49,8 @@ $(LIB): $(SRC) $(HEADER) $(HDRS)
 
 scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt
 	$(PERL) mkscripts.pl
+confus.h: mkconfus.pl # confusables.txt
+	$(PERL) mkconfus.pl
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
 	clean regen-scripts regen-norm install man dist-src dist-bin clang-format
@@ -57,6 +63,10 @@ check-all: test check-norms check-profiles check-xid check-asan
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS) $(DEFINES) -g -fsanitize=address -I. -Iinclude test.c u8ident.c u8idscr.c u8idnorm.c -o test-asan
 	./test-asan
+
+perf: perf.c $(SRC)
+	$(CC) $(CFLAGS) $(DEFINES) -I. -Iinclude perf.c u8idroar.c -o perf
+	./perf
 
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o libu8ident.a test test-asan \

@@ -181,7 +181,7 @@ e.g codesizes for u8idnorm.o with -Os
 default: 365K with -g on amd64-gcc
 
 With `confus` enabled, the confusable API is added.
-With `croaring` this is about twice as fast.
+With `croaring` the confus API is about twice as fast, and needs half the size.
 
 See the likewise **cmake** options: 
 
@@ -274,7 +274,9 @@ Lookup the long script name for the internal script byte/index.
 
 `bool u8ident_is_confusable (const uint32_t cp)`
 
-Lookup if the codepoint is a confusable. Only with `--enable-confus/-DHAVE_CONFUS`.
+Lookup if the codepoint is a confusable. Only with `--enable-confus /
+-DHAVE_CONFUS`.  With `--with-croaring / -DHAVE_CROARING` this is
+twice as fast, and needs half the size. Not exported.
 
 `enum u8id_errors u8ident_check (const u8* string, char** outnorm)`
 
@@ -338,7 +340,12 @@ i.e. empty configure options.
 
 Build dependencies: ronn (`dnf install rubygem-ronn-ng`)
 
-Maintainer dependencies: wget, perl. Needed every year when the UCD changes.
+Optional dependencies:
+
+  * CRoaring (the two amalgamated sources only).
+    autotools downloads it automatically with `--enable-confus --with-roaring`.
+
+Maintainer dependencies: wget, perl, xxd. Needed every year when the UCD changes.
 
 Internals
 ---------
@@ -375,6 +382,10 @@ alphabetically) and *Limited Use Scripts* (sorted by codepoint).
 With `-DDISABLE_CHECK_XID` and `-DENABLE_CHECK_XID` we can use the
 shorter `nonxid_script_list[]`, as we know that only valid XID's are
 checked.
+
+With CRoaring some boolean bitset queries can be optimized. So far only
+the confusables codepoints lookups, not yet the `allowed_id_list` lookup.
+
 
 TODO
 ----
