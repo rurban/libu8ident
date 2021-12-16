@@ -149,14 +149,12 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
   return sc ? sc->scr : 255;
 }
 
-#if !defined DISABLE_CHECK_XID
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
   const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
   return r ? true : false;
 }
-#endif
 
 uint8_t u8ident_get_script(const uint32_t cp) {
 #if defined DISABLE_CHECK_XID || defined ENABLE_CHECK_XID
@@ -318,6 +316,7 @@ const char *u8ident_existing_scripts(const int i) {
   return res;
 }
 
+#if 0
 // TODO. Generate either if-trees, or sorted lists of those.
 static bool _is_MARK(const uint32_t cp) {
   (void)cp;
@@ -339,6 +338,58 @@ bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr) {
   if (scr == SC_Hangul || _is_MARK(cp))
     return true;
   return _is_DECOMPOSED_REST(cp);
+}
+#endif
+
+/* quickcheck these lists
+  NFD_QC_N
+  NFC_QC_N
+  NFC_QC_M
+  NFKD_QC_N
+  NFKC_QC_N
+  NFKC_QC_M  
+ */
+bool u8ident_maybe_normalized(const uint32_t cp) {
+
+#if !defined U8ID_NORM
+  if (s_u8id_options & U8ID_NFKC)
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFKC
+  {
+    if (range_bool_search(cp, NFKC_N_list, ARRAY_SIZE(NFKC_N_list)))
+      return true;
+    return range_bool_search(cp, NFKC_M_list, ARRAY_SIZE(NFKC_M_list));
+  }
+#endif
+
+#if !defined U8ID_NORM
+  if (s_u8id_options & U8ID_NFD)
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFD
+  {
+    return !range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
+  }
+#endif
+
+#if !defined U8ID_NORM
+  if (s_u8id_options & U8ID_NFC)
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFC
+  {
+    if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
+      return true;
+    return range_bool_search(cp, NFC_M_list, ARRAY_SIZE(NFC_M_list));
+  }
+#endif
+
+#if !defined U8ID_NORM
+  if (s_u8id_options & U8ID_NFKD)
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFKD
+  {
+    return !range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
+  }
+#endif
 }
 
 // See also the Table 3. Unicode Script Property Values and ISO 15924 Codes

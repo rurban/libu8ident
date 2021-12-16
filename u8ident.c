@@ -162,7 +162,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 
     if (!need_normalize) {
-      need_normalize = u8ident_is_decomposed(cp, scr);
+      need_normalize = u8ident_maybe_normalized(cp);
     }
 
 #if defined U8ID_PROFILE && U8ID_PROFILE == 5
