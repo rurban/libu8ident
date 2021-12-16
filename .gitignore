@@ -17,6 +17,7 @@ u8idroar.o
 /Scripts.txt
 /ScriptExtensions.txt
 /PropertyValueAliases.txt
+/DerivedNormalizationProps.txt
 /IdentifierType.txt
 /IdentifierStatus.txt
 /confusables.txt

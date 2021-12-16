@@ -10,10 +10,12 @@ use strict;
 my $scn = "Scripts.txt";
 my $scxn = "ScriptExtensions.txt";
 my $pva = "PropertyValueAliases.txt";
+my $normp = "DerivedNormalizationProps.txt";
+# --
 my $idtype = "IdentifierType.txt";
 my $idstat = "IdentifierStatus.txt";
 my $conf = "confusables.txt";
-for ($scn, $scxn, $pva) {
+for ($scn, $scxn, $pva, $normp) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/UNIDATA/$_");
   }
@@ -25,7 +27,7 @@ for ($idtype, $idstat, $conf) {
 }
 
 my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
-    @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $sc, $id);
+    @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $id);
 my ($started, @IDTYPES, @ALLOWED);
 open my $IDTYPE, "<", $idtype or die "$idtype $!";
 while (<$IDTYPE>) {
@@ -43,13 +45,14 @@ while (<$IDTYPE>) {
 }
 close $IDTYPE;
 # Collapse neighbors. sort the list by ->from
-my (@_ID, $oldid, $oldto);
+my (@_ID, $oldid);
+$oldto = 0;
 my %idtype_values = map { $_->[2] => 1 } @IDTYPES;
 for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
   my ($from, $to, $id) = ($r->[0], $r->[1], $r->[2]);
   if (($from != $oldto + 1) or ($oldid ne $id)) { # honor holes
     push @_ID, [$from, $to, $id];
-    $oldsc = $sc;
+    # $oldsc = $sc;
   } else { # update the range
     my $range = $_ID[$#_ID];
     $range->[1] = $to;
@@ -152,7 +155,7 @@ my @limited = qw(
   Tai_Viet Tifinagh Vai Wancho Yi Unknown);
 
 open my $SC, "<", $scn or die "$scn $!";
-$started = 0;
+$started = 0; $oldsc = '';
 while (<$SC>) {
   if (!$started && /^# Scripts-(\d+)\.(\d+)\.(\d+)\.txt/) {
     @ucd_version = ($1, $2, $3);
@@ -229,6 +232,33 @@ printf "%d SC ranges, %d unique scripts", scalar @SCR, $num_scripts;
 printf ", %d SCX ranges\n", scalar @SCXR;
 die if $num_scripts > 255;
 
+$started = 0;
+open my $NORMP, "<", $normp or die "$normp $!";
+my ($list, $yes_maybe, @NORM_QC,
+    @NFD_QC_N, @NFC_QC_N, @NFC_QC_M, @NFKD_QC_N, @NFKC_QC_N, @NFKC_QC_M);
+while (<$NORMP>) {
+  # first list
+  if (/^# NFD_Quick_Check=No/) { $started++; }
+  next unless $started;
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; (NF\w+_QC); ([NMY]) #/) {
+    ($from, $to, $list, $yes_maybe) = (hex($1), hex($2), $3, $4);
+  }
+  elsif (/^([0-9A-F]{4,5})\s+; (NF\w+_QC); ([NMY]) #/) {
+    ($from, $to, $list, $yes_maybe) = (hex($1), hex($1), $2, $3);
+  } else {
+    #warn $_;
+    next;
+  }
+  no strict 'refs';
+  my $name = $list . "_" . $yes_maybe;
+  unless (@{$name}) {
+    push @NORM_QC, $name;
+    print "$name\n";
+  }
+  push @{$name}, [$from, $to];
+}
+close $NORMP;
+
 # sort the scripts by ->from
 @SCR = sort { $a->[0] <=> $b->[0] } @SCR;
 @SCXR = sort { $a->[0] <=> $b->[0] } @SCXR;
@@ -301,7 +331,7 @@ $oldto = 0;
 # Collapse neighbors, generate a fast SCRF variant without holes.
 my @_SCR;
 undef $oldsc;
-my $oldscf;
+my $oldscf = '';
 for my $r (@SCR) {
   ($from, $to, $sc) = ($r->[0], $r->[1], $r->[2]);
   # the full list, with all holes.
@@ -404,9 +434,10 @@ EOF
 $i = 0;
 my $defines = "";
 for my $sc (@recommended) {
-  my $ws = " " x (10-length($sc));
+  my $n = 10 - length($sc);
+  my $ws = $n > 0 ? " " x $n : "";
   $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-  printf $H "    \"%s\",\n", $sc, $i;
+  printf $H "    \"%s\",\n", $sc;
   $i++;
 }
 $defines .= "#define FIRST_EXCLUDED_SCRIPT $i\n";
@@ -416,9 +447,10 @@ print $H <<"EOF";
 EOF
 for my $sc (sort keys %scripts) {
   unless ($other{$sc}) {
-    my $ws = " " x (10-length($sc));
+    my $n = 10 - length($sc);
+    my $ws = $n > 0 ? " " x $n : "";
     $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-    printf $H "    \"%s\",\n", $sc, $i;
+    printf $H "    \"%s\",\n", $sc;
     $i++;
   }
 }
@@ -428,9 +460,10 @@ print $H <<"EOF";
     // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 EOF
 for my $sc (@limited) {
-  my $ws = " " x (10-length($sc));
+  my $n = 10 - length($sc);
+  my $ws = $n > 0 ? " " x $n : "";
   $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-  printf $H "    \"%s\",\n", $sc, $i;
+  printf $H "    \"%s\",\n", $sc;
   $i++;
 }
 $i--;
@@ -503,7 +536,7 @@ for my $r (@SCRF) {
     printf $H "\n";
   }
 };
-printf $H <<"EOF", $b, $s, scalar(@SCXR);
+printf $H <<"EOF", $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 #endif
@@ -568,7 +601,7 @@ extern const struct range_bool allowed_id_list[%u];
 // IdentifierType bit-values
 enum u8id_idtypes {
 EOF
-my $i = 1;
+$i = 1;
 my %idtype_keys;
 for my $s (keys %idtype_values) {
   for (split(" ", $s)) {
@@ -620,11 +653,44 @@ extern const struct range_short idtype_list[%u];
 
 #endif // DISABLE_CHECK_XID
 EOF
-close $H;
 
-# TODO
-# MARK: 1963 mark characters (Combining, Overlay, ...) \p{IsM}
-# DECOMPOSED_REST: The remaining 869 non-mark and non-hangul normalizables.
+# TODO maybe_normalize
+#   MARK: 1963 mark characters (Combining, Overlay, ...) \p{IsM}
+#   DECOMPOSED_REST: The remaining 869 non-mark and non-hangul normalizables.
+# @NFD_QC_N, @NFC_QC_N, @NFC_QC_M, @NFKD_QC_N, @NFKC_QC_N, @NFKC_QC_M;
+
+for my $name (@NORM_QC) {
+  my ($NORM, $M) = ($name =~ /^(NF.+)_QC_(.)$/);
+  my $maybe = $M eq 'M' ? 'Maybe' : $M eq 'N' ? 'No' : 'Yes';
+  my $list = $NORM . "_" . $M;
+  no strict 'refs';
+  printf $H <<'EOF', $NORM, $maybe, $NORM, $list, scalar(@{$name}), $list;
+
+// %s_Quick_Check=%s
+#if !defined U8ID_NORM || U8ID_NORM == %s
+#  ifdef EXT_SCRIPTS
+extern const struct range_bool %s_list[%u];
+#  else
+const struct range_bool %s_list[] = {
+    // clang-format off
+EOF
+  ($b, $s) = (0, 0);
+  for my $r (@{$name}) {
+    if ($r->[0] == $r->[1]) {
+      $s++;
+    } else {
+      $b++;
+    }
+    printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+  };
+  printf $H <<'EOF', $b, $s;
+    // clang-format on
+}; // %u ranges, %u single codepoints
+#  endif
+#endif
+EOF
+}
+close $H;
 
 # patch our header
 my $inc = "include/u8ident.h";
