@@ -3,7 +3,14 @@
    SPDX-License-Identifier: Apache-2.0
 
    Measure binary_search in array vs croaring for confusables[] and
-   allowed_id_list[] sets. croaring is from 10 to 100% faster.
+   allowed_id_list[] sets.
+   croaring is from 10 to 100% faster for confusables,
+   and 70-100% slower for allowed_id_list range sets.
+
+   confus:
+   croaring: 351442	bsearch: 517036          47.12% faster
+   allowed_id:
+   croaring: 4333056	bsearch: 2439034         77.65% slower
 */
 #include <stdlib.h>
 #include <stdio.h>
