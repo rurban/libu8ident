@@ -8,6 +8,15 @@
 
 #define EXTERN extern
 
+#ifndef PERF_TEST
+// too slow
+#  undef USE_ALLOWED_CROAR
+#  undef USE_NORM_CROAR
+#else
+#  define USE_ALLOWED_CROAR
+#  define USE_NORM_CROAR
+#endif
+
 #if __GNUC__ >= 3
 #  define _expect(expr, value) __builtin_expect((expr), (value))
 #  define INLINE static inline
@@ -28,6 +37,9 @@
 #define FCC 5
 #define _XSTR(s) _STR(s)
 #define _STR(s) #s
+#define CAT(a, b) a##b
+#define PASTE(a, b) CAT(a, b)
+#define JOIN(prefix, name) PASTE(prefix, PASTE(_, name))
 
 #ifdef U8ID_NORM
 #  if U8ID_NORM == NFKC

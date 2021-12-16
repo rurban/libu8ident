@@ -41,3 +41,5 @@ roaring.c
 roaring.h
 test-driver
 u8ident.3
+mkroar
+*_croar.bin

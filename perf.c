@@ -3,12 +3,20 @@
    SPDX-License-Identifier: Apache-2.0
 
    Measure binary_search in array vs croaring for confusables[] and
-   allowed_id_list[] sets.
-   croaring is from 10 to 100% faster for confusables,
-   and 70-100% slower for allowed_id_list range sets.
+   some range_bool sets, like allowed_id_list[] and the NORM lists.
+   croaring is 10-100% faster only for confusables,
+   and 70-100% slower for the range_bool sets.
 
    confus:
    croaring: 351442	bsearch: 517036          47.12% faster
+   nfkd:
+   croaring: 3193632	bsearch: 1829178 	 74.59% slower
+   nfd:
+   croaring: 3376412	bsearch: 1876160 	 79.96% slower
+   nfkc:
+   croaring: 4980066	bsearch: 3699228 	 34.62% slower
+   nfc:
+   croaring: 4497194	bsearch: 2139826 	 110.17% slower
    allowed_id:
    croaring: 4333056	bsearch: 2439034         77.65% slower
 */
@@ -141,6 +149,106 @@ void perf_confus(void) {
            100.0 * (t1 - t2) / (double)t2);
 }
 
+void perf_nfkc(void) {
+  printf("nfkc:\n");
+  uint64_t begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret = u8ident_roar_maybe_nfkc(cp);
+  }
+  uint64_t end = timer_end();
+  uint64_t t1 = end - begin;
+
+  begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret;
+    if (range_bool_search(cp, NFKC_N_list, ARRAY_SIZE(NFKC_N_list)))
+      ret = true;
+    else
+      ret = range_bool_search(cp, NFKC_M_list, ARRAY_SIZE(NFKC_M_list));
+  }
+  end = timer_end();
+  uint64_t t2 = end - begin;
+  if (t1 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
+           100.0 * (t2 - t1) / (double)t1);
+  else
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
+           100.0 * (t1 - t2) / (double)t2);
+}
+
+void perf_nfc(void) {
+  printf("nfc:\n");
+  uint64_t begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret = u8ident_roar_maybe_nfc(cp);
+  }
+  uint64_t end = timer_end();
+  uint64_t t1 = end - begin;
+
+  begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret;
+    if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
+      ret = true;
+    else
+      ret = range_bool_search(cp, NFC_M_list, ARRAY_SIZE(NFC_M_list));
+  }
+  end = timer_end();
+  uint64_t t2 = end - begin;
+  if (t1 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
+           100.0 * (t2 - t1) / (double)t1);
+  else
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
+           100.0 * (t1 - t2) / (double)t2);
+}
+
+void perf_nfkd(void) {
+  printf("nfkd:\n");
+  uint64_t begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret = u8ident_roar_maybe_nfkd(cp);
+  }
+  uint64_t end = timer_end();
+  uint64_t t1 = end - begin;
+
+  begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret = range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
+  }
+  end = timer_end();
+  uint64_t t2 = end - begin;
+  if (t1 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
+           100.0 * (t2 - t1) / (double)t1);
+  else
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
+           100.0 * (t1 - t2) / (double)t2);
+}
+
+void perf_nfd(void) {
+  printf("nfd:\n");
+  uint64_t begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret = u8ident_roar_maybe_nfd(cp);
+  }
+  uint64_t end = timer_end();
+  uint64_t t1 = end - begin;
+
+  begin = timer_start();
+  for (uint32_t cp = 128; cp < 0x11000; cp++) {
+    volatile bool ret = range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
+  }
+  end = timer_end();
+  uint64_t t2 = end - begin;
+  if (t1 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
+           100.0 * (t2 - t1) / (double)t1);
+  else
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
+           100.0 * (t1 - t2) / (double)t2);
+}
+
 void perf_allowed_id(void) {
   printf("allowed_id:\n");
   uint64_t begin = timer_start();
@@ -175,6 +283,10 @@ void perf_allowed_id(void) {
 int main(void) {
   u8ident_roar_init();
   perf_confus();
+  perf_nfkd();
+  perf_nfd();
+  perf_nfkc();
+  perf_nfc();
   perf_allowed_id();
   u8ident_roar_free();
 }

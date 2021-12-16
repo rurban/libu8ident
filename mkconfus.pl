@@ -146,10 +146,22 @@ if ($^O =~ /Win32/) {
   system("./mkroar");
 }
 print "\n";
-# not optimized. stayed with 816 array
-system("xxd -i allowed_croar.bin > allowed_croar.h");
-print "Created allowed_croar.h\n";
-
-# optimized from 8552 byte to 4731 byte (3 run-length encoded containers)
-system("xxd -i confus_croar.bin > confus_croar.h");
-print "Created confus_croar.h\n";
+# allowed not optimized. stayed with 816 array
+# confus optimized from 8552 byte to 4731 byte (3 run-length encoded containers)
+# NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M
+for my $name (qw(allowed confus nfd_n nfc_n nfc_m nfkd_n nfkc_n nfkc_m)) {
+  my $c = $name . "_croar";
+  my $b = $c;
+  if ($name =~ /(nfk?[cd])_./) {
+    $b = $1 . "_croar";
+  }
+  if ($name =~ /^nfk?c_m/) {
+    system("xxd -i $c.bin >> $b.h");
+  } else {
+    open my $F, '>', "$b.h";
+    print $F "/* generated via mkroar.c */\n";
+    close $F;
+    system("xxd -i $c.bin >> $b.h");
+    print "Created $b.h\n";
+  }
+}

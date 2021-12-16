@@ -347,18 +347,26 @@ bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr) {
   NFC_QC_M
   NFKD_QC_N
   NFKC_QC_N
-  NFKC_QC_M  
+  NFKC_QC_M
  */
 bool u8ident_maybe_normalized(const uint32_t cp) {
+
+#if U8ID_NORM == FCC || U8ID_NORM == FCD
+  (void)cp;
+#endif
 
 #if !defined U8ID_NORM
   if (s_u8id_options & U8ID_NFKC)
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKC
   {
+#  if defined HAVE_CROARING && defined USE_NORM_CROAR
+    return u8ident_roar_maybe_nfkc(cp);
+#  else
     if (range_bool_search(cp, NFKC_N_list, ARRAY_SIZE(NFKC_N_list)))
       return true;
     return range_bool_search(cp, NFKC_M_list, ARRAY_SIZE(NFKC_M_list));
+#  endif
   }
 #endif
 
@@ -367,7 +375,11 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFD
   {
+#  if defined HAVE_CROARING && defined USE_NORM_CROAR
+    return u8ident_roar_maybe_nfd(cp);
+#  else
     return !range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
+#  endif
   }
 #endif
 
@@ -376,9 +388,13 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFC
   {
+#  if defined HAVE_CROARING && defined USE_NORM_CROAR
+    return u8ident_roar_maybe_nfc(cp);
+#  else
     if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
       return true;
     return range_bool_search(cp, NFC_M_list, ARRAY_SIZE(NFC_M_list));
+#  endif
   }
 #endif
 
@@ -387,9 +403,14 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKD
   {
+#  if defined HAVE_CROARING && defined USE_NORM_CROAR
+    return u8ident_roar_maybe_nfkd(cp);
+#  else
     return !range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
+#  endif
   }
 #endif
+  return true;
 }
 
 // See also the Table 3. Unicode Script Property Values and ISO 15924 Codes

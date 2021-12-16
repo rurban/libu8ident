@@ -78,6 +78,7 @@ test_LDADD = $(lib_LTLIBRARIES)
 if HAVE_CROARING
 test_LDADD += u8idroar.lo
 EXTRA_PROGRAMS += perf
+# TODO -DPERF_TEST
 perf_CFLAGS = $(DEFS) $(CFLAGS) $(AM_CFLAGS) -I$(CROARING_PATH)
 perf_SOURCES = perf.c
 perf_LDADD = u8idroar.lo

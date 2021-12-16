@@ -11,7 +11,16 @@
 #include "confus.h"
 
 #define ARR_SIZE(x) sizeof(x) / sizeof(*x)
-enum what_list { ALLOWED_ID_LIST, CONFUSABLES };
+enum what_list {
+  ALLOWED_ID_LIST,
+  CONFUSABLES,
+  NFD_N,
+  NFC_N,
+  NFC_M,
+  NFKD_N,
+  NFKC_N,
+  NFKC_M
+};
 
 int serialize(size_t size, const uint32_t *list, enum what_list what) {
   FILE *f;
@@ -22,15 +31,37 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
     for (uint32_t i = 0; i < size; i++)
       roaring_bitmap_add(rb, list[i]);
     file = "confus_croar.bin";
-  } else if (what == ALLOWED_ID_LIST) { // struct range_bool allowed_id_list[]
+  } else /* if (what == ALLOWED_ID_LIST) */ { // struct range_bool
     const struct range_bool *blist = (const struct range_bool *)list;
-    ;
     for (uint32_t i = 0; i < size; i++) {
       for (uint32_t cp = blist[i].from; cp <= blist[i].to; cp++) {
         roaring_bitmap_add(rb, cp);
       }
     }
-    file = "allowed_croar.bin";
+    switch (what) {
+    case ALLOWED_ID_LIST:
+      file = "allowed_croar.bin";
+      break;
+    /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
+    case NFD_N:
+      file = "nfd_n_croar.bin";
+      break;
+    case NFC_N: // this might be slower than binary search
+      file = "nfc_n_croar.bin";
+      break;
+    case NFC_M:
+      file = "nfc_m_croar.bin";
+      break;
+    case NFKD_N:
+      file = "nfkd_n_croar.bin";
+      break;
+    case NFKC_N:
+      file = "nfkc_n_croar.bin";
+      break;
+    case NFKC_M:
+      file = "nfkc_m_croar.bin";
+      break;
+    }
   }
   f = fopen(file, "w");
   uint32_t sizebefore = roaring_bitmap_portable_size_in_bytes(rb);
@@ -64,5 +95,13 @@ int main() {
   serialize(ARR_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list,
             ALLOWED_ID_LIST);
   serialize(ARR_SIZE(confusables), confusables, CONFUSABLES);
+  /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
+  serialize(ARR_SIZE(NFD_N_list), (const uint32_t *)NFD_N_list, NFD_N);
+  serialize(ARR_SIZE(NFC_N_list), (const uint32_t *)NFC_N_list, NFC_N);
+  serialize(ARR_SIZE(NFC_M_list), (const uint32_t *)NFC_M_list, NFC_M);
+  serialize(ARR_SIZE(NFKD_N_list), (const uint32_t *)NFKD_N_list, NFKD_N);
+  serialize(ARR_SIZE(NFKC_N_list), (const uint32_t *)NFKC_N_list, NFKC_N);
+  serialize(ARR_SIZE(NFKC_M_list), (const uint32_t *)NFKC_M_list, NFKC_M);
+
   return 0;
 }

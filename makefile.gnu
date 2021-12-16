@@ -26,6 +26,7 @@ DEFINES += -DHAVE_CONFUS
 endif
 ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
+HDRS += confus_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h
 endif
 LIB = libu8ident.a
 DOCS = README.md NOTICE LICENSE
@@ -50,7 +51,9 @@ $(LIB): $(SRC) $(HEADER) $(HDRS)
 
 scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt
 	$(PERL) mkscripts.pl
-confus.h: mkconfus.pl # confusables.txt
+confus.h: mkconfus.pl mkroar.c # confusables.txt
+	$(PERL) mkconfus.pl
+confus_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
@@ -66,7 +69,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	./test-asan
 
 perf: perf.c $(SRC)
-	$(CC) $(CFLAGS) $(DEFINES) -I. -Iinclude perf.c u8idroar.c -o perf
+	$(CC) $(CFLAGS) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf
 	./perf
 
 clean:
