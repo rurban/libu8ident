@@ -403,12 +403,13 @@ TODO
   exists we need to store the list and check it against the next yet unseen
   script, and check for mixed-script violations. Currently we only check if
   none of the SCX variants exist yet, and only then we have a new script.
-  Which exactly is unknown, but the new script might lead to a mixed-script violation.
+  Which exactly is unknown, but the new script might lead to a mixed-script
+  violation.
 
 * Faster **maybe_normalize** check. I.e. search for MARK and DECOMPOSED codepoints.
   We only need to normalize, if the codepoint in question is different under NFKC,
   resp. the current normalization option. I have that in cperl to great effect, but
-  with NFC only.
+  with NFC only. Here we can use `--with-roaring` or binary search.
 
 * **[IdentifierType](http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
   The list of idtypes is provided, but not yet integrated into any API.
@@ -424,8 +425,3 @@ TODO
   The testsuite does not yet check the profile 2-6 differences.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
-
-* Optional **confusables** values. The table consists of a `uint32_t cp` -> 
-  list of 1-3 `uint32_t cp's`. 6311 entries, gperf or binary-search.
-  Probably behind a `--enable-confus`. Not sure if we need the value at all,
-  just the keys. Check CRoaring, gperf or cbitmap optims.
