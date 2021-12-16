@@ -276,26 +276,30 @@ Lookup the long script name for the internal script byte/index.
 
 Lookup if the codepoint is a confusable. Only with `--enable-confus /
 -DHAVE_CONFUS`.  With `--with-croaring / -DHAVE_CROARING` this is
-twice as fast, and needs half the size. Not exported.
+twice as fast, and needs half the size.
 
 `enum u8id_errors u8ident_check (const u8* string, char** outnorm)`
 
 `enum u8id_errors u8ident_check_buf (const char* buf, int len, char** outnorm)`
 
-Two variants to check if this identifier is valid. The second avoids
-allocating a fresh string from the parsed input.
-outnorm is set to a fresh normalized string if valid.
+Two variants to check if this identifier is valid. u8ident_check_buf
+avoids allocating a fresh string from the parsed input.  outnorm is
+set to a fresh normalized string if valid.
 
 Return values (`enum u8id_errors`):
 
   * 0  - valid without need to normalize.
   * 1   - valid with need to normalize.
-  * 2   - warn about confusable (_not yet implemented_)
+  * 2   - warn about confusable
+  * 3   - warn about confusable and need to normalize
   * -1  - invalid character class (only with `U8ID_CHECK_XID`)
   * -2  - invalid script
   * -3  - invalid mixed scripts
   * -4  - invalid UTF-8 encoding
-  * -5  - invalid because confusable (_not yet implemented_)
+  * -5  - invalid because confusable
+
+Note that we explicitly allow the Latin confusables: 0 1 I ` |
+i.e. U+30, U+31, U+49, U+60, U+7C
 
 `char * u8ident_normalize (const char* buf, int len)`
 

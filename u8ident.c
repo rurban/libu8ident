@@ -130,6 +130,20 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #endif
 
+#ifdef HAVE_CONFUS
+    /* allow some latin confusables: 0 1 I ` | U+30, U+31, U+49, U+60, U+7C */
+    /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6 */
+    if (s_u8id_options >= U8ID_WARN_CONFUSABLE && cp > 0x7C) {
+      bool yes = u8ident_is_confusable(cp);
+      if (yes) {
+        if (s_u8id_options & U8ID_ERROR_CONFUSABLE)
+          return U8ID_ERR_CONFUS;
+        else if (s_u8id_options & U8ID_WARN_CONFUSABLE)
+          ret = U8ID_EOK_WARN_CONFUS;
+      }
+    }
+#endif
+
 #if defined U8ID_PROFILE && U8ID_PROFILE == 6
     continue; // skip all script checks
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 6
@@ -146,6 +160,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
     }
+
     if (!need_normalize) {
       need_normalize = u8ident_is_decomposed(cp, scr);
     }
@@ -163,16 +178,18 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     // reduce them
     if (scr == SC_Common || scr == SC_Inherited) {
       const char *this_scx = u8ident_get_scx(cp);
-      char *x = (char *)this_scx;
-      int n = 0;
-      while (x) {
-        bool has = u8ident_has_script_ctx(*x, ctx);
-        n += has ? 1 : 0;
-        x++;
-      }
-      if (this_scx && !n) { // We have SCX and none of the SCX occured yet. so
-                            // we have a new one.
-        is_new = true;      // we dont know which yet, but we can set is_new.
+      if (this_scx) {
+        char *x = (char *)this_scx;
+        int n = 0;
+        while (*x) {
+          bool has = u8ident_has_script_ctx(*x, ctx);
+          n += has ? 1 : 0;
+          x++;
+        }
+        if (!n) { // We have SCX and none of the SCX occured yet. so
+          // we have a new one.
+          is_new = true; // we dont know which yet, but we can set is_new.
+        }
       }
     }
     // ignore Latin. This is compatible with everything
@@ -251,6 +268,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       u8ident_add_script_ctx(scr, ctx);
     }
   }
+
 #if defined U8ID_PROFILE && U8ID_PROFILE == 6
   need_normalize = true;
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 6
@@ -261,7 +279,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);
     if (!norm || strcmp(norm, buf))
-      ret = U8ID_EOK_NORM;
+      ret = U8ID_EOK_NORM | ret;
     if (outnorm)
       *outnorm = norm;
     else

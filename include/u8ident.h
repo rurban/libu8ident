@@ -110,14 +110,18 @@ void u8ident_free(void);
    `u8ident_init`. Defaults to U8ID_NFKC. */
 char *u8ident_normalize(const char *buf, int len);
 
-/* Lookup if the codepoint is a confusable.
-   Only with --enable-confus/-DHAVE_CONFUS */
+/*
+  Lookup if the codepoint is a confusable. Only with --enable-confus
+  -DHAVE_CONFUS.  With --with-croaring -DHAVE_CROARING this is
+  twice as fast, and needs half the size.
+*/
 bool u8ident_is_confusable(const uint32_t cp);
 
 enum u8id_errors {
   U8ID_EOK = 0,
   U8ID_EOK_NORM = 1,
   U8ID_EOK_WARN_CONFUS = 2,
+  U8ID_EOK_NORM_WARN_CONFUS = 3,
   U8ID_ERR_XID = -1,
   U8ID_ERR_SCRIPT = -2,
   U8ID_ERR_SCRIPTS = -3,
@@ -125,19 +129,24 @@ enum u8id_errors {
   U8ID_ERR_CONFUS = -5,
 };
 
-/* Two variants to check if this identifier is valid. The second avoids
+/* Two variants to check if this identifier is valid. u8ident_check_buf avoids
    allocating a fresh string from the parsed input. buf must not be
    zero-terminated.
-   Return values:
+
+   Return values (enum u8id_errors):
     * 0   - valid without need to normalize.
     * 1   - valid with need to normalize.
-    * 2   - warn about confusable (not yet implemented)
+    * 2   - warn about confusable
+    * 3   - warn about confusable and need to normalize
     * -1  - invalid xid, disallowed via IdentifierStatus.txt
     * -2  - invalid script
     * -3  - invalid mixed scripts
     * -4  - invalid encoding
     * -5  - invalid because confusable (not yet implemented)
     outnorm is set to a fresh normalized string if valid.
+
+  Note that in the check we explicitly allow the Latin confusables: 0 1 I `
+  i.e. U+30, U+31, U+49, U+60
 */
 enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
 enum u8id_errors u8ident_check_buf(const char *buf, int len, char **outnorm);

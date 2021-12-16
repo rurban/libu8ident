@@ -13,8 +13,11 @@
 #ifdef HAVE_CROARING
 #  include "u8idroar.h"
 #endif
+#undef EXT_SCRIPTS
 #ifdef HAVE_CONFUS
-#  define EXT_SCRIPTS
+#  ifndef HAVE_CROARING
+#    define EXT_SCRIPTS
+#  endif
 #  include "confus.h"
 #endif
 
@@ -24,6 +27,7 @@ static char buf[128]; // for hex display
 // private access
 unsigned u8ident_options(void);
 unsigned u8ident_profile(void);
+char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 static const char *errstr(int errcode) {
   static const char *const _str[] = {
@@ -35,8 +39,9 @@ static const char *errstr(int errcode) {
       "EOK",             // 0
       "EOK_NORM",        // 1
       "EOK_WARN_CONFUS", // 2
+      "EOK_NORM_WARN_CONFUS", // 3
   };
-  assert(errcode >= -5 && errcode <= 2);
+  assert(errcode >= -5 && errcode <= 3);
   return _str[errcode + 5];
 }
 
@@ -180,7 +185,7 @@ static void testnorm(const char *name, const struct norms_t *testids) {
   all differences: unichars -a '\pL' 'NFC ne NFKC'
 
   sub wstr($) {
-  join('',map{sprintf'\x%02x',$_} unpack 'W*', encode_utf8 $_[0]);
+    join('',map{sprintf'\x%02x',$_} unpack 'W*', encode_utf8 $_[0]);
   }
   ./mktest-norm.pl
   Café [\x43\x61\x66\x65\xcc\x81]:
@@ -549,10 +554,33 @@ void test_confus(void) {
 #  ifdef HAVE_CROARING
   u8ident_roar_init();
 #  endif
+  // test for equality of both variants
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     const uint32_t cp = confusables[i];
     assert(u8ident_is_confusable(cp));
     assert(bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
+  }
+  //
+  u8ident_init(U8ID_DEFAULT_OPTS | U8ID_WARN_CONFUSABLE);
+  int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
+  assert(!(ret & U8ID_EOK_WARN_CONFUS));
+
+  u8ident_add_script(SC_Coptic);
+  ret = u8ident_check((const uint8_t *)"ͮ", NULL);
+  if (ret != U8ID_EOK_WARN_CONFUS)
+    printf("ERROR \"ͮ\" U+36E not detected as confusable");
+  assert(ret == U8ID_EOK_WARN_CONFUS);
+  for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
+    char buf[16];
+    size_t len;
+    const uint32_t cp = confusables[i];
+    if (cp > 0x7C) { // skip the latin confusables: 0 1 I ` |
+      ret = u8ident_check((const uint8_t *)enc_utf8(buf, &len, cp), NULL);
+      if (ret == U8ID_EOK || ret == U8ID_EOK_NORM) {
+        printf("ERROR U+%X not detected as confusable, but %s\n", cp, errstr(ret));
+      }
+      assert(ret == U8ID_EOK_WARN_CONFUS || ret < 0 || ret == U8ID_EOK_NORM_WARN_CONFUS);
+    }
   }
 #  ifdef HAVE_CROARING
   u8ident_roar_free();

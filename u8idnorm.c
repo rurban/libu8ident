@@ -129,7 +129,7 @@ uint32_t dec_utf8(char **strp) {
 }
 
 /* convert unicode codepoint to utf8 (to_utf8) */
-static char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
+char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
   const int bytes = cp_len(cp);
 
   if (bytes > 4) {
