@@ -42,4 +42,11 @@ roaring.h
 test-driver
 u8ident.3
 mkroar
-*_croar.bin
+allowed_croar.h
+nfc_croar.h
+nfd_croar.h
+nfkc_croar.h
+nfkd_croar.h
+allowed_croar.bin
+confus_croar.bin
+nf*_croar.bin

@@ -141,6 +141,7 @@ print "Create serialized roaring bitmaps:\n";
 if ($^O =~ /Win32/) {
   system($Config{cc}." mkroar.c -o mkroar.exe");
   system("mkroar.exe");
+  # ignore vms for now
 } else {
   system($Config{cc}." mkroar.c -o mkroar");
   system("./mkroar");
