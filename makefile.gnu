@@ -26,8 +26,10 @@ DEFINES += -DHAVE_CONFUS
 endif
 ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
-HDRS += confus_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h
+HDRS += confus_croar.h
 endif
+#OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
+OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 DOCS = README.md NOTICE LICENSE
 MAN = u8ident.3
@@ -41,19 +43,22 @@ endif
 
 all: $(LIB) $(MAN)
 
-$(LIB): $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8ident.c -o u8ident.o
-	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idscr.c -o u8idscr.o
-	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o u8idnorm.o
-	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o u8idroar.o
-	$(AR) $(ARFLAGS) $@ u8ident.o u8idscr.o u8idnorm.o u8idroar.o
+.c.o:
+	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c $< -o $@
+u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
+	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
+u8idroar.o: u8idroar.c u8id_private.h $(HEADER) roaring.c roaring.h confus_croar.h
+	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o $@
+
+$(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt
 	$(PERL) mkscripts.pl
 confus.h: mkconfus.pl mkroar.c # confusables.txt
 	$(PERL) mkconfus.pl
-confus_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
+confus_croar.h allow_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
@@ -68,7 +73,8 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS) $(DEFINES) -g -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
 
-perf: perf.c $(SRC)
+perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h \
+      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allow_croar.h
 	$(CC) $(CFLAGS) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf
 	./perf
 

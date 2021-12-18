@@ -3,6 +3,7 @@
    SPDX-License-Identifier: Apache-2.0
 
    use roaring bitmaps for some sets.
+   Currently only confus_croar is faster than binary search in our ranges lists.
 */
 
 #include "u8id_private.h"
@@ -39,6 +40,7 @@ int u8ident_roar_init(void) {
     if (!rc) return -1;
   }
 
+  // These are disabled by default. Only used by perf
 #  ifdef USE_NORM_CROAR
 
 #    define DEF_DESERIALIZE_SAFE(rn, n)                                       \
@@ -47,35 +49,42 @@ int u8ident_roar_init(void) {
                                                   JOIN(n, croar_bin_len));    \
     if (!rn) return -1;                                                       \
   }
+
   DEF_DESERIALIZE_SAFE(rnfkc_m, nfkc_m)
   DEF_DESERIALIZE_SAFE(rnfkc_n, nfkc_n)
   DEF_DESERIALIZE_SAFE(rnfc_m, nfc_m)
   DEF_DESERIALIZE_SAFE(rnfc_n, nfc_n)
   DEF_DESERIALIZE_SAFE(rnfkd_n, nfkc_n)
   DEF_DESERIALIZE_SAFE(rnfd_n, nfd_n)
-
-#    undef DEF_DESERIALIZE_SAFE
 #  endif
-
 #  ifdef USE_ALLOWED_CROAR
-  if (!ra) {
-    ra = roaring_bitmap_portable_deserialize_safe((char *)allowed_croar_bin,
-                                                  allowed_croar_bin_len);
-    if (!ra) return -1;
-  }
+  DEF_DESERIALIZE_SAFE(ra, allowed)
 #endif
+#    undef DEF_DESERIALIZE_SAFE
   return 0;
 }
 
 void u8ident_roar_free(void) {
-  if (rc)
-    roaring_bitmap_free(rc);
-  rc = NULL;
-#ifdef USE_ALLOWED_CROAR
-  if (ra)
-    roaring_bitmap_free(ra);
-  ra = NULL;
-#endif
+
+#  define FREE_R(rc)                                                           \
+    if (rc)                                                                    \
+      roaring_bitmap_free(rc);                                                 \
+    rc = NULL
+
+  FREE_R(rc);
+
+#  ifdef USE_ALLOWED_CROAR
+  FREE_R(ra);
+#  endif
+#  ifdef USE_NORM_CROAR
+  FREE_R(rnfkc_m);
+  FREE_R(rnfkc_n);
+  FREE_R(rnfc_m);
+  FREE_R(rnfc_n);
+  FREE_R(rnfkd_n);
+  FREE_R(rnfd_n);
+#  endif
+#  undef FREE_R
 }
 
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
