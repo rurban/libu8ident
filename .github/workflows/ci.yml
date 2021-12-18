@@ -29,8 +29,7 @@ jobs:
     - run: make check
     - run: make check-all
     - if: matrix.CFLAGS == ''
-      run: make distcheck
-      run: ./test-all-fast.sh
+      run: make distcheck && ./test-all-fast.sh
   macOS:
     name: macOS
     runs-on: macOS-latest
