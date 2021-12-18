@@ -9,7 +9,7 @@ RANLIB := ranlib
 # dnf install rubygem-ronn-ng
 RONN := ronn
 # Maintainer only
-VERSION = 0.0
+VERSION = 0.1
 # This should to be a recent perl, matching the target unicode version
 PERL := perl
 WGET := wget
