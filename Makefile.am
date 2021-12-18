@@ -135,7 +135,7 @@ u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < $< > $@
 
 CLEANFILES = test$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) test-xid$(EXEEXT)
-DISTCLEANFILES = config.log
+DISTCLEANFILES = config.log u8ident.3
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
