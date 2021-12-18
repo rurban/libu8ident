@@ -388,7 +388,8 @@ shorter `nonxid_script_list[]`, as we know that only valid XID's are
 checked.
 
 With CRoaring some boolean bitset queries can be optimized. So far only
-the confusables codepoints lookups, not yet the `allowed_id_list` lookup.
+the confusables codepoints lookups, not yet the `allowed_id_list` and
+maybe_normalize lookups.
 
 
 TODO
@@ -406,11 +407,6 @@ TODO
   Which exactly is unknown, but the new script might lead to a mixed-script
   violation.
 
-* Faster **maybe_normalize** check. I.e. search for MARK and DECOMPOSED codepoints.
-  We only need to normalize, if the codepoint in question is different under NFKC,
-  resp. the current normalization option. I have that in cperl to great effect, but
-  with NFC only. Here we can use `--with-roaring` or binary search.
-
 * **[IdentifierType](http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
   The list of idtypes is provided, but not yet integrated into any API.
   E.g. if someone wants to allow the Technical idtype.
@@ -422,6 +418,5 @@ TODO
 
 * The **testsuite** does not yet check for known UTF-8 or other Unicode
   spoofing exploits.
-  The testsuite does not yet check the profile 2-6 differences.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
