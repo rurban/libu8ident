@@ -567,9 +567,12 @@ void test_confus(void) {
 
   u8ident_add_script(SC_Coptic);
   ret = u8ident_check((const uint8_t *)"ͮ", NULL);
+#if !defined ENABLE_CHECK_XID
   if (ret != U8ID_EOK_WARN_CONFUS)
     printf("ERROR \"ͮ\" U+36E not detected as confusable");
   assert(ret == U8ID_EOK_WARN_CONFUS);
+#endif
+
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     char buf[16];
     size_t len;
