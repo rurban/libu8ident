@@ -26,7 +26,7 @@ DEFINES += -DHAVE_CONFUS
 endif
 ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
-HDRS += confus_croar.h
+HDRS += confus_croar.h roaring.h
 endif
 #OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 OBJS = $(SRC:.c=.o)
@@ -47,7 +47,7 @@ all: $(LIB) $(MAN)
 	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c $< -o $@
 u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
 	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
-u8idroar.o: u8idroar.c u8id_private.h $(HEADER) roaring.c roaring.h confus_croar.h
+u8idroar.o: u8idroar.c u8id_private.h $(HEADER) confus_croar.h
 	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o $@
 
 $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
@@ -75,7 +75,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allow_croar.h
-	$(CC) $(CFLAGS) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf
+	$(CC) $(CFLAGS) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
 	./perf
 
 clean:

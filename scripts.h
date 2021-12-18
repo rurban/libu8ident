@@ -3971,11 +3971,14 @@ extern const struct range_short idtype_list[1629];
 
 #endif // DISABLE_CHECK_XID
 
+// CROARING uses different lists
+#if !defined USE_NORM_CROAR || defined PERF_TEST
+
 // NFD_Quick_Check=No
-#if !defined U8ID_NORM || U8ID_NORM == NFD
-#  ifdef EXT_SCRIPTS
+#  if !defined U8ID_NORM || U8ID_NORM == NFD
+#    ifdef EXT_SCRIPTS
 extern const struct range_bool NFD_N_list[243];
-#  else
+#    else
 const struct range_bool NFD_N_list[] = {
     // clang-format off
     {0x00C0, 0x00C5},
@@ -4223,14 +4226,15 @@ const struct range_bool NFD_N_list[] = {
     {0x2F800, 0x2FA1D},
     // clang-format on
 }; // 121 ranges, 122 single codepoints
+#    endif
 #  endif
-#endif
+
 
 // NFC_Quick_Check=No
-#if !defined U8ID_NORM || U8ID_NORM == NFC
-#  ifdef EXT_SCRIPTS
+#  if !defined U8ID_NORM || U8ID_NORM == NFC
+#    ifdef EXT_SCRIPTS
 extern const struct range_bool NFC_N_list[74];
-#  else
+#    else
 const struct range_bool NFC_N_list[] = {
     // clang-format off
     {0x0340, 0x0341},
@@ -4309,14 +4313,15 @@ const struct range_bool NFC_N_list[] = {
     {0x2F800, 0x2FA1D},
     // clang-format on
 }; // 23 ranges, 51 single codepoints
+#    endif
 #  endif
-#endif
+
 
 // NFC_Quick_Check=Maybe
-#if !defined U8ID_NORM || U8ID_NORM == NFC
-#  ifdef EXT_SCRIPTS
+#  if !defined U8ID_NORM || U8ID_NORM == NFC
+#    ifdef EXT_SCRIPTS
 extern const struct range_bool NFC_M_list[43];
-#  else
+#    else
 const struct range_bool NFC_M_list[] = {
     // clang-format off
     {0x0300, 0x0304},
@@ -4364,14 +4369,15 @@ const struct range_bool NFC_M_list[] = {
     {0x11930, 0x11930},
     // clang-format on
 }; // 11 ranges, 32 single codepoints
+#    endif
 #  endif
-#endif
+
 
 // NFKD_Quick_Check=No
-#if !defined U8ID_NORM || U8ID_NORM == NFKD
-#  ifdef EXT_SCRIPTS
+#  if !defined U8ID_NORM || U8ID_NORM == NFKD
+#    ifdef EXT_SCRIPTS
 extern const struct range_bool NFKD_N_list[547];
-#  else
+#    else
 const struct range_bool NFKD_N_list[] = {
     // clang-format off
     {0x00A0, 0x00A0},
@@ -4923,14 +4929,15 @@ const struct range_bool NFKD_N_list[] = {
     {0x2F800, 0x2FA1D},
     // clang-format on
 }; // 281 ranges, 266 single codepoints
+#    endif
 #  endif
-#endif
+
 
 // NFKC_Quick_Check=No
-#if !defined U8ID_NORM || U8ID_NORM == NFKC
-#  ifdef EXT_SCRIPTS
+#  if !defined U8ID_NORM || U8ID_NORM == NFKC
+#    ifdef EXT_SCRIPTS
 extern const struct range_bool NFKC_N_list[392];
-#  else
+#    else
 const struct range_bool NFKC_N_list[] = {
     // clang-format off
     {0x00A0, 0x00A0},
@@ -5327,14 +5334,15 @@ const struct range_bool NFKC_N_list[] = {
     {0x2F800, 0x2FA1D},
     // clang-format on
 }; // 192 ranges, 200 single codepoints
+#    endif
 #  endif
-#endif
+
 
 // NFKC_Quick_Check=Maybe
-#if !defined U8ID_NORM || U8ID_NORM == NFKC
-#  ifdef EXT_SCRIPTS
+#  if !defined U8ID_NORM || U8ID_NORM == NFKC
+#    ifdef EXT_SCRIPTS
 extern const struct range_bool NFKC_M_list[43];
-#  else
+#    else
 const struct range_bool NFKC_M_list[] = {
     // clang-format off
     {0x0300, 0x0304},
@@ -5382,5 +5390,7 @@ const struct range_bool NFKC_M_list[] = {
     {0x11930, 0x11930},
     // clang-format on
 }; // 11 ranges, 32 single codepoints
+#    endif
 #  endif
-#endif
+
+#endif // USE_NORM_CROAR

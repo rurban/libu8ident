@@ -33,6 +33,8 @@
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
+volatile bool gret = false;
+
 #if defined(_MSC_VER)
 #  define timer_start() __rdtsc()
 #  define timer_end() __rdtsc()
@@ -128,7 +130,8 @@ void perf_confus(void) {
   uint64_t begin = timer_start();
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     const uint32_t cp = confusables[i];
-    volatile bool ret = u8ident_is_confusable(cp);
+    bool ret = u8ident_is_confusable(cp);
+    gret |= ret;
   }
   uint64_t end = timer_end();
   uint64_t t1 = end - begin;
@@ -136,8 +139,9 @@ void perf_confus(void) {
   begin = timer_start();
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     const uint32_t cp = confusables[i];
-    volatile void *ret =
+    void *ret =
         bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32);
+    gret |= ret ? true : false;
   }
   end = timer_end();
   uint64_t t2 = end - begin;
@@ -153,18 +157,19 @@ void perf_nfkc(void) {
   printf("nfkc:\n");
   uint64_t begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret = u8ident_roar_maybe_nfkc(cp);
+    gret |= u8ident_roar_maybe_nfkc(cp);
   }
   uint64_t end = timer_end();
   uint64_t t1 = end - begin;
 
   begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret;
+    bool ret;
     if (range_bool_search(cp, NFKC_N_list, ARRAY_SIZE(NFKC_N_list)))
       ret = true;
     else
       ret = range_bool_search(cp, NFKC_M_list, ARRAY_SIZE(NFKC_M_list));
+    gret |= ret;
   }
   end = timer_end();
   uint64_t t2 = end - begin;
@@ -180,18 +185,20 @@ void perf_nfc(void) {
   printf("nfc:\n");
   uint64_t begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret = u8ident_roar_maybe_nfc(cp);
+    bool ret = u8ident_roar_maybe_nfc(cp);
+    gret |= ret;
   }
   uint64_t end = timer_end();
   uint64_t t1 = end - begin;
 
   begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret;
+    bool ret;
     if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
       ret = true;
     else
       ret = range_bool_search(cp, NFC_M_list, ARRAY_SIZE(NFC_M_list));
+    gret |= ret;
   }
   end = timer_end();
   uint64_t t2 = end - begin;
@@ -207,14 +214,16 @@ void perf_nfkd(void) {
   printf("nfkd:\n");
   uint64_t begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret = u8ident_roar_maybe_nfkd(cp);
+    bool ret = u8ident_roar_maybe_nfkd(cp);
+    gret |= ret;
   }
   uint64_t end = timer_end();
   uint64_t t1 = end - begin;
 
   begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret = range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
+    bool ret = range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
+    gret |= ret;
   }
   end = timer_end();
   uint64_t t2 = end - begin;
@@ -230,14 +239,16 @@ void perf_nfd(void) {
   printf("nfd:\n");
   uint64_t begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret = u8ident_roar_maybe_nfd(cp);
+    bool ret = u8ident_roar_maybe_nfd(cp);
+    gret |= ret;
   }
   uint64_t end = timer_end();
   uint64_t t1 = end - begin;
 
   begin = timer_start();
   for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    volatile bool ret = range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
+    bool ret = range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
+    gret |= ret;
   }
   end = timer_end();
   uint64_t t2 = end - begin;
@@ -255,7 +266,8 @@ void perf_allowed_id(void) {
   for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list); i++) {
     for (uint32_t cp = allowed_id_list[i].from; cp <= allowed_id_list[i].to;
          cp++) {
-      volatile bool ret = u8ident_roar_is_allowed(cp);
+      bool ret = u8ident_roar_is_allowed(cp);
+      gret |= ret;
     }
   }
   uint64_t end = timer_end();
@@ -265,9 +277,10 @@ void perf_allowed_id(void) {
   for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list); i++) {
     for (uint32_t cp = allowed_id_list[i].from; cp <= allowed_id_list[i].to;
          cp++) {
-      volatile bool ret =
+      bool ret =
           range_bool_search(cp, allowed_id_list,
                             sizeof(allowed_id_list) / sizeof(*allowed_id_list));
+      gret |= ret;
     }
   }
   end = timer_end();

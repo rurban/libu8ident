@@ -652,11 +652,16 @@ extern const struct range_short idtype_list[%u];
 #  endif
 
 #endif // DISABLE_CHECK_XID
+
+// CROARING uses different lists
+#if !defined USE_NORM_CROAR || defined PERF_TEST
 EOF
 
-# TODO maybe_normalize
+# for maybe_normalize
 #   MARK: 1963 mark characters (Combining, Overlay, ...) \p{IsM}
 #   DECOMPOSED_REST: The remaining 869 non-mark and non-hangul normalizables.
+# but we just use the pre-prepared UCD DerivedNormalizationProps, optimized for each
+# normalization:
 # @NFD_QC_N, @NFC_QC_N, @NFC_QC_M, @NFKD_QC_N, @NFKC_QC_N, @NFKC_QC_M;
 
 for my $name (@NORM_QC) {
@@ -667,10 +672,10 @@ for my $name (@NORM_QC) {
   printf $H <<'EOF', $NORM, $maybe, $NORM, $list, scalar(@{$name}), $list;
 
 // %s_Quick_Check=%s
-#if !defined U8ID_NORM || U8ID_NORM == %s
-#  ifdef EXT_SCRIPTS
+#  if !defined U8ID_NORM || U8ID_NORM == %s
+#    ifdef EXT_SCRIPTS
 extern const struct range_bool %s_list[%u];
-#  else
+#    else
 const struct range_bool %s_list[] = {
     // clang-format off
 EOF
@@ -686,10 +691,14 @@ EOF
   printf $H <<'EOF', $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
+#    endif
 #  endif
-#endif
+
 EOF
 }
+printf $H <<'EOF';
+#endif // USE_NORM_CROAR
+EOF
 close $H;
 
 # patch our header

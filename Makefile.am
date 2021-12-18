@@ -75,15 +75,20 @@ regen-all: regen-scripts regen-norm regen-confus
 EXTRA_PROGRAMS = test
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
+
 if HAVE_CROARING
 test_LDADD += u8idroar.lo
 EXTRA_PROGRAMS += perf
-# TODO -DPERF_TEST
-perf_CFLAGS = $(DEFS) $(CFLAGS) $(AM_CFLAGS) -I$(CROARING_PATH)
-perf_SOURCES = perf.c
+perf_CFLAGS = $(AM_CFLAGS) -DPERF_TEST
+perf_SOURCES = perf.c u8idroar.c
 perf_LDADD = u8idroar.lo
 endif
 TESTS = test
+
+if !HAVE_CROARING
+perf: perf.c
+	@echo perf requires roaring.c (--with-croaring)
+endif
 
 check-all: check check-asan check-norms check-profiles check-xid
 
