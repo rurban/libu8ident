@@ -4,6 +4,7 @@
 */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define U8IDENT_VERSION_MAJOR 0
 #define U8IDENT_VERSION_MINOR 0
