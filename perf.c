@@ -36,6 +36,9 @@ nfc:  bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
 #include "u8id_private.h"
 #include "scripts.h"
 #include "u8idroar.h"
+// the slower variant with seperated ranges and singles
+#undef EXT_SCRIPTS
+#include "scripts1.h"
 #undef EXT_SCRIPTS
 #include "scripts16.h"
 #include "confus.h"
@@ -185,6 +188,30 @@ static size_t range_bool_eytzinger_sort(const struct range_bool *restrict in,
   }
   return i;
 }
+ 
+static struct sc1 *binary_search_single(const uint32_t cp, const char *list,
+                                       const size_t len, const size_t size) {
+  int n = (int)len;
+  const char *p = list;
+  struct sc1 *pos;
+  while (n > 0) {
+    pos = (struct sc1 *)(p + size * (n / 2));
+    if (cp == pos->from)
+      return pos;
+    else if (cp < pos->from)
+      n /= 2;
+    else {
+      p = (char *)pos + size;
+      n -= (n / 2) + 1;
+    }
+  }
+  return NULL;
+}
+
+static inline bool single_bool_search(const uint32_t cp, const uint32_t *list,
+                                      const size_t len) {
+  return binary_search_single(cp, (char *)list, len, sizeof(*list)) ? true : false;
+}
 
 static struct sc *eytzinger_search(const uint32_t cp, const char *elist,
                                    const size_t len, const size_t size)
@@ -244,6 +271,15 @@ static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
   return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
+}
+
+static inline bool range_bool_search2(const uint32_t cp,
+                                      const struct range_bool *list2,
+                                      const size_t len2,
+                                      const uint32_t *list1,
+                                      const size_t len1) {
+  return binary_search(cp, (char *)list2, len2, sizeof(*list2)) ||
+         binary_search_single(cp, (char *)list1, len1, sizeof(*list1));
 }
 
 static inline bool range_bool_search_hybr(const uint32_t cp,
@@ -334,6 +370,17 @@ sc16_search(const uint32_t cp, const struct sc16 *sc_list16, const size_t len16,
   }
 }
 
+static inline uint8_t
+sc_search2(const uint32_t cp, const struct sc *list2, const size_t len2,
+           const struct sc1 *list1, const size_t len1) {
+  const struct sc *sc =
+      (struct sc *)binary_search(cp, (char *)list2, len2, sizeof(*list2));
+  if (sc)
+    return sc->scr;
+  const struct sc1 *sc1 = binary_search_single(cp, (char *)list1, len1, sizeof(*list1));
+  return sc1 ? sc1->scr : 255;
+}
+
 static inline uint8_t sc_eytzinger_search(const uint32_t cp,
                                           const struct sc *list,
                                           const size_t len) {
@@ -398,29 +445,77 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
   end = timer_end();                                    \
   uint64_t t1 = ((end - begin) - tbase) / LOOPS
 
-#define DO_LOOP_NM(t1,boolfunc,NFPRE)                   \
+#define DO_LOOP_NM(t1,rangefunc,NFPRE)     \
   /* warmup */                                          \
   for (uint32_t cp = 0x10000; cp > 20; cp -= 4) {       \
-    bool ret = boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list))); \
-    gret |= ret;                                        \
+    bool ret;                                                           \
+    if (rangefunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
+      ret = true;                                                       \
+    else                                                                \
+      ret = rangefunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
+    gret |= ret;                                                          \
   }                                                     \
   begin = timer_start();                                \
   for (int i = 0; i < 100; i++) {                       \
     for (uint32_t cp = 20; cp < 128; cp++) {            \
       bool ret;                                                         \
-      if (boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
+      if (rangefunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
         ret = true;                                                     \
       else                                                              \
-        ret = boolfunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
+        ret = rangefunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
       gret |= ret;                                                      \
     }                                                                   \
   }                                                                     \
   for (uint32_t cp = 20; cp < 0x11000; cp++) {                          \
     bool ret;                                                           \
-    if (boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
+    if (rangefunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
       ret = true;                                                       \
     else                                                                \
-      ret = boolfunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
+      ret = rangefunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
+    gret |= ret;                                                        \
+  }                                                                     \
+  end = timer_end();                                                    \
+  uint64_t t1 = ((end - begin) - tbase) / LOOPS
+
+#define DO_LOOP_NM_2(t1,rangefunc,singlefunc,NFPRE)     \
+  /* warmup */                                          \
+  for (uint32_t cp = 0x10000; cp > 20; cp -= 4) {       \
+    bool ret;                                                           \
+    if (rangefunc(cp, JOIN(NFPRE,N_list_2), ARRAY_SIZE(JOIN(NFPRE,N_list_2)))) \
+      ret = true;                                                       \
+    else if (singlefunc(cp, JOIN(NFPRE,N_list_1), ARRAY_SIZE(JOIN(NFPRE,N_list_1)))) \
+      ret = true;                                                       \
+    else if (rangefunc(cp, JOIN(NFPRE,M_list_2), ARRAY_SIZE(JOIN(NFPRE,M_list_2)))) \
+      ret = true;                                                       \
+    else                                                                \
+      ret = singlefunc(cp, JOIN(NFPRE,M_list_1), ARRAY_SIZE(JOIN(NFPRE,M_list_1))); \
+    gret |= ret;                                                        \
+  }                                                     \
+  begin = timer_start();                                \
+  for (int i = 0; i < 100; i++) {                       \
+    for (uint32_t cp = 20; cp < 128; cp++) {            \
+      bool ret;                                                         \
+      if (rangefunc(cp, JOIN(NFPRE,N_list_2), ARRAY_SIZE(JOIN(NFPRE,N_list_2)))) \
+        ret = true;                                                     \
+      else if (singlefunc(cp, JOIN(NFPRE,N_list_1), ARRAY_SIZE(JOIN(NFPRE,N_list_1)))) \
+        ret = true;                                                     \
+      else if (rangefunc(cp, JOIN(NFPRE,M_list_2), ARRAY_SIZE(JOIN(NFPRE,M_list_2)))) \
+        ret = true;                                              \
+      else                                                              \
+        ret = singlefunc(cp, JOIN(NFPRE,M_list_1), ARRAY_SIZE(JOIN(NFPRE,M_list_1))); \
+      gret |= ret;                                                      \
+    }                                                                   \
+  }                                                                     \
+  for (uint32_t cp = 20; cp < 0x11000; cp++) {                          \
+    bool ret;                                                           \
+    if (rangefunc(cp, JOIN(NFPRE,N_list_2), ARRAY_SIZE(JOIN(NFPRE,N_list_2)))) \
+      ret = true;                                                       \
+    else if (singlefunc(cp, JOIN(NFPRE,N_list_1), ARRAY_SIZE(JOIN(NFPRE,N_list_1)))) \
+      ret = true;                                                       \
+    else if (rangefunc(cp, JOIN(NFPRE,M_list_2), ARRAY_SIZE(JOIN(NFPRE,M_list_2)))) \
+      ret = true;                                                       \
+    else                                                                \
+      ret = singlefunc(cp, JOIN(NFPRE,M_list_1), ARRAY_SIZE(JOIN(NFPRE,M_list_1))); \
     gret |= ret;                                                        \
   }                                                                     \
   end = timer_end();                                                    \
@@ -443,8 +538,8 @@ void measure_baseline(void) {
 
 // with t1 being the slowest, t3 usually the fastest
 #define RESULT(name, t1, t2, t3)                                 \
-  printf("%-10s: %-10lu %-10lu %-9lu|\t\t\t\tlast %0.2f%% %s\n", name, \
-         t1, t2, t3,                                                   \
+  printf("%-10s: %-10lu %-10lu %-10lu %-9lu|\t\t\t\tlast %0.2f%% %s\n", name, \
+         t1, t2, 0UL, t3,                                               \
          t3 < t2 ? PERC(t3,t2) : PERC(t2,t3),                    \
          t3 < t2 ? "faster" : "slower")
 // with t1 being the slowest, t4 usually the fastest, compare to t3
@@ -455,8 +550,13 @@ void measure_baseline(void) {
          t4 < t3 ? "faster" : "slower")
 */
 #define RESULT5(name, t1, t2, t3, t4, t5)                               \
-  printf("%-10s: %-10lu %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
-         t1, t2, t3, t4, t5,    \
+  printf("%-10s: %-10lu %-10lu %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
+         t1, t2, 0UL, t3, t4, t5,                                          \
+         t4 ? (t5 < t4 ? PERC(t5,t4) : PERC(t4,t5)) : (t5 < t3 ? PERC(t5,t3) : PERC(t3,t5)), \
+         t5 < (t4 ? t4 : t3) ? "faster" : "slower")
+#define RESULT6(name, t1, t2, t3, t4, t5, t6)                              \
+  printf("%-10s: %-10lu %-10lu %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
+         t1, t2, t3, t4, t5, t6,                                        \
          t4 ? (t5 < t4 ? PERC(t5,t4) : PERC(t4,t5)) : (t5 < t3 ? PERC(t5,t3) : PERC(t3,t5)), \
          t5 < (t4 ? t4 : t3) ? "faster" : "slower")
 
@@ -465,13 +565,14 @@ void perf_confus(void) {
   uint64_t begin, end;
 
   // just a uint32_t[] array. not from,to pairs
-  DO_LOOP(t1, bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
-  DO_LOOP(t2, u8ident_is_confusable(cp)); // croaring
+  DO_LOOP(t1, u8ident_is_confusable(cp)); // croaring
+  DO_LOOP(t2, bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
   DO_LOOP(t3, array_search_hybr(cp, confusables, ARRAY_SIZE(confusables)));
 
-  printf("%-10s: %-10lu %-10lu %-9lu|\t\t\t\tlast %0.2f%% %s\n", "confus", t1, t2, t3,
-         t3 < t1 ? PERC(t3, t1) : PERC(t1, t3), t3 < t1 ? "faster" : "slower");
-  // RESULT("confus", t1,t2,t3);
+  //printf("%-10s: %-10lu %-10lu %-10lu %-9lu|\t\t\t\tlast %0.2f%% %s\n", "confus",
+  //       t1, t2, 0UL, t3,
+  //       t3 < t1 ? PERC(t3, t1) : PERC(t1, t3), t3 < t1 ? "faster" : "slower");
+  RESULT("confus", t1,t2,t3);
 }
 
 void perf_scripts(void) {
@@ -481,16 +582,18 @@ void perf_scripts(void) {
   //DO_LOOP(t1, u8ident_roar_has_uncommonscript(cp));
   uint64_t t1 = 0;
   DO_LOOP(t2, binary_search(cp, (const char*)xid_script_list, len, sizeof(struct sc)));
-  DO_LOOP(t3, sc_search(cp, xid_script_list, len));
-  DO_LOOP(t4, sc16_search(cp, xid_script_list16, ARRAY_SIZE(xid_script_list16),
+  DO_LOOP(t3, sc_search2(cp, xid_script_list_2, ARRAY_SIZE(xid_script_list_2),
+                         xid_script_list_1, ARRAY_SIZE(xid_script_list_1)));
+  DO_LOOP(t4, sc_search(cp, xid_script_list, len));
+  DO_LOOP(t5, sc16_search(cp, xid_script_list16, ARRAY_SIZE(xid_script_list16),
                           xid_script_list32, ARRAY_SIZE(xid_script_list32)));
 
   struct sc *eytz_list = malloc((len + 1) * sizeof(*xid_script_list));
   sc_eytzinger_sort(xid_script_list, eytz_list, len, 0, 1);
-  DO_LOOP(t5, sc_eytzinger_search(cp, eytz_list, len));
+  DO_LOOP(t6, sc_eytzinger_search(cp, eytz_list, len));
   free (eytz_list);
 
-  RESULT5("scripts", t1,t2,t3,t4,t5);
+  RESULT6("scripts", t1,t2,t3,t4,t5,t6);
 }
 
 void perf_allowed_id(void) {
@@ -499,17 +602,19 @@ void perf_allowed_id(void) {
 
   DO_LOOP(t1, u8ident_roar_is_allowed(cp));
   DO_LOOP(t2, range_bool_search(cp, allowed_id_list, len));
-  DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, len));
+  DO_LOOP(t3, range_bool_search2(cp, allowed_id_list_2, ARRAY_SIZE(allowed_id_list_2),
+                         allowed_id_list_1, ARRAY_SIZE(allowed_id_list_1)));
+  DO_LOOP(t4, range_bool_search_hybr(cp, allowed_id_list, len));
   //DO_LOOP(t4, faster_search(cp, allowed_id_list, len));
-  DO_LOOP(t4, rb16_search_hybr(cp, allowed_id_list16, ARRAY_SIZE(allowed_id_list16),
+  DO_LOOP(t5, rb16_search_hybr(cp, allowed_id_list16, ARRAY_SIZE(allowed_id_list16),
                                allowed_id_list32, ARRAY_SIZE(allowed_id_list32)));
 
   struct range_bool *eytz_list = malloc((len + 1) * sizeof(*allowed_id_list));
   range_bool_eytzinger_sort(allowed_id_list, eytz_list, len, 0, 1);
-  DO_LOOP(t5, range_bool_eytzinger_search(cp, eytz_list, len));
+  DO_LOOP(t6, range_bool_eytzinger_search(cp, eytz_list, len));
   free (eytz_list);
 
-  RESULT5("allowed_id", t1,t2,t3,t4,t5);
+  RESULT6("allowed_id", t1,t2,t3,t4,t5,t6);
 }
 
 void perf_mark(void) {
@@ -590,8 +695,8 @@ int main(void) {
   u8ident_roar_init();
   printf("times in rdtsc cycles per lookup, less is better.\n");
   measure_baseline();
-  printf("%-10s| %-8s | %-8s | %-8s | %-8s | %-8s |\n", "", "croaring",
-         "bsearch", "hybrid", "hybrid16", "eytzinger");
+  printf("%-10s| %-8s | %-8s | %-8s | %-8s | %-8s | %-8s |\n", "", "croaring",
+         "bsearch", "bsearch2", "hybrid", "hybrid16", "eytzinger");
   perf_confus();
   perf_scripts();
   perf_allowed_id();

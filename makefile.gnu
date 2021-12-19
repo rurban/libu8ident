@@ -89,6 +89,10 @@ u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
 u8idroar.o: u8idroar.c u8id_private.h $(HEADER) confus_croar.h
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o $@
+u8idscr.o: u8idscr.c u8id_private.h $(HEADER) scripts.h
+	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idscr.c -o $@
+u8idscr1.o: u8idscr1.c u8id_private.h $(HEADER) scripts1.h
+	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idscr1.c -o $@
 
 $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
@@ -96,6 +100,8 @@ $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 
 scripts.h scripts16.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt DerivedNormalizationProps.txt
 	$(PERL) mkscripts.pl
+scripts1.h: mkscripts1.pl # Scripts.txt ScriptExtensions.txt
+	$(PERL) mkscripts1.pl
 confus.h: mkconfus.pl mkroar.c # confusables.txt
 	$(PERL) mkconfus.pl -c
 confus_croar.h: mkroar.c mkconfus.pl
@@ -147,7 +153,8 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	./test-asan
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
-      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h
+      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h \
+      mark.h scripts16.h scripts1.h
 	$(CC) $(CFLAGS_PERF) -Wno-unused-function $(DEFINES) -DPERF_TEST -I. -Iinclude \
 	  perf.c u8idroar.c -o perf && \
 	./perf
