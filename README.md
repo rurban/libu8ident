@@ -395,6 +395,11 @@ maybe_normalize lookups.
 TODO
 ----
 
+* Lookup optimization:
+  For some common combinations generate a single lookup with all the needed values:
+  NFKD + PROFILE_4 + CHECK\_XID with the script byte in the first decompose lookup
+  `UN8IF_compat_tbl`.
+
 * **SCX variants**: Some codepoints are combinations, valid for a number of
   scripts.  These appear with the Common and Inherited scripts. When
   an SCX appears with more than one script, such as e.g. U+60C with
