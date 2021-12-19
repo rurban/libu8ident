@@ -23,7 +23,18 @@ doc_DATA = README.md NOTICE LICENSE
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA)
+TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
+        texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
+        texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
+        texts/bengali-1.txt       texts/gujarati-1.txt   texts/korean-2.txt     texts/swedish-1.txt \
+        texts/bopomofo-1.txt      texts/hebrew-1.txt     texts/lao-1.txt        texts/tamil-1.txt \
+        texts/bulgarian-1.txt     texts/hindi-1.txt      texts/latin-1.txt      texts/telugu-1.txt \
+        texts/chinese-s-1.txt     texts/hungarian-1.txt  texts/malayalam-1.txt  texts/thai-1.txt \
+        texts/chinese-trad-1.txt  texts/igbo-1.txt       texts/marathi-1.txt    texts/turkish-1.txt \
+        texts/cyrillic-1.txt      texts/japanese-1.txt   texts/myanmar-1.txt    texts/urdu-1.txt \
+        texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA) \
+	$(TEXTS)
 
 .c.i:
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -86,7 +97,7 @@ perf_SOURCES = perf.c u8idroar.c
 perf_LDADD = u8idroar.lo
 endif
 TESTS = test test-texts
-TESTS_ENVIRONMENT = U8IDTEST_TEXTS='@srcdir@/texts'
+TESTS_ENVIRONMENT = U8IDTEST_TEXTS='@top_srcdir@/texts'
 
 if !HAVE_CROARING
 perf: perf.c
@@ -137,7 +148,9 @@ RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu
 u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < $< > $@
 
-CLEANFILES = test$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) test-xid$(EXEEXT)
+CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
+	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) test-prof{2,3,4,5,6}$(EXEEXT) \
+	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
