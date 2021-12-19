@@ -113,7 +113,7 @@ static uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, con
   // so far only linear search. TODO binary
   for (int i=0; i<len; i++) {
     assert(s->from <= s->to);
-    if (cp >= s->from && cp <= s->to)
+    if ((cp - s->from) <= (s->to - s->from))
       return s->scr;
     if (cp <= s->to) // s is sorted. not found
       return 255;
@@ -130,7 +130,8 @@ static struct sc *binary_search(const uint32_t cp, const char *list,
   struct sc *pos;
   while (n > 0) {
     pos = (struct sc *)(p + size * (n / 2));
-    if (cp >= pos->from && cp <= pos->to)
+    // hack: with unsigned wrapping max-cp is always higher, so false
+    if ((cp - pos->from) <= (pos->to - pos->from)) // (cp >= pos->from && cp <= pos->to)
       return pos;
     else if (cp < pos->from)
       n /= 2;
