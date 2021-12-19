@@ -20,9 +20,8 @@
    allowed_id:
    croaring: 4333056	bsearch: 2439034         77.65% slower
 
-   with the scripts1.h variant: (first search range, then singles, see branch scripts1)
-   nfkd:
-   bsearch: 3326908 	2x bsearch: 4575870 	 37.54% faster
+   with the scripts1.h variant: (first search range, then singles, see branch
+   scripts1) nfkd: bsearch: 3326908 	2x bsearch: 4575870 	 37.54% faster
    nfd:
    bsearch: 2575716 	2x bsearch: 4131504 	 60.40% faster
    nfkc:
@@ -149,8 +148,7 @@ void perf_confus(void) {
   begin = timer_start();
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     const uint32_t cp = confusables[i];
-    void *ret =
-        bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32);
+    void *ret = bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32);
     gret |= ret ? true : false;
   }
   end = timer_end();

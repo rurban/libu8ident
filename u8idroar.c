@@ -37,18 +37,20 @@ int u8ident_roar_init(void) {
   if (!rc) {
     rc = roaring_bitmap_portable_deserialize_safe((char *)confus_croar_bin,
                                                   confus_croar_bin_len);
-    if (!rc) return -1;
+    if (!rc)
+      return -1;
   }
 
   // These are disabled by default. Only used by perf
 #  ifdef USE_NORM_CROAR
 
-#    define DEF_DESERIALIZE_SAFE(rn, n)                                       \
-  if (!rn) {                                                                  \
-    rn = roaring_bitmap_portable_deserialize_safe((char *)JOIN(n, croar_bin), \
-                                                  JOIN(n, croar_bin_len));    \
-    if (!rn) return -1;                                                       \
-  }
+#    define DEF_DESERIALIZE_SAFE(rn, n)                                        \
+      if (!rn) {                                                               \
+        rn = roaring_bitmap_portable_deserialize_safe(                         \
+            (char *)JOIN(n, croar_bin), JOIN(n, croar_bin_len));               \
+        if (!rn)                                                               \
+          return -1;                                                           \
+      }
 
   DEF_DESERIALIZE_SAFE(rnfkc_m, nfkc_m)
   DEF_DESERIALIZE_SAFE(rnfkc_n, nfkc_n)
@@ -59,8 +61,8 @@ int u8ident_roar_init(void) {
 #  endif
 #  ifdef USE_ALLOWED_CROAR
   DEF_DESERIALIZE_SAFE(ra, allowed)
-#endif
-#    undef DEF_DESERIALIZE_SAFE
+#  endif
+#  undef DEF_DESERIALIZE_SAFE
   return 0;
 }
 
@@ -91,11 +93,11 @@ EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return roaring_bitmap_contains(rc, cp);
 }
 
-#ifdef USE_ALLOWED_CROAR
+#  ifdef USE_ALLOWED_CROAR
 bool u8ident_roar_is_allowed(const uint32_t cp) {
   return roaring_bitmap_contains(ra, cp);
 }
-#endif
+#  endif
 
 #  ifdef USE_NORM_CROAR
 bool u8ident_roar_maybe_nfkc(const uint32_t cp) {

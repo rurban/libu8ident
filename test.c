@@ -31,14 +31,14 @@ char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 static const char *errstr(int errcode) {
   static const char *const _str[] = {
-      "ERR_CONFUS",      // -5
-      "ERR_ENCODING",    // -4
-      "ERR_SCRIPTS",     //-3
-      "ERR_SCRIPT",      //-2
-      "ERR_XID",         // -1
-      "EOK",             // 0
-      "EOK_NORM",        // 1
-      "EOK_WARN_CONFUS", // 2
+      "ERR_CONFUS",           // -5
+      "ERR_ENCODING",         // -4
+      "ERR_SCRIPTS",          //-3
+      "ERR_SCRIPT",           //-2
+      "ERR_XID",              // -1
+      "EOK",                  // 0
+      "EOK_NORM",             // 1
+      "EOK_WARN_CONFUS",      // 2
       "EOK_NORM_WARN_CONFUS", // 3
   };
   assert(errcode >= -5 && errcode <= 3);
@@ -567,11 +567,11 @@ void test_confus(void) {
 
   u8ident_add_script(SC_Coptic);
   ret = u8ident_check((const uint8_t *)"ͮ", NULL);
-#if !defined ENABLE_CHECK_XID
+#  if !defined ENABLE_CHECK_XID
   if (ret != U8ID_EOK_WARN_CONFUS)
     printf("ERROR \"ͮ\" U+36E not detected as confusable");
   assert(ret == U8ID_EOK_WARN_CONFUS);
-#endif
+#  endif
 
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     char buf[16];
@@ -580,9 +580,11 @@ void test_confus(void) {
     if (cp > 0x7C) { // skip the latin confusables: 0 1 I ` |
       ret = u8ident_check((const uint8_t *)enc_utf8(buf, &len, cp), NULL);
       if (ret == U8ID_EOK || ret == U8ID_EOK_NORM) {
-        printf("ERROR U+%X not detected as confusable, but %s\n", cp, errstr(ret));
+        printf("ERROR U+%X not detected as confusable, but %s\n", cp,
+               errstr(ret));
       }
-      assert(ret == U8ID_EOK_WARN_CONFUS || ret < 0 || ret == U8ID_EOK_NORM_WARN_CONFUS);
+      assert(ret == U8ID_EOK_WARN_CONFUS || ret < 0 ||
+             ret == U8ID_EOK_NORM_WARN_CONFUS);
     }
   }
 #  ifdef HAVE_CROARING

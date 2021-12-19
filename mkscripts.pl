@@ -693,7 +693,6 @@ EOF
 }; // %u ranges, %u single codepoints
 #    endif
 #  endif
-
 EOF
 }
 printf $H <<'EOF';

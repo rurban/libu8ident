@@ -17,5 +17,5 @@ bool u8ident_is_allowed(const uint32_t cp);
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp);
 const char *u8ident_script_name(const int scr);
-//bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr);
+// bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr);
 bool u8ident_maybe_normalized(const uint32_t cp);

@@ -124,14 +124,15 @@ static inline uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_li
 #endif
 
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
-                                const size_t len, const size_t size) {
+                                       const size_t len, const size_t size) {
   int n = (int)len;
   const char *p = list;
   struct sc *pos;
   while (n > 0) {
     pos = (struct sc *)(p + size * (n / 2));
     // hack: with unsigned wrapping max-cp is always higher, so false
-    if ((cp - pos->from) <= (pos->to - pos->from)) // (cp >= pos->from && cp <= pos->to)
+    if ((cp - pos->from) <=
+        (pos->to - pos->from)) // (cp >= pos->from && cp <= pos->to)
       return pos;
     else if (cp < pos->from)
       n /= 2;
@@ -201,7 +202,8 @@ static int compar32(const void *a, const void *b) {
 
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32) != NULL
-    ? true : false;
+             ? true
+             : false;
 }
 #  endif
 #endif
