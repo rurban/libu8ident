@@ -72,9 +72,11 @@ regen-all: regen-scripts regen-norm regen-confus
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man
 
-EXTRA_PROGRAMS = test
+EXTRA_PROGRAMS = test test-texts
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
+test_texts_SOURCES = test-texts.c
+test_texts_LDADD = $(lib_LTLIBRARIES)
 
 if HAVE_CROARING
 test_LDADD += u8idroar.lo
@@ -83,7 +85,8 @@ perf_CFLAGS = $(AM_CFLAGS) -DPERF_TEST
 perf_SOURCES = perf.c u8idroar.c
 perf_LDADD = u8idroar.lo
 endif
-TESTS = test
+TESTS = test test-texts
+TESTS_ENVIRONMENT = U8IDTEST_TEXTS='@srcdir@/texts'
 
 if !HAVE_CROARING
 perf: perf.c

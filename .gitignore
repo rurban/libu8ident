@@ -13,6 +13,7 @@ u8idscr.o
 u8idroar.o
 /test
 /test-asan
+/test-texts
 /build*
 /Scripts.txt
 /ScriptExtensions.txt

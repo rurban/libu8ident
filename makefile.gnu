@@ -63,10 +63,13 @@ confus_croar.h allow_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: 
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
-check: test
+check: test test-texts
+	./test-texts
 	./test
 test: test.c $(LIB)
 	$(CC) $(CFLAGS) $(DEFINES) -g -I. -Iinclude test.c -L. -lu8ident -o test
+test-texts: test-texts.c $(LIB)
+	$(CC) $(CFLAGS) $(DEFINES) -g -I. -Iinclude test-texts.c -L. -lu8ident -o test-texts
 check-all: check check-norms check-profiles check-xid check-asan
 
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
@@ -81,7 +84,8 @@ perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h \
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
 	       perf mkroar \
-	       test test-asan test-xid-{EN,DIS}ABLE test-prof{2,3,4,5,6} test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
+	       test test-texts test-asan test-xid-{EN,DIS}ABLE test-prof{2,3,4,5,6}\
+	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
 # Maintainer-only
 # Check coverage and sizes for all configure combinations
