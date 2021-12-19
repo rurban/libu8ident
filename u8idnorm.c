@@ -340,7 +340,7 @@ static int _decomp_hangul_s(char *dest, size_t dmax, uint32_t cp) {
 */
 static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
                      const bool iscompat) {
-  assert(dmax > 1);
+  assert(dmax > 0);
   /* The costly is_HANGUL_cp_high(cp) checks also all composing chars.
      Hangul_IsS only for the valid start points. Which we can do here. */
   if (Hangul_IsS(cp)) {
@@ -825,7 +825,7 @@ EXTERN char *u8ident_normalize(const char *src, int len) {
   do {
     dmax *= 2;
     dest = realloc(dest, dmax);
-    memset(dest, 0, dmax); // not really needed
+    memset(dest, 0, dmax); // not really needed.
     err = u8id_decompose_s(dest, dmax, (char *)src, &destlen, iscompat);
   } while (err == ERR_NOSPACE);
   if (err) {
