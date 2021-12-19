@@ -16,6 +16,15 @@
 #   with only allowing NFC, with SC and SCX combined. This should be default without
 #   user-added scripts (#pragma unicode Braille). Then you need to fallback to the slow lists.
 # * More statistics, to check against perf results. E.g. why croaring or eytzinger is not good enough.
+#
+# Implementation:
+# Almost all lists are sorted range lists. musl seperates into range
+# and single cp lists. First search in the ranges, and if not found
+# search the singles. icu does 2-or 3-way tables as with our norm headers, and special tries.
+# libunicode uses perfect hashes (?). glibc uses a huge array with all properties at once.
+# hybrid search with linear search for the most commen ranges, and bsearch for the rest
+# is done here. hybrid16 with seperated searches for 16 and 32bit ranges is not much better.
+# Eytzinger is an idea, but does not gain much here.
 
 use strict;
 my $scn = "Scripts.txt";
