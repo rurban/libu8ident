@@ -119,9 +119,11 @@ uint32_t dec_utf8(char **strp) {
     return 0;
   }
   shift = utf[0]->bits_stored * (bytes - 1);
+  assert(shift >= 0);
   cp = (*str++ & utf[bytes]->mask) << shift;
   for (int i = 1; i < bytes; ++i, ++str) {
     shift -= utf[0]->bits_stored;
+    assert(shift >= 0);
     cp |= (*str & utf[0]->mask) << shift;
   }
   *strp = (char *)str;
@@ -130,6 +132,11 @@ uint32_t dec_utf8(char **strp) {
 
 /* convert unicode codepoint to utf8 (to_utf8) */
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
+  if (cp > _UNICODE_MAX) {
+    errno = EILSEQ;
+    *lenp = 0;
+    return NULL;
+  }
   const int bytes = cp_len(cp);
 
   if (bytes > 4) {
@@ -138,9 +145,11 @@ char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
     return NULL;
   } else {
     int shift = utf[0]->bits_stored * (bytes - 1);
+    assert(shift >= 0);
     dest[0] = (cp >> shift & utf[bytes]->mask) | utf[bytes]->lead;
     shift -= utf[0]->bits_stored;
     for (int i = 1; i < bytes; ++i) {
+      assert(shift >= 0);
       dest[i] = (cp >> shift & utf[0]->mask) | utf[0]->lead;
       shift -= utf[0]->bits_stored;
     }
@@ -317,9 +326,9 @@ static int _decomp_hangul_s(char *dest, size_t dmax, uint32_t cp) {
 
   // encode to UTF-8
   enc_utf8(dest, &dlen, lindex + Hangul_LBase);
-  enc_utf8(dest, &dlen, vindex + Hangul_VBase);
+  enc_utf8(&dest[1], &dlen, vindex + Hangul_VBase);
   if (tindex) {
-    enc_utf8(dest, &dlen, tindex + Hangul_TBase);
+    enc_utf8(&dest[2], &dlen, tindex + Hangul_TBase);
     return 3;
   }
   return 2;
