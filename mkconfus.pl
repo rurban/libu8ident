@@ -158,11 +158,13 @@ for my $name (qw(allowed confus nfd_n nfc_n nfc_m nfkd_n nfkc_n nfkc_m)) {
   }
   if ($name =~ /^nfk?c_m/) {
     system("xxd -i $c.bin >> $b.h");
+    unlink "$c.bin";
   } else {
     open my $F, '>', "$b.h";
     print $F "/* generated via mkroar.c */\n";
     close $F;
     system("xxd -i $c.bin >> $b.h");
+    unlink "$c.bin";
     print "Created $b.h\n";
   }
 }

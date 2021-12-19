@@ -80,7 +80,7 @@ perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h \
 
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
-	       perf mkroar allowed_croar.bin confus_croar.bin \
+	       perf mkroar \
 	       test test-asan test-xid-{EN,DIS}ABLE test-prof{2,3,4,5,6} test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
 # Maintainer-only

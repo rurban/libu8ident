@@ -42,6 +42,7 @@ roaring.h
 test-driver
 u8ident.3
 mkroar
+perf
 allowed_croar.h
 nfc_croar.h
 nfd_croar.h

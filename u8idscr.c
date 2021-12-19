@@ -108,7 +108,7 @@ int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
 }
 
 #if 0
-static uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, const int len) {
+static inline uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, const int len) {
   struct sc *s = (struct sc *)sc_list;
   // so far only linear search. TODO binary
   for (int i=0; i<len; i++) {
@@ -123,7 +123,7 @@ static uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, con
 }
 #endif
 
-static struct sc *binary_search(const uint32_t cp, const char *list,
+static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                 const size_t len, const size_t size) {
   int n = (int)len;
   const char *p = list;
