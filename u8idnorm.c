@@ -482,8 +482,12 @@ int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
 done:
   if (lenp)
     *lenp = (size_t)((long)orig_dmax - dmax);
-  *dest = 0;
-  return dmax >= 0 ? 0 : ERR_NOSPACE;
+  if (dmax > 0) {
+    *dest = 0;
+    return 0;
+  } else {
+    return ERR_NOSPACE;
+  }
 }
 
 #if !defined U8ID_NORM || U8ID_NORM != FCD
@@ -798,13 +802,12 @@ int u8ident_may_normalize(const char *buf, int len) {
 /* Returns a freshly allocated normalized string, in the option defined at
  * `u8ident_init`. */
 /* TODO: more stack allocations for dest throughout */
-EXTERN char *u8ident_normalize(const char *buf, int len) {
+GCC_DIAG_IGNORE (-Wreturn-local-addr)
+EXTERN char *u8ident_normalize(const char *src, int len) {
 #if !defined U8ID_NORM || U8ID_NORM != FCD
   // clang-format off
-GCC_DIAG_IGNORE (-Wreturn-local-addr)
-  // clang-format on
   char tmp_stack[128];
-  GCC_DIAG_POP
+  // clang-format on
   char *tmp_ptr;
   char *tmp = NULL;
   size_t tmp_size;
@@ -822,7 +825,8 @@ GCC_DIAG_IGNORE (-Wreturn-local-addr)
   do {
     dmax *= 2;
     dest = realloc(dest, dmax);
-    err = u8id_decompose_s(dest, dmax, (char *)buf, &destlen, iscompat);
+    memset(dest, 0, dmax); // not really needed
+    err = u8id_decompose_s(dest, dmax, (char *)src, &destlen, iscompat);
   } while (err == ERR_NOSPACE);
   if (err) {
     free(dest);
@@ -852,6 +856,7 @@ GCC_DIAG_IGNORE (-Wreturn-local-addr)
       tmp_ptr = tmp = (char *)realloc(tmp_ptr, tmp_size);
     else
       tmp_ptr = tmp = (char *)malloc(tmp_size);
+    memset(tmp_ptr, 0, tmp_size); // not really needed
     err = u8id_reorder_s((unsigned char *)tmp_ptr, tmp_size, dest, destlen);
   }
 
@@ -885,3 +890,4 @@ GCC_DIAG_IGNORE (-Wreturn-local-addr)
 #  endif // !(NFD or NFKD)
 #endif   // !FCD
 }
+GCC_DIAG_POP
