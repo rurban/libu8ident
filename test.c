@@ -588,7 +588,6 @@ void test_confus(void) {
 #  endif
 
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
-    char buf[16];
     size_t len;
     const uint32_t cp = confusables[i];
     if (cp > 0x7C) { // skip the latin confusables: 0 1 I ` |

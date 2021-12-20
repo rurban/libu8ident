@@ -46,15 +46,25 @@ CFLAGS_REL += -march=native
 endif
 # cc prints name as cc, not gcc. so check for the copyright banner
 CC_COPY := $(shell $(CC) --version | head -n2 | tail -n1 | cut -c1-7)
-# clang would have Target:
+# gcc has "Copyright (C) 2020 Free Software Foundation, Inc"
+# clang would have "Target: ..."
+# icc would have "Copyright (c) (C) 1985-2014 Intel Corporation"
+# pcc has "Portable C Compiler 1.2.0.DEVEL 20200630 for x86_64-pc-linux-gnu" on the 1st line
+# chibicc has no --version, just --help
 ifeq (Copyrig,$(CC_COPY))
 IS_GCC = 1
 CFLAGS_REL += -Werror -Wno-return-local-addr
 CFLAGS_DBG += -Wno-return-local-addr
-endif
+else
 ifeq (Target:,$(CC_COPY))
 IS_CLANG = 1
 CFLAGS_REL += -Werror
+else
+ifeq (Portable C Compiler,$(shell $(CC) --version | cut -c1-19))
+IS_PCC = 1
+CFLAGS_REL += -Werror
+endif
+endif
 endif
 
 all: $(LIB) $(MAN)

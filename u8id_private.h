@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _U8ID_PRIVATE_H
+#define _U8ID_PRIVATE_H
+
 #ifdef HAVE_CONFIG_H
 #  include "config.h"
 #endif
@@ -108,3 +110,5 @@ struct ctx_t {
 #  define GCC_DIAG_IGNORE(w)
 #  define GCC_DIAG_POP
 #endif
+
+#endif // _U8ID_PRIVATE_H

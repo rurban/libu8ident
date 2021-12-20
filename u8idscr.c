@@ -64,11 +64,11 @@ struct ctx_t *u8ident_ctx(void) {
 }
 
 // search in linear vector of scripts per ctx
-bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *ctx) {
-  if (!ctx->count)
+bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
+  if (!c->count)
     return false;
-  const uint8_t *u8p = (ctx->count > 8) ? ctx->u8p : ctx->scr8;
-  for (int i = 0; i < ctx->count; i++) {
+  const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
+  for (int i = 0; i < c->count; i++) {
     if (scr == u8p[i])
       return true;
   }
@@ -79,31 +79,31 @@ bool u8ident_has_script(const uint8_t scr) {
   return u8ident_has_script_ctx(scr, u8ident_ctx());
 }
 
-int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx) {
+int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
   if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
     return -1;
-  int i = ctx->count;
+  int i = c->count;
   if (unlikely(i > 8 && (i & 7) == 7)) {
-    ctx->u8p = realloc(ctx->u8p, i + 8);
-    ctx->u8p[i] = scr;
+    c->u8p = realloc(c->u8p, i + 8);
+    c->u8p[i] = scr;
   } else if (i == 9) {
     uint8_t *p = malloc(16);
-    memcpy(p, ctx->scr8, 8);
-    ctx->u8p = p;
-    ctx->u8p[i] = scr;
+    memcpy(p, c->scr8, 8);
+    c->u8p = p;
+    c->u8p[i] = scr;
   } else {
-    uint8_t *u8p = (i > 8) ? ctx->u8p : ctx->scr8;
+    uint8_t *u8p = (i > 8) ? c->u8p : c->scr8;
     u8p[i] = scr;
   }
   if (scr == SC_Han)
-    ctx->has_han = 1;
+    c->has_han = 1;
   else if (scr == SC_Bopomofo)
-    ctx->is_chinese = 1;
+    c->is_chinese = 1;
   else if (scr == SC_Katakana || scr == SC_Hiragana)
-    ctx->is_japanese = 1;
+    c->is_japanese = 1;
   else if (scr == SC_Hangul)
-    ctx->is_korean = 1;
-  ctx->count++;
+    c->is_korean = 1;
+  c->count++;
   return 0;
 }
 
