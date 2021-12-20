@@ -3,7 +3,7 @@
 HAVE_CONFUS := 1
 DEFINES :=
 CC := cc
-CFLAGS := -Wall -Wextra -O2
+CFLAGS := -Wall -Wextra
 AR := ar
 RANLIB := ranlib
 # dnf install rubygem-ronn-ng
@@ -37,18 +37,34 @@ PREFIX = usr
 PKG = libu8ident-$(VERSION)
 PKG_BIN = $(PKG)-`uname -m`
 
-ifeq (x86_64,$(shell uname -m))
-CFLAGS += -march=native
+CFLAGS_REL = $(CFLAGS) -O2 -DNDEBUG
+CFLAGS_DBG = $(CFLAGS) -g -DDEBUG
+
+MACHINE := $(shell uname -m)
+ifeq (x86_64,$(MACHINE))
+CFLAGS_REL += -march=native
+endif
+# cc prints name as cc, not gcc. so check for the copyright banner
+CC_COPY := $(shell $(CC) --version | head -n2 | tail -n1 | cut -c1-7)
+# clang would have Target:
+ifeq (Copyrig,$(CC_COPY))
+IS_GCC = 1
+CFLAGS_REL += -Werror -Wno-return-local-addr
+CFLAGS_DBG += -Wno-return-local-addr
+endif
+ifeq (Target:,$(CC_COPY))
+IS_CLANG = 1
+CFLAGS_REL += -Werror
 endif
 
 all: $(LIB) $(MAN)
 
 .c.o:
-	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c $< -o $@
+	$(CC) $(CFLAGS_REL) $(DEFINES) -Iinclude -c $< -o $@
 u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
-	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
+	$(CC) $(CFLAGS_REL) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
 u8idroar.o: u8idroar.c u8id_private.h $(HEADER) confus_croar.h
-	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o $@
+	$(CC) $(CFLAGS_REL) $(DEFINES) -Iinclude -c u8idroar.c -o $@
 
 $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
@@ -69,16 +85,16 @@ check: test test-texts
 check-all: check check-norms check-profiles check-xid check-asan
 
 test: test.c $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS) $(DEFINES) -g -I. -Iinclude test.c $(SRC) -o test
+	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS) $(DEFINES) -g -I. -Iinclude test-texts.c $(SRC) -o test-texts
+	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS) $(DEFINES) -g -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
+	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allow_croar.h
-	$(CC) $(CFLAGS) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
+	$(CC) $(CFLAGS_REL) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
 	./perf
 
 clean:
@@ -92,21 +108,21 @@ clean:
 check-norms: $(SRC) $(HEADER) $(HDRS)
 	for n in NFKC NFC FCC NFKD NFD FCD; do \
             echo $$n; \
-            cc -DU8ID_NORM=$$n -O3 -Wall -Wno-return-local-addr -Wfatal-errors -Iinclude -c u8idnorm.c -o u8idnorm.o && \
-            ls -gGh u8idnorm.o; \
-	    $(CC) $(CFLAGS) $(DEFINES) -DU8ID_NORM=$$n -Wno-return-local-addr -I. -Iinclude test.c $(SRC) \
+            $(CC) $(CFLAGS_REL) -DU8ID_NORM=$$n -Wfatal-errors -Iinclude -c u8idnorm.c -o u8idnorm.o && \
+	      ls -gGh u8idnorm.o; \
+	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_NORM=$$n -I. -Iinclude test.c $(SRC) \
 	      -o test-norm-$$n && ./test-norm-$$n norm; \
         done
 check-profiles: $(SRC) $(HEADER) $(HDRS)
 	for n in 2 3 4 5 6; do \
             echo PROFILE_$${n}; \
-	    $(CC) $(CFLAGS) $(DEFINES) -DU8ID_PROFILE=$$n -Wno-return-local-addr -I. -Iinclude test.c $(SRC) \
+	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && ./test-prof$$n profile; \
         done
 check-xid: $(SRC) $(HEADER) $(HDRS)
 	for n in DISABLE ENABLE; do \
             echo $${n}_CHECK_XID; \
-	    $(CC) $(CFLAGS) $(DEFINES) -D$${n}_CHECK_XID -Wno-return-local-addr -I. -Iinclude test.c $(SRC) \
+	    $(CC) $(CFLAGS_DBG) $(DEFINES) -D$${n}_CHECK_XID -I. -Iinclude test.c $(SRC) \
 	      -o test-xid-$$n && ./test-xid-$$n xid; \
         done
 

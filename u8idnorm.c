@@ -9,6 +9,9 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <errno.h>
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 #include "u8id_private.h"
 #include <u8ident.h>
 

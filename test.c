@@ -154,6 +154,20 @@ static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
   }
 }
 
+// check if a script is detected and added properly
+void test_script(void) {
+  int ctx = u8ident_new_ctx();
+  assert(strcmp(u8ident_script_name(u8ident_get_script(0x3BB)), "Greek") == 0);
+  // U+3BB Greek (03A3..03E1)
+  int ret = u8ident_check((const uint8_t *)"λ", NULL);
+  CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
+  if (strcmp(u8ident_script_name(ctx), "Greek"))
+      printf("%s\n", u8ident_script_name(ctx));
+  assert(strcmp(u8ident_script_name(ctx), "Greek") == 0);
+
+  assert(u8ident_free_ctx(ctx) == 0);
+}
+
 struct norms_t {
   const char *id;
   const char *norm;
@@ -604,6 +618,7 @@ int main(int argc, char **argv) {
   if (argc == 1) {
     test_scripts_no_init();
     test_init();
+    test_script();
   }
   if (norm || argc == 1) {
 #if !defined U8ID_NORM || U8ID_NORM == NFKC
