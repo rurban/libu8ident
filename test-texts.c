@@ -72,7 +72,7 @@ int testdir(const char *dir, const char *fname) {
       printf(" + U+%X %s)!\n", cp, u8ident_script_name(u8ident_get_script(cp)));
     } else
       printf(")\n");
-    free ((char*)scripts);
+    free((char *)scripts);
   }
 
   u8ident_free_ctx(ctx);
@@ -81,18 +81,18 @@ int testdir(const char *dir, const char *fname) {
 }
 
 int cmp_str(const void *a, const void *b) {
-  return strcmp(*(const char**)a, *(const char**)b);
+  return strcmp(*(const char **)a, *(const char **)b);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   char *dirname = "texts";
   struct stat st;
   u8ident_init(U8ID_DEFAULT_OPTS);
 
   if (argc > 1 && stat(argv[1], &st) == 0) {
-      testdir(NULL, argv[1]);
-      u8ident_free();
-      return 0;
+    testdir(NULL, argv[1]);
+    u8ident_free();
+    return 0;
   }
 
   if (getenv("U8IDTEST_TEXTS")) {
@@ -109,30 +109,30 @@ int main(int argc, char** argv) {
   // sort the names, to compare against the result
   while ((d = readdir(dir))) {
     size_t l = strlen(d->d_name);
-    if (l > 4 && strcmp(&d->d_name[l-4], ".txt") == 0) {
+    if (l > 4 && strcmp(&d->d_name[l - 4], ".txt") == 0) {
       s++;
     }
   }
   rewinddir(dir);
-  const char **files = calloc(s, sizeof(char*));
+  const char **files = calloc(s, sizeof(char *));
   int i = 0;
   while ((d = readdir(dir))) {
     size_t l = strlen(d->d_name);
-    if (l > 4 && strcmp(&d->d_name[l-4], ".txt") == 0) {
+    if (l > 4 && strcmp(&d->d_name[l - 4], ".txt") == 0) {
       assert(i < s);
       files[i] = malloc(strlen(d->d_name) + 1);
-      strcpy((char*)files[i], d->d_name);
+      strcpy((char *)files[i], d->d_name);
       i++;
     }
   }
-  qsort(files, s, sizeof(char*), cmp_str);
-  for (i=0; i < s; i++) {
-    //printf("%s\n", files[i]);
+  qsort(files, s, sizeof(char *), cmp_str);
+  for (i = 0; i < s; i++) {
+    // printf("%s\n", files[i]);
     testdir(dirname, files[i]);
   }
   closedir(dir);
-  for (i=0; i < s; i++)
-    free((void*)files[i]);
+  for (i = 0; i < s; i++)
+    free((void *)files[i]);
   free(files);
   u8ident_free();
   return 0;

@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <errno.h>
 #ifdef DEBUG
-#include <stdio.h>
+#  include <stdio.h>
 #endif
 #include "u8id_private.h"
 #include <u8ident.h>
@@ -807,12 +807,12 @@ int u8ident_may_normalize(const char *buf, int len) {
 /* Returns a freshly allocated normalized string, in the option defined at
  * `u8ident_init`. */
 /* TODO: more stack allocations for dest throughout */
-GCC_DIAG_IGNORE (-Wreturn-local-addr)
+// clang-format off
+GCC_DIAG_IGNORE(-Wreturn-local-addr)
+// clang-format on
 EXTERN char *u8ident_normalize(const char *src, int len) {
 #if !defined U8ID_NORM || U8ID_NORM != FCD
-  // clang-format off
   char tmp_stack[128];
-  // clang-format on
   char *tmp_ptr;
   char *tmp = NULL;
   size_t tmp_size;
