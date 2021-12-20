@@ -387,10 +387,14 @@ With `-DDISABLE_CHECK_XID` and `-DENABLE_CHECK_XID` we can use the
 shorter `nonxid_script_list[]`, as we know that only valid XID's are
 checked.
 
-With CRoaring some boolean bitset queries can be optimized. So far only
-the confusables codepoints lookups, not yet the `allowed_id_list` and
-maybe_normalize lookups.
-
+With **CRoaring** some boolean bitset queries can be optimized. So far
+only the confusables codepoints lookups are used. The others,
+`allowed_croar.h` and the `nf*_croar.h` headers are too slow. See
+`perf`. These optimizations on boolean ranges are work in progress, if
+I can find faster lookups than binary search. Also for special
+configurations, such as **c99** a single header and optimized lookup
+method should be implemented, combining the script, xid and
+decomposition in it. This would replace the ~6 lookups per codepoint.
 
 TODO
 ----
