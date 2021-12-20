@@ -42,7 +42,8 @@ static const char *errstr(int errcode) {
 
 int testdir(const char *dir, const char *fname) {
   char path[256];
-  char word[1024];
+  static char line[1024] = {0};
+  static char word[128] = {0};
   if (!dir) {
     strncpy(path, fname, sizeof(path) - 1);
   } else {
@@ -63,16 +64,64 @@ int testdir(const char *dir, const char *fname) {
 
   printf("-- %s\n", path);
   int ctx = u8ident_new_ctx();
-  while (fscanf(f, " %1023s", word) == 1) {
-    int ret = u8ident_check((uint8_t *)word, NULL);
-    const char *scripts = u8ident_existing_scripts(ctx);
-    printf("%s: %s (%s", word, errstr(ret), scripts);
-    if (ret < 0) {
-      uint32_t cp = u8ident_failed_char(ctx);
-      printf(" + U+%X %s)!\n", cp, u8ident_script_name(u8ident_get_script(cp)));
-    } else
-      printf(")\n");
-    free((char *)scripts);
+  //while (fscanf(f, " %1023s", word) == 1)
+  while (fgets(line, 1023, f)) {
+    char *s = &line[0];
+    bool prev_isword = false;
+    char *wp = &word[0];
+    *word = '\0';
+    while (*s) {
+      char *olds = s;
+      uint32_t cp = dec_utf8(&s);
+      if (!cp) {
+        printf("ERROR %s illegal UTF-8\n", olds);
+        exit(1);
+      }
+      bool isword = u8ident_is_allowed(cp);
+      // first, or changed from non-word to word
+      if (olds == &line[0] || prev_isword != isword) {
+        prev_isword = isword;
+        if (isword) {
+          int l = s - olds;
+          if (l == 1) {
+            *wp++ = *olds;
+          }
+          else {
+            memcpy(wp, olds, l);
+            wp += l;
+          }
+          continue; // started new word
+        } else { // word-end: fall-through to word check
+          *wp = '\0';
+        }
+      } else { // no change. in word or non-word
+        if (isword) {
+          int l = s - olds;
+          if (l == 1) {
+            *wp++ = *olds;
+          }
+          else {
+            memcpy(wp, olds, l);
+            wp += l;
+          }
+        }
+        if (*s != '\n')
+          continue;
+      }
+      if (*word) { // non-empty word-end
+        int ret = u8ident_check((uint8_t *)word, NULL);
+        const char *scripts = u8ident_existing_scripts(ctx);
+        printf("%s: %s (%s", word, errstr(ret), scripts);
+        if (ret < 0) {
+          uint32_t cp = u8ident_failed_char(ctx);
+          printf(" + U+%X %s)!\n", cp, u8ident_script_name(u8ident_get_script(cp)));
+        } else
+          printf(")\n");
+        free((char *)scripts);
+        *word = '\0';
+        wp = &word[0];
+      }
+    }
   }
 
   u8ident_free_ctx(ctx);
