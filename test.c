@@ -166,16 +166,19 @@ void test_script(void) {
   // U+3BB Greek (03A3..03E1)
   int ret = u8ident_check((const uint8_t *)"λ2", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek only
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   const char *s = u8ident_existing_scripts(ctx);
   assert(strcmp(s, "Greek") == 0);
   free((char *)s);
+#endif
 
   ret = u8ident_check((const uint8_t *)"aλ", NULL); // Latin + Greek
   CHECK_RET(ret, U8ID_EOK, ctx);
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   s = u8ident_existing_scripts(ctx);
   assert(strcmp(s, "Greek, Latin") == 0);
   free((char *)s);
-
+#endif
   assert(u8ident_free_ctx(ctx) == 0);
 }
 
