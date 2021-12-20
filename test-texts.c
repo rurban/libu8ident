@@ -66,7 +66,12 @@ int testdir(const char *dir, char *fname) {
   while (fscanf(f, " %1023s", word) == 1) {
     int ret = u8ident_check((uint8_t *)word, NULL);
     const char *scripts = u8ident_existing_scripts(ctx);
-    printf("%s: %s (%s)\n", word, errstr(ret), scripts);
+    printf("%s: %s (%s", word, errstr(ret), scripts);
+    if (ret < 0) {
+      uint32_t cp = u8ident_failed_char(ctx);
+      printf(" + U+%X %s)!\n", cp, u8ident_script_name(u8ident_get_script(cp)));
+    } else
+      printf(")\n");
     free ((char*)scripts);
   }
 
