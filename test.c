@@ -94,6 +94,9 @@ void test_scripts_no_init(void) {
         printf("ERROR U+%X .. U+%X both with SC %d\n", r->to, n->from, r->scr);
       assert(r->scr != n->scr); // can not be merged
     }
+    //if (r->to + 1 != n->from) {
+    //  printf("  Unknown at U+%X .. U+%X Zzzz\n", r->to + 1, n->from - 1);
+    //}
   }
 #endif
   for (size_t i = 0; i < ARRAY_SIZE(nonxid_script_list) - 1; i++) {

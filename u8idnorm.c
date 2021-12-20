@@ -239,7 +239,7 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
       const int i = UN8IF_canon_IDX(vi);
       const char *tbl = (const char *)UN8IF_canon_tbl[l - 1];
       const int len = l;
-#  if defined(DEBUG)
+#  if defined(__DEBUG)
       printf("U+%04X vi=0x%x (>>12, &fff) => TBL(%d)|%d\n", cp, vi, l, i);
 #  endif
       assert(l > 0 && l <= 4);

@@ -34,7 +34,7 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
         texts/cyrillic-1.txt      texts/japanese-1.txt   texts/myanmar-1.txt    texts/urdu-1.txt \
         texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt
 EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA) \
-	$(TEXTS)
+	$(TEXTS) texts/result.lst
 
 .c.i:
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

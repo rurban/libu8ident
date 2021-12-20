@@ -90,7 +90,8 @@ confus_croar.h allow_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: 
 .PHONY: check check-asan check-norms check-profiles check-xid \
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
 check: test test-texts
-	./test-texts
+	./test-texts > texts.tst
+	diff texts.tst texts/result.lst && rm texts.tst
 	./test
 check-all: check check-norms check-profiles check-xid check-asan
 
