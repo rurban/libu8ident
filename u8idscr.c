@@ -131,8 +131,8 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
   while (n > 0) {
     pos = (struct sc *)(p + size * (n / 2));
     // hack: with unsigned wrapping max-cp is always higher, so false
-    if ((cp - pos->from) <=
-        (pos->to - pos->from)) // (cp >= pos->from && cp <= pos->to)
+    // was: (cp >= pos->from && cp <= pos->to)
+    if ((cp - pos->from) <= (pos->to - pos->from))
       return pos;
     else if (cp < pos->from)
       n /= 2;

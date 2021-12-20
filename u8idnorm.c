@@ -351,9 +351,11 @@ static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
   } else {
 #if defined U8ID_NORM && (U8ID_NORM == NFC || U8ID_NORM == NFD ||              \
                           U8ID_NORM == FCC || U8ID_NORM == FCD)
+    (void)iscompat;
     assert(!iscompat);
     return _decomp_canonical_s(dest, dmax, cp);
 #elif defined U8ID_NORM && (U8ID_NORM == NFKC || U8ID_NORM == NFKD)
+    (void)iscompat;
     assert(iscompat);
     return _decomp_compat_s(dest, dmax, cp);
 #else

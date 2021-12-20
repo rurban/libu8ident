@@ -157,13 +157,24 @@ static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
 // check if a script is detected and added properly
 void test_script(void) {
   int ctx = u8ident_new_ctx();
+  // first
+  assert(strcmp(u8ident_script_name(u8ident_get_script(0x388)), "Greek") == 0);
+  // middle
   assert(strcmp(u8ident_script_name(u8ident_get_script(0x3BB)), "Greek") == 0);
+  // last
+  assert(strcmp(u8ident_script_name(u8ident_get_script(0x3FF)), "Greek") == 0);
   // U+3BB Greek (03A3..03E1)
-  int ret = u8ident_check((const uint8_t *)"λ", NULL);
-  CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
-  if (strcmp(u8ident_script_name(ctx), "Greek"))
-      printf("%s\n", u8ident_script_name(ctx));
-  assert(strcmp(u8ident_script_name(ctx), "Greek") == 0);
+  int ret = u8ident_check((const uint8_t *)"λ2", NULL);
+  CHECK_RET(ret, U8ID_EOK, ctx); // Greek only
+  const char *s = u8ident_existing_scripts(ctx);
+  assert(strcmp(s, "Greek") == 0);
+  free((char *)s);
+
+  ret = u8ident_check((const uint8_t *)"aλ", NULL); // Latin + Greek
+  CHECK_RET(ret, U8ID_EOK, ctx);
+  s = u8ident_existing_scripts(ctx);
+  assert(strcmp(s, "Greek, Latin") == 0);
+  free((char *)s);
 
   assert(u8ident_free_ctx(ctx) == 0);
 }
