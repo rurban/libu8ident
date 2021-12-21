@@ -160,13 +160,13 @@ static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
 // check if a script is detected and added properly
 void test_script(void) {
   int ctx = u8ident_new_ctx();
-  // first
+  // first in a range 0x0388 .. 0x03E1
   assert(strcmp(u8ident_script_name(u8ident_get_script(0x388)), "Greek") == 0);
   // middle
   assert(strcmp(u8ident_script_name(u8ident_get_script(0x3BB)), "Greek") == 0);
   // last
-  assert(strcmp(u8ident_script_name(u8ident_get_script(0x3FF)), "Greek") == 0);
-  // U+3BB Greek (03A3..03E1)
+  assert(strcmp(u8ident_script_name(u8ident_get_script(0x3E1)), "Greek") == 0);
+  // U+3BB Greek
   int ret = u8ident_check((const uint8_t *)"λ2", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek only
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5

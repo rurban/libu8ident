@@ -49,7 +49,7 @@ NFKC variants (as in Python 3), which prevents from various TR31, TR36 and TR39
 unicode confusable and spoofing security problems with identifiers. See
 http://www.unicode.org/reports/tr31/, http://www.unicode.org/reports/tr36/
 and http://www.unicode.org/reports/tr39
-Optionally we also support the NFC and NFD formats.
+Optionally we also support the NFC, NFKD and NFD methods.
 
 Mixed Scripts
 -------------
@@ -401,7 +401,7 @@ TODO
 
 * Lookup optimization:
   For some common combinations generate a single lookup with all the needed values:
-  NFKD + PROFILE_4 + CHECK\_XID with the script byte in the first decompose lookup
+  NFKC + PROFILE_4 + CHECK\_XID with the script byte in the first decompose lookup
   `UN8IF_compat_tbl`.
 
 * **SCX variants**: Some codepoints are combinations, valid for a number of
