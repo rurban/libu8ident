@@ -9,11 +9,13 @@
 #include "roaring.c"
 #include "scripts.h"
 #include "confus.h"
+#include "mark.h"
 
 #define ARR_SIZE(x) sizeof(x) / sizeof(*x)
 enum what_list {
   ALLOWED_ID_LIST,
   CONFUSABLES,
+  MARK,
   NFD_N,
   NFC_N,
   NFC_M,
@@ -27,10 +29,9 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
   roaring_bitmap_t *rb = roaring_bitmap_create_with_capacity(size);
   roaring_statistics_t stat;
   const char *file;
-  if (what == CONFUSABLES) { // simple confusables uint32_t confusable[]
+  if (what == CONFUSABLES || what == MARK) { // simple uint32_t[]
     for (uint32_t i = 0; i < size; i++)
       roaring_bitmap_add(rb, list[i]);
-    file = "confus_croar.bin";
   } else /* if (what == ALLOWED_ID_LIST) */ { // struct range_bool
     const struct range_bool *blist = (const struct range_bool *)list;
     for (uint32_t i = 0; i < size; i++) {
@@ -38,31 +39,41 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
         roaring_bitmap_add(rb, cp);
       }
     }
-    switch (what) {
-    case ALLOWED_ID_LIST:
+  }
+  switch (what) {
+  case ALLOWED_ID_LIST:
       file = "allowed_croar.bin";
       break;
-    /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
-    case NFD_N:
+  case CONFUSABLES:
+      file = "confus_croar.bin";
+      break;
+  case MARK:
+      file = "mark_croar.bin";
+      break;
+      /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
+  case NFD_N:
       file = "nfd_n_croar.bin";
       break;
-    case NFC_N: // this might be slower than binary search
+  case NFC_N: // this might be slower than binary search
       file = "nfc_n_croar.bin";
       break;
-    case NFC_M:
+  case NFC_M:
       file = "nfc_m_croar.bin";
       break;
-    case NFKD_N:
+  case NFKD_N:
       file = "nfkd_n_croar.bin";
       break;
-    case NFKC_N:
+  case NFKC_N:
       file = "nfkc_n_croar.bin";
       break;
-    case NFKC_M:
+  case NFKC_M:
       file = "nfkc_m_croar.bin";
       break;
-    }
+  default:
+      fprintf(stderr, "Unhandled case %d\n", what);
+      exit(1);
   }
+
   f = fopen(file, "w");
   uint32_t sizebefore = roaring_bitmap_portable_size_in_bytes(rb);
   roaring_bitmap_run_optimize(rb);
@@ -91,10 +102,19 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
   return 0;
 }
 
-int main() {
+int main(int argc, char **argv) {
+  if (argc < 2 || strcmp(argv[1], "confus") == 0)
+    serialize(ARR_SIZE(confusables), confusables, CONFUSABLES);
+  if (argc > 1 && strcmp(argv[1], "confus") == 0)
+    exit(0);
+
+  if (argc < 2 || strcmp(argv[1], "mark") == 0)
+    serialize(ARR_SIZE(mark_list), mark_list, MARK);
+  if (argc > 1 && strcmp(argv[1], "mark") == 0)
+    exit(0);
+
   serialize(ARR_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list,
             ALLOWED_ID_LIST);
-  serialize(ARR_SIZE(confusables), confusables, CONFUSABLES);
   /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
   serialize(ARR_SIZE(NFD_N_list), (const uint32_t *)NFD_N_list, NFD_N);
   serialize(ARR_SIZE(NFC_N_list), (const uint32_t *)NFC_N_list, NFC_N);

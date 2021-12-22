@@ -139,12 +139,12 @@ close $H1;
 
 print "Create serialized roaring bitmaps:\n";
 if ($^O =~ /Win32/) {
-  system($Config{cc}." mkroar.c -o mkroar.exe");
-  system("mkroar.exe");
+  system($Config{cc}." mkroar.c -I. -o mkroar.exe");
+  system("mkroar.exe confus");
   # ignore vms for now
 } else {
-  system($Config{cc}." mkroar.c -o mkroar");
-  system("./mkroar");
+  system($Config{cc}." mkroar.c -I. -o mkroar");
+  system("./mkroar confus");
 }
 print "\n";
 # allowed not optimized. stayed with 816 array

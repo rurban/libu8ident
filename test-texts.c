@@ -4,6 +4,7 @@
 
    read some files with words/valid identifiers in some common scripts.
 */
+#include "u8id_private.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -12,8 +13,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include "u8id_private.h"
 #include "u8ident.h"
+#include "mark.h"
+#ifdef HAVE_CROARING
+#  include "roaring.c"
+static roaring_bitmap_t *rmark = NULL;
+#endif
 #include "u8idscr.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
@@ -23,6 +28,24 @@
 unsigned u8ident_options(void);
 unsigned u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+
+#ifndef HAVE_CROARING
+static int compar32(const void *a, const void *b) {
+  const uint32_t ai = *(const uint32_t *)a;
+  const uint32_t bi = *(const uint32_t *)b;
+  return ai < bi ? -1 : ai == bi ? 0 : 1;
+}
+#endif
+
+bool isMARK(uint32_t cp) {
+#ifdef HAVE_CROARING
+  return roaring_bitmap_contains(rmark, cp);
+#else
+  return bsearch(&cp, mark_list, ARRAY_SIZE(mark_list), 4, compar32) != NULL
+             ? true
+             : false;
+#endif
+}
 
 static const char *errstr(int errcode) {
   static const char *const _str[] = {
@@ -65,6 +88,7 @@ int testdir(const char *dir, const char *fname) {
   printf("-- %s\n", path);
   int ctx = u8ident_new_ctx();
   //while (fscanf(f, " %1023s", word) == 1)
+  // TODO Check also against libunistring: u8_wordbreaks
   while (fgets(line, 1023, f)) {
     char *s = &line[0];
     bool prev_isword = false;
@@ -77,9 +101,12 @@ int testdir(const char *dir, const char *fname) {
         printf("ERROR %s illegal UTF-8\n", olds);
         exit(1);
       }
+      // unicode #29 word-break, but simplified:
+      // need to check for continuations (MARK). e.g. for texts/arabic-1.txt
       bool isword = u8ident_is_allowed(cp);
-      // first, or changed from non-word to word
-      if (olds == &line[0] || prev_isword != isword) {
+      bool ismark = isMARK(cp);
+      // first, or changed from non-word to word, and is no mark (continuation)
+      if (olds == &line[0] || (prev_isword != isword && !ismark)) {
         prev_isword = isword;
         if (isword) {
           int l = s - olds;
@@ -108,7 +135,8 @@ int testdir(const char *dir, const char *fname) {
         if (*s != '\n')
           continue;
       }
-      if (*word) { // non-empty word-end
+      // FIXME: "\xd8\xa8\xd8\xb1\xd9\x88\xd8\xad" "بروح" Arabic
+      if (!*wp && *word && !ismark) { // non-empty word-end
         int ret = u8ident_check((uint8_t *)word, NULL);
         const char *scripts = u8ident_existing_scripts(ctx);
         printf("%s: %s (%s", word, errstr(ret), scripts);
@@ -137,10 +165,17 @@ int main(int argc, char **argv) {
   char *dirname = "texts";
   struct stat st;
   u8ident_init(U8ID_DEFAULT_OPTS);
-
+#ifdef HAVE_CROARING
+  rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
+						   mark_croar_bin_len);
+#endif
+  
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
     u8ident_free();
+#ifdef HAVE_CROARING
+    roaring_bitmap_free (rmark);
+#endif
     return 0;
   }
 
@@ -184,5 +219,8 @@ int main(int argc, char **argv) {
     free((void *)files[i]);
   free(files);
   u8ident_free();
+#ifdef HAVE_CROARING
+  roaring_bitmap_free (rmark);
+#endif
   return 0;
 }
