@@ -392,9 +392,10 @@ only the confusables codepoints lookups are used. The others,
 `allowed_croar.h` and the `nf*_croar.h` headers are too slow. See
 `perf`. These optimizations on boolean ranges are work in progress, if
 I can find faster lookups than binary search. Also for special
-configurations, such as **c99** a single header and optimized lookup
-method should be implemented, combining the script, xid and
-decomposition in it. This would replace the ~6 lookups per codepoint.
+configurations, such as a new **c11** profile a single header and
+optimized lookup method should be implemented, combining the script,
+xid and decomposition in it. This would replace the ~6 lookups per
+codepoint.
 
 TODO
 ----
@@ -429,3 +430,9 @@ TODO
   spoofing exploits.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
+
+* Eventually add a secure **C11 security profile**, which should allow Greek with Latin.
+  See `unic11.h`
+  Note: The C11-C23 STDs do allow Cyrillic together with Greek and other mixed scripts,
+  which is highly insecure.
+  http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf
