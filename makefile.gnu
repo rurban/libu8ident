@@ -86,7 +86,7 @@ confus.h: mkconfus.pl mkroar.c # confusables.txt
 	$(PERL) mkconfus.pl
 confus_croar.h allow_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
-mark.h: mkmark.pl
+mark.h: mkmark.pl # UnicodeData.txt
 	$(PERL) mkmark.pl
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
@@ -94,15 +94,15 @@ mark.h: mkmark.pl
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
 check: test test-texts
+	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
-	./test
 else
 ifeq (-DHAVE_CONFUS -DHAVE_CROARING,$(DEFINES))
 check: test test-texts
+	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
-	./test
 else
 check: test
 	./test
@@ -114,7 +114,7 @@ check-all: check check-norms check-profiles check-xid check-asan
 test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
-	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan

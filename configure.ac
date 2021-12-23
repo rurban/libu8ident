@@ -210,11 +210,33 @@ AC_CHECK_HEADERS([stdlib.h	\
                   malloc.h	\
                   string.h	\
                   stddef.h	\
-                  unistd.h	\
-                  sys/types.h	\
                   inttypes.h	\
                   stdint.h	\
+                  assert.h	\
+                  unistd.h	\
+                  sys/types.h	\
+                  sys/stat.h	\
+                  dirent.h	\
+                  libgen.h	\
+                  uniwbrk.h     \
                   ])
+#AC_CHECK_LIB([unistring],[u8_wordbreaks])
+#AM_CONDITIONAL([HAVE_LIBUNISTRING], [test x$ac_cv_lib_unistring_u8_wordbreaks = xyes])
+AC_CHECK_LIB([unistring],[u8_wordbreaks],
+  [have_libunistring=yes;
+   test_texts_LIBS=-lunistring;
+   AC_SUBST([test_texts_LIBS])
+   ],
+  [if pkg-config --exists libunistring; then
+    have_libunistring=yes;
+    TEST_TEXTS_CFLAGS=`pkg-config libunistring --cflags`
+    test_texts_LIBS=`pkg-config libunistring --libs`
+    AC_SUBST([TEST_TEXTS_CFLAGS])
+    AC_SUBST([test_texts_LIBS])
+  else
+    AC_MSG_WARN([libunistring for test-texts not found])
+  fi])
+AM_CONDITIONAL([HAVE_LIBUNISTRING], [test x$have_libunistring = xyes])
 
 AC_MSG_NOTICE([Check typedefs, structures, and compiler characteristics])
 # ===============================================
@@ -244,7 +266,11 @@ AH_BOTTOM([
 #endif /* __U8ID_CONF_H__ */
 ])
 
+LTEXEC="./libtool --mode=execute"
+AC_SUBST(LTEXEC)
+
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([libu8ident.pc
                  Makefile])
+AC_CONFIG_FILES([test-texts.test], [chmod +x test-texts.test])
 AC_OUTPUT

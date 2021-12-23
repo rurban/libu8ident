@@ -22,7 +22,7 @@ docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h
+	confus_croar.h mark.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
         texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
         texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -33,7 +33,7 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
         texts/chinese-trad-1.txt  texts/igbo-1.txt       texts/marathi-1.txt    texts/turkish-1.txt \
         texts/cyrillic-1.txt      texts/japanese-1.txt   texts/myanmar-1.txt    texts/urdu-1.txt \
         texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl makefile.gnu $(HDRS) $(doc_DATA) \
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl makefile.gnu $(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst
 
 .c.i:
@@ -48,6 +48,8 @@ $(srcdir)/scripts.h: $(srcdir)/mkscripts.pl
 	cd $(srcdir) && $(PERL) mkscripts.pl
 $(srcdir)/confus.h: $(srcdir)/mkconfus.pl
 	cd $(srcdir) && $(PERL) mkconfus.pl
+$(srcdir)/mark.h: $(srcdir)/mkmark.pl # UnicodeData.txt
+	cd $(srcdir) && $(PERL) mkmark.pl
 # emacs flymake-mode
 check-syntax:
 	test -n "$(CHK_SOURCES)" && \
@@ -87,7 +89,8 @@ EXTRA_PROGRAMS = test test-texts
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
 test_texts_SOURCES = test-texts.c
-test_texts_LDADD = $(lib_LTLIBRARIES)
+test_texts_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS)
+test_texts_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
 
 if HAVE_CROARING
 test_LDADD += u8idroar.lo
@@ -96,8 +99,10 @@ perf_CFLAGS = $(AM_CFLAGS) -DPERF_TEST
 perf_SOURCES = perf.c u8idroar.c
 perf_LDADD = u8idroar.lo
 endif
-TESTS = test test-texts
+TESTS = test test-texts.test
 TESTS_ENVIRONMENT = U8IDTEST_TEXTS='@top_srcdir@/texts'
+
+test-texts.test: test-texts
 
 if !HAVE_CROARING
 perf: perf.c
@@ -150,7 +155,8 @@ u8ident.3: README.md
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) test-prof{2,3,4,5,6}$(EXEEXT) \
-	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT)
+	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
+	     texts.tst
 DISTCLEANFILES = config.log u8ident.3
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
@@ -168,5 +174,6 @@ LIBTOOL_DISTCLEAN_FILES = \
 	m4/ltoptions.m4 \
 	m4/ltsugar.m4 \
 	m4/ltversion.m4 \
-	m4/lt~obsolete.m4
+	m4/lt~obsolete.m4 \
+	test-texts.test
 

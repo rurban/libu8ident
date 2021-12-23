@@ -22,6 +22,7 @@ u8idroar.o
 /IdentifierType.txt
 /IdentifierStatus.txt
 /confusables.txt
+/UnicodeData.txt
 Unicode-Normalize
 libu8ident-*.tar.gz
 libu8ident-*.tar.xz
@@ -52,3 +53,5 @@ nfkd_croar.h
 allowed_croar.bin
 confus_croar.bin
 nf*_croar.bin
+test-texts.test
+texts.tst

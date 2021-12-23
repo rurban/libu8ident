@@ -29,7 +29,7 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
   roaring_bitmap_t *rb = roaring_bitmap_create_with_capacity(size);
   roaring_statistics_t stat;
   const char *file;
-  if (what == CONFUSABLES || what == MARK) { // simple uint32_t[]
+  if (what == CONFUSABLES) { // simple uint32_t[]
     for (uint32_t i = 0; i < size; i++)
       roaring_bitmap_add(rb, list[i]);
   } else /* if (what == ALLOWED_ID_LIST) */ { // struct range_bool
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
     exit(0);
 
   if (argc < 2 || strcmp(argv[1], "mark") == 0)
-    serialize(ARR_SIZE(mark_list), mark_list, MARK);
+    serialize(ARR_SIZE(mark_list), (const uint32_t *)mark_list, MARK);
   if (argc > 1 && strcmp(argv[1], "mark") == 0)
     exit(0);
 

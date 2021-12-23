@@ -8,6 +8,9 @@
 /* Defined to the path to the CRoaring library */
 #undef CROARING_PATH
 
+/* Define to 1 if you have the <assert.h> header file. */
+#undef HAVE_ASSERT_H
+
 /* Defined to 1 when the compiler supports c11 */
 #undef HAVE_C11
 
@@ -17,11 +20,17 @@
 /* Defined to 1 when to use the CRoaring library */
 #undef HAVE_CROARING
 
+/* Define to 1 if you have the <dirent.h> header file. */
+#undef HAVE_DIRENT_H
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <libgen.h> header file. */
+#undef HAVE_LIBGEN_H
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H
@@ -61,6 +70,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <uniwbrk.h> header file. */
+#undef HAVE_UNIWBRK_H
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
