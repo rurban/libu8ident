@@ -77,6 +77,8 @@
 #  else
 #    error "Invalid U8ID_PROFILE "_XSTR(U8ID_PROFILE)
 #  endif
+#elif defined U8ID_PROFILE_C11
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4_C11
 #else
 // Moderately Restrictive
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4

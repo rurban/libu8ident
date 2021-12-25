@@ -58,6 +58,9 @@ EXTERN int u8ident_init(unsigned options) {
 #  endif
 #endif
   s_u8id_profile = 0;
+#ifdef U8ID_PROFILE_C11
+  s_u8id_profile = 11;
+#else
   for (unsigned i = U8ID_PROFILE_2; i <= U8ID_PROFILE_6; i *= 2) {
     if (options & i) {
       if (s_u8id_profile)
@@ -65,6 +68,7 @@ EXTERN int u8ident_init(unsigned options) {
       s_u8id_profile = i;
     }
   }
+#endif
   if (!s_u8id_profile)
     return -1; // error. no profile defined
   s_u8id_options = options;
@@ -77,10 +81,14 @@ EXTERN int u8ident_init(unsigned options) {
 
 unsigned u8ident_options(void) { return s_u8id_options; }
 unsigned u8ident_profile(void) {
+#ifdef U8ID_PROFILE_C11
+  return 11;
+#else
   assert(s_u8id_profile >= U8ID_PROFILE_2 && s_u8id_profile <= U8ID_PROFILE_6);
   // 8>>4: 0, 16>>4: 1, 32>>4: 2, 64>>4: 4, 128>>4: 8
   static const uint8_t _profiles[] = {2, 3, 4, 0, 5, 0, 0, 0, 6};
   return (unsigned)_profiles[(unsigned)s_u8id_profile >> 4];
+#endif
 }
 
 /* maxlength of an identifier. Default: 1024. Beware that such long identiers
@@ -133,7 +141,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #ifdef HAVE_CONFUS
     /* allow some latin confusables: 0 1 I ` | U+30, U+31, U+49, U+60, U+7C */
     /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6 */
-    if (s_u8id_options >= U8ID_WARN_CONFUSABLE && cp > 0x7C) {
+    if (s_u8id_options & (U8ID_WARN_CONFUSABLE | U8ID_ERROR_CONFUSABLE) &&
+        cp > 0x7C) {
       bool yes = u8ident_is_confusable(cp);
       if (yes) {
         if (s_u8id_options & U8ID_ERROR_CONFUSABLE)
@@ -244,6 +253,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         else if (s_u8id_profile == U8ID_PROFILE_3) {
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
+        }
+#endif
+#if defined U8ID_PROFILE_C11
+        else if (scr == SC_Greek) {
+          assert(s_u8id_profile == U8ID_PROFILE_4_C11);
+          goto ok;
         }
 #endif
         // PROFILE_4: allow adding any Recommended to Latin,

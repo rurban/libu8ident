@@ -25,7 +25,8 @@ enum u8id_profile {
   U8ID_PROFILE_3 = 16, // Highly Restrictive
   U8ID_PROFILE_4 = 32, // Moderately Restrictive
   U8ID_PROFILE_5 = 64, // Minimally Restrictive
-  U8ID_PROFILE_6 = 128 // Unrestricted
+  U8ID_PROFILE_6 = 128, // Unrestricted
+  U8ID_PROFILE_4_C11 = 4096 // 4 + Greek
 };
 
 #ifndef U8ID_PROFILE_DEFAULT

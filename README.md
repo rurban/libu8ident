@@ -131,6 +131,13 @@ This is the recommended profile, don't fall into the unicode identifier trap.
 Recommended is Level 4, the **Moderately Restrictive level**.
 It is always easier to widen restrictions than narrow them.
 
+We also provide a special profile, called **`U8ID_PROFILE_4_C11`**, defined by
+`-DU8ID_PROFILE_C11`. This is an extended Moderate Profile (4), plus allowing
+Greek with Latin. The C11 allowed a certain range of codepoints, but did not
+define combinations of mixed scripts. Thus an insecure Minimally Restrictive
+profile 5. `U8ID_PROFILE_4_C11` is a secure extension over C11, disallowing
+most confusables.
+
 configure options
 -----------------
 

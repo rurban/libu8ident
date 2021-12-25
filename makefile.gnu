@@ -93,19 +93,22 @@ mark.h: mkmark.pl # UnicodeData.txt
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
-check: test test-texts
+check: test test-texts test-c11
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
+	./test-c11
 else
 ifeq (-DHAVE_CONFUS -DHAVE_CROARING,$(DEFINES))
-check: test test-texts
+check: test test-texts test-c11
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
+	./test-c11
 else
-check: test
+check: test test-c11
 	./test
+	./test-c11
 endif
 endif
 
@@ -115,6 +118,8 @@ test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
+test-c11: test-c11.c $(SRC) $(HEADER) $(HDRS) mark.h
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_C11 -I. -Iinclude test-c11.c $(SRC) -o test-c11
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
