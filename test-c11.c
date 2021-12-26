@@ -207,6 +207,84 @@ int cmp_str(const void *a, const void *b) {
   return strcmp(*(const char **)a, *(const char **)b);
 }
 
+/* Show all insecure scripts in the C11 permitted range.
+   They accept all, ignoring all unicode security recommendations.
+ */
+static void print_all_scripts(void) {
+  uint8_t o = 0, s;
+  for (size_t i=0; i < ARRAY_SIZE(c11_start_list); i++) {
+    struct range_bool r = c11_start_list[i];
+    for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      s = u8ident_get_script(cp);
+      if (s != o && s > SC_Latin && s < SC_Unknown) {
+        if (cp == r.from)
+          printf("    {0x%X, 0x%X}, // %s%s\n", cp, r.to,
+                 u8ident_script_name(s),
+                 s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
+                 s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
+        else
+          printf("                      // %X: %s%s\n",
+                 cp, u8ident_script_name(s),
+                 s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
+                 s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
+        o = s;
+      }
+    }
+  }
+}
+
+/* Generate a filtered range without Limited and Excluded scripts.
+   TODO Also skip the LTR, RTL symbols for non-Arabic, and word joiners on non-CFK scripts.
+   WIP
+ */
+static void print_valid_scripts(void) {
+  uint8_t o = 0, s;
+  puts("\nconst struct range_bool safec11_start_list[] = {\n"
+       "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
+       "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
+       "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
+       "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
+       "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
+       "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also Bopomofo)");
+  for (size_t i = 14; i < ARRAY_SIZE(c11_start_list); i++) {
+    struct range_bool r = c11_start_list[i];
+    struct range_bool r1;
+    r1.from = r.from;
+    r1.to = r.to;
+    for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      s = u8ident_get_script(cp);
+      // split into permitted and forbidden ranges
+      if (s != o) {
+        if (s >= FIRST_EXCLUDED_SCRIPT) { // split
+          // bad, print the range before
+          r1.to = cp - 1;
+          if (r1.from <= r1.to)
+            printf("    {0x%X, 0x%X}, // %s\n", r1.from, r1.to, u8ident_script_name(o));
+          if (s < SC_Unknown) {
+            printf("    // skipped 0x%X %s%s\n", cp, u8ident_script_name(s),
+                   s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
+                   s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
+          }
+          r1.from = cp + 1;
+        } else { // allowed again
+          r1.to = cp;
+          //if (r1.from >= r1.to)
+          //  printf("    {0x%X, 0x%X}, // %s\n", r1.from, r1.to, u8ident_script_name(o));
+        }
+        o = s;
+      } else if (s >= FIRST_EXCLUDED_SCRIPT) { // invalid
+        r1.from = cp + 1;
+      }
+    }
+    // print rest
+    if (r1.from <= r1.to) {
+      printf("    {0x%X, 0x%X}, // %s\n", r1.from, r1.to, u8ident_script_name(s));
+      r1.from = r1.to + 1;
+    }
+  }
+  puts("};");
+}
+
 int main(int argc, char **argv) {
   char *dirname = "texts";
   struct stat st;
@@ -215,6 +293,9 @@ int main(int argc, char **argv) {
   rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
 						   mark_croar_bin_len);
 #endif
+
+  print_all_scripts();
+  print_valid_scripts();
   
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
