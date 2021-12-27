@@ -207,14 +207,45 @@ int cmp_str(const void *a, const void *b) {
   return strcmp(*(const char **)a, *(const char **)b);
 }
 
+// uint8_t[10FFFF/8]
+#define BITGET(b,i) (b[i >> 3] & (1 << (7 - (i & 7)))) != 0
+#define BITSET(b,i) b[i >> 3] |= (1 << (7 - (i & 7)))
+#define BITCLR(b,i) b[i >> 3] &= ~(1 << (7 - (i & 7)))
+
+void emit_ranges(FILE *f, size_t start, uint8_t *u) {
+  unsigned from = start;
+  bool on = BITGET(u, from);
+  for (unsigned i = start; i < 0x10ffff; i++) {
+    if (BITGET(u, i)) {
+      if (!on) { // on, and was off
+        from = i;
+        on = true;
+      }
+    } else if (on) { // off, but was on
+      if (from <= i - 1) {
+        const uint8_t s = u8ident_get_script(from);
+        fprintf(f, "    {0x%X, 0x%X}, // %s%s\n", from, i - 1,
+                u8ident_script_name(s),
+                s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
+                s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
+      }
+      from = i;
+      on = false;
+    }
+  }
+}
+
 /* Show all insecure scripts in the C11 permitted range.
    They accept all, ignoring all unicode security recommendations.
  */
-static void print_all_scripts(void) {
+static void gen_c11_all(void) {
   uint8_t o = 0, s;
+  uint8_t u[0x10ffff >> 3];
+  memset(u, 0, sizeof(u));
   for (size_t i=0; i < ARRAY_SIZE(c11_start_list); i++) {
     struct range_bool r = c11_start_list[i];
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      BITSET(u, cp);
       s = u8ident_get_script(cp);
       if (s != o && s > SC_Latin && s < SC_Unknown) {
         if (cp == r.from)
@@ -231,14 +262,53 @@ static void print_all_scripts(void) {
       }
     }
   }
+  FILE *f = fopen("c11-all.h", "w");
+  fputs("// generated with test-c11 from unic11.h", f);
+  fprintf(f, "%s", "const struct range_bool c11_start_list[] = {\n"
+       "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
+       "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
+       "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
+       "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
+       "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
+       "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also Bopomofo)\n");
+  emit_ranges(f, 0x100, u);
+  fprintf(f, "%s", "};\n");
+  fclose (f);
+}
+
+static void gen_c11_safe(void) {
+  FILE *f = fopen("c11-safe.h", "w");
+  static uint8_t u[0x10ffff >> 3];
+  memset(u, 0, sizeof(u));
+  for (size_t i = 0; i < ARRAY_SIZE(c11_start_list); i++) {
+    struct range_bool r = c11_start_list[i];
+    for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      uint8_t s = u8ident_get_script(cp);
+      if (s < FIRST_EXCLUDED_SCRIPT && u8ident_is_allowed(cp)) {
+        BITSET(u,cp);
+      }
+    }
+  }
+  fputs("// generated with test-c11 by filtering allowed scripts and IdentifierStatus", f);
+  fprintf(f, "%s", "const struct range_bool safec11_start_list[] = {\n"
+       "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
+       "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
+       "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
+       "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
+       "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
+       "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also Bopomofo)\n");
+  emit_ranges(f, 0x100, u);
+  fprintf(f, "%s", "};\n");
+  fclose (f);
 }
 
 /* Generate a filtered range without Limited and Excluded scripts.
    TODO Also skip the LTR, RTL symbols for non-Arabic, and word joiners on non-CFK scripts.
-   WIP
+   WIP See gen_c11_safe()
  */
 static void print_valid_scripts(void) {
   uint8_t o = 0, s;
+  uint8_t u[0x10ffff >> 3];
   puts("\nconst struct range_bool safec11_start_list[] = {\n"
        "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
        "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
@@ -246,6 +316,7 @@ static void print_valid_scripts(void) {
        "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
        "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
        "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also Bopomofo)");
+  // keep the first 13 ranges
   for (size_t i = 14; i < ARRAY_SIZE(c11_start_list); i++) {
     struct range_bool r = c11_start_list[i];
     struct range_bool r1;
@@ -253,15 +324,19 @@ static void print_valid_scripts(void) {
     r1.to = r.to;
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       s = u8ident_get_script(cp);
+      bool good = u8ident_is_allowed(cp);
+      if (s < FIRST_EXCLUDED_SCRIPT && good) {
+        BITSET(u,cp);
+      }
       // split into permitted and forbidden ranges
       if (s != o) {
-        if (s >= FIRST_EXCLUDED_SCRIPT) { // split
+        if (s >= FIRST_EXCLUDED_SCRIPT || !good) { // split
           // bad, print the range before
           r1.to = cp - 1;
           if (r1.from <= r1.to)
             printf("    {0x%X, 0x%X}, // %s\n", r1.from, r1.to, u8ident_script_name(o));
           if (s < SC_Unknown) {
-            printf("    // skipped 0x%X %s%s\n", cp, u8ident_script_name(s),
+            printf("    // skipped 0x%X %s%s%s\n", cp, good ? "" : "IdRestr ", u8ident_script_name(s),
                    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
                    s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
           }
@@ -272,7 +347,7 @@ static void print_valid_scripts(void) {
           //  printf("    {0x%X, 0x%X}, // %s\n", r1.from, r1.to, u8ident_script_name(o));
         }
         o = s;
-      } else if (s >= FIRST_EXCLUDED_SCRIPT) { // invalid
+      } else if (s >= FIRST_EXCLUDED_SCRIPT || !good) { // invalid
         r1.from = cp + 1;
       }
     }
@@ -294,8 +369,9 @@ int main(int argc, char **argv) {
 						   mark_croar_bin_len);
 #endif
 
-  print_all_scripts();
-  print_valid_scripts();
+  gen_c11_all();
+  //print_valid_scripts();
+  gen_c11_safe();
   
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
