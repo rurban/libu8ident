@@ -47,18 +47,18 @@ AC_SUBST([U8ID_NORM])
 # Recommended: --with-profile=4
 AC_MSG_CHECKING([for --with-profile=])
 AC_ARG_WITH([profile],
-	[AS_HELP_STRING([--with-profile={2,3,4,5,6}],
+	[AS_HELP_STRING([--with-profile={2,3,4,5,6,C11_4,C11_6}],
 		[support only this Unicode security profile. @<:@default=4@:>@
 		 Recommended: --with-profile=4])],
 	[case "${with_profile}" in
-	2|3|4|5|6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
-	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6]) ;;
+	2|3|4|5|6|C11_4|C11_6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
+	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6,C11_4,C11_6]) ;;
 	esac],
         [ U8ID_PROFILE=; AC_MSG_RESULT([none. support all (default). Recommended: 4]) ]
 	)
 if test -n "$U8ID_PROFILE"; then
   CFLAGS="$CFLAGS -DU8ID_PROFILE=$U8ID_PROFILE"
-  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 2-6 to support only this Unicode security profile])
+  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 2-6,C11_4,C11_6 to support only this Unicode security profile])
 fi
 AC_SUBST([U8ID_PROFILE])
 

@@ -363,7 +363,7 @@ static void print_valid_scripts(void) {
 int main(int argc, char **argv) {
   char *dirname = "texts";
   struct stat st;
-  u8ident_init(U8ID_PROFILE_4_C11);
+  u8ident_init(U8ID_PROFILE_C11_4);
 #ifdef HAVE_CROARING
   rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
 						   mark_croar_bin_len);

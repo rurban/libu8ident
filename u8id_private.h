@@ -37,6 +37,8 @@
 #define NFKD 3
 #define FCD 4
 #define FCC 5
+#define C11_4 7
+#define C11_6 8
 #define _XSTR(s) _STR(s)
 #define _STR(s) #s
 #define CAT(a, b) a##b
@@ -74,11 +76,21 @@
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_5
 #  elif U8ID_PROFILE == 6
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_6
+#  elif U8ID_PROFILE == C11_4
+#    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_4
+#    define U8ID_PROFILE_SAFEC11
+#  elif U8ID_PROFILE == C11_6
+#    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
+#    define U8ID_PROFILE_C11STD
 #  else
 #    error "Invalid U8ID_PROFILE "_XSTR(U8ID_PROFILE)
 #  endif
-#elif defined U8ID_PROFILE_C11
-#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4_C11
+#elif defined U8ID_PROFILE_SAFEC11
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_4
+#  define U8ID_PROFILE C11_4
+#elif defined U8ID_PROFILE_C11STD
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
+#  define U8ID_PROFILE C11_6
 #else
 // Moderately Restrictive
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4

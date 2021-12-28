@@ -25,7 +25,7 @@ unsigned s_maxlen = 1024;
 /* Initialize the library with a bitmask of options, which define the
    performed checks. Recommended is `U8ID_PROFILE_4` only. */
 EXTERN int u8ident_init(unsigned options) {
-  if (options > 2047)
+  if (options > 8192 + 2048 + 512 + 256)
     return -1;
   if ((options & U8ID_NFMASK) > 5)
     return -1;
@@ -58,9 +58,6 @@ EXTERN int u8ident_init(unsigned options) {
 #  endif
 #endif
   s_u8id_profile = 0;
-#ifdef U8ID_PROFILE_C11
-  s_u8id_profile = 11;
-#else
   for (unsigned i = U8ID_PROFILE_2; i <= U8ID_PROFILE_6; i *= 2) {
     if (options & i) {
       if (s_u8id_profile)
@@ -68,7 +65,12 @@ EXTERN int u8ident_init(unsigned options) {
       s_u8id_profile = i;
     }
   }
-#endif
+  if (!s_u8id_profile) {
+    if (options & U8ID_PROFILE_C11_4)
+      s_u8id_profile = 11;
+    else if (options & U8ID_PROFILE_C11_6)
+      s_u8id_profile = 12;
+  }
   if (!s_u8id_profile)
     return -1; // error. no profile defined
   s_u8id_options = options;
@@ -81,8 +83,10 @@ EXTERN int u8ident_init(unsigned options) {
 
 unsigned u8ident_options(void) { return s_u8id_options; }
 unsigned u8ident_profile(void) {
-#ifdef U8ID_PROFILE_C11
+#if defined U8ID_PROFILE_SAFEC11
   return 11;
+#elif defined U8ID_PROFILE_C11STD
+  return 12;
 #else
   assert(s_u8id_profile >= U8ID_PROFILE_2 && s_u8id_profile <= U8ID_PROFILE_6);
   // 8>>4: 0, 16>>4: 1, 32>>4: 2, 64>>4: 4, 128>>4: 8
@@ -153,11 +157,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #endif
 
-#if defined U8ID_PROFILE && U8ID_PROFILE == 6
+#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
     continue; // skip all script checks
-#elif defined U8ID_PROFILE && U8ID_PROFILE != 6
+#elif defined U8ID_PROFILE && U8ID_PROFILE != 6 && U8ID_PROFILE != C11_6
 #else
-    if (s_u8id_profile == U8ID_PROFILE_6)
+    if (s_u8id_profile == U8ID_PROFILE_6 || s_u8id_profile == U8ID_PROFILE_C11_6)
       continue;
 #endif
 
@@ -255,10 +259,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           return U8ID_ERR_SCRIPTS;
         }
 #endif
-#if defined U8ID_PROFILE_C11
-        else if (scr == SC_Greek) {
-          assert(s_u8id_profile == U8ID_PROFILE_4_C11);
-          goto ok;
+#if !defined U8ID_PROFILE || U8ID_PROFILE == C11_4
+        else if (s_u8id_profile == U8ID_PROFILE_C11_4) {
+          if (scr == SC_Greek) {
+            assert(s_u8id_profile == U8ID_PROFILE_C11_4);
+            goto ok;
+          }
         }
 #endif
         // PROFILE_4: allow adding any Recommended to Latin,
@@ -270,7 +276,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         } else {
-          assert(s_u8id_profile == U8ID_PROFILE_4);
+          assert(s_u8id_profile == U8ID_PROFILE_4 || s_u8id_profile == U8ID_PROFILE_C11_4);
           // but not more than 2
           if (ctx->count >= 2) {
             ctx->last_cp = cp;
@@ -284,11 +290,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
   }
 
-#if defined U8ID_PROFILE && U8ID_PROFILE == 6
+#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
   need_normalize = true;
-#elif defined U8ID_PROFILE && U8ID_PROFILE != 6
+#elif defined U8ID_PROFILE && U8ID_PROFILE != 6 && U8ID_PROFILE != C11_6
 #else
-  if (s_u8id_profile == U8ID_PROFILE_6)
+  if (s_u8id_profile == U8ID_PROFILE_6 || s_u8id_profile == U8ID_PROFILE_C11_6)
     need_normalize = true;
 #endif
   if (need_normalize) {

@@ -133,9 +133,15 @@ check-norms:
             ls -gGh u8idnorm.o; \
         done
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in 2 3 4 5 6; do \
+	for n in 2 3 4 5 6 C11_4 C11_6; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles && \
+	    ./test-profiles profile; \
+        done
+	for n in SAFEC11 C11STD; do \
+            echo PROFILE_$${n}; \
+	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles && \
 	    ./test-profiles profile; \
         done
@@ -159,7 +165,8 @@ u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < $< > $@
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
-	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) test-prof{2,3,4,5,6}$(EXEEXT) \
+	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) \
+	     test-prof{2,3,4,5,6,C11_4,C11_6,SAFEC11,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst test-c11$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 c11-all.h c11-safe.h

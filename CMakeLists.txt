@@ -1,7 +1,7 @@
 project(libu8ident C)
 cmake_minimum_required(VERSION 2.9)
 # Supported options -DU8ID_NORM=NFC,NFKC,NFD,NFKD
-#                   -DU8ID_PROFILE=2,3,4,5,6
+#                   -DU8ID_PROFILE=2,3,4,5,6,C11_4,C11_6
 #                   -DU8ID_CHECK_XID=On,Off
 # for smaller builds and lib.
 
@@ -50,14 +50,14 @@ endif()
 # Supported options:
 #  -DBUILD_SHARED_LIBS=ON,OFF
 #  -DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD
-#  -DLIBU8IDENT_PROFILE=2,3,4,5,6
+#  -DLIBU8IDENT_PROFILE=2,3,4,5,6,C11_4,C11_6
 #  -DENABLE_CHECK_XID=On
 #  -DDISABLE_CHECK_XID=On
 #  -DHAVE_CONFUS=ON
 #  -DHAVE_CROARING=ON
 option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
 option(LIBU8IDENT_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
-option(LIBU8IDENT_PROFILE "force a single profile: 2-6" OFF)
+option(LIBU8IDENT_PROFILE "force a single profile: 2-6,C11_4,C11_6" OFF)
 option(ENABLE_CHECK_XID "en- or disabled check_xid" OFF)
 option(DISABLE_CHECK_XID "en- or disabled check_xid" OFF)
 option(HAVE_CONFUS "add confus.h set" OFF)

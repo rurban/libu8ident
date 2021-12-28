@@ -280,10 +280,10 @@ void test_norm_nfkc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  char *norm;
   assert(!u8ident_init(U8ID_NFKC | U8ID_PROFILE_4));
   testnorm("NFKC", testids);
 
+  char *norm;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strcmp(norm, "Caf\xc3\xa9") == 0);
@@ -442,7 +442,7 @@ void test_mixed_scripts(int xid_check) {
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_EOK, 0); // small letter b with stroke U+180
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 6
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C11_4
     CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+1B05 Balinese is limited
 #else
     CHECK_RET(ret, U8ID_EOK, 0);

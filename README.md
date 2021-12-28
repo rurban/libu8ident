@@ -128,15 +128,29 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   value indicating that the string does not match any of the levels
   1-5.
 
+4_c11. **safeC11**
+
+* We also provide a special profile, called **`U8ID_PROFILE_4_C11`**,
+  defined by `-DU8ID_PROFILE_SAFEC11`. This is an extended Moderate
+  Profile (4), plus allowing Greek with Latin, plus only allowing Allowed
+  IdentifierStatus.
+* `U8ID_PROFILE_4_C11` is the secure extension over C11, disallowing the
+  restricted and limited_use scripts and identifiers, arbitrary rtl
+  and ltr overrides, and all the insecure mixed scripts combinations.
+  See `unic11.h` and `test-c11.c`
+
+6_c11. **C11STD**
+
+* The C11 standard allows a certain range of (mostly insecure)
+  codepoints, and did not define combinations of mixed scripts, not a
+  security profile.  Thus an insecure Unrestricted profile 6, ignoring
+  the UCD IdentifierStatus.  This is `U8ID_PROFILE_6_C11`, defined by
+  `-DU8ID_PROFILE_C11STD`
+  See `unic11.h` and http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf
+  Annex D (p. 425)
+
 Recommended is Level 4, the **Moderately Restrictive level**.
 It is always easier to widen restrictions than narrow them.
-
-We also provide a special profile, called **`U8ID_PROFILE_4_C11`**, defined by
-`-DU8ID_PROFILE_C11`. This is an extended Moderate Profile (4), plus allowing
-Greek with Latin. The C11 allowed a certain range of codepoints, but did not
-define combinations of mixed scripts. Thus an insecure Minimally Restrictive
-profile 5. `U8ID_PROFILE_4_C11` is a secure extension over C11, disallowing
-most confusables.
 
 configure options
 -----------------
@@ -144,7 +158,7 @@ configure options
 * `--with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD`. Default: none (at run-time,
   NFKC is the default)
 
-* `--with-profile=2,3,4,5,6`. Default: none (at run-time, 4 is the default)
+* `--with-profile=2,3,4,5,6,4_c11,6_c11`. Default: none (at run-time, 4 is the default)
 
 * `--enable-confus`
 
@@ -187,6 +201,9 @@ e.g codesizes for u8idnorm.o with -Os
 
 default: 365K with -g on amd64-gcc
 
+For `-DU8ID_PROFILE_C11` see above. `4_c11` is also called **safeC11**, `6_c11` is the std
+insecure C11 profile.
+
 With `confus` enabled, the confusable API is added.
 With `croaring` the confus API is about twice as fast, and needs half the size.
 
@@ -194,7 +211,7 @@ See the likewise **cmake** options:
 
 * `-DBUILD_SHARED_LIBS=ON,OFF`
 * `-DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD`
-* `-DLIBU8IDENT_PROFILE=2,3,4,5,6`
+* `-DLIBU8IDENT_PROFILE=2,3,4,5,6,6_c11,4_c11`
 * `-DLIBU8IDENT_ENABLE_CHECK_XID=On`
 * `-DLIBU8IDENT_DISABLE_CHECK_XID=On`
 * `-DHAVE_CONFUS=ON`
@@ -219,6 +236,8 @@ API
     U8ID_PROFILE_4 = 32 // Moderately Restrictive
     U8ID_PROFILE_5 = 64 // Minimally Restrictive
     U8ID_PROFILE_6 = 128 // Unrestricted
+    U8ID_PROFILE_4_C11 = 4096, // 4 + Greek with only Allowed ID's ("safeC11")
+    U8ID_PROFILE_6_C11 = 8192, // The C11 std
 
     U8ID_FOLDCASE  = 256, // optional for case-insensitive idents. case-folded
                           // when normalized.
@@ -437,9 +456,3 @@ TODO
   spoofing exploits.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
-
-* Eventually add a secure **C11 security profile**, which should allow Greek with Latin.
-  See `unic11.h`
-  Note: The C11-C23 STDs do allow Cyrillic together with Greek and other mixed scripts,
-  which is highly insecure.
-  http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf

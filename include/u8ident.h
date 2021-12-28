@@ -26,7 +26,8 @@ enum u8id_profile {
   U8ID_PROFILE_4 = 32, // Moderately Restrictive
   U8ID_PROFILE_5 = 64, // Minimally Restrictive
   U8ID_PROFILE_6 = 128, // Unrestricted
-  U8ID_PROFILE_4_C11 = 4096 // 4 + Greek
+  U8ID_PROFILE_C11_4 = 4096, // 4 + Greek with only Allowed ID's ("safeC11")
+  U8ID_PROFILE_C11_6 = 8192, // The C11 std
 };
 
 #ifndef U8ID_PROFILE_DEFAULT
@@ -43,8 +44,8 @@ enum u8id_options {
                         // IdentifierStatus. hard-coded with
                         // --{en,dis}able-check-xid Note: The parser should do
                         // that. Without, the checker can be faster.
-  U8ID_WARN_CONFUSABLE = 1024,  // not yet implemented
-  U8ID_ERROR_CONFUSABLE = 2048, //       -"-
+  U8ID_WARN_CONFUSABLE = 1024,  // requires -DHAVE_CONFUS
+  U8ID_ERROR_CONFUSABLE = 2048, // requires -DHAVE_CONFUS
 };
 #define U8ID_NFMASK 7
 

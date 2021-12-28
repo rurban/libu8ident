@@ -132,7 +132,8 @@ perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h \
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
 	       perf mkroar \
-	       test test-texts test-asan test-xid-{EN,DIS}ABLE test-prof{2,3,4,5,6}\
+	       test test-texts test-asan test-xid-{EN,DIS}ABLE \
+	       test-prof{2,3,4,5,6,C11_4,C11_6,SAFEC11,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
 # Maintainer-only
@@ -146,9 +147,14 @@ check-norms: $(SRC) $(HEADER) $(HDRS)
 	      -o test-norm-$$n && ./test-norm-$$n norm; \
         done
 check-profiles: $(SRC) $(HEADER) $(HDRS)
-	for n in 2 3 4 5 6; do \
+	for n in 2 3 4 5 6 C11_4 C11_6; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
+	      -o test-prof$$n && ./test-prof$$n profile; \
+        done
+	for n in SAFEC11 C11STD; do \
+            echo PROFILE_$${n}; \
+	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE_$${n} -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && ./test-prof$$n profile; \
         done
 check-xid: $(SRC) $(HEADER) $(HDRS)
