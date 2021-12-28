@@ -13,7 +13,7 @@
 #  include "u8idroar.h"
 #endif
 
-// defaults to U8ID_NFKC | U8ID_PROFILE_4
+// defaults to U8ID_NFC | U8ID_PROFILE_4
 unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT
 #ifndef DISABLE_CHECK_XID
                           | U8ID_CHECK_XID

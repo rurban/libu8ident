@@ -31,9 +31,9 @@
 #  define unlikely(expr) _expect((long)((expr) != 0), 0)
 #endif
 
-#define NFKC 0
+#define NFC 0
 #define NFD 1
-#define NFC 2
+#define NFKC 2
 #define NFKD 3
 #define FCD 4
 #define FCC 5
@@ -46,14 +46,14 @@
 #define JOIN(prefix, name) PASTE(prefix, PASTE(_, name))
 
 #ifdef U8ID_NORM
-#  if U8ID_NORM == NFKC
-#    define U8ID_NORM_DEFAULT U8ID_NFKC
-#  elif U8ID_NORM == NFKD
-#    define U8ID_NORM_DEFAULT U8ID_NFKD
+#  if U8ID_NORM == NFC
+#    define U8ID_NORM_DEFAULT U8ID_NFC
 #  elif U8ID_NORM == NFD
 #    define U8ID_NORM_DEFAULT U8ID_NFD
-#  elif U8ID_NORM == NFC
-#    define U8ID_NORM_DEFAULT U8ID_NFC
+#  elif U8ID_NORM == NFKD
+#    define U8ID_NORM_DEFAULT U8ID_NFKD
+#  elif U8ID_NORM == NFKC
+#    define U8ID_NORM_DEFAULT U8ID_NFKC
 #  elif U8ID_NORM == FCC
 #    define U8ID_NORM_DEFAULT U8ID_FCC
 #  elif U8ID_NORM == FCD
@@ -62,7 +62,7 @@
 #    error "Invalid U8ID_NORM "_XSTR(U8ID_NORM)
 #  endif
 #else
-#  define U8ID_NORM_DEFAULT U8ID_NFKC
+#  define U8ID_NORM_DEFAULT U8ID_NFC
 #endif
 
 #ifdef U8ID_PROFILE

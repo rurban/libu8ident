@@ -25,18 +25,18 @@ AC_MSG_NOTICE([
 Check options])
 # ===============================================
 # hardcode certain options, to creater smaller and faster binaries
-# Recommended: --with-norm=NFKC
+# Recommended: --with-norm=NFC
 AC_MSG_CHECKING([for --with-norm=])
 AC_ARG_WITH([norm],
 	[AS_HELP_STRING([--with-norm=NF{K,}{C,D}],
 		[support only this normalization method. @<:@default=@:>@
-		 Recommended: --with-norm=NFKC])],
+		 Recommended: --with-norm=NFC])],
 	[case "${with_norm}" in
 	NFKD|NFKC|NFC|NFD) U8ID_NORM=${with_norm}; AC_MSG_RESULT([$with_norm]) ;;
 	FCD|FCD)           U8ID_NORM=${with_norm}; AC_MSG_RESULT([$with_norm]) ;;
 	*)    AC_MSG_RESULT([invalid ${with_norm}: only NFC,NFKC,NFD,NFKD,FCC,FCD]) ;;
 	esac],
-        [ U8ID_NORM=; AC_MSG_RESULT([none. support all (default). Recommended: NFKC]) ]
+        [ U8ID_NORM=; AC_MSG_RESULT([none. support all (default). Recommended: NFC]) ]
 	)
 if test -n "$U8ID_NORM"; then
   CFLAGS="$CFLAGS -DU8ID_NORM=$U8ID_NORM"

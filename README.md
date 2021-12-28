@@ -45,11 +45,16 @@ Normalization
 -------------
 
 All utf8 identifiers and literals are parsed and stored as normalized
-NFKC variants (as in Python 3), which prevents from various TR31, TR36 and TR39
+NFC variants (unlike Python 3), which prevents from various TR31, TR36 and TR39
 unicode confusable and spoofing security problems with identifiers. See
 http://www.unicode.org/reports/tr31/, http://www.unicode.org/reports/tr36/
 and http://www.unicode.org/reports/tr39
-Optionally we also support the NFC, NFKD and NFD methods.
+Optionally we also support the NFKC, NFKD and NFD methods.
+
+For example with NFKC the following two characters would be equal:
+ℌ => H, Ⅸ => IX, ℯ => e, ℨ => Z (and not 3), ⒛ => 20, µ (Math) => μ (Greek) ...
+Under NFC only glyphs looking the same, but varying the underlying
+combining marks would be equal: Such as Café == Café.
 
 Mixed Scripts
 -------------
@@ -156,7 +161,7 @@ configure options
 -----------------
 
 * `--with-norm=NFKC,NFC,NFD,NFKD,FCC,FCD`. Default: none (at run-time,
-  NFKC is the default)
+  NFC is the default)
 
 * `--with-profile=2,3,4,5,6,4_c11,6_c11`. Default: none (at run-time, 4 is the default)
 
@@ -188,8 +193,8 @@ is_allowed check at run-time.
 
 When you know beforehand which normalization or profile you will need,
 and your parsers knows about allowed identifier codepoints, define
-that via `./configure --with-norm=NFKC --with-profile=4 --disable-check-xid`,
-resp. `cmake -DLIBU8IDENT_NORM=NFKC -DLIBU8IDENT_PROFILE=4 -DBUILD_SHARED_LIBS=OFF`.
+that via `./configure --with-norm=NFC --with-profile=4 --disable-check-xid`,
+resp. `cmake -DLIBU8IDENT_NORM=NFC -DLIBU8IDENT_PROFILE=4 -DBUILD_SHARED_LIBS=OFF`.
 This skips a lot of unused code and branches.
 The generic shared library has all the code for all normalizations,
 profiles, xid check and branches at run-time.
@@ -224,9 +229,9 @@ API
 
 **u8id_options** is an enum of the following bits:
 
-    U8ID_NFKC = 0  // by the default the compatibility composed normalization
+    U8ID_NFC  = 0  // the default, shortest canonical composed normalization
     U8ID_NFD  = 1  // the longer, decomposed normalization
-    U8ID_NFC  = 2  // the shorter composed normalization
+    U8ID_NFKC = 2  // the compatibility normalization
     U8ID_NFKD = 3  // the longer compatibility decomposed normalization
     U8ID_FCD  = 4,  // the faster variants
     U8ID_FCC  = 5
@@ -428,8 +433,8 @@ TODO
 
 * Lookup optimization:
   For some common combinations generate a single lookup with all the needed values:
-  NFKC + PROFILE_4 + CHECK\_XID with the script byte in the first decompose lookup
-  `UN8IF_compat_tbl`.
+  NFC + PROFILE_4 + CHECK\_XID with the script byte in the first decompose lookup
+  `UN8IF_canon_tbl`.
 
 * **SCX variants**: Some codepoints are combinations, valid for a number of
   scripts.  These appear with the Common and Inherited scripts. When
@@ -448,7 +453,8 @@ TODO
   E.g. if someone wants to allow the Technical idtype.
   Then you have to use `u8ident_get_idtypes ()` by yourself, and it is
   not exported (ie. unusable from the shared library)
-  We only optionally check the IdentifierStatus Allowed with CHECK_XID.
+  We only optionally check the IdentifierStatus Allowed with CHECK_XID, from
+  this TR39 Table 1, which is a summary of the idtype rules.
 
 * **FCD**: This normalization is broken.
 

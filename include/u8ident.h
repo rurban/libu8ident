@@ -11,11 +11,10 @@
 #define U8IDENT_UNICODE_VERSION 14
 
 enum u8id_norm {
-  U8ID_NFKC = 0, // by the default the compatibility composed normalization, as
-                 // in Python 3
-  U8ID_NFD = 1,  // the longer, decomposed normalization, as in the previous
+  U8ID_NFC = 0,  // the default, shorter canonical composed normalization
+  U8ID_NFD = 1,  // the longer, canonical decomposed normalization, as in the previous
                  // Apple HPFS filesystem
-  U8ID_NFC = 2,  // the shorter composed normalization
+  U8ID_NFKC = 2, // the compatibility composed normalization, as in Python 3
   U8ID_NFKD = 3, // the longer compatibility decomposed normalization
   U8ID_FCD = 4,  // the faster variants
   U8ID_FCC = 5
@@ -34,7 +33,7 @@ enum u8id_profile {
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
 #endif
 #ifndef U8ID_NORM_DEFAULT
-#  define U8ID_NORM_DEFAULT U8ID_NFKC
+#  define U8ID_NORM_DEFAULT U8ID_NFC
 #endif
 
 enum u8id_options {
@@ -110,7 +109,7 @@ int u8ident_free_ctx(int);
 void u8ident_free(void);
 
 /* Returns a freshly allocated normalized string, in the option defined at
-   `u8ident_init`. Defaults to U8ID_NFKC. */
+   `u8ident_init`. Defaults to U8ID_NFC. */
 char *u8ident_normalize(const char *buf, int len);
 
 /*
