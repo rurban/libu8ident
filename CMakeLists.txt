@@ -90,7 +90,7 @@ if((CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 9)
 endif()
 
 set(libu8ident_DOCS
-    README.md NOTICE LICENSE)
+    README.md c11.md NOTICE LICENSE)
 
 set(libu8ident_HEADERS
     include/u8ident.h)
@@ -98,15 +98,25 @@ set(libu8ident_HEADERS
 set(libu8ident_SOURCES
     u8ident.c
     u8idnorm.c
-    u8idscr.c)
+    u8idscr.c
+    u8idroar.c)
+
+if (CRoaring_FOUND)
+  set(roaring_HEADERS
+      confus_croar.h
+      )
+endif()
 
 set(private_HEADERS
   scripts.h
   config.h
   u8idscr.h
+  u8idroar.h
   u8id_private.h
-  un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h)
-  
+  un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
+  mark.h unic11.h confus.h ${roaring_HEADERS}
+  )
+
 add_library(u8ident
     ${libu8ident_HEADERS}
     ${libu8ident_SOURCES}
@@ -140,7 +150,18 @@ if(NOT CMAKE_CROSSCOMPILING)
     test.c
     ${libu8ident_SOURCES}
     ${libu8ident_HEADERS})
+  add_executable(test-texts
+    test-texts.c
+    ${libu8ident_SOURCES}
+    ${libu8ident_HEADERS})
+  add_executable(test-c11
+    test-c11.c
+    ${libu8ident_SOURCES}
+    ${libu8ident_HEADERS})
+  #set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
   add_test(test ./u8idtest)
+  #add_test(test-texts ./test-texts)
+  #add_test(test-c11 ./test-c11)
 endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(

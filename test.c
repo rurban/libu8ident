@@ -283,7 +283,7 @@ void test_norm_nfkc(void) {
   assert(!u8ident_init(U8ID_NFKC | U8ID_PROFILE_4));
   testnorm("NFKC", testids);
 
-  char *norm;
+  char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strcmp(norm, "Caf\xc3\xa9") == 0);
@@ -302,10 +302,10 @@ void test_norm_nfc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  char *norm;
   assert(!u8ident_init(U8ID_NFC | U8ID_PROFILE_4));
   testnorm("NFC", testids);
 
+  char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strcmp(norm, "Caf\xc3\xa9") == 0);
@@ -341,10 +341,10 @@ void test_norm_nfkd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  char *norm;
   assert(!u8ident_init(U8ID_NFKD | U8ID_PROFILE_4));
   testnorm("NFKD", testids);
 
+  char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strcmp(norm, "Cafe\xcc\x81") == 0);
@@ -364,10 +364,10 @@ void test_norm_nfd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  char *norm;
   assert(!u8ident_init(U8ID_NFD | U8ID_PROFILE_4));
   testnorm("NFD", testids);
 
+  char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strcmp(norm, "Cafe\xcc\x81") == 0);
