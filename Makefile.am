@@ -118,7 +118,11 @@ perf: perf.c
 	@echo perf requires roaring.c (--with-croaring)
 endif
 
+if !HAVE_WINDOWS
 check-all: check check-asan check-norms check-profiles check-xid
+else
+check-all: check check-norms check-profiles check-xid
+endif
 
 check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
@@ -140,21 +144,21 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6 C11_4 C11_6; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles && \
-	    ./test-profiles profile; \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
+	    ./test-profiles$(EXEEXT) profile; \
         done
 	for n in SAFEC11 C11STD; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles && \
-	    ./test-profiles profile; \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
+	    ./test-profiles$(EXEEXT) profile; \
         done
 check-xid: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in DISABLE ENABLE; do \
             echo $${n}_CHECK_XID; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-xid && \
-	    ./test-xid xid; \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-xid$(EXEEXT) && \
+	    ./test-xid$(EXEEXT) xid; \
         done
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer

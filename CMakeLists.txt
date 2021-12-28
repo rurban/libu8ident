@@ -22,6 +22,7 @@ string(STRIP "${NL_PACKAGE_VERSION}" PACKAGE_VERSION)
 
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("dlfcn.h" HAVE_DLFCN_H)
+CHECK_INCLUDE_FILE("dirent.h" HAVE_DIRENT_H)
 CHECK_INCLUDE_FILE("inttypes.h" HAVE_INTTYPES_H)
 CHECK_INCLUDE_FILE("malloc.h" HAVE_MALLOC_H)
 CHECK_INCLUDE_FILE("memory.h" HAVE_MEMORY_H)
@@ -46,6 +47,7 @@ if(CMAKE_MAJOR_VERSION GREATER 2)
     add_definitions(-DBIG_ENDIAN)
   endif()
 endif()
+add_definitions(-DHAVE_CONFIG_H)
 
 # Supported options:
 #  -DBUILD_SHARED_LIBS=ON,OFF
@@ -150,7 +152,9 @@ if(NOT CMAKE_CROSSCOMPILING)
     test.c
     ${libu8ident_SOURCES}
     ${libu8ident_HEADERS})
-  if (NOT Win32)
+  set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
+  add_test(test ./u8idtest)
+  if (NOT WIN32)
     add_executable(test-texts
       test-texts.c
       ${libu8ident_SOURCES}
@@ -159,11 +163,9 @@ if(NOT CMAKE_CROSSCOMPILING)
       test-c11.c
       ${libu8ident_SOURCES}
       ${libu8ident_HEADERS})
-  endif(NOT Windows)
-  #set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
-  add_test(test ./u8idtest)
-  #add_test(test-texts ./test-texts)
-  #add_test(test-c11 ./test-c11)
+    #add_test(test-texts ./test-texts)
+    #add_test(test-c11 ./test-c11)
+  endif(NOT WIN32)
 endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(
@@ -183,7 +185,7 @@ add_custom_target(
   regen-confus
   COMMAND wget -N https://www.unicode.org/Public/security/latest/confusables.txt
   COMMAND perl mkconfus.pl
-  BYPRODUCTS confus.h
+  #BYPRODUCTS confus.h
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_custom_target(

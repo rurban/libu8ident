@@ -12,8 +12,15 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <sys/types.h>
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
+#endif
+#ifdef HAVE_DIRENT_H
 #include <dirent.h>
+#endif
+#ifdef _WIN32
+#include <direct.h>
+#endif
 #include <libgen.h>
 
 #include "u8ident.h"
@@ -362,7 +369,9 @@ static void print_valid_scripts(void) {
 
 int main(int argc, char **argv) {
   char *dirname = "texts";
+#ifdef HAVE_SYS_STAT_H
   struct stat st;
+#endif
   u8ident_init(U8ID_PROFILE_C11_4);
 #ifdef HAVE_CROARING
   rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
@@ -373,6 +382,7 @@ int main(int argc, char **argv) {
   //print_valid_scripts();
   gen_c11_safe();
   
+#ifndef _WIN32
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
     u8ident_free();
@@ -381,6 +391,7 @@ int main(int argc, char **argv) {
 #endif
     return 0;
   }
+#endif
 
   if (getenv("U8IDTEST_TEXTS")) {
     dirname = getenv("U8IDTEST_TEXTS");
@@ -391,6 +402,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+#ifdef HAVE_DIRENT_H
   struct dirent *d;
   int s = 0;
   // sort the names, to compare against the result
@@ -413,6 +425,8 @@ int main(int argc, char **argv) {
     }
   }
   qsort(files, s, sizeof(char *), cmp_str);
+#endif
+
   for (i = 0; i < s; i++) {
     // printf("%s\n", files[i]);
     testdir(dirname, files[i]);
