@@ -1,6 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4 --install ${ACLOCAL_FLAGS}
 PERL = @PERL@
 WGET = @WGET@
+RONN = @RONN@
 WARN_CFLAGS = @WARN_CFLAGS@
 CROARING_PATH = @CROARING_PATH@
 AM_CFLAGS = -I$(srcdir)/include -I$(builddir) -I$(srcdir) $(WARN_CFLAGS)
