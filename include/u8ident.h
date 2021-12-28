@@ -19,6 +19,7 @@ enum u8id_norm {
   U8ID_FCD = 4,  // the faster variants
   U8ID_FCC = 5
 };
+#define U8ID_NFMASK 7
 enum u8id_profile {
   U8ID_PROFILE_2 = 8,  // Single Script only
   U8ID_PROFILE_3 = 16, // Highly Restrictive
@@ -46,7 +47,6 @@ enum u8id_options {
   U8ID_WARN_CONFUSABLE = 1024,  // requires -DHAVE_CONFUS
   U8ID_ERROR_CONFUSABLE = 2048, // requires -DHAVE_CONFUS
 };
-#define U8ID_NFMASK 7
 
 /* Initialize the library with a bitmask of options, which define the
    performed checks. Recommended is `U8ID_PROFILE_4` only.

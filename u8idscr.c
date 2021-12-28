@@ -359,35 +359,7 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 
 #if !defined U8ID_NORM
-  if (s_u8id_options & U8ID_NFKC)
-#endif
-#if !defined U8ID_NORM || U8ID_NORM == NFKC
-  {
-#  if defined HAVE_CROARING && defined USE_NORM_CROAR
-    return u8ident_roar_maybe_nfkc(cp);
-#  else
-    if (range_bool_search(cp, NFKC_N_list, ARRAY_SIZE(NFKC_N_list)))
-      return true;
-    return range_bool_search(cp, NFKC_M_list, ARRAY_SIZE(NFKC_M_list));
-#  endif
-  }
-#endif
-
-#if !defined U8ID_NORM
-  if (s_u8id_options & U8ID_NFD)
-#endif
-#if !defined U8ID_NORM || U8ID_NORM == NFD
-  {
-#  if defined HAVE_CROARING && defined USE_NORM_CROAR
-    return u8ident_roar_maybe_nfd(cp);
-#  else
-    return !range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
-#  endif
-  }
-#endif
-
-#if !defined U8ID_NORM
-  if (s_u8id_options & U8ID_NFC)
+  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFC)
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFC
   {
@@ -402,7 +374,35 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 
 #if !defined U8ID_NORM
-  if (s_u8id_options & U8ID_NFKD)
+  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFKC)
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFKC
+  {
+#  if defined HAVE_CROARING && defined USE_NORM_CROAR
+    return u8ident_roar_maybe_nfkc(cp);
+#  else
+    if (range_bool_search(cp, NFKC_N_list, ARRAY_SIZE(NFKC_N_list)))
+      return true;
+    return range_bool_search(cp, NFKC_M_list, ARRAY_SIZE(NFKC_M_list));
+#  endif
+  }
+#endif
+
+#if !defined U8ID_NORM
+  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFD)
+#endif
+#if !defined U8ID_NORM || U8ID_NORM == NFD
+  {
+#  if defined HAVE_CROARING && defined USE_NORM_CROAR
+    return u8ident_roar_maybe_nfd(cp);
+#  else
+    return !range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
+#  endif
+  }
+#endif
+
+#if !defined U8ID_NORM
+  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFKD)
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKD
   {
