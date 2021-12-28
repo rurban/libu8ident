@@ -87,7 +87,12 @@ regen-all: regen-scripts regen-norm regen-confus
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man
 
-EXTRA_PROGRAMS = test test-texts test-c11
+EXTRA_PROGRAMS = test
+TESTS = test
+if !HAVE_WINDOWS
+EXTRA_PROGRAMS += test-texts test-c11
+TESTS += test-texts.test test-c11
+endif
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
 test_texts_SOURCES = test-texts.c
@@ -104,7 +109,6 @@ perf_CFLAGS = $(AM_CFLAGS) -DPERF_TEST
 perf_SOURCES = perf.c u8idroar.c
 perf_LDADD = u8idroar.lo
 endif
-TESTS = test test-texts.test test-c11
 TESTS_ENVIRONMENT = U8IDTEST_TEXTS='@top_srcdir@/texts'
 
 test-texts.test: test-texts

@@ -150,14 +150,16 @@ if(NOT CMAKE_CROSSCOMPILING)
     test.c
     ${libu8ident_SOURCES}
     ${libu8ident_HEADERS})
-  add_executable(test-texts
-    test-texts.c
-    ${libu8ident_SOURCES}
-    ${libu8ident_HEADERS})
-  add_executable(test-c11
-    test-c11.c
-    ${libu8ident_SOURCES}
-    ${libu8ident_HEADERS})
+  if (NOT Win32)
+    add_executable(test-texts
+      test-texts.c
+      ${libu8ident_SOURCES}
+      ${libu8ident_HEADERS})
+    add_executable(test-c11
+      test-c11.c
+      ${libu8ident_SOURCES}
+      ${libu8ident_HEADERS})
+  endif(NOT Windows)
   #set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
   add_test(test ./u8idtest)
   #add_test(test-texts ./test-texts)

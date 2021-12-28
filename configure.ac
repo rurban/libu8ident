@@ -251,8 +251,12 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 dnl AC_TYPE_UINTPTR_T
 AC_CHECK_SIZEOF(size_t)
-
 AC_CHECK_FUNCS([ memset strcmp ])
+
+case $host_os in
+  mingw*|cygwin*|msys*) have_windows=1 ;;
+esac
+AM_CONDITIONAL([HAVE_WINDOWS], [test x1 = x$have_windows])
 
 AC_CHECK_TOOLS([PERL], [cperl perl])
 AC_CHECK_TOOLS([WGET], [wget])
