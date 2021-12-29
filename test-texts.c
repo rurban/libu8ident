@@ -218,7 +218,7 @@ int main(int argc, char **argv) {
                                                    mark_croar_bin_len);
 #endif
 
-#ifndef _WIN32
+#if !defined _WIN32 && defined HAVE_SYS_STAT_H
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
     u8ident_free();
