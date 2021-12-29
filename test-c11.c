@@ -2,8 +2,12 @@
    Copyright 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
-   Test a secure variant of C11, the C11 profile: Moderately Restrictive (4), but
-   allow Greek scripts.
+   Create and test a secure variant of C11 identifiers, the safeC11 profile:
+   * Moderately Restrictive (4), but allow Greek scripts,
+   * disallow all restricted identifier codepoints as in Table TR10176-4
+     https://www.unicode.org/Public/security/latest/IdentifierStatus.txt,
+   * and disallow all Limited_Use and Excluded scripts,
+   * plus demand NFC normalization.
 */
 #include "u8id_private.h"
 #include <stdlib.h>
@@ -150,9 +154,9 @@ int testdir(const char *dir, const char *fname) {
 
       // unicode #29 word-break, but simplified:
       // must not split at continuations (Combining marks). e.g. for texts/arabic-1.txt
-      bool isword = prev_isword ? isC11_start(cp) || isC11_cont(cp) : isC11_start(cp);
-      //bool ismark = isMARK(cp);
-      char force_break = (prev_isword != isword);
+      const bool iscont = isC11_cont(cp);
+      bool isword = prev_isword ? (isC11_start(cp) || iscont) : isC11_start(cp);
+      char force_break = (prev_isword != isword && !iscont);
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
       if (force_break != brks[s - olds])
         fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ", cp);
@@ -309,9 +313,10 @@ static void gen_c11_safe(void) {
   fclose (f);
 }
 
+#if 0
 /* Generate a filtered range without Limited and Excluded scripts.
    TODO Also skip the LTR, RTL symbols for non-Arabic, and word joiners on non-CFK scripts.
-   WIP See gen_c11_safe()
+   WIP See gen_c11_safe() for the simplier variant.
  */
 static void print_valid_scripts(void) {
   uint8_t o = 0, s;
@@ -366,6 +371,7 @@ static void print_valid_scripts(void) {
   }
   puts("};");
 }
+#endif
 
 int main(int argc, char **argv) {
   char *dirname = "texts";
@@ -378,11 +384,8 @@ int main(int argc, char **argv) {
 						   mark_croar_bin_len);
 #endif
 
-  gen_c11_all();
-  //print_valid_scripts();
-  gen_c11_safe();
-  
 #ifndef _WIN32
+  // TODO Windows via GetFileAttributes as DirExists
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
     u8ident_free();
@@ -392,6 +395,10 @@ int main(int argc, char **argv) {
     return 0;
   }
 #endif
+
+  gen_c11_all();
+  gen_c11_safe();
+  //print_valid_scripts();
 
   if (getenv("U8IDTEST_TEXTS")) {
     dirname = getenv("U8IDTEST_TEXTS");
@@ -405,7 +412,7 @@ int main(int argc, char **argv) {
 #ifdef HAVE_DIRENT_H
   struct dirent *d;
   int s = 0;
-  // sort the names, to compare against the result
+  // sort the names on unix, to compare against the result
   while ((d = readdir(dir))) {
     size_t l = strlen(d->d_name);
     if (l > 2 && strcmp(&d->d_name[l - 2], ".c") == 0) {

@@ -24,6 +24,12 @@ SRC += u8idroar.c
 HDRS += u8idroar.h confus.h
 DEFINES += -DHAVE_CONFUS
 endif
+ifneq (,$(wildcard /usr/include/sys/stat.h))
+DEFINES += -DHAVE_SYS_STAT_H
+endif
+ifneq (,$(wildcard /usr/include/dirent.h))
+DEFINES += -DHAVE_DIRENT_H
+endif
 ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
 HDRS += confus_croar.h roaring.h
