@@ -19,9 +19,9 @@ which did so, I publish this little library so that others can follow.
 Remember, the meaning of identifiers is to be **identifiable**. A user
 should not confuse one identifier with another. Only a program, IDE or
 library can properly check unicode identifiers, humans certainly not.
-Leaving such checks to a linter is not recommended. (_The C 20 Standard
-commitee is wrong. They believe the whole UCD is needed for those checks.
-So they rather ignore the problem._)
+Leaving such checks to a linter is not recommended, and they don't even exist.
+(_The C 20 Standard commitee is wrong. They believe the whole UCD is needed
+for those checks. So they rather ignore the problem._)
 
 Valid characters
 ----------------
