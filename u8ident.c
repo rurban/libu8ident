@@ -222,7 +222,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (is_new) {
       // if Limited Use it must have been already manually added
       if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
-                   s_u8id_profile < U8ID_PROFILE_5)) {
+                   (s_u8id_profile < U8ID_PROFILE_5 ||
+                    s_u8id_profile < U8ID_PROFILE_C11_4))) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }
