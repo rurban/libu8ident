@@ -3,6 +3,12 @@
    SPDX-License-Identifier: Apache-2.0
 
    See https://www.unicode.org/reports/tr15/tr15-51.html
+
+   TODO: If the codepoint came from the decomposing table, there is no
+   need to reorder.  Only reorder combining marks directly from the
+   user.
+   Optimize already properly composed NFC characters. No need to decompose,
+   reorder and compose for most.
 */
 #include <string.h>
 #include <stdlib.h>
@@ -194,6 +200,10 @@ static int _bsearch_exc(const void *ptr1, const void *ptr2) {
 /* Note that we can generate two versions of the tables.  The old format as
  * used in Unicode::Normalize, and the new 3x smaller NORMALIZE_IND_TBL cperl
  * variant, as used here and in cperl core since 5.27.2.
+ * Return values:
+ *   errors < 1 (see the ERR_* definitions)
+ *   0: ok, passthru (not in table)
+ *   >0: len of the returned utf-8 sequence
  */
 static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
   /* the new format generated with cperl Unicode-Normalize/mkheader -uni -ind
@@ -206,13 +216,13 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
   }
   plane = UN8IF_canon[cp >> 16];
   if (!plane) { /* Only the first 3 of 16 are filled */
-    return 0;
+    return EOK;
   }
   row = plane[(cp >> 8) & 0xff];
   if (row) { /* the first row is pretty filled, the rest very sparse */
     const UN8IF_canon_PLANE_T vi = row[cp & 0xff];
     if (!vi)
-      return 0;
+      return EOK;
 #  if UN8IF_canon_exc_size > 0
     /* overlong: search in extra list */
     else if (unlikely(vi == (uint16_t)-1)) {
@@ -230,7 +240,7 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
         memcpy(dest, e->v, l + 1); /* incl \0 */
         return (int)l;
       }
-      return 0;
+      return EOK;
     }
 #  endif
     else {
@@ -255,7 +265,7 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
       return len;
     }
   } else {
-    return 0;
+    return EOK;
   }
 }
 #endif // NFC, NFD, FCC, FCD
@@ -268,13 +278,13 @@ static int _decomp_compat_s(char *dest, size_t dmax, uint32_t cp) {
   const UN8IF_compat_PLANE_T **plane, *row;
   plane = UN8IF_compat[cp >> 16];
   if (!plane) { /* Only the first 3 of 16 are filled */
-    return 0;
+    return EOK;
   }
   row = plane[(cp >> 8) & 0xff];
   if (row) { /* the first row is pretty filled, the rest very sparse */
     const UN8IF_compat_PLANE_T vi = row[cp & 0xff];
     if (!vi)
-      return 0;
+      return EOK;
 #  if UN8IF_compat_exc_size > 0
     else if (unlikely(vi ==
                       (uint16_t)-1)) { /* overlong: search in extra list */
@@ -292,7 +302,7 @@ static int _decomp_compat_s(char *dest, size_t dmax, uint32_t cp) {
         memcpy(dest, e->v, l + 1); /* incl \0 */
         return (int)l;
       }
-      return 0;
+      return EOK;
 #  endif
     } else {
       /* value => length and index */
@@ -311,7 +321,7 @@ static int _decomp_compat_s(char *dest, size_t dmax, uint32_t cp) {
       return l;
     }
   } else {
-    return 0;
+    return EOK;
   }
 }
 #endif // NFKC or NFKD
@@ -853,7 +863,7 @@ EXTERN char *u8ident_normalize(const char *src, int len) {
     tmp_size = destlen + 2;
     tmp_ptr = tmp = (char *)malloc(tmp_size);
   }
-  // now reorder for some canonalization
+  // now reorder for some canonalization (if required)
   err = u8id_reorder_s((unsigned char *)tmp_ptr, tmp_size, dest, destlen);
   while (err == ERR_NOSPACE) {
     tmp_size *= 2;
