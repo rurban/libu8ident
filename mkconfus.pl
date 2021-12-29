@@ -1,14 +1,17 @@
-#!/usr/bin/env perl
+#!/usr/bin/env perl -s
 # libu8ident - Check unicode security guidelines for identifiers.
 # Copyright 2014, 2021 Reini Urban
 # SPDX-License-Identifier: Apache-2.0
 #
 # Create confus.h from https://www.unicode.org/Public/security/latest/confusables.txt
+# with mkconfus.pl -c.
+# perf needs mkconfus.pl without -c to generate all headers.
 #
 # Note that this is just a binary-search in an unoptimized,
 # uncompressed array, without any values.  It might be smaller and
 # faster with gperf or cbitset/croaring.
 
+use vars qw($c);
 use strict;
 use Config;
 my $conf = "confusables.txt";
@@ -138,19 +141,30 @@ EOF
 close $H1;
 
 print "Create serialized roaring bitmaps:\n";
+my $arg = $c ? "confus" : "";
 if ($^O =~ /Win32/) {
   system($Config{cc}." mkroar.c -I. -o mkroar.exe");
-  system("mkroar.exe");
+  if ($c) {
+    system("mkroar.exe", $arg);
+  } else {
+    system("mkroar.exe");
+  }
   # ignore vms for now
 } else {
   system($Config{cc}." mkroar.c -I. -o mkroar");
-  system("./mkroar");
+  if ($c) {
+    system("./mkroar", $arg);
+  } else {
+    system("./mkroar");
+  }
 }
 print "\n";
 # allowed not optimized. stayed with 816 array
 # confus optimized from 8552 byte to 4731 byte (3 run-length encoded containers)
 # NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M
-for my $name (qw(allowed confus nfd_n nfc_n nfc_m nfkd_n nfkc_n nfkc_m)) {
+my @list = $c ? qw(confus)
+              : qw(allowed confus nfd_n nfc_n nfc_m nfkd_n nfkc_n nfkc_m);
+for my $name (@list) {
   my $c = $name . "_croar";
   my $b = $c;
   if ($name =~ /(nfk?[cd])_./) {

@@ -89,11 +89,13 @@ $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt
 	$(PERL) mkscripts.pl
 confus.h: mkconfus.pl mkroar.c # confusables.txt
-	$(PERL) mkconfus.pl
-confus_croar.h allow_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
-	$(PERL) mkconfus.pl
+	$(PERL) mkconfus.pl -c
+confus_croar.h: mkroar.c mkconfus.pl
+	$(PERL) mkconfus.pl -c
 mark.h: mkmark.pl # UnicodeData.txt
 	$(PERL) mkmark.pl
+allow_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
+	$(PERL) mkconfus.pl
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
@@ -130,8 +132,8 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
 
-perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h mark.h \
-      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allow_croar.h
+perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
+      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allow_croar.h confus_croar.h mark.h
 	$(CC) $(CFLAGS_REL) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
 	./perf
 
