@@ -196,6 +196,8 @@ regen-confus:
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h u8id*.h
+GTAGS: $(SRC) $(HEADER) $(HDRS)
+	ls $(SRC) $(HEADER) $(HDRS) | gtags -f -
 
 # End Maintainer-only
 
