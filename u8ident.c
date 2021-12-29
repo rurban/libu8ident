@@ -163,7 +163,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     continue; // skip all script checks
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 6 && U8ID_PROFILE != C11_6
 #else
-    if (s_u8id_profile == U8ID_PROFILE_6 || s_u8id_profile == U8ID_PROFILE_C11_6)
+    if (s_u8id_profile == U8ID_PROFILE_6 ||
+        s_u8id_profile == U8ID_PROFILE_C11_6)
       continue;
 #endif
 
@@ -275,11 +276,13 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         // the only remaining profile
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 4
         else if (scr == SC_Greek || scr == SC_Cyrillic) {
-          assert(s_u8id_profile == U8ID_PROFILE_4 || s_u8id_profile == U8ID_PROFILE_C11_4);
+          assert(s_u8id_profile == U8ID_PROFILE_4 ||
+                 s_u8id_profile == U8ID_PROFILE_C11_4);
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         } else {
-          assert(s_u8id_profile == U8ID_PROFILE_4 || s_u8id_profile == U8ID_PROFILE_C11_4);
+          assert(s_u8id_profile == U8ID_PROFILE_4 ||
+                 s_u8id_profile == U8ID_PROFILE_C11_4);
           // but not more than 2
           if (ctx->count >= 2) {
             ctx->last_cp = cp;

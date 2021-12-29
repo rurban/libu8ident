@@ -42,36 +42,36 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
   }
   switch (what) {
   case ALLOWED_ID_LIST:
-      file = "allowed_croar.bin";
-      break;
+    file = "allowed_croar.bin";
+    break;
   case CONFUSABLES:
-      file = "confus_croar.bin";
-      break;
+    file = "confus_croar.bin";
+    break;
   case MARK:
-      file = "mark_croar.bin";
-      break;
-      /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
+    file = "mark_croar.bin";
+    break;
+    /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
   case NFD_N:
-      file = "nfd_n_croar.bin";
-      break;
+    file = "nfd_n_croar.bin";
+    break;
   case NFC_N: // this might be slower than binary search
-      file = "nfc_n_croar.bin";
-      break;
+    file = "nfc_n_croar.bin";
+    break;
   case NFC_M:
-      file = "nfc_m_croar.bin";
-      break;
+    file = "nfc_m_croar.bin";
+    break;
   case NFKD_N:
-      file = "nfkd_n_croar.bin";
-      break;
+    file = "nfkd_n_croar.bin";
+    break;
   case NFKC_N:
-      file = "nfkc_n_croar.bin";
-      break;
+    file = "nfkc_n_croar.bin";
+    break;
   case NFKC_M:
-      file = "nfkc_m_croar.bin";
-      break;
+    file = "nfkc_m_croar.bin";
+    break;
   default:
-      fprintf(stderr, "Unhandled case %d\n", what);
-      exit(1);
+    fprintf(stderr, "Unhandled case %d\n", what);
+    exit(1);
   }
 
   f = fopen(file, "w");

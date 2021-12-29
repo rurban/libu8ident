@@ -17,13 +17,13 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
+#  include <sys/stat.h>
 #endif
 #ifdef HAVE_DIRENT_H
-#include <dirent.h>
+#  include <dirent.h>
 #endif
 #ifdef _WIN32
-#include <direct.h>
+#  include <direct.h>
 #endif
 #include <libgen.h>
 
@@ -134,8 +134,8 @@ int testdir(const char *dir, const char *fname) {
 
   printf("-- texts/%s\n", fname);
   int ctx = u8ident_new_ctx();
-  //while (fscanf(f, " %1023s", word) == 1)
-  // Check now also against libunistring: u8_wordbreaks
+  // while (fscanf(f, " %1023s", word) == 1)
+  //  Check now also against libunistring: u8_wordbreaks
   while (fgets(line, 1023, f)) {
     char *s = &line[0];
     bool prev_isword = false;
@@ -153,13 +153,15 @@ int testdir(const char *dir, const char *fname) {
       }
 
       // unicode #29 word-break, but simplified:
-      // must not split at continuations (Combining marks). e.g. for texts/arabic-1.txt
+      // must not split at continuations (Combining marks). e.g. for
+      // texts/arabic-1.txt
       const bool iscont = isC11_cont(cp);
       bool isword = prev_isword ? (isC11_start(cp) || iscont) : isC11_start(cp);
       char force_break = (prev_isword != isword && !iscont);
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
       if (force_break != brks[s - olds])
-        fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ", cp);
+        fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
+                cp);
       force_break = brks[s - olds];
 #endif
       // first, or changed from non-word to word, and is no mark (continuation)
@@ -169,13 +171,12 @@ int testdir(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          }
-          else {
+          } else {
             memcpy(wp, olds, l);
             wp += l;
           }
           continue; // started new word
-        } else { // word-end: fall-through to word check
+        } else {    // word-end: fall-through to word check
           *wp = '\0';
         }
       } else { // no change. in word or non-word
@@ -183,8 +184,7 @@ int testdir(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          }
-          else {
+          } else {
             memcpy(wp, olds, l);
             wp += l;
           }
@@ -199,7 +199,8 @@ int testdir(const char *dir, const char *fname) {
         printf("%s: %s (%s", word, errstr(ret), scripts);
         if (ret < 0) {
           uint32_t cp = u8ident_failed_char(ctx);
-          printf(" + U+%X %s)!\n", cp, u8ident_script_name(u8ident_get_script(cp)));
+          printf(" + U+%X %s)!\n", cp,
+                 u8ident_script_name(u8ident_get_script(cp)));
         } else
           printf(")\n");
         free((char *)scripts);
@@ -219,9 +220,9 @@ int cmp_str(const void *a, const void *b) {
 }
 
 // uint8_t[10FFFF/8]
-#define BITGET(b,i) (b[i >> 3] & (1 << (7 - (i & 7)))) != 0
-#define BITSET(b,i) b[i >> 3] |= (1 << (7 - (i & 7)))
-#define BITCLR(b,i) b[i >> 3] &= ~(1 << (7 - (i & 7)))
+#define BITGET(b, i) (b[i >> 3] & (1 << (7 - (i & 7)))) != 0
+#define BITSET(b, i) b[i >> 3] |= (1 << (7 - (i & 7)))
+#define BITCLR(b, i) b[i >> 3] &= ~(1 << (7 - (i & 7)))
 
 void emit_ranges(FILE *f, size_t start, uint8_t *u) {
   unsigned from = start;
@@ -237,8 +238,9 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u) {
         const uint8_t s = u8ident_get_script(from);
         fprintf(f, "    {0x%X, 0x%X}, // %s%s\n", from, i - 1,
                 u8ident_script_name(s),
-                s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
-                s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
+                s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
+                : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
+                                              : "");
       }
       from = i;
       on = false;
@@ -253,7 +255,7 @@ static void gen_c11_all(void) {
   uint8_t o = 0, s;
   uint8_t u[0x10ffff >> 3];
   memset(u, 0, sizeof(u));
-  for (size_t i=0; i < ARRAY_SIZE(c11_start_list); i++) {
+  for (size_t i = 0; i < ARRAY_SIZE(c11_start_list); i++) {
     struct range_bool r = c11_start_list[i];
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       BITSET(u, cp);
@@ -262,29 +264,33 @@ static void gen_c11_all(void) {
         if (cp == r.from)
           printf("    {0x%X, 0x%X}, // %s%s\n", cp, r.to,
                  u8ident_script_name(s),
-                 s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
-                 s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
+                 s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
+                 : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
+                                               : "");
         else
-          printf("                      // %X: %s%s\n",
-                 cp, u8ident_script_name(s),
-                 s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)" :
-                 s >= FIRST_EXCLUDED_SCRIPT ? " (Excluded)" : "");
+          printf("                      // %X: %s%s\n", cp,
+                 u8ident_script_name(s),
+                 s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
+                 : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
+                                               : "");
         o = s;
       }
     }
   }
   FILE *f = fopen("c11-all.h", "w");
   fputs("// generated with test-c11 from unic11.h", f);
-  fprintf(f, "%s", "const struct range_bool c11_start_list[] = {\n"
-       "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
-       "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
-       "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
-       "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
-       "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
-       "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also Bopomofo)\n");
+  fprintf(f, "%s",
+          "const struct range_bool c11_start_list[] = {\n"
+          "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
+          "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
+          "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
+          "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
+          "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
+          "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also "
+          "Bopomofo)\n");
   emit_ranges(f, 0x100, u);
   fprintf(f, "%s", "};\n");
-  fclose (f);
+  fclose(f);
 }
 
 static void gen_c11_safe(void) {
@@ -296,21 +302,25 @@ static void gen_c11_safe(void) {
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
       if (s < FIRST_EXCLUDED_SCRIPT && u8ident_is_allowed(cp)) {
-        BITSET(u,cp);
+        BITSET(u, cp);
       }
     }
   }
-  fputs("// generated with test-c11 by filtering allowed scripts and IdentifierStatus", f);
-  fprintf(f, "%s", "const struct range_bool safec11_start_list[] = {\n"
-       "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
-       "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
-       "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
-       "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
-       "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
-       "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also Bopomofo)\n");
+  fputs("// generated with test-c11 by filtering allowed scripts and "
+        "IdentifierStatus",
+        f);
+  fprintf(f, "%s",
+          "const struct range_bool safec11_start_list[] = {\n"
+          "    {'_', '_'},         {'a', 'z'},         {'A', 'Z'},\n"
+          "    {'$', '$'},         {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
+          "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
+          "    {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},\n"
+          "    {0x00D8, 0x00F6},   {0x00F8, 0x00FF},\n"
+          "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also "
+          "Bopomofo)\n");
   emit_ranges(f, 0x100, u);
   fprintf(f, "%s", "};\n");
-  fclose (f);
+  fclose(f);
 }
 
 #if 0
@@ -381,7 +391,7 @@ int main(int argc, char **argv) {
   u8ident_init(U8ID_PROFILE_C11_4);
 #ifdef HAVE_CROARING
   rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
-						   mark_croar_bin_len);
+                                                   mark_croar_bin_len);
 #endif
 
 #ifndef _WIN32
@@ -389,16 +399,16 @@ int main(int argc, char **argv) {
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
     u8ident_free();
-#ifdef HAVE_CROARING
-    roaring_bitmap_free (rmark);
-#endif
+#  ifdef HAVE_CROARING
+    roaring_bitmap_free(rmark);
+#  endif
     return 0;
   }
 #endif
 
   gen_c11_all();
   gen_c11_safe();
-  //print_valid_scripts();
+  // print_valid_scripts();
 
   if (getenv("U8IDTEST_TEXTS")) {
     dirname = getenv("U8IDTEST_TEXTS");
@@ -444,7 +454,7 @@ int main(int argc, char **argv) {
   free(files);
   u8ident_free();
 #ifdef HAVE_CROARING
-  roaring_bitmap_free (rmark);
+  roaring_bitmap_free(rmark);
 #endif
   return 0;
 }

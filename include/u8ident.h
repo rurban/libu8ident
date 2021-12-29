@@ -11,9 +11,9 @@
 #define U8IDENT_UNICODE_VERSION 14
 
 enum u8id_norm {
-  U8ID_NFC = 0,  // the default, shorter canonical composed normalization
-  U8ID_NFD = 1,  // the longer, canonical decomposed normalization, as in the previous
-                 // Apple HPFS filesystem
+  U8ID_NFC = 0, // the default, shorter canonical composed normalization
+  U8ID_NFD = 1, // the longer, canonical decomposed normalization, as in the
+                // previous Apple HPFS filesystem
   U8ID_NFKC = 2, // the compatibility composed normalization, as in Python 3
   U8ID_NFKD = 3, // the longer compatibility decomposed normalization
   U8ID_FCD = 4,  // the faster variants
@@ -21,11 +21,11 @@ enum u8id_norm {
 };
 #define U8ID_NFMASK 7
 enum u8id_profile {
-  U8ID_PROFILE_2 = 8,  // Single Script only
-  U8ID_PROFILE_3 = 16, // Highly Restrictive
-  U8ID_PROFILE_4 = 32, // Moderately Restrictive
-  U8ID_PROFILE_5 = 64, // Minimally Restrictive
-  U8ID_PROFILE_6 = 128, // Unrestricted
+  U8ID_PROFILE_2 = 8,        // Single Script only
+  U8ID_PROFILE_3 = 16,       // Highly Restrictive
+  U8ID_PROFILE_4 = 32,       // Moderately Restrictive
+  U8ID_PROFILE_5 = 64,       // Minimally Restrictive
+  U8ID_PROFILE_6 = 128,      // Unrestricted
   U8ID_PROFILE_C11_4 = 4096, // 4 + Greek with only Allowed ID's ("safeC11")
   U8ID_PROFILE_C11_6 = 8192, // The C11 std
 };

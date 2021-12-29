@@ -12,13 +12,13 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
+#  include <sys/stat.h>
 #endif
 #ifdef HAVE_DIRENT_H
-#include <dirent.h>
+#  include <dirent.h>
 #endif
 #ifdef _WIN32
-#include <direct.h>
+#  include <direct.h>
 #endif
 #include <libgen.h>
 
@@ -122,8 +122,8 @@ int testdir(const char *dir, const char *fname) {
 
   printf("-- texts/%s\n", fname);
   int ctx = u8ident_new_ctx();
-  //while (fscanf(f, " %1023s", word) == 1)
-  // Check now also against libunistring: u8_wordbreaks
+  // while (fscanf(f, " %1023s", word) == 1)
+  //  Check now also against libunistring: u8_wordbreaks
   while (fgets(line, 1023, f)) {
     char *s = &line[0];
     bool prev_isword = false;
@@ -141,13 +141,15 @@ int testdir(const char *dir, const char *fname) {
       }
 
       // unicode #29 word-break, but simplified:
-      // must not split at continuations (Combining marks). e.g. for texts/arabic-1.txt
+      // must not split at continuations (Combining marks). e.g. for
+      // texts/arabic-1.txt
       bool isword = u8ident_is_allowed(cp);
       bool ismark = isMARK(cp);
       char force_break = (prev_isword != isword && !ismark);
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
       if (force_break != brks[s - olds])
-        fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ", cp);
+        fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
+                cp);
       force_break = brks[s - olds];
 #endif
       // first, or changed from non-word to word, and is no mark (continuation)
@@ -157,13 +159,12 @@ int testdir(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          }
-          else {
+          } else {
             memcpy(wp, olds, l);
             wp += l;
           }
           continue; // started new word
-        } else { // word-end: fall-through to word check
+        } else {    // word-end: fall-through to word check
           *wp = '\0';
         }
       } else { // no change. in word or non-word
@@ -171,8 +172,7 @@ int testdir(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          }
-          else {
+          } else {
             memcpy(wp, olds, l);
             wp += l;
           }
@@ -187,7 +187,8 @@ int testdir(const char *dir, const char *fname) {
         printf("%s: %s (%s", word, errstr(ret), scripts);
         if (ret < 0) {
           uint32_t cp = u8ident_failed_char(ctx);
-          printf(" + U+%X %s)!\n", cp, u8ident_script_name(u8ident_get_script(cp)));
+          printf(" + U+%X %s)!\n", cp,
+                 u8ident_script_name(u8ident_get_script(cp)));
         } else
           printf(")\n");
         free((char *)scripts);
@@ -214,16 +215,16 @@ int main(int argc, char **argv) {
   u8ident_init(U8ID_DEFAULT_OPTS);
 #ifdef HAVE_CROARING
   rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
-						   mark_croar_bin_len);
+                                                   mark_croar_bin_len);
 #endif
 
 #ifndef _WIN32
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
     u8ident_free();
-#ifdef HAVE_CROARING
-    roaring_bitmap_free (rmark);
-#endif
+#  ifdef HAVE_CROARING
+    roaring_bitmap_free(rmark);
+#  endif
     return 0;
   }
 #endif
@@ -272,7 +273,7 @@ int main(int argc, char **argv) {
   free(files);
   u8ident_free();
 #ifdef HAVE_CROARING
-  roaring_bitmap_free (rmark);
+  roaring_bitmap_free(rmark);
 #endif
   return 0;
 }
