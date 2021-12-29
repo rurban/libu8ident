@@ -130,7 +130,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
 
-perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h \
+perf: perf.c u8idroar.c $(HEADER) $(HDRS) confus_croar.h mark.h \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allow_croar.h
 	$(CC) $(CFLAGS_REL) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
 	./perf

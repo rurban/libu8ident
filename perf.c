@@ -19,9 +19,13 @@
    croaring: 4497194	bsearch: 2139826 	 110.17% slower
    allowed_id:
    croaring: 4333056	bsearch: 2439034         77.65% slower
+   mark:
+   croaring: 138476	bsearch: 98540 	         40.53% slower
 
    with the scripts1.h variant: (first search range, then singles, see branch
-   scripts1) nfkd: bsearch: 3326908 	2x bsearch: 4575870 	 37.54% faster
+   scripts1)
+   nfkd:
+   bsearch: 3326908 	2x bsearch: 4575870 	 37.54% faster
    nfd:
    bsearch: 2575716 	2x bsearch: 4131504 	 60.40% faster
    nfkc:
@@ -39,6 +43,8 @@
 #include "u8idroar.h"
 #undef EXT_SCRIPTS
 #include "confus.h"
+#define EXT_SCRIPTS
+#include "mark.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
@@ -285,9 +291,38 @@ void perf_allowed_id(void) {
   for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list); i++) {
     for (uint32_t cp = allowed_id_list[i].from; cp <= allowed_id_list[i].to;
          cp++) {
-      bool ret =
-          range_bool_search(cp, allowed_id_list,
-                            sizeof(allowed_id_list) / sizeof(*allowed_id_list));
+      bool ret = range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
+      gret |= ret;
+    }
+  }
+  end = timer_end();
+  uint64_t t2 = end - begin;
+  if (t1 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
+           100.0 * (t2 - t1) / (double)t1);
+  else
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
+           100.0 * (t1 - t2) / (double)t2);
+}
+
+void perf_mark(void) {
+  printf("mark:\n");
+  uint64_t begin = timer_start();
+  for (size_t i = 0; i < ARRAY_SIZE(mark_list); i++) {
+    for (uint32_t cp = mark_list[i].from; cp <= mark_list[i].to;
+         cp++) {
+      bool ret = u8ident_roar_is_mark(cp);
+      gret |= ret;
+    }
+  }
+  uint64_t end = timer_end();
+  uint64_t t1 = end - begin;
+
+  begin = timer_start();
+  for (size_t i = 0; i < ARRAY_SIZE(mark_list); i++) {
+    for (uint32_t cp = mark_list[i].from; cp <= mark_list[i].to;
+         cp++) {
+      bool ret = range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
       gret |= ret;
     }
   }
@@ -309,5 +344,6 @@ int main(void) {
   perf_nfkc();
   perf_nfc();
   perf_allowed_id();
+  perf_mark();
   u8ident_roar_free();
 }

@@ -13,9 +13,11 @@
 #ifndef PERF_TEST
 // too slow
 #  undef USE_ALLOWED_CROAR
+#  undef USE_MARK_CROAR
 #  undef USE_NORM_CROAR
 #else
 #  define USE_ALLOWED_CROAR
+#  define USE_MARK_CROAR
 #  define USE_NORM_CROAR
 #endif
 

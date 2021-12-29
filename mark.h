@@ -316,6 +316,7 @@ const struct range_bool mark_list[] = {
 #endif
 
 #ifdef HAVE_CROARING
+#  ifndef EXT_SCRIPTS
 /* generated via mkroar.c */
 const unsigned char mark_croar_bin[] = {
   0x3b, 0x30, 0x02, 0x00, 0x07, 0x00, 0x00, 0x37, 0x05, 0x01, 0x00, 0x3f,
@@ -422,4 +423,8 @@ const unsigned char mark_croar_bin[] = {
   0x00, 0x01, 0x00, 0x00, 0x01, 0xef, 0x00
 };
 const unsigned int mark_croar_bin_len = 1219;
+#  else
+extern const unsigned int mark_croar_bin_len;
+extern const unsigned char mark_croar_bin[1219]; // checkme on updates
+#  endif // EXT_SCRIPTS
 #endif // HAVE_CROARING

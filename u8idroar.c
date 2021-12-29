@@ -20,6 +20,14 @@ static roaring_bitmap_t *rc = NULL;
 static roaring_bitmap_t *ra = NULL;
 #  endif
 
+#  ifdef USE_MARK_CROAR
+#    define EXT_SCRIPTS
+#    include "scripts.h"
+#    undef EXT_SCRIPTS
+#    include "mark.h"
+static roaring_bitmap_t *rm = NULL;
+#  endif
+
 #  ifdef USE_NORM_CROAR
 #    include "nfkc_croar.h"
 #    include "nfc_croar.h"
@@ -62,6 +70,9 @@ int u8ident_roar_init(void) {
 #  ifdef USE_ALLOWED_CROAR
   DEF_DESERIALIZE_SAFE(ra, allowed)
 #  endif
+#  ifdef USE_MARK_CROAR
+  DEF_DESERIALIZE_SAFE(rm, mark)
+#  endif
 #  undef DEF_DESERIALIZE_SAFE
   return 0;
 }
@@ -77,6 +88,9 @@ void u8ident_roar_free(void) {
 
 #  ifdef USE_ALLOWED_CROAR
   FREE_R(ra);
+#  endif
+#  ifdef USE_MARK_CROAR
+  FREE_R(rm);
 #  endif
 #  ifdef USE_NORM_CROAR
   FREE_R(rnfkc_m);
@@ -96,6 +110,12 @@ EXTERN bool u8ident_is_confusable(const uint32_t cp) {
 #  ifdef USE_ALLOWED_CROAR
 bool u8ident_roar_is_allowed(const uint32_t cp) {
   return roaring_bitmap_contains(ra, cp);
+}
+#  endif
+
+#  ifdef USE_MARK_CROAR
+bool u8ident_roar_is_mark(const uint32_t cp) {
+  return roaring_bitmap_contains(rm, cp);
 }
 #  endif
 

@@ -15,6 +15,10 @@ EXTERN bool u8ident_is_confusable(const uint32_t cp);
 bool u8ident_roar_is_allowed(const uint32_t cp);
 #endif
 
+#ifdef USE_MARK_CROAR
+bool u8ident_roar_is_mark(const uint32_t cp);
+#endif
+
 #ifdef USE_NORM_CROAR
 bool u8ident_roar_maybe_nfkc(const uint32_t cp);
 bool u8ident_roar_maybe_nfc(const uint32_t cp);

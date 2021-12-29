@@ -79,13 +79,24 @@ if (-e "roaring.h" && -e "roaring.c") {
     }
     print "\n";
     my $c = "mark_croar";
-    print $H "\n#ifdef HAVE_CROARING\n";
-    print $H "/* generated via mkroar.c */\n";
+    print $H <<'EOF';
+
+#ifdef HAVE_CROARING
+#  ifndef EXT_SCRIPTS
+/* generated via mkroar.c */
+EOF
     close $H;
     system("xxd -i $c.bin >> mark.h");
     unlink "$c.bin";
     open $H, ">>", "mark.h" or die "appending mark.h $!";
-    print $H "#endif // HAVE_CROARING\n";
+    print $H <<'EOF';
+#  else
+extern const unsigned int mark_croar_bin_len;
+extern const unsigned char mark_croar_bin[1219]; // checkme on updates
+#  endif // EXT_SCRIPTS
+#endif // HAVE_CROARING
+EOF
+    close $H;
 }
 
 close $H;
