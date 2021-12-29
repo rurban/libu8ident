@@ -67,9 +67,9 @@ EXTERN int u8ident_init(unsigned options) {
   }
   if (!s_u8id_profile) {
     if (options & U8ID_PROFILE_C11_4)
-      s_u8id_profile = 11;
+      s_u8id_profile = U8ID_PROFILE_C11_4;
     else if (options & U8ID_PROFILE_C11_6)
-      s_u8id_profile = 12;
+      s_u8id_profile = U8ID_PROFILE_C11_6;
   }
   if (!s_u8id_profile)
     return -1; // error. no profile defined
@@ -84,10 +84,12 @@ EXTERN int u8ident_init(unsigned options) {
 unsigned u8ident_options(void) { return s_u8id_options; }
 unsigned u8ident_profile(void) {
 #if defined U8ID_PROFILE_SAFEC11
-  return 11;
+  return U8ID_PROFILE_C11_4;
 #elif defined U8ID_PROFILE_C11STD
-  return 12;
+  return U8ID_PROFILE_C11_6;
 #else
+  if (s_u8id_profile > U8ID_PROFILE_6)
+    return s_u8id_profile;
   assert(s_u8id_profile >= U8ID_PROFILE_2 && s_u8id_profile <= U8ID_PROFILE_6);
   // 8>>4: 0, 16>>4: 1, 32>>4: 2, 64>>4: 4, 128>>4: 8
   static const uint8_t _profiles[] = {2, 3, 4, 0, 5, 0, 0, 0, 6};
@@ -272,7 +274,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         // the only remaining profile
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 4
         else if (scr == SC_Greek || scr == SC_Cyrillic) {
-          assert(s_u8id_profile == U8ID_PROFILE_4);
+          assert(s_u8id_profile == U8ID_PROFILE_4 || s_u8id_profile == U8ID_PROFILE_C11_4);
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         } else {

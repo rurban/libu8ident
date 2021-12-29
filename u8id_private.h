@@ -37,8 +37,8 @@
 #define NFKD 3
 #define FCD 4
 #define FCC 5
-#define C11_4 7
-#define C11_6 8
+#define C11_4 4096
+#define C11_6 8192
 #define _XSTR(s) _STR(s)
 #define _STR(s) #s
 #define CAT(a, b) a##b
