@@ -364,6 +364,13 @@ Usage:
       free(errstr);
     }
 
+u8idlint
+--------
+
+Included is the sample program **u8idlint** which parses program
+source files for possible unicode identifier violations.
+See `man u8idlint`.
+
 Packaging
 ---------
 
