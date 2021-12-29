@@ -208,7 +208,7 @@ e.g codesizes for u8idnorm.o with -Os
 default: 365K with -g on amd64-gcc
 
 For `-DU8ID_PROFILE_SAFEC11` see above. `c11_4` is also called
-**safeC11**, `c11_6` is the std insecure C11 profile.
+**SAFEC11**, `c11_6` is the std insecure C11 profile.
 
 With `confus` enabled, the confusable API is added.
 With `croaring` the confus API is about twice as fast, and needs half the size.
