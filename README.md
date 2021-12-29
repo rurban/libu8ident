@@ -133,18 +133,19 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   value indicating that the string does not match any of the levels
   1-5.
 
-c11_4. **safeC11**
+c11_4. **SAFEC11**
 
 * We also provide a special profile, called **`U8ID_PROFILE_C11_4`**,
   defined by `-DU8ID_PROFILE_SAFEC11`. This is an extended Moderate
   Profile (4), plus allowing Greek with Latin, plus only allowing Allowed
   IdentifierStatus.
-* `U8ID_PROFILE_C11_4` is the secure extension over C11, disallowing the
-  restricted and limited_use scripts and identifiers, arbitrary rtl
-  and ltr overrides, and all the insecure mixed scripts combinations.
-  See `unic11.h`, `test-c11.c` and [c11.md](c11.md).
+* `U8ID_PROFILE_C11_4` aka `U8ID_PROFILE_SAFEC11` is the secure
+  extension over C11, disallowing the restricted and limited_use
+  scripts and identifiers, arbitrary rtl and ltr overrides, and all
+  the insecure mixed scripts combinations.  See `unic11.h`,
+  `test-c11.c` and [c11.md](c11.md).
 
-c11_5. **C11STD**
+c11_6. **C11STD**
 
 * The C11 standard allows a certain range of (mostly insecure)
   codepoints, and did not define combinations of mixed scripts, not a
