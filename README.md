@@ -464,3 +464,7 @@ TODO
   spoofing exploits.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
+
+AUTHOR
+------
+Reini Urban <rurban@cpan.org> 2014,2021

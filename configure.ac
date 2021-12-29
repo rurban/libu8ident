@@ -214,6 +214,7 @@ AC_CHECK_HEADERS([stdlib.h	\
                   stdint.h	\
                   assert.h	\
                   unistd.h	\
+                  getopt.h      \
                   sys/types.h	\
                   sys/stat.h	\
                   dirent.h	\
@@ -252,6 +253,8 @@ AC_TYPE_UINT64_T
 dnl AC_TYPE_UINTPTR_T
 AC_CHECK_SIZEOF(size_t)
 AC_CHECK_FUNCS([ memset strcmp ])
+AC_CHECK_FUNCS([getopt_long],[],
+  AC_MSG_WARN([getopt_long not found. u8idlint will not accept long options.]))
 
 case $host_os in
   mingw*|cygwin*|msys*) have_windows=1 ;;

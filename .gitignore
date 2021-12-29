@@ -7,6 +7,7 @@ autom4te.cache
 config.h
 include/u8ident.h.bak
 libu8ident.a
+u8idlint
 u8ident.o
 u8idnorm.o
 u8idscr.o

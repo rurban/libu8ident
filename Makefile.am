@@ -16,9 +16,14 @@ libu8ident_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
+bin_PROGRAMS = u8idlint
+u8idlint_SOURCES = u8idlint.c
+u8idlint_LDADD   = $(lib_LTLIBRARIES)
+
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc
-man_MANS = u8ident.3
+dist_man1_MANS = u8idlint.1
+dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
@@ -61,6 +66,11 @@ check-syntax:
 clang-format:
 	clang-format -i $(srcdir)/*.c $(srcdir)/include/*.h $(srcdir)/scripts.h $(srcdir)/confus.h $(srcdir)/u8id*.h
 
+regen-man: $(bin_PROGRAMS)
+	-for p in $(dist_man1_MANS); do \
+	  base=`basename $$p .1`; \
+	  help2man -N -s1 -p $(PACKAGE_NAME) --manual "U8IDENT Manual $(VERSION)" -o $$p ./$$base$(EXEEXT); done
+
 # Create the normalization headers via a current perl
 Unicode-Normalize: un8ifcan.h
 	if test -d Unicode-Normalize; then \
@@ -83,7 +93,7 @@ regen-scripts:
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
-regen-all: regen-scripts regen-norm regen-confus
+regen-all: regen-scripts regen-norm regen-confus regen-man
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man
 
@@ -166,7 +176,7 @@ SCAN_BUILD = scan-build
 scan-build: clean
 	$(SCAN_BUILD) -V -o $(srcdir)/.analysis $(MAKE) -j4 &
 
-man: $(man_MANS)
+man: $(dist_man1_MANS) $(dist_man3_MANS)
 
 RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
 u8ident.3: README.md
