@@ -111,6 +111,7 @@ check: test test-texts test-c11
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
 	./test-c11
+	./u8idlint.test
 else
 ifeq (-DHAVE_CONFUS -DHAVE_CROARING,$(DEFINES))
 check: test test-texts test-c11
@@ -118,10 +119,12 @@ check: test test-texts test-c11
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
 	./test-c11
+	./u8idlint.test
 else
 check: test test-c11
 	./test
 	./test-c11
+	./u8idlint.test
 endif
 endif
 
