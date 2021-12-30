@@ -25,7 +25,7 @@ jobs:
     - run: autoreconf -fi
     - run: ./configure
     - run: make V=1
-    - run: make V=1 check
+    - run: make V=1 check || (cat test-suite.log; false)
     - run: make V=1 check-all
     - if: matrix.CFLAGS == ''
       run: make distcheck && ./test-all-fast.sh
