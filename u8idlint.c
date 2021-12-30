@@ -61,6 +61,7 @@ unsigned u8idopts = U8ID_PROFILE_C11_4;
 unsigned u8ident_options(void);
 unsigned u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+unsigned u8ident_maxlength(void);
 
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
@@ -113,7 +114,7 @@ static bool isASCII_cont(uint32_t cp) {
   return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
 }
 static bool isTR31_start(uint32_t cp) {
-  return range_bool_search(cp, safec11_start_list, ARRAY_SIZE(safec11_start_list));
+  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
   //return range_bool_search(cp, tr31_start_list, ARRAY_SIZE(tr31_start_list));
 }
 static bool isTR31_cont(uint32_t cp) {
@@ -256,7 +257,14 @@ int testfile(const char *dir, const char *fname) {
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
   static char brks[1024] = {0};
 #endif
-  static char word[128] = {0};
+  static char _word[1024] = {0};
+  char *word;
+  unsigned maxlen = u8ident_maxlength();
+  if (maxlen > 1024) {
+    word = calloc(maxlen, 1);
+  } else {
+    word = &_word[0];
+  }
   assert(xid <= ALLUTF8);
   func_start *id_start = id_funcs[xid].start;
   func_start *id_cont = id_funcs[xid].cont;
@@ -275,6 +283,8 @@ int testfile(const char *dir, const char *fname) {
   if (!f) {
     perror("fopen");
     fprintf(stderr, "%s/%s\n", dir, fname);
+    if (maxlen > 1024)
+      free (word);
     return -1;
   }
 
@@ -284,11 +294,12 @@ int testfile(const char *dir, const char *fname) {
     else
       printf("%s/%s\n", dir, fname);
   }
-  int ctx = u8ident_new_ctx();
+  int c = u8ident_new_ctx();
   while (fgets(line, 1023, f)) {
     char *s = &line[0];
     bool prev_isword = false;
     char *wp = &word[0];
+    bool skip = false;
     *word = '\0';
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
     u8_wordbreaks(s, strlen(s), brks);
@@ -298,15 +309,20 @@ int testfile(const char *dir, const char *fname) {
       uint32_t cp = dec_utf8(&s);
       if (!cp) {
         printf("ERROR %s illegal UTF-8\n", olds);
+        if (maxlen > 1024)
+          free (word);
         exit(1);
       }
-
       // unicode #29 word-break, but simplified:
       // must not split at continuations (Combining marks). e.g. for
       // texts/arabic-1.txt
       bool iscont = (*id_cont)(cp);
       bool isword = prev_isword ? ((*id_start)(cp) || iscont) : (*id_start)(cp);
       char force_break = (prev_isword != isword && !iscont);
+      if (wp - word + (s - olds) > maxlen) {
+        force_break = true;
+        skip = true;
+      }
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
       if (force_break != brks[s - olds])
         fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
@@ -314,7 +330,7 @@ int testfile(const char *dir, const char *fname) {
       force_break = brks[s - olds];
 #endif
       // first, or changed from non-word to word, and is no mark (continuation)
-      if (olds == &line[0] || force_break) {
+      if ((olds == &line[0] || force_break) && !skip) {
         prev_isword = isword;
         if (isword) {
           int l = s - olds;
@@ -342,7 +358,7 @@ int testfile(const char *dir, const char *fname) {
           if (u8ident_is_bidi(cp)) {
             struct ctx_t *cx = u8ident_ctx();
             if (!cx->is_rtl) {
-              const char *scripts = u8ident_existing_scripts(ctx);
+              const char *scripts = u8ident_existing_scripts(c);
               if (quiet) {
                 if (strEQc(dir, "."))
                   printf("%s\n", fname);
@@ -366,7 +382,7 @@ int testfile(const char *dir, const char *fname) {
       // bad case "\xd8\xa8\xd8\xb1\xd9\x88\xd8\xad" "بروح" Arabic
       if (!*wp && *word && force_break) { // non-empty word-end
         int ret = u8ident_check((uint8_t *)word, NULL);
-        const char *scripts = u8ident_existing_scripts(ctx);
+        const char *scripts = u8ident_existing_scripts(c);
         err |= ret;
         if (ret < 0) {
           if (quiet) {
@@ -376,7 +392,7 @@ int testfile(const char *dir, const char *fname) {
               printf("%s/%s\n", dir, fname);
           }
           printf("  %s: %s (%s", word, errstr(ret), scripts);
-          uint32_t cp = u8ident_failed_char(ctx);
+          uint32_t cp = u8ident_failed_char(c);
           printf(" + U+%X %s)!\n", cp,
                  u8ident_script_name(u8ident_get_script(cp)));
         } else if (verbose && !quiet) {
@@ -386,11 +402,14 @@ int testfile(const char *dir, const char *fname) {
         free((char *)scripts);
         *word = '\0';
         wp = &word[0];
+        skip = false;
       }
     }
   }
 
-  u8ident_free_ctx(ctx);
+  if (maxlen > 1024)
+    free (word);
+  u8ident_free_ctx(c);
   fclose(f);
   return err;
 }

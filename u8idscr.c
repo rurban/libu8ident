@@ -92,8 +92,15 @@ int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
     c->u8p = p;
     c->u8p[i] = scr;
   } else {
-    uint8_t *u8p = (i > 8) ? c->u8p : c->scr8;
-    u8p[i] = scr;
+    if (i > 8) {
+      if (!c->u8p) {
+        c->u8p = calloc(16, 1);
+        memcpy(c->u8p, c->scr8, 8);
+      }
+      c->u8p[i] = scr;
+    } else {
+      c->scr8[i] = scr;
+    }
   }
   if (scr == SC_Han)
     c->has_han = 1;
