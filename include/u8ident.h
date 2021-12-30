@@ -28,6 +28,7 @@ enum u8id_profile {
   U8ID_PROFILE_6 = 128,      // Unrestricted
   U8ID_PROFILE_C11_4 = 4096, // 4 + Greek with only Allowed ID's ("safeC11")
   U8ID_PROFILE_C11_6 = 8192, // The C11 std
+  U8ID_PROFILE_1     = 16384,// ASCII only
 };
 
 #ifndef U8ID_PROFILE_DEFAULT

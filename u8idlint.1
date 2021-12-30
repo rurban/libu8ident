@@ -11,8 +11,57 @@ u8idlint 0.1
 .TP
 \fB\-n\fR|\-\-normalize=nfc,nfkc,nfd,nfkc
 default: nfc
-.HP
-\fB\-p\fR|\-\-profile=2,3,4,5,6,c11_4,c11_6 default: 4
+.IP
+set to nfkd by default for python
+.TP
+\fB\-p\fR|\-\-profile=1,2,3,4,5,6,c11_4,c11_6
+default: 4
+.IP
+TR39 unicode security profile for identifiers:
+.TP
+1
+ASCII. sets xid ascii.
+.TP
+2
+Single script
+.TP
+3
+Highly Restrictive
+.TP
+4
+Moderately Restrictive
+.TP
+5
+Minimally Restrictive
+.TP
+6
+Unrestricted
+.TP
+c11_4
+SAFEC11 (i.e. 4 with Greek). Sets xid allowed.
+.TP
+c11_6
+C11STD. Sets xid c11.
+.TP
+\fB\-x\fR|\-\-xid=ascii,allowed,tr31,c11,allutf8
+default: tr31
+.IP
+allowed set of identifiers:
+.TP
+ascii
+only ASCII letters, punctuations. plus numbers
+.TP
+allowed
+tr31 with only recommended scripts, IdentifierStatus
+.TP
+tr31
+all letters, punctuations. plus numbers and combining marks
+.TP
+c11
+some AltId unicode ranges from C11
+.TP
+allutf8
+allow all >128. e.g. php, nim, crystal
 .TP
 \fB\-e\fR|\-\-ext=.c
 only this file extension
