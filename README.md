@@ -26,20 +26,40 @@ for those checks. So they rather ignore the problem._)
 Valid characters
 ----------------
 
-Each identifer must start with *XID_Start* and continue with *XID_Continue*
-characters. As perl regex:
+Each identifer must start with a *ID_Start* and continue with a *ID_Continue*
+matcher. See [TR31](http://www.unicode.org/reports/tr31/). As perl regex:
 
      / (?[ ( \p{Word} & \p{XID_Start} ) + [_] ])
        (?[ ( \p{Word} & \p{XID_Continue} ) ]) * /x
 
+The tokenizer has variable options for the start and cont matchers. The default
+is to use none.
 This is normally done by a parser, to the library you just pass the len or
 null-terminated identifier.  Optionally we can check for proper
 `XID_Start`/`XID_Continue` properties also. But this may not use the
-optimization `-DDISABLE_CHECK_XID`. 
+optimization `-DDISABLE_CHECK_XID`.
 
-With the `U8ID_CHECK_XID` option we check for valid UTF-8 encoding, valid
-XID properties and allowed script of each character. We do this by checking
-for the Allowed IdentifierStatus.
+With the optional `U8ID_CHECK_XID` option we check for valid UTF-8
+encoding, valid XID_Start/Continue properties and allowed script of
+each character. We do this by checking for the Allowed
+[IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt).
+
+Some parsers also need to check for allowed **median** characters, which
+are not allowed at the very end of an identifier. Esp. for
+unrestrictive mixed-script security profiles or insecure xid
+ranges. This library does not do this yet.
+
+**u8idlint** has its own tokenizer, which can be configured with the
+**--xid** options: **ASCII, ALLOWED, ID, XID, C11** and
+**ALLUTF8**. (sorted from most secure to most insecure).  ASCII
+ignores all utf8 word boundaries, ALLOWED, the default option is the
+same as the `U8ID_CHECK_XID` option in the library. ID allows all
+letters, plus numbers, punctuation and marks, including all exotic
+scripts. XID is ID plus some special exceptions to avoid the NFKC
+quirks, because NFKC has a lot of confusable mappings and no
+roundtrips. C11 uses the C11 standard insecure DefId unicode ranges.
+ALLUTF8 allows all unicode characters as letters > 127, as in php, D,
+nim or crystal.
 
 Normalization
 -------------
