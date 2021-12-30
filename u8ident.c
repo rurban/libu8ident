@@ -186,6 +186,13 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       need_normalize = u8ident_maybe_normalized(cp);
     }
 
+    struct ctx_t *ctx = u8ident_ctx();
+    // disallow bidi formatting
+    if (unlikely(ctx->is_rtl && u8ident_is_bidi(cp))) {
+      ctx->last_cp = cp;
+      return U8ID_ERR_SCRIPT;
+    }
+
 #if defined U8ID_PROFILE && U8ID_PROFILE == 5
     continue; // skip all mixed scripts checks
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 5
@@ -194,7 +201,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       continue; // skip all mixed scripts checks
 #endif
     bool is_new = false;
-    struct ctx_t *ctx = u8ident_ctx();
     // check scx on Common or Inherited. keep list of possible scripts, and
     // reduce them
     if (scr == SC_Common || scr == SC_Inherited) {

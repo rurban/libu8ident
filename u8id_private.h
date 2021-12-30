@@ -106,6 +106,7 @@ struct ctx_t {
   uint8_t is_japanese : 1;
   uint8_t is_chinese : 1;
   uint8_t is_korean : 1;
+  uint8_t is_rtl : 1; // Hebrew or Arabic
   uint32_t last_cp; // only set on errors
   union {
     uint64_t scr64; // room for 8 scripts

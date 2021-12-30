@@ -122,6 +122,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
 * The only restrictions are the identifier well-formedness criteria
   and Identifier Profile, allowing arbitrary mixtures of scripts such
   as Ωmega, Teχ, HλLF-LIFE, Toys-Я-Us.
+  Bidi-formatting is only allowed with Hebrew or Arabic. (an extension over TR39)
 
 6. **Unrestricted**
 
@@ -129,6 +130,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
 * The only restrictions are the criteria on identifier
   well-formedness. Characters may be outside of the Identifier
   Profile.
+  Bidi-formatting is allowed with all scripts.
 * This level is primarily for use in detection APIs, providing return
   value indicating that the string does not match any of the levels
   1-5.

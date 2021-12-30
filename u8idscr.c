@@ -103,25 +103,26 @@ int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
     c->is_japanese = 1;
   else if (scr == SC_Hangul)
     c->is_korean = 1;
+  else if (scr == SC_Hebrew || scr == SC_Arabic)
+    c->is_rtl = 1;
   c->count++;
   return 0;
 }
 
-#if 0
-static inline uint8_t sc_search_linear(const uint32_t cp, const struct sc *sc_list, const int len) {
-  struct sc *s = (struct sc *)sc_list;
-  // so far only linear search. TODO binary
-  for (int i=0; i<len; i++) {
+static inline bool linear_search(const uint32_t cp,
+                                 const struct range_bool *sc_list,
+                                 const int len) {
+  struct range_bool *s = (struct range_bool *)sc_list;
+  for (int i = 0; i < len; i++) {
     assert(s->from <= s->to);
     if ((cp - s->from) <= (s->to - s->from))
-      return s->scr;
+      return true;
     if (cp <= s->to) // s is sorted. not found
-      return 255;
+      return false;
     s++;
   }
-  return 255;
+  return false;
 }
-#endif
 
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
@@ -178,7 +179,7 @@ const char *u8ident_get_scx(const uint32_t cp) {
 }
 
 bool u8ident_is_bidi(const uint32_t cp) {
-  return range_bool_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
+  return linear_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
 }
 
 #ifndef DISABLE_CHECK_XID

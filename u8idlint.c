@@ -240,6 +240,8 @@ static void usage(void) {
   puts("violations against various unicode security guidelines for identifiers.");
   //puts("For special known file extensions it applies rules to parse identifiers,");
   //puts("macro names and #include names, and handles them stricter than comments or strings.");
+  puts("It adds a special BIDI warning on bidi formatting chars and when the document");
+  puts("is not in Hebrew nor Arabic.");
   puts("\nSEE ALSO:");
   puts("  u8ident.3");
   puts("\nAUTHOR:");
@@ -335,6 +337,28 @@ int testfile(const char *dir, const char *fname) {
             memcpy(wp, olds, l);
             wp += l;
           }
+        } else {
+          // check at least for bidi chars
+          if (u8ident_is_bidi(cp)) {
+            struct ctx_t *cx = u8ident_ctx();
+            if (!cx->is_rtl) {
+              const char *scripts = u8ident_existing_scripts(ctx);
+              if (quiet) {
+                if (strEQc(dir, "."))
+                  printf("%s\n", fname);
+                else
+                  printf("%s/%s\n", dir, fname);
+              }
+              printf(
+                  "  %s: %s (%s", olds,
+                  (profile == U8ID_PROFILE_6 || profile == U8ID_PROFILE_C11_6)
+                      ? "WARN_BIDI"
+                      : "ERR_BIDI",
+                  scripts);
+              printf(" + U+%X)!\n", cp);
+              free((char *)scripts);
+            }
+          }
         }
         if (*s != '\n')
           continue;
@@ -343,7 +367,6 @@ int testfile(const char *dir, const char *fname) {
       if (!*wp && *word && force_break) { // non-empty word-end
         int ret = u8ident_check((uint8_t *)word, NULL);
         const char *scripts = u8ident_existing_scripts(ctx);
-        // TODO add BIDI warnings
         err |= ret;
         if (ret < 0) {
           if (quiet) {
@@ -359,6 +382,7 @@ int testfile(const char *dir, const char *fname) {
         } else if (verbose && !quiet) {
           printf("  %s: %s (%s)\n", word, errstr(ret), scripts);
         }
+        // maybe also warn on skip. overly long words
         free((char *)scripts);
         *word = '\0';
         wp = &word[0];
