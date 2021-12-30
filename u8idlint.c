@@ -261,6 +261,13 @@ static void usage(void) {
   exit(0);
 }
 
+void printfile(const char *dir, const char *fname) {
+  if (strEQc(dir, "."))
+    printf("%s\n", fname);
+  else
+    printf("%s/%s\n", dir, fname);
+}
+
 int testfile(const char *dir, const char *fname) {
   int err = 0;
   char path[256];
@@ -300,10 +307,7 @@ int testfile(const char *dir, const char *fname) {
   }
 
   if (!quiet) {
-    if (strEQc(dir, "."))
-      printf("%s\n", fname);
-    else
-      printf("%s/%s\n", dir, fname);
+    printfile(dir, fname);
   }
   int c = u8ident_new_ctx();
   while (fgets(line, 1023, f)) {
@@ -370,12 +374,8 @@ int testfile(const char *dir, const char *fname) {
             struct ctx_t *cx = u8ident_ctx();
             if (!cx->is_rtl) {
               const char *scripts = u8ident_existing_scripts(c);
-              if (quiet) {
-                if (strEQc(dir, "."))
-                  printf("%s\n", fname);
-                else
-                  printf("%s/%s\n", dir, fname);
-              }
+              if (quiet)
+                printfile(dir, fname);
               printf(
                   "  %s: %s (%s", olds,
                   (profile == U8ID_PROFILE_6 || profile == U8ID_PROFILE_C11_6)
@@ -396,12 +396,8 @@ int testfile(const char *dir, const char *fname) {
         const char *scripts = u8ident_existing_scripts(c);
         err |= ret;
         if (ret < 0) {
-          if (quiet) {
-            if (strEQc(dir, "."))
-              printf("%s\n", fname);
-            else
-              printf("%s/%s\n", dir, fname);
-          }
+          if (quiet)
+            printfile(dir, fname);
           printf("  %s: %s (%s", word, errstr(ret), scripts);
           uint32_t cp = u8ident_failed_char(c);
           printf(" + U+%X %s)!\n", cp,
