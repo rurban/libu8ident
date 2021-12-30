@@ -5,6 +5,14 @@
   Classify and search for the script property
   https://www.unicode.org/reports/tr24/tr24-32.html Implement
   http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
+
+  TODO: seperate is_allowed into start, and cont. special case some TR31 characters.
+  U+B7 MIDDLE DOT is allowed, but should only be in median.
+  U+200D ZERO WIDTH JOINER* is allowed, but should only be in cont and TR31 2.3 special-cases.
+  U+200C ZERO WIDTH NON-JOINER* is allowed, but should only be in median and TR31 special-cases.
+    They are currently in Inherited.
+  HEBREW U+5F3 is only allowed in median.
+  KATAKANA U+30A0, U+30FB are only allowed in median.
 */
 
 #include <string.h>

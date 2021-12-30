@@ -459,18 +459,22 @@ TODO
   Which exactly is unknown, but the new script might lead to a mixed-script
   violation.
 
+* allowed_id: seperate into start and cont lists.
+
+* add special checks for zero-with (non-)joiners, only allowed in special
+  median or cont positions. See TR31 2.3 A1,A2 or B.
+  Ditto for other tr31 special median positions, e.g. MIDDLE DOT, HEBREW U+5F3,
+  KATAKANA U+30A0, U+30FB.
+
 * **[IdentifierType](http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
   The list of idtypes is provided, but not yet integrated into any API.
   E.g. if someone wants to allow the Technical idtype.
   Then you have to use `u8ident_get_idtypes ()` by yourself, and it is
   not exported (ie. unusable from the shared library)
   We only optionally check the IdentifierStatus Allowed with CHECK_XID, from
-  this TR39 Table 1, which is a summary of the idtype rules.
+  this TR39 Table 1.
 
 * **FCD**: This normalization is broken.
-
-* The **testsuite** does not yet check for known UTF-8 or other Unicode
-  spoofing exploits.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
 

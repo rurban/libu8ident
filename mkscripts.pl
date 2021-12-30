@@ -820,7 +820,7 @@ printf $H <<'EOF';
 #endif // USE_NORM_CROAR
 
 // Bidi formatting characters for reordering attacks.
-// Only valid with RTL sctipts, such as Hebrew and Arabic.
+// Only valid with RTL scripts, such as Hebrew and Arabic.
 #ifdef EXT_SCRIPTS
 extern const struct range_bool bidi_list[2];
 #else
