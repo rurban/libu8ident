@@ -45,15 +45,16 @@
 int verbose = 0;
 int quiet = 0;
 int recursive = 0;
-// allowed set of identifiers
+// allowed set of identifiers (--xid tokenizer options)
 enum xid_e {
   ASCII,   // only ASCII letters
-  TR31,    // all letters and punctuations
-  ALLOWED, // TR31 with only recommended scripts
+  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus
+  ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts
+  XID,     // ID plus NFKC quirks
   C11,     // some AltId ranges from C11
   ALLUTF8, // all > 128, e.g. php, nim, crystal
 };
-enum xid_e xid = TR31;
+enum xid_e xid = ALLOWED;
 unsigned profile = U8ID_PROFILE_C11_4;
 unsigned u8idopts = U8ID_PROFILE_C11_4;
 
@@ -101,9 +102,6 @@ const struct range_bool ascii_cont_list[] = {
     {'$', '$'},
     {'0', '9'},
 };
-// FIXME
-//const struct range_bool tr31_start_list[] = {};
-//const struct range_bool tr31_cont_list[] = {};
 
 typedef bool func_start(uint32_t cp);
 
@@ -113,13 +111,17 @@ static bool isASCII_start(uint32_t cp) {
 static bool isASCII_cont(uint32_t cp) {
   return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
 }
-static bool isTR31_start(uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
-  //return range_bool_search(cp, tr31_start_list, ARRAY_SIZE(tr31_start_list));
+static bool isID_start(uint32_t cp) {
+  return u8ident_is_ID_Start(cp);
 }
-static bool isTR31_cont(uint32_t cp) {
-  return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
-  //return range_bool_search(cp, tr31_cont_list, ARRAY_SIZE(tr31_cont_list));
+static bool isID_cont(uint32_t cp) {
+  return u8ident_is_ID_Start(cp);
+}
+static bool isXID_start(uint32_t cp) {
+  return u8ident_is_XID_Start(cp);
+}
+static bool isXID_cont(uint32_t cp) {
+  return u8ident_is_XID_Start(cp);
 }
 static bool isALLOWED_start(uint32_t cp) {
   return range_bool_search(cp, safec11_start_list, ARRAY_SIZE(safec11_start_list));
@@ -143,10 +145,18 @@ struct func_start_s {
   func_start *start;
   func_start *cont;
 };
+
+/* tokenizers:
+  ASCII,   // only ASCII letters
+  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus
+  ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts
+  XID,     // ID plus NFKC quirks
+  C11,     // some AltId ranges from C11
+  ALLUTF8, // all > 128, e.g. php, nim, crystal */
 static struct func_start_s id_funcs[] = {
-    {isASCII_start, isASCII_cont},     {isTR31_start, isTR31_cont},
-    {isALLOWED_start, isALLOWED_cont}, {isC11_start, isC11_cont},
-    {isALLUTF8_start, isALLUTF8_cont},
+    {isASCII_start, isASCII_cont}, {isALLOWED_start, isALLOWED_cont},
+    {isID_start, isID_cont},       {isXID_start, isXID_cont},
+    {isC11_start, isC11_cont},     {isALLUTF8_start, isALLUTF8_cont},
 };
 
 static inline bool isMARK(uint32_t cp) {
@@ -214,7 +224,7 @@ static void usage(void) {
   puts("OPTIONS:");
   puts(" -n|--normalize=nfc,nfkc,nfd,nfkc            default: nfc");
   puts("  set to nfkd by default for python");
-  puts(" -p|--profile=1,2,3,4,5,6,c11_4,c11_6        default: 4");
+  puts(" -p|--profile=1,2,3,4,5,6,c11_4,c11_6        default: c11_4");
   puts("  TR39 unicode security profile for identifiers:");
   puts("    1      ASCII. sets xid ascii.");
   puts("    2      Single script");
@@ -224,11 +234,12 @@ static void usage(void) {
   puts("    6      Unrestricted");
   puts("    c11_4  SAFEC11 (i.e. 4 with Greek). Sets xid allowed.");
   puts("    c11_6  C11STD. Sets xid c11.");
-  puts(" -x|--xid=ascii,allowed,tr31,c11,allutf8     default: tr31");
+  puts(" -x|--xid=ascii,allowed,id,xid,c11,allutf8     default: allowed");
   puts("  allowed set of identifiers:"); // sorted from most secure to least secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
   puts("    allowed   tr31 with only recommended scripts, IdentifierStatus");
-  puts("    tr31      all letters, punctuations. plus numbers and combining marks");
+  puts("    id        all letters. plus numbers, punctuations and combining marks");
+  puts("    xid       id plus NFKC quirks");
   puts("    c11       some AltId unicode ranges from C11");
   puts("    allutf8   allow all >128. e.g. php, nim, crystal");
   // see below for recognized extensions
@@ -492,19 +503,20 @@ int main(int argc, char **argv) {
   int c;
   bool opt_xid = false; // if the --xid option was given, to set profile defaults
   bool opt_profile = false; // if the --profile option was given, to set xid defaults
-  xid = TR31;
+  xid = ALLOWED;
 #ifdef HAVE_GETOPT_LONG
   int option_index = 0;
-  static struct option long_options[] = {{"normalization", 1, 0, 'n'}, // *nfc*,nfd,nfkc,nfkd
-                                         {"profile", 1, 0, 'p'},       // 1,2,3,*4*,5,6,c11_4,c11_6
-                                         {"xid", 1, 0, 'x'},           // ascii,allowed,*tr31*,c11,allutf8
-                                         {"ext", 1, 0, 'e'},
-                                         {"recursive", 0, 0, 'r'},
-                                         {"help", 0, 0, 0},
-                                         {"version", 0, 0, 0},
-                                         {"quiet", 0, &quiet, 'q'},
-                                         {"verbose", 0, &verbose, 'v'},
-                                         {NULL, 0, NULL, 0}};
+  static struct option long_options[] = {
+      {"normalization", 1, 0, 'n'}, // *nfc*,nfd,nfkc,nfkd
+      {"profile", 1, 0, 'p'},       // 1,2,3,*4*,5,6,c11_4,c11_6
+      {"xid", 1, 0, 'x'},           // ascii,*allowed*,id,xid,c11,allutf8
+      {"ext", 1, 0, 'e'},
+      {"recursive", 0, 0, 'r'},
+      {"help", 0, 0, 0},
+      {"version", 0, 0, 0},
+      {"quiet", 0, &quiet, 'q'},
+      {"verbose", 0, &verbose, 'v'},
+      {NULL, 0, NULL, 0}};
 #endif
 
   if (argc > 1 && strEQc(argv[1], "--help"))
@@ -571,7 +583,7 @@ int main(int argc, char **argv) {
         }
         u8idopts |= profile;
         break;
-      case 'x': // ascii,allowed,tr31,c11,allutf8
+      case 'x': // ascii,allowed,id,xid,c11,allutf8
         opt_xid = true;
         if (strEQc(optarg, "ascii")) {
           xid = ASCII;
@@ -582,8 +594,10 @@ int main(int argc, char **argv) {
           xid = ALLOWED;
           u8idopts |= U8ID_CHECK_XID;
         }
-        else if (strEQc(optarg, "tr31"))
-          xid = TR31;
+        else if (strEQc(optarg, "id"))
+          xid = ID;
+        else if (strEQc(optarg, "xid"))
+          xid = XID;
         else if (strEQc(optarg, "c11"))
           xid = C11;
         else if (strEQc(optarg, "allutf8"))

@@ -90,6 +90,10 @@ regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
+	$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
+	$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
+	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
+	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
 	$(PERL) mkscripts.pl
 # Download some UCD files and create confus.h
 regen-confus:

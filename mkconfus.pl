@@ -14,15 +14,15 @@
 use vars qw($c);
 use strict;
 use Config;
-my $conf = "confusables.txt";
-for ($conf) {
+my $confus = "confusables.txt";
+for ($confus) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/security/latest/$_");
   }
 }
 
 my (@CONF, @ucd_version, $started);
-open my $CONF, "<", $conf or die "$conf $!";
+open my $CONF, "<", $confus or die "$confus $!";
 while (<$CONF>) {
   if (!$started) {
     if (/^# Version: (\d+)\.(\d)\.(\d)/) { @ucd_version = ($1,$2,$3); }

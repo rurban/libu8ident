@@ -5,22 +5,29 @@
 #
 # Classify and search for the script property https://www.unicode.org/reports/tr24/tr24-32.html
 # Implement http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
+# Generates the following lists: all_scripts as strings and defines, xid_script,
+# nonxid_script, scx, allowed_id, idtype, NF{K,}{C,D}_N, NF{K,}C_M, bidi.
+#
+# TODO https://www.unicode.org/reports/tr31/
+# xid_{start,cont}, id_{start,cont}, uax31_d1, uax31_r1, uax31_r1b.
+# xid is relevant for NFKC languages (ie python 3), the rest should use id_{start,cont} or
+# better allowed_id, which keeps only recommended scripts.
 
 use strict;
 my $scn = "Scripts.txt";
 my $scxn = "ScriptExtensions.txt";
 my $pva = "PropertyValueAliases.txt";
 my $normp = "DerivedNormalizationProps.txt";
+my $corep = "DerivedCoreProperties.txt";
 # --
 my $idtype = "IdentifierType.txt";
 my $idstat = "IdentifierStatus.txt";
-my $conf = "confusables.txt";
-for ($scn, $scxn, $pva, $normp) {
+for ($scn, $scxn, $pva, $corep, $normp) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/UNIDATA/$_");
   }
 }
-for ($idtype, $idstat, $conf) {
+for ($idtype, $idstat) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/security/latest/$_");
   }
@@ -28,7 +35,7 @@ for ($idtype, $idstat, $conf) {
 
 my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
     @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $id);
-my ($started, @IDTYPES, @ALLOWED);
+my ($started, @IDTYPES, @ALLOWED, @IDSTART, @IDCONT, @XIDSTART, @XIDCONT);
 open my $IDTYPE, "<", $idtype or die "$idtype $!";
 while (<$IDTYPE>) {
   if (/^#\tIdentifier_Type:/) { $started++; }
@@ -71,6 +78,43 @@ for my $r (sort { $a->[0] <=> $b->[0] } @IDTYPES) {
 }
 @IDTYPES = @_ID;
 undef @_ID;
+
+open my $COREP, "<", $corep or die "$corep $!";
+$started = 0;
+my $ref;
+while (<$COREP>) {
+  if (/^# Derived Property: (\w+)/) {
+    if ($1 eq 'ID_Start') {
+      $ref = \@IDSTART;
+      $started = 1;
+    }
+    elsif ($1 eq 'ID_Continue') {
+      $ref = \@IDCONT;
+      $started = 1;
+    }
+    elsif ($1 eq 'XID_Start') {
+      $ref = \@XIDSTART;
+      $started = 1;
+    }
+    elsif ($1 eq 'XID_Continue') {
+      $ref = \@XIDCONT;
+      $started = 1;
+    }
+    else {
+      $started = 0;
+    }
+  }
+  next unless $started;
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; [\w ]+\s+#/) {
+    ($from, $to) = (hex($1), hex($2));
+    push @$ref, [$from, $to];
+  }
+  elsif (/^([0-9A-F]{4,5})\s+; [\w ]+\s+#/) {
+    $from = hex($1);
+    push @$ref, [$from, $from];
+  }
+}
+close $COREP;
 
 open my $IDSTAT, "<", $idstat or die "$idstat $!";
 $started = 0;
@@ -596,6 +640,83 @@ printf $H <<"EOF", $b, $s, scalar(@ALLOWED);
 }; // %u ranges, %u single codepoints
 #  else
 extern const struct range_bool allowed_id_list[%u];
+#  endif
+
+// TR31 ID_Start
+#  ifndef EXT_SCRIPTS
+const struct range_bool id_start_list[] = {
+    // clang-format off
+EOF
+($b, $s) = (0, 0);
+for my $r (@IDSTART) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
+  printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+};
+printf $H <<"EOF", $b, $s;
+    // clang-format on
+}; // %u ranges, %u single codepoints
+
+const struct range_bool id_cont_list[] = {
+    // clang-format off
+EOF
+($b, $s) = (0, 0);
+for my $r (@IDCONT) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
+  printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+};
+printf $H <<"EOF", $b, $s, scalar(@IDSTART), scalar(@IDCONT);
+    // clang-format on
+}; // %u ranges, %u single codepoints
+#  else
+extern const struct range_bool id_start_list[%u];
+extern const struct range_bool id_cont_list[%u];
+#  endif
+
+// If you use NFKC you'd need the xid lists instead
+// NFKC has many special cases, and does not roundtrip.
+#  ifndef EXT_SCRIPTS
+const struct range_bool xid_start_list[] = {
+    // clang-format off
+EOF
+($b, $s) = (0, 0);
+for my $r (@XIDSTART) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
+  printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+};
+printf $H <<"EOF", $b, $s;
+    // clang-format on
+}; // %u ranges, %u single codepoints
+
+const struct range_bool xid_cont_list[] = {
+    // clang-format off
+EOF
+($b, $s) = (0, 0);
+for my $r (@XIDCONT) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
+  printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+};
+printf $H <<"EOF", $b, $s, scalar(@XIDSTART), scalar(@XIDCONT);
+    // clang-format on
+}; // %u ranges, %u single codepoints
+#  else
+extern const struct range_bool xid_start_list[%u];
+extern const struct range_bool xid_cont_list[%u];
 #  endif
 
 // IdentifierType bit-values

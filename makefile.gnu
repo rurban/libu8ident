@@ -88,7 +88,7 @@ $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
-scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt
+scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt DerivedNormalizationProps.txt
 	$(PERL) mkscripts.pl
 confus.h: mkconfus.pl mkroar.c # confusables.txt
 	$(PERL) mkconfus.pl -c
@@ -197,6 +197,8 @@ regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
+	$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
+	$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
 	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
 	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
 	$(PERL) mkscripts.pl

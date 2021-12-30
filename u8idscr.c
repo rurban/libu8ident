@@ -194,6 +194,18 @@ bool u8ident_is_bidi(const uint32_t cp) {
 bool u8ident_is_allowed(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
+bool u8ident_is_ID_Start(const uint32_t cp) {
+  return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
+}
+bool u8ident_is_ID_Cont(const uint32_t cp) {
+  return range_bool_search(cp, id_cont_list, ARRAY_SIZE(id_cont_list));
+}
+bool u8ident_is_XID_Start(const uint32_t cp) {
+  return range_bool_search(cp, xid_start_list, ARRAY_SIZE(xid_start_list));
+}
+bool u8ident_is_XID_Cont(const uint32_t cp) {
+  return range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
+}
 //#endif
 
 // bitmask of u8id_idtypes
