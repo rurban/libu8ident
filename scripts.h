@@ -5388,3 +5388,16 @@ const struct range_bool NFKC_M_list[] = {
 #    endif
 #  endif
 #endif // USE_NORM_CROAR
+
+// Bidi formatting characters for reordering attacks.
+// Only valid with RTL sctipts, such as Hebrew and Arabic.
+#ifdef EXT_SCRIPTS
+extern const struct range_bool bidi_list[2];
+#else
+const struct range_bool bidi_list[] = {
+    // clang-format off
+    { 0x202A, 0x202E }, // LRE, RLE, PDF, LRO, RLO
+    { 0x2066, 0x2069 }, // LRI, RLI, FSI, PDI
+    // clang-format on
+};
+#endif

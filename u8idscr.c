@@ -177,6 +177,10 @@ const char *u8ident_get_scx(const uint32_t cp) {
   return scx ? scx->list : NULL;
 }
 
+bool u8ident_is_bidi(const uint32_t cp) {
+  return range_bool_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
+}
+
 #ifndef DISABLE_CHECK_XID
 //#ifndef HAVE_CROARING
 bool u8ident_is_allowed(const uint32_t cp) {
