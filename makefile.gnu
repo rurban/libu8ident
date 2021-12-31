@@ -142,7 +142,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h
-	$(CC) $(CFLAGS_REL) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
+	$(CC) $(CFLAGS_REL) -O3 -flto $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
 	./perf
 
 clean:

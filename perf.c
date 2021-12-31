@@ -121,13 +121,14 @@ static inline bool linear_search(const uint32_t cp, const char *list,
 }
 #endif
 
-static struct sc *binary_search(const uint32_t cp, const char *list,
-                                const size_t len, const size_t size) {
+static inline struct sc *binary_search(const uint32_t cp, const char *list,
+                                       const size_t len, const size_t size) {
   int n = (int)len;
   const char *p = list;
   struct sc *pos;
   while (n > 0) {
     pos = (struct sc *)(p + size * (n / 2));
+    //if ((cp - pos->from) <= (pos->to - pos->from)) // in-between trick slower here
     if (cp >= pos->from && cp <= pos->to)
       return pos;
     else if (cp < pos->from)
@@ -149,7 +150,8 @@ static struct sc *binary_search_fast(const uint32_t cp, const char *list,
   struct sc *pos;
   while (n > 0) {
     pos = (struct sc *)(p + size * (n / 2));
-    if (cp >= pos->from && cp <= pos->to)
+    if ((cp - pos->from) <= (pos->to - pos->from)) // faster in-between trick
+      //if (cp >= pos->from && cp <= pos->to)
       return pos;
     else if (cp < pos->from)
       n /= 2;
@@ -192,7 +194,7 @@ static inline bool range_bool_search_hybr(const uint32_t cp,
   if (cp < 127) {
     struct range_bool *s = (struct range_bool *)list;
     for (size_t i = 0; i < len; i++) {
-      if ((cp - s->from) <= (s->to - s->from))
+      if ((cp - s->from) <= (s->to - s->from)) // faster in-between trick
         return true;
       if (cp <= s->to) // s is sorted. not found
         return false;
@@ -215,49 +217,59 @@ static int compar32(const void *a, const void *b) {
 
 #define PERC(fast,slow) (100.0 * (slow - fast) / (double)fast)
 // favor ASCII 100x over unicode char coverage
-#define DO_LOOP(t1,boolfunc) \
-  begin = timer_start(); \
-  for (int i = 0; i < 100; i++) { \
-    for (uint32_t cp = 20; cp < 128; cp++) { \
-      bool ret = boolfunc; \
-      gret |= ret; \
-    } \
-  } \
-  for (uint32_t cp = 20; cp < 0x11000; cp++) { \
-    bool ret = boolfunc; \
-    gret |= ret; \
-  } \
-  end = timer_end(); \
+#define DO_LOOP(t1,boolfunc)                            \
+  /* warmup */                                          \
+  for (uint32_t cp = 0x10000; cp > 20; cp -= 4) {       \
+    bool ret = boolfunc;                                \
+    gret |= ret;                                        \
+  }                                                     \
+  begin = timer_start();                                \
+  for (int i = 0; i < 100; i++) {                       \
+    for (uint32_t cp = 20; cp < 128; cp++) {            \
+      bool ret = boolfunc;                              \
+      gret |= ret;                                      \
+    }                                                   \
+  }                                                     \
+  for (uint32_t cp = 20; cp < 0x11000; cp++) {          \
+    bool ret = boolfunc;                                \
+    gret |= ret;                                        \
+  }                                                     \
+  end = timer_end();                                    \
   uint64_t t1 = end - begin
 
-#define DO_LOOP_NM(t1,boolfunc,NFPRE)           \
-  begin = timer_start(); \
-  for (int i = 0; i < 100; i++) { \
-    for (uint32_t cp = 20; cp < 128; cp++) { \
-    bool ret; \
+#define DO_LOOP_NM(t1,boolfunc,NFPRE)                   \
+  /* warmup */                                          \
+  for (uint32_t cp = 0x10000; cp > 20; cp -= 4) {       \
+    bool ret = boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list))); \
+    gret |= ret;                                        \
+  }                                                     \
+  begin = timer_start();                                \
+  for (int i = 0; i < 100; i++) {                       \
+    for (uint32_t cp = 20; cp < 128; cp++) {            \
+      bool ret;                                                         \
+      if (boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
+        ret = true;                                                     \
+      else                                                              \
+        ret = boolfunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
+      gret |= ret;                                                      \
+    }                                                                   \
+  }                                                                     \
+  for (uint32_t cp = 20; cp < 0x11000; cp++) {                          \
+    bool ret;                                                           \
     if (boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
-      ret = true; \
-    else \
+      ret = true;                                                       \
+    else                                                                \
       ret = boolfunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
-    gret |= ret; \
-    } \
-  } \
-  for (uint32_t cp = 20; cp < 0x11000; cp++) { \
-    bool ret; \
-    if (boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
-      ret = true; \
-    else \
-      ret = boolfunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
-    gret |= ret; \
-  } \
-  end = timer_end(); \
+    gret |= ret;                                                        \
+  }                                                                     \
+  end = timer_end();                                                    \
   uint64_t t1 = end - begin
 
 void perf_confus(void) {
   printf("confus:\n");
   uint64_t begin, end;
 
-  // just a uint32_t[] array. not from, to pairs
+  // just a uint32_t[] array. not from,to pairs
   DO_LOOP(t1, u8ident_is_confusable(cp));
   DO_LOOP(t2, bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
   //DO_LOOP(t3, search_hybr(cp, confusables, ARRAY_SIZE(confusables)));
@@ -281,6 +293,8 @@ void perf_allowed_id(void) {
   DO_LOOP(t1, u8ident_roar_is_allowed(cp));
   DO_LOOP(t2, range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
   DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
+  //DO_LOOP(t4, faster_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
+  //DO_LOOP(t5, eytzinger_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
 
   RESULT("allowed_id", t1,t2,t3);
 }
