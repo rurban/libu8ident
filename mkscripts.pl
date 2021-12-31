@@ -253,13 +253,17 @@ while (<$SCX>) {
   }
   elsif (/^([0-9A-F]{4,5})\s+; ([\w ]+) #/) {
     ($from, $to, $scl) = (hex($1), hex($1), $2);
+    if ($from == 0x0345) { # UCD bug
+      $from = 0x342;
+      $oldto = 0x341; # update the prev. range
+    }
   } else {
     #warn $_;
     next;
   }
   # only if the Sc is new or there is a hole
   if (($from != $oldto + 1) or ($oldsc ne $scl) or !@SCXR) {
-    # scl is a list of short script names
+    # scl is a string, list of short script names
     push @SCXR, [$from, $to, $scl];
     $oldsc = $scl;
   } else { # update the range
@@ -270,6 +274,8 @@ while (<$SCX>) {
   $oldto = $to;
 }
 close $SCX;
+# special-case (scx bug in 14), but handled above
+#push @SCXR, [0x343, 0x344, 'Grek']; # not Inherited
 
 my $num_scripts = scalar keys %scripts;
 printf "%d SC ranges, %d unique scripts", scalar @SCR, $num_scripts;

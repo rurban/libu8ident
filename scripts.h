@@ -384,7 +384,7 @@ extern const char *const all_scripts[161];
 // non-codepoints. Not needed with U8ID_CHECK_XID or when the parser checks
 // all XID's properly.
 #  ifdef EXT_SCRIPTS
-extern const struct sc xid_script_list[951];
+extern const struct sc xid_script_list[949];
 #  else
 const struct sc xid_script_list[] = {
     // clang-format off
@@ -408,9 +408,7 @@ const struct sc xid_script_list[] = {
     {0x02EA, 0x02EB, 6},	// Bopomofo
     {0x02EC, 0x02FF, 0},	// Common
     {0x0300, 0x0341, 1},	// Inherited
-    {0x0342, 0x0342, 11},	// Greek, originally SC Inherited
-    {0x0343, 0x0344, 1},	// Inherited
-    {0x0345, 0x0345, 11},	// Greek, originally SC Inherited
+    {0x0342, 0x0345, 11},	// Greek, originally SC Inherited
     {0x0346, 0x0362, 1},	// Inherited
     {0x0363, 0x036F, 2},	// Latin, originally SC Inherited
     {0x0370, 0x0373, 11},	// Greek
@@ -1340,7 +1338,7 @@ const struct sc xid_script_list[] = {
     {0xE0020, 0xE007F, 0},	// Common
     {0xE0100, 0xE01EF, 1},	// Inherited
     // clang-format on
-}; // 817 ranges, 134 single codepoints
+}; // 817 ranges, 132 single codepoints
 #  endif
 #endif // DISABLE_CHECK_XID
 
@@ -1782,8 +1780,7 @@ const struct sc nonxid_script_list[] = {
 #ifndef EXT_SCRIPTS
 const struct scx scx_list[] = {
     // clang-format off
-    // {0x0342, 0x0342, "\x0b"},	// Greek, moved to sc proper
-    // {0x0345, 0x0345, "\x0b"},	// Greek, moved to sc proper
+    // {0x0342, 0x0345, "\x0b"},	// Greek, moved to sc proper
     // {0x0363, 0x036F, "\x02"},	// Latin, moved to sc proper
     {0x0483, 0x0483, "\x07\x5c"},	// Cyrl Perm
     {0x0484, 0x0484, "\x07\x36"},	// Cyrl Glag
@@ -1904,7 +1901,7 @@ const struct scx scx_list[] = {
     // {0x1D360, 0x1D371, "\x0f"},	// Han, moved to sc proper
     // {0x1F250, 0x1F251, "\x0f"},	// Han, moved to sc proper
     // clang-format on
-}; // 56 ranges, 65 single codepoints
+}; // 57 ranges, 63 single codepoints
 #else
 extern const struct scx scx_list[93];
 #endif
