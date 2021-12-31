@@ -13,24 +13,28 @@
 #  include "u8idroar.h"
 #endif
 
-// defaults to U8ID_NFC | U8ID_PROFILE_4
-unsigned s_u8id_options = U8ID_NORM_DEFAULT | U8ID_PROFILE_DEFAULT
+// defaults to U8ID_PROFILE_4, U8ID_NFC, U8ID_TR31_ALLOWED
+unsigned s_u8id_options = 0
 #ifndef DISABLE_CHECK_XID
-                          | U8ID_CHECK_XID
+                          | U8ID_TR31_ALLOWED
 #endif
     ;
+enum u8id_norm s_u8id_norm = U8ID_NORM_DEFAULT;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
-/* Initialize the library with a bitmask of options, which define the
-   performed checks. Recommended is `U8ID_PROFILE_4` only. */
-EXTERN int u8ident_init(unsigned options) {
-  if (options > 8192 + 2048 + 512 + 256)
+/* Initialize the library with a profile, normalization and a bitmask of options,
+   which define the performed checks.
+   Recommended is `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
+*/
+EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm, unsigned options) {
+  if (options > 1023)
     return -1;
-  if ((options & U8ID_NFMASK) > 5)
+  if (profile < U8ID_PROFILE_1 || profile > U8ID_PROFILE_C23_4)
+    return -1;
+  if (norm > U8ID_FCC)
     return -1;
 #if defined U8ID_NORM
-  enum u8id_norm norm = options & U8ID_NFMASK;
   // only one is allowed, else fail
 #  if U8ID_NORM == NFD
   if (!((norm != U8ID_NFD || norm != U8ID_FCD)))
@@ -57,22 +61,16 @@ EXTERN int u8ident_init(unsigned options) {
     return -1;
 #  endif
 #endif
-  s_u8id_profile = 0;
-  for (unsigned i = U8ID_PROFILE_2; i <= U8ID_PROFILE_6; i *= 2) {
-    if (options & i) {
-      if (s_u8id_profile)
-        return -1; // error. another profile already defined
-      s_u8id_profile = i;
-    }
-  }
-  if (!s_u8id_profile) {
-    if (options & U8ID_PROFILE_C11_4)
-      s_u8id_profile = U8ID_PROFILE_C11_4;
-    else if (options & U8ID_PROFILE_C11_6)
-      s_u8id_profile = U8ID_PROFILE_C11_6;
-  }
-  if (!s_u8id_profile)
-    return -1; // error. no profile defined
+  s_u8id_norm = norm;
+
+#if defined U8ID_PROFILE_SAFEC23
+  s_u8id_profile = U8ID_PROFILE_C23_4;
+#elif defined U8ID_PROFILE_C11STD
+  s_u8id_profile = U8ID_PROFILE_C11_6;
+#else  
+  s_u8id_profile = profile;
+#endif
+
   s_u8id_options = options;
 #ifdef HAVE_CROARING
   if (u8ident_roar_init())
@@ -81,21 +79,12 @@ EXTERN int u8ident_init(unsigned options) {
   return 0;
 }
 
-unsigned u8ident_options(void) { return s_u8id_options; }
-unsigned u8ident_profile(void) {
-#if defined U8ID_PROFILE_SAFEC11
-  return U8ID_PROFILE_C11_4;
-#elif defined U8ID_PROFILE_C11STD
-  return U8ID_PROFILE_C11_6;
-#else
-  if (s_u8id_profile > U8ID_PROFILE_6)
-    return s_u8id_profile;
-  assert(s_u8id_profile >= U8ID_PROFILE_2 && s_u8id_profile <= U8ID_PROFILE_6);
-  // 8>>4: 0, 16>>4: 1, 32>>4: 2, 64>>4: 4, 128>>4: 8
-  static const uint8_t _profiles[] = {2, 3, 4, 0, 5, 0, 0, 0, 6};
-  return (unsigned)_profiles[(unsigned)s_u8id_profile >> 4];
-#endif
+enum u8id_norm u8ident_norm(void) { return s_u8id_norm; }
+enum u8id_profile u8ident_profile(void) { return s_u8id_profile; }
+enum u8id_options u8ident_tr31(void) {
+  return (enum u8id_options)(s_u8id_options & 127);
 }
+unsigned u8ident_options(void) { return s_u8id_options; }
 
 /* maxlength of an identifier. Default: 1024. Beware that such long identiers
    are not really identifiable anymore, and keep them under 80 or even less.
@@ -133,7 +122,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #  ifdef ENABLE_CHECK_XID
         (1)
 #  else
-        (s_u8id_options & U8ID_CHECK_XID)
+        (s_u8id_options & U8ID_TR31_XID)
 #  endif
     {
       if (unlikely(!u8ident_is_allowed(cp))) {
@@ -233,7 +222,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       // if Limited Use it must have been already manually added
       if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
                    (s_u8id_profile < U8ID_PROFILE_5 ||
-                    s_u8id_profile < U8ID_PROFILE_C11_4))) {
+                    s_u8id_profile < U8ID_PROFILE_C23_4))) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }
@@ -274,10 +263,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           return U8ID_ERR_SCRIPTS;
         }
 #endif
-#if !defined U8ID_PROFILE || U8ID_PROFILE == C11_4
-        else if (s_u8id_profile == U8ID_PROFILE_C11_4) {
+#if !defined U8ID_PROFILE || U8ID_PROFILE == C23_4
+        else if (s_u8id_profile == U8ID_PROFILE_C23_4) {
           if (scr == SC_Greek) {
-            assert(s_u8id_profile == U8ID_PROFILE_C11_4);
+            assert(s_u8id_profile == U8ID_PROFILE_C23_4);
             goto ok;
           }
         }
@@ -288,12 +277,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 4
         else if (scr == SC_Greek || scr == SC_Cyrillic) {
           assert(s_u8id_profile == U8ID_PROFILE_4 ||
-                 s_u8id_profile == U8ID_PROFILE_C11_4);
+                 s_u8id_profile == U8ID_PROFILE_C23_4);
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         } else {
           assert(s_u8id_profile == U8ID_PROFILE_4 ||
-                 s_u8id_profile == U8ID_PROFILE_C11_4);
+                 s_u8id_profile == U8ID_PROFILE_C23_4);
           // but not more than 2
           if (ctx->count >= 2) {
             ctx->last_cp = cp;

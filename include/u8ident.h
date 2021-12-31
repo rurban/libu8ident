@@ -19,43 +19,46 @@ enum u8id_norm {
   U8ID_FCD = 4,  // the faster variants
   U8ID_FCC = 5
 };
-#define U8ID_NFMASK 7
 enum u8id_profile {
-  U8ID_PROFILE_2 = 8,        // Single Script only
-  U8ID_PROFILE_3 = 16,       // Highly Restrictive
-  U8ID_PROFILE_4 = 32,       // Moderately Restrictive
-  U8ID_PROFILE_5 = 64,       // Minimally Restrictive
-  U8ID_PROFILE_6 = 128,      // Unrestricted
-  U8ID_PROFILE_C11_4 = 4096, // 4 + Greek with only Allowed ID's ("safeC11")
-  U8ID_PROFILE_C11_6 = 8192, // The C11 std
-  U8ID_PROFILE_1     = 16384,// ASCII only
+  U8ID_PROFILE_1 = 1,       // ASCII only
+  U8ID_PROFILE_2 = 2,       // Single Script only
+  U8ID_PROFILE_3 = 3,       // Highly Restrictive
+  U8ID_PROFILE_4 = 4,       // Moderately Restrictive
+  U8ID_PROFILE_5 = 5,       // Minimally Restrictive
+  U8ID_PROFILE_6 = 6,       // Unrestricted
+  U8ID_PROFILE_C11_6 = 7,   // The C11 std
+  U8ID_PROFILE_C23_4 = 8,   // PROFILE_4 + Greek with only Allowed ID's ("SAFEC23")
+};
+enum u8id_options {
+  //  Note: The parser/tokenizer should do that. Without, the checker can be faster.
+  //  Can be disallowed with --disable-check-xid
+  U8ID_TR31_ALLOWED = 64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
+  U8ID_TR31_ID = 65,      // tr31 variants
+  U8ID_TR31_XID = 66,
+  U8ID_TR31_C11 = 67,
+  U8ID_TR31_ALLUTF8 = 68,
+  // room for more tr31 profiles
+
+  U8ID_FOLDCASE = 128,
+  U8ID_WARN_CONFUSABLE = 256,  // requires -DHAVE_CONFUS
+  U8ID_ERROR_CONFUSABLE = 512, // requires -DHAVE_CONFUS
 };
 
-#ifndef U8ID_PROFILE_DEFAULT
-#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
-#endif
 #ifndef U8ID_NORM_DEFAULT
 #  define U8ID_NORM_DEFAULT U8ID_NFC
 #endif
+#ifndef U8ID_PROFILE_DEFAULT
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
+#endif
 
-enum u8id_options {
-  U8ID_DEFAULT_OPTS = U8ID_NORM_DEFAULT + U8ID_PROFILE_DEFAULT,
-  U8ID_FOLDCASE = 256,
-  U8ID_CHECK_XID = 512, // Optional, check for the allowed tr39
-                        // IdentifierStatus. hard-coded with
-                        // --{en,dis}able-check-xid Note: The parser should do
-                        // that. Without, the checker can be faster.
-  U8ID_WARN_CONFUSABLE = 1024,  // requires -DHAVE_CONFUS
-  U8ID_ERROR_CONFUSABLE = 2048, // requires -DHAVE_CONFUS
-};
-
-/* Initialize the library with a bitmask of options, which define the
-   performed checks. Recommended is `U8ID_PROFILE_4` only.
+/* Initialize the library with a tr39 profile, normalization and bitmask of options,
+   which define more performed checks.
+   Recommended is `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
    return -1 on error, 0 if options are valid.
 */
-int u8ident_init(unsigned options);
+int u8ident_init(enum u8id_profile, enum u8id_norm, unsigned options);
 
-/* maxlength of an identifier. Default: 1024. Beware that such longs identiers,
+/* maxlength of an identifier. Default: 1024. Beware that such longs identifiers,
    are not really identifiable anymore, and keep them under 80 or even less.
    Some filesystems do allow now 32K identifiers, which is a glaring security
    hole, waiting to be exploited */

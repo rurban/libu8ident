@@ -55,14 +55,12 @@ enum xid_e {
   ALLUTF8, // all > 128, e.g. php, nim, crystal
 };
 enum xid_e xid = ALLOWED;
-unsigned profile = U8ID_PROFILE_C11_4;
-unsigned u8idopts = U8ID_PROFILE_C11_4;
+enum u8id_norm norm = U8ID_NFC;
+enum u8id_profile profile = U8ID_PROFILE_C23_4;
+unsigned u8idopts = 0;
 
 // private access
-unsigned u8ident_options(void);
-unsigned u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
-unsigned u8ident_maxlength(void);
 
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
@@ -224,7 +222,7 @@ static void usage(void) {
   puts("OPTIONS:");
   puts(" -n|--normalize=nfc,nfkc,nfd,nfkc            default: nfc");
   puts("  set to nfkd by default for python");
-  puts(" -p|--profile=1,2,3,4,5,6,c11_4,c11_6        default: c11_4");
+  puts(" -p|--profile=1,2,3,4,5,6,c23_4,c11_6        default: c23_4");
   puts("  TR39 unicode security profile for identifiers:");
   puts("    1      ASCII. sets xid ascii.");
   puts("    2      Single script");
@@ -232,8 +230,8 @@ static void usage(void) {
   puts("    4      Moderately Restrictive");
   puts("    5      Minimally Restrictive");
   puts("    6      Unrestricted");
-  puts("    c11_4  SAFEC11 (i.e. 4 with Greek). Sets xid allowed.");
   puts("    c11_6  C11STD. Sets xid c11.");
+  puts("    c23_4  SAFEC23 (i.e. 4 with Greek). Sets xid allowed.");
   puts(" -x|--xid=ascii,allowed,id,xid,c11,allutf8     default: allowed");
   puts("  allowed set of identifiers:"); // sorted from most secure to least secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
@@ -504,7 +502,7 @@ int main(int argc, char **argv) {
   int option_index = 0;
   static struct option long_options[] = {
       {"normalization", 1, 0, 'n'}, // *nfc*,nfd,nfkc,nfkd
-      {"profile", 1, 0, 'p'},       // 1,2,3,*4*,5,6,c11_4,c11_6
+      {"profile", 1, 0, 'p'},       // 1,2,3,*4*,5,6,c23_4,c11_6
       {"xid", 1, 0, 'x'},           // ascii,*allowed*,id,xid,c11,allutf8
       {"ext", 1, 0, 'e'},
       {"recursive", 0, 0, 'r'},
@@ -535,13 +533,13 @@ int main(int argc, char **argv) {
       {
       case 'n':
         if (strEQc(optarg, "nfkc"))
-          u8idopts |= U8ID_NFKC;
+          norm = U8ID_NFKC;
         else if (strEQc(optarg, "nfc"))
-          u8idopts |= U8ID_NFC;
+          norm = U8ID_NFC;
         else if (strEQc(optarg, "nfkd"))
-          u8idopts |= U8ID_NFKD;
+          norm = U8ID_NFKD;
         else if (strEQc(optarg, "nfd"))
-          u8idopts |= U8ID_NFD;
+          norm = U8ID_NFD;
         else {
           fprintf(stderr, "Invalid --normalize %s\n", optarg);
           exit(1);
@@ -563,21 +561,20 @@ int main(int argc, char **argv) {
           profile = U8ID_PROFILE_5;
         else if (strEQc(optarg, "6"))
           profile = U8ID_PROFILE_6;
-        else if (strEQc(optarg, "c11_4")) {
-          profile = U8ID_PROFILE_C11_4;
+        else if (strEQc(optarg, "c23_4")) {
+          profile = U8ID_PROFILE_C23_4;
           if (!opt_xid)
-            opt_xid = ALLOWED;
+            xid = ALLOWED;
         }
         else if (strEQc(optarg, "c11_6")) {
           profile = U8ID_PROFILE_C11_6;
           if (!opt_xid)
-            opt_xid = C11;
+            xid = C11;
         }
         else {
           fprintf(stderr, "Invalid --profile %s\n", optarg);
           exit(1);
         }
-        u8idopts |= profile;
         break;
       case 'x': // ascii,allowed,id,xid,c11,allutf8
         opt_xid = true;
@@ -588,7 +585,7 @@ int main(int argc, char **argv) {
         }
         else if (strEQc(optarg, "allowed")) {
           xid = ALLOWED;
-          u8idopts |= U8ID_CHECK_XID;
+          u8idopts |= U8ID_TR31_ALLOWED;
         }
         else if (strEQc(optarg, "id"))
           xid = ID;
@@ -641,7 +638,7 @@ int main(int argc, char **argv) {
   }
   i = optind;
 
-  u8ident_init(u8idopts);
+  u8ident_init(profile, norm, u8idopts);
   if (i == argc) // no dir/file args
     ret |= process_dir(dirname, ext);
   while (i < argc) {

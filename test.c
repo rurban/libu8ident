@@ -280,7 +280,7 @@ void test_norm_nfkc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  assert(!u8ident_init(U8ID_NFKC | U8ID_PROFILE_4));
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFKC, 0));
   testnorm("NFKC", testids);
 
   char *norm = NULL;
@@ -302,7 +302,7 @@ void test_norm_nfc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  assert(!u8ident_init(U8ID_NFC | U8ID_PROFILE_4));
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFC, 0));
   testnorm("NFC", testids);
 
   char *norm = NULL;
@@ -324,7 +324,7 @@ void test_norm_fcc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  assert(!u8ident_init(U8ID_FCC | U8ID_PROFILE_4));
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_FCC, 0));
   testnorm("FCC", testids);
 }
 #endif
@@ -341,7 +341,7 @@ void test_norm_nfkd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  assert(!u8ident_init(U8ID_NFKD | U8ID_PROFILE_4));
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFKD, 0));
   testnorm("NFKD", testids);
 
   char *norm = NULL;
@@ -364,7 +364,7 @@ void test_norm_nfd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  assert(!u8ident_init(U8ID_NFD | U8ID_PROFILE_4));
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFD, 0));
   testnorm("NFD", testids);
 
   char *norm = NULL;
@@ -387,7 +387,7 @@ void test_norm_fcd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
-  assert(!u8ident_init(U8ID_FCD | U8ID_PROFILE_4));
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_FCD, 0));
   testnorm("FCD", testids);
   u8ident_free();
 }
@@ -398,7 +398,7 @@ void test_norm_fcd(void) {
 // Bengali 2nd/ https://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 void test_mixed_scripts(int xid_check) {
   int ret;
-  u8ident_init(U8ID_DEFAULT_OPTS | xid_check);
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   ret = u8ident_check((const uint8_t *)"abcd", NULL);
   CHECK_RET(ret, U8ID_EOK, 0); // Latin only
 
@@ -430,7 +430,7 @@ void test_mixed_scripts(int xid_check) {
 #endif
 
   ret = u8ident_check((const uint8_t *)"\xc3\xb7", NULL);
-  if (u8ident_options() & U8ID_CHECK_XID) {
+  if (u8ident_options() & U8ID_TR31_ALLOWED) {
     CHECK_RET(ret, U8ID_ERR_XID, 0); // division sign U+F7 forbidden as XID
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_ERR_XID,
@@ -442,7 +442,7 @@ void test_mixed_scripts(int xid_check) {
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_EOK, 0); // small letter b with stroke U+180
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C11_4
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C23_4
     CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+1B05 Balinese is limited
 #else
     CHECK_RET(ret, U8ID_EOK, 0);
@@ -488,7 +488,7 @@ void test_mixed_scripts_with_ctx(void) {
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
   assert(u8ident_free_ctx(ctx) == 0);
 
-  assert(!u8ident_init(u8ident_options()));
+  assert(!u8ident_init(u8ident_profile(), u8ident_norm(), u8ident_options()));
   ctx = u8ident_new_ctx();
   assert(ctx == 1);
   ret = u8ident_check((const uint8_t *)"ѝ", NULL);
@@ -517,15 +517,13 @@ void test_mixed_scripts_with_ctx(void) {
 
 void test_init(void) {
   // wrong inits
-  assert(u8ident_init(0)); // missing profile
-  assert(u8ident_init(6));
-  assert(u8ident_init(2048));
-  assert(u8ident_init(U8ID_CHECK_XID)); // missing PROFILE
-  assert(
-      !u8ident_init(U8ID_NORM_DEFAULT | U8ID_CHECK_XID | U8ID_PROFILE_DEFAULT));
-  assert(u8ident_init(U8ID_FCC));                        // missing PROFILE
-  assert(u8ident_init(U8ID_PROFILE_2 | U8ID_PROFILE_4)); // multiple profiles
-  assert(u8ident_init(2048));
+  assert(u8ident_init(0,0,0)); // missing profile
+  assert(u8ident_init(0,0,6));
+  assert(u8ident_init(2048,0,0));
+  assert(u8ident_init(0,0,U8ID_TR31_ALLOWED)); // missing PROFILE
+  assert(!u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ALLOWED));
+  assert(u8ident_init(U8ID_PROFILE_DEFAULT, 8, 0)); // wrong norm
+  assert(u8ident_init(1, 0, 2048));
   u8ident_free();
 }
 
@@ -592,7 +590,7 @@ void test_confus(void) {
     assert(bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
   }
   //
-  u8ident_init(U8ID_DEFAULT_OPTS | U8ID_WARN_CONFUSABLE);
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_WARN_CONFUSABLE);
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
   assert(!(ret & U8ID_EOK_WARN_CONFUS));
 
@@ -665,11 +663,11 @@ int main(int argc, char **argv) {
 #endif
 #ifndef DISABLE_CHECK_XID
   if (profile || xid || argc == 1) {
-    test_mixed_scripts(U8ID_CHECK_XID);
+    test_mixed_scripts(U8ID_TR31_ALLOWED);
   } else
 #endif
 #ifdef ENABLE_CHECK_XID
-    test_mixed_scripts(U8ID_CHECK_XID);
+    test_mixed_scripts(U8ID_TR31_ALLOWED);
 #endif
 
   test_mixed_scripts_with_ctx();

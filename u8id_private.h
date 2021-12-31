@@ -11,7 +11,7 @@
 #define EXTERN extern
 
 #ifndef PERF_TEST
-// too slow
+// they are all too slow
 #  undef USE_ALLOWED_CROAR
 #  undef USE_MARK_CROAR
 #  undef USE_NORM_CROAR
@@ -39,8 +39,8 @@
 #define NFKD 3
 #define FCD 4
 #define FCC 5
-#define C11_4 4096
-#define C11_6 8192
+#define C11_6 7
+#define C23_4 8
 #define _XSTR(s) _STR(s)
 #define _STR(s) #s
 #define CAT(a, b) a##b
@@ -68,7 +68,9 @@
 #endif
 
 #ifdef U8ID_PROFILE
-#  if U8ID_PROFILE == 2
+#  if U8ID_PROFILE == 1
+#    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_1
+#  elif U8ID_PROFILE == 2
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_2
 #  elif U8ID_PROFILE == 3
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_3
@@ -78,18 +80,18 @@
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_5
 #  elif U8ID_PROFILE == 6
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_6
-#  elif U8ID_PROFILE == C11_4
-#    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_4
-#    define U8ID_PROFILE_SAFEC11
+#  elif U8ID_PROFILE == C23_4
+#    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C23_4
+#    define U8ID_PROFILE_SAFEC23
 #  elif U8ID_PROFILE == C11_6
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
 #    define U8ID_PROFILE_C11STD
 #  else
 #    error "Invalid U8ID_PROFILE "_XSTR(U8ID_PROFILE)
 #  endif
-#elif defined U8ID_PROFILE_SAFEC11
-#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_4
-#  define U8ID_PROFILE C11_4
+#elif defined U8ID_PROFILE_SAFEC23
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C23_4
+#  define U8ID_PROFILE C23_4
 #elif defined U8ID_PROFILE_C11STD
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
 #  define U8ID_PROFILE C11_6
@@ -111,8 +113,8 @@ struct ctx_t {
   union {
     uint64_t scr64; // room for 8 scripts
     uint8_t scr8[U8ID_SCR_TRESH];
-    // TODO check if we really need more than 8. Very unlikely.
-    // Only if we manually add extra scripts.
+    // TODO check if we really need more than 8. Only with insecure
+    // profiles, or when we manually add extra scripts.
     uint8_t *u8p; // or if count > 8
   };
 };
@@ -127,5 +129,11 @@ struct ctx_t {
 #  define GCC_DIAG_IGNORE(w)
 #  define GCC_DIAG_POP
 #endif
+
+enum u8id_norm u8ident_norm(void);
+enum u8id_profile u8ident_profile(void);
+enum u8id_options u8ident_tr31(void);
+unsigned u8ident_options(void);
+unsigned u8ident_maxlength(void);
 
 #endif // _U8ID_PRIVATE_H

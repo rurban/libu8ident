@@ -827,7 +827,7 @@ EXTERN char *u8ident_normalize(const char *src, int len) {
   char *tmp = NULL;
   size_t tmp_size;
 #endif
-  const enum u8id_norm mode = u8ident_options() & U8ID_NFMASK;
+  const enum u8id_norm mode = u8ident_norm();
   const bool iscompat = (mode == U8ID_NFKC || mode == U8ID_NFKD);
 
   size_t dmax = len;

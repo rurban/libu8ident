@@ -115,7 +115,7 @@ test_texts_SOURCES = test-texts.c
 test_texts_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS)
 test_texts_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
 test_c11_SOURCES = test-c11.c
-test_c11_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS)
+test_c11_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS) -DU8ID_PROFILE_SAFEC23
 test_c11_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
 
 if HAVE_CROARING
@@ -157,13 +157,13 @@ check-norms:
             ls -gGh u8idnorm.o; \
         done
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in 2 3 4 5 6 C11_4 C11_6; do \
+	for n in 2 3 4 5 6 C11_6 C23_4; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile; \
         done
-	for n in SAFEC11 C11STD; do \
+	for n in SAFEC23 C11STD; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
@@ -190,7 +190,7 @@ u8ident.3: README.md
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) \
-	     test-prof{2,3,4,5,6,C11_4,C11_6,SAFEC11,C11STD}$(EXEEXT) \
+	     test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst test-c11$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 c11-all.h c11-safe.h

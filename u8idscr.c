@@ -191,7 +191,7 @@ uint8_t u8ident_get_script(const uint32_t cp) {
   // faster check, as we have no NON-xid's
   return sc_search(cp, nonxid_script_list, ARRAY_SIZE(nonxid_script_list));
 #else
-  if (s_u8id_options & U8ID_CHECK_XID) // we already checked for allowed
+  if (s_u8id_options & U8ID_TR31_ALLOWED) // we already checked for allowed
     return sc_search(cp, nonxid_script_list, ARRAY_SIZE(nonxid_script_list));
   else
     return sc_search(cp, xid_script_list, ARRAY_SIZE(xid_script_list));
@@ -403,7 +403,7 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 
 #if !defined U8ID_NORM
-  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFC)
+  if (u8ident_norm() == U8ID_NFC)
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFC
   {
@@ -418,7 +418,7 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 
 #if !defined U8ID_NORM
-  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFKC)
+  if (u8ident_norm() == U8ID_NFKC)
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKC
   {
@@ -433,7 +433,7 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 
 #if !defined U8ID_NORM
-  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFD)
+  if (u8ident_norm() == U8ID_NFD)
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFD
   {
@@ -446,7 +446,7 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #endif
 
 #if !defined U8ID_NORM
-  if ((s_u8id_options & U8ID_NFMASK) == U8ID_NFKD)
+  if (u8ident_norm() == U8ID_NFKD)
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKD
   {

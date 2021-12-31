@@ -135,7 +135,7 @@ test: test.c $(SRC) $(HEADER) $(HDRS)
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
 test-c11: test-c11.c $(SRC) $(HEADER) $(HDRS) mark.h
-	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_C11 -I. -Iinclude test-c11.c $(SRC) -o test-c11
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude test-c11.c $(SRC) -o test-c11
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
@@ -149,7 +149,7 @@ clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
 	       perf mkroar \
 	       test test-texts test-asan test-xid-{EN,DIS}ABLE \
-	       test-prof{2,3,4,5,6,C11_4,C11_6,SAFEC11,C11STD} \
+	       test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
 # Maintainer-only
@@ -163,12 +163,12 @@ check-norms: $(SRC) $(HEADER) $(HDRS)
 	      -o test-norm-$$n && ./test-norm-$$n norm; \
         done
 check-profiles: $(SRC) $(HEADER) $(HDRS)
-	for n in 2 3 4 5 6 C11_4 C11_6; do \
+	for n in 2 3 4 5 6 C11_6 C23_4; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && ./test-prof$$n profile; \
         done
-	for n in SAFEC11 C11STD; do \
+	for n in SAFEC23 C11STD; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE_$${n} -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && ./test-prof$$n profile; \

@@ -388,7 +388,7 @@ int main(int argc, char **argv) {
 #ifdef HAVE_SYS_STAT_H
   struct stat st;
 #endif
-  u8ident_init(U8ID_PROFILE_C11_4);
+  u8ident_init(U8ID_PROFILE_C23_4, U8ID_NFC, 0);
 #ifdef HAVE_CROARING
   rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
                                                    mark_croar_bin_len);

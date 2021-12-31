@@ -250,32 +250,39 @@ API
 
     #include "u8ident.h"
 
-**u8id_options** is an enum of the following bits:
+**u8id_options** is the sum of the following bits:
+
+enum u8id_norm:
 
     U8ID_NFC  = 0  // the default, shortest canonical composed normalization
     U8ID_NFD  = 1  // the longer, decomposed normalization
     U8ID_NFKC = 2  // the compatibility normalization
     U8ID_NFKD = 3  // the longer compatibility decomposed normalization
-    U8ID_FCD  = 4,  // the faster variants
-    U8ID_FCC  = 5
+    U8ID_FCD  = 4, // the faster variants
+    U8ID_FCC  = 5, //
 
-    U8ID_PROFILE_2 = 8  // Single Script only
-    U8ID_PROFILE_3 = 16  // Highly Restrictive
-    U8ID_PROFILE_4 = 32 // Moderately Restrictive
-    U8ID_PROFILE_5 = 64 // Minimally Restrictive
-    U8ID_PROFILE_6 = 128 // Unrestricted
-    U8ID_PROFILE_C11_4 = 4096, // 4 + Greek with only Allowed ID's ("SAFEC11")
-    U8ID_PROFILE_C11_6 = 8192, // "C11STD"
+enum u8id_profile:
 
-    U8ID_FOLDCASE  = 256, // optional for case-insensitive idents. case-folded
-                          // when normalized.
-    U8ID_CHECK_XID = 512, // optional, check for the allowed tr39
-                          // IdentifierStatus.
-                          // hard-coded with --{en,dis}able-check-xid
-                          // Note: The parser should do that. Without, the
-                          // checker can be faster.
-    U8ID_WARN_CONFUSABLE  = 1024,  // not yet implemented
-    U8ID_ERROR_CONFUSABLE = 2048, //       -"-
+    U8ID_PROFILE_1 = 1      // ASCII only
+    U8ID_PROFILE_2 = 2      // Single Script only
+    U8ID_PROFILE_3 = 3      // Highly Restrictive
+    U8ID_PROFILE_4 = 4      // Moderately Restrictive
+    U8ID_PROFILE_5 = 5      // Minimally Restrictive
+    U8ID_PROFILE_6 = 6      // Unrestricted
+    U8ID_PROFILE_C11_6 = 7, // "C11STD"
+    U8ID_PROFILE_C23_4 = 8, // 4 + Greek with only Allowed ID's ("SAFEC23")
+
+enum u8id_options:
+
+    U8ID_FOLDCASE  = 64,        // optional for case-insensitive idents. case-folded
+                                // when normalized.
+    U8ID_TR31_XID = 128,        // optional, check for the allowed tr31
+                                // IdentifierStatus.
+                                // hard-coded with --{en,dis}able-check-xid
+                                // Note: The parser should do that. Without, the
+                                // checker can be faster.
+    U8ID_WARN_CONFUSABLE  = 256 // requires -DHAVE_CONFUS
+    U8ID_ERROR_CONFUSABLE = 512 // requires -DHAVE_CONFUS
 
 `int u8ident_init (u8id_options)`
 
