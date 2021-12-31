@@ -162,9 +162,21 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
 
 static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
                                 const size_t len) {
-  const struct sc *sc =
+  if (cp < 255) { // 14 ranges a 9 byte (126 byte, i.e cache loads)
+    struct sc *s = (struct sc *)sc_list;
+    for (size_t i = 0; i < len; i++) {
+      if ((cp - s->from) <= (s->to - s->from)) // faster in-between trick
+        return s->scr;
+      if (cp <= s->to) // s is sorted. not found
+        return 255;
+      s++;
+    }
+    return 255;
+  } else {
+    const struct sc *sc =
       (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
-  return sc ? sc->scr : 255;
+    return sc ? sc->scr : 255;
+  }
 }
 
 static inline bool range_bool_search(const uint32_t cp,

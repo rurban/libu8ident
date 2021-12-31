@@ -15,7 +15,7 @@ default: nfc
 set to nfkd by default for python
 .TP
 \fB\-p\fR|\-\-profile=1,2,3,4,5,6,c11_4,c11_6
-default: 4
+default: c11_4
 .IP
 TR39 unicode security profile for identifiers:
 .TP
@@ -43,8 +43,8 @@ SAFEC11 (i.e. 4 with Greek). Sets xid allowed.
 c11_6
 C11STD. Sets xid c11.
 .TP
-\fB\-x\fR|\-\-xid=ascii,allowed,tr31,c11,allutf8
-default: tr31
+\fB\-x\fR|\-\-xid=ascii,allowed,id,xid,c11,allutf8
+default: allowed
 .IP
 allowed set of identifiers:
 .TP
@@ -54,8 +54,11 @@ only ASCII letters, punctuations. plus numbers
 allowed
 tr31 with only recommended scripts, IdentifierStatus
 .TP
-tr31
-all letters, punctuations. plus numbers and combining marks
+id
+all letters. plus numbers, punctuations and combining marks
+.TP
+xid
+id plus NFKC quirks
 .TP
 c11
 some AltId unicode ranges from C11

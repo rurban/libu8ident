@@ -163,11 +163,11 @@ static struct sc *binary_search_fast(const uint32_t cp, const char *list,
   return NULL;
 }
 
-static struct sc *eytzinger_search(const uint32_t cp, const char *list,
+static struct sc *eytzinger_search(const uint32_t cp, const char *elist,
                                    const size_t len, const size_t size)
 {
   size_t k = 1;
-  const char *p = list;
+  const char *p = elist;
   struct sc *pos;
   while (k <= len) {
     pos = (struct sc *)(p + (size * k));
