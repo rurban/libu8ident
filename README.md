@@ -274,20 +274,23 @@ enum u8id_profile:
 
 enum u8id_options:
 
-    U8ID_FOLDCASE  = 64,        // optional for case-insensitive idents. case-folded
-                                // when normalized.
-    U8ID_TR31_XID = 128,        // optional, check for the allowed tr31
-                                // IdentifierStatus.
-                                // hard-coded with --{en,dis}able-check-xid
-                                // Note: The parser should do that. Without, the
-                                // checker can be faster.
-    U8ID_WARN_CONFUSABLE  = 256 // requires -DHAVE_CONFUS
-    U8ID_ERROR_CONFUSABLE = 512 // requires -DHAVE_CONFUS
+    U8ID_FOLDCASE  = 64,        .
+    U8ID_TR31_ALLOWED = 64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
+    U8ID_TR31_ID = 65,      // tr31 variants
+    U8ID_TR31_XID = 66,
+    U8ID_TR31_C11 = 67,
+    U8ID_TR31_ALLUTF8 = 68,
+    // room for more tr31 profiles
+    
+    U8ID_FOLDCASE = 128,         // optional for case-insensitive idents. case-folded
+                                 // when normalized
+    U8ID_WARN_CONFUSABLE = 256,  // requires -DHAVE_CONFUS
+    U8ID_ERROR_CONFUSABLE = 512, // requires -DHAVE_CONFUS
 
-`int u8ident_init (u8id_options)`
+`int u8ident_init (enum u8id_profile, enum u8id_norm, unsigned options)`
 
 Initialize the library with a bitmask of options, which define the
-performed checks. Recommended is `U8ID_PROFILE_4` only.
+performed checks. Recommended is `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
 
 `int u8ident_set_maxlength (int maxlen)`
 
@@ -296,7 +299,7 @@ not really identifiable anymore, and keep them under 80 or even
 less. Some filesystems do allow now 32K identifiers, which is a
 glaring security hole, waiting to be exploited.
 
-`int u8ident_new_ctx ()`
+`u8id_ctx_t u8ident_new_ctx ()`
 
 Generates a new identifier document/context/directory, which
 initializes a new list of seen scripts. Contexts are optional. By
@@ -306,7 +309,7 @@ with usernames you may choose if you need to support different
 languages at once.  I cannot think of any such usage, so better avoid
 contexts with usernames to avoid mixups.
 
-`int u8ident_set_ctx (int ctx)`
+`int u8ident_set_ctx (u8id_ctx_t ctx)`
 
 Changes to the context generated with `u8ident_new_ctx`.
 
@@ -317,12 +320,12 @@ Adds the script to the context, if it's known or declared
 beforehand. Such as `use utf8 "Greek";` in cperl, or a
 `#pragma unicode Braille` in some C to add some Limited_Use scripts.
 
-`int u8ident_delete_ctx (int)`
+`int u8ident_free_ctx (u8id_ctx_t ctx)`
 
 Deletes the context generated with `u8ident_new_ctx`. This is
-optional, all remaining contexts are deleted by `u8ident_delete`.
+optional, all remaining contexts are deleted by `u8ident_free()`.
 
-`int u8ident_delete ()`
+`int u8ident_free ()`
 
 End this library, cleaning up all internal structures.
 

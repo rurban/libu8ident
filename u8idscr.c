@@ -37,14 +37,14 @@
 extern unsigned s_u8id_options;
 // not yet thread-safe
 struct ctx_t ctx[U8ID_CTX_TRESH] = {0}; // pre-allocate 5 contexts
-static int i_ctx = 0;
+static u8id_ctx_t i_ctx = 0;
 struct ctx_t *ctxp = NULL; // if more than 5 contexts
 
 /* Generates a new identifier document/context/directory, which
    initializes a new list of seen scripts. */
-EXTERN int u8ident_new_ctx(void) {
+EXTERN u8id_ctx_t u8ident_new_ctx(void) {
   // thread-safety later
-  int i = i_ctx + 1;
+  u8id_ctx_t i = i_ctx + 1;
   i_ctx++;
   if (i == U8ID_CTX_TRESH) {
     ctxp = (struct ctx_t *)calloc(U8ID_CTX_TRESH, sizeof(struct ctx_t));
@@ -58,8 +58,8 @@ EXTERN int u8ident_new_ctx(void) {
 }
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
-EXTERN int u8ident_set_ctx(int i) {
-  if (i >= 0 && i <= i_ctx) {
+EXTERN int u8ident_set_ctx(u8id_ctx_t i) {
+  if (i <= i_ctx) {
     i_ctx = i;
     return 0;
   } else
@@ -260,8 +260,8 @@ const char *u8ident_script_name(const int scr) {
 }
 
 /* returns the failing codepoint, which failed in the last check. */
-uint32_t u8ident_failed_char(const int i) {
-  if (i >= 0 && i <= i_ctx) {
+uint32_t u8ident_failed_char(const u8id_ctx_t i) {
+  if (i <= i_ctx) {
     const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
     return c->last_cp;
   } else {
@@ -269,8 +269,8 @@ uint32_t u8ident_failed_char(const int i) {
   }
 }
 /* returns the constant script name, which failed in the last check. */
-const char *u8ident_failed_script_name(const int i) {
-  if (i >= 0 && i <= i_ctx) {
+const char *u8ident_failed_script_name(const u8id_ctx_t i) {
+  if (i <= i_ctx) {
     const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
     const uint32_t cp = c->last_cp;
     if (cp > 0)
@@ -289,10 +289,10 @@ EXTERN int u8ident_add_script(uint8_t scr) {
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
    optional, all remaining contexts are deleted by `u8ident_free` */
-EXTERN int u8ident_free_ctx(int i) {
+EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
   if (i_ctx < U8ID_CTX_TRESH)
     ctxp = &ctx[0];
-  if (i >= 0 && i <= i_ctx) {
+  if (i <= i_ctx) {
     if (ctxp[i].count > 8)
       free(ctxp[i].u8p);
     ctxp[i].count = 0;
@@ -307,7 +307,7 @@ EXTERN int u8ident_free_ctx(int i) {
 
 /* End this library, cleaning up all internal structures. */
 EXTERN void u8ident_free(void) {
-  for (int i = 0; i <= i_ctx; i++) {
+  for (u8id_ctx_t i = 0; i <= i_ctx; i++) {
     u8ident_free_ctx(i);
   }
   if (i_ctx >= U8ID_CTX_TRESH) {
@@ -333,8 +333,8 @@ EXTERN void u8ident_free(void) {
      free(errstr);
    }
 */
-const char *u8ident_existing_scripts(const int i) {
-  if (unlikely(i < 0 || i > i_ctx))
+const char *u8ident_existing_scripts(const u8id_ctx_t i) {
+  if (unlikely(i > i_ctx))
     return NULL;
   const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
   const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;

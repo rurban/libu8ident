@@ -43,6 +43,7 @@ enum u8id_options {
   U8ID_WARN_CONFUSABLE = 256,  // requires -DHAVE_CONFUS
   U8ID_ERROR_CONFUSABLE = 512, // requires -DHAVE_CONFUS
 };
+typedef unsigned u8id_ctx_t;
 
 #ifndef U8ID_NORM_DEFAULT
 #  define U8ID_NORM_DEFAULT U8ID_NFC
@@ -72,10 +73,10 @@ void u8ident_set_maxlength(unsigned maxlen);
    once.
    I cannot think of any such usage, so better avoid contexts with usernames to
    avoid mixups. */
-int u8ident_new_ctx(void);
+u8id_ctx_t u8ident_new_ctx(void);
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
-int u8ident_set_ctx(int ctx);
+int u8ident_set_ctx(u8id_ctx_t ctx);
 
 /* Optionally adds a script to the context, if it's known or declared
    beforehand. Such as `use utf8 "Greek";` in cperl.
@@ -107,7 +108,7 @@ const char *u8ident_script_name(const int scr);
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
    optional, all remaining contexts are deleted by `u8ident_free` */
-int u8ident_free_ctx(int);
+int u8ident_free_ctx(u8id_ctx_t ctx);
 
 /* End this library, cleaning up all internal structures. */
 void u8ident_free(void);
@@ -158,9 +159,9 @@ enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
 enum u8id_errors u8ident_check_buf(const char *buf, int len, char **outnorm);
 
 /* returns the failing codepoint, which failed in the last check. */
-uint32_t u8ident_failed_char(const int ctx);
+uint32_t u8ident_failed_char(const u8id_ctx_t ctx);
 /* returns the constant script name, which failed in the last check. */
-const char *u8ident_failed_script_name(const int ctx);
+const char *u8ident_failed_script_name(const u8id_ctx_t ctx);
 
 /* Returns a fresh string of the list of the seen scripts in this
    context whenever a mixed script error occurs. Needed for the error message
@@ -177,4 +178,4 @@ const char *u8ident_failed_script_name(const int ctx);
        free(scripts);
    }
 */
-const char *u8ident_existing_scripts(int ctx);
+const char *u8ident_existing_scripts(const u8id_ctx_t ctx);
