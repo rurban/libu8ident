@@ -96,7 +96,7 @@ confus_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl -c
 mark.h: mkmark.pl # UnicodeData.txt
 	$(PERL) mkmark.pl
-allow_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
+allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
 u8idlint: u8idlint.c $(LIB)
@@ -141,7 +141,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	./test-asan
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
-      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allow_croar.h confus_croar.h mark.h
+      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h
 	$(CC) $(CFLAGS_REL) $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
 	./perf
 

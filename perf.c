@@ -6,21 +6,22 @@
    some range_bool sets, like allowed_id_list[] and the NORM lists.
    croaring is 10-100% faster only for confusables,
    and 70-100% slower for the range_bool sets.
+   A hybrid linear and bsearch is the fastest for most.
 
    confus:
    croaring: 351442	bsearch: 517036          47.12% faster
    nfkd:
-   croaring: 3193632	bsearch: 1829178 	 74.59% slower
+   croaring: 10757006	bsearch: 5298098 	 linear+bsearch: 5373056 	 1.41% slower
    nfd:
-   croaring: 3376412	bsearch: 1876160 	 79.96% slower
+   croaring: 8199750	bsearch: 4596332 	 linear+bsearch: 2612246 	 75.95% faster
    nfkc:
-   croaring: 4980066	bsearch: 3699228 	 34.62% slower
+   croaring: 6731504	bsearch: 3824808 	 linear+bsearch: 2901860 	 31.81% faster
    nfc:
-   croaring: 4497194	bsearch: 2139826 	 110.17% slower
+   croaring: 4721964	bsearch: 3664752 	 linear+bsearch: 2942784 	 24.53% faster
    allowed_id:
-   croaring: 4333056	bsearch: 2439034         77.65% slower
+   croaring: 3339830	bsearch: 2284932 	 linear+bsearch: 1684774 	 35.62% faster
    mark:
-   croaring: 138476	bsearch: 98540 	         40.53% slower
+   croaring: 2776046	bsearch: 2268656 	 linear+bsearch: 1710826 	 32.61% faster
 
    with the scripts1.h variant: (first search range, then singles, see branch
    scripts1)
@@ -107,6 +108,23 @@ static inline uint64_t timer_end() {
 
 #endif
 
+#if 0
+static inline bool linear_search(const uint32_t cp, const char *list,
+                                 const size_t len, const size_t size) {
+  const char *p = list;
+  struct range_bool *s = (struct range_bool *)list;
+  for (size_t i = 0; i < len; i++) {
+    if ((cp - s->from) <= (s->to - s->from))
+      return true;
+    if (cp <= s->to) // s is sorted. not found
+      return false;
+    p += size;
+    s = (struct range_bool *)p;
+  }
+  return false;
+}
+#endif
+
 static struct sc *binary_search(const uint32_t cp, const char *list,
                                 const size_t len, const size_t size) {
   int n = (int)len;
@@ -133,6 +151,26 @@ static inline bool range_bool_search(const uint32_t cp,
   return r ? true : false;
 }
 
+static inline bool range_bool_search_hybr(const uint32_t cp,
+                                          const struct range_bool *list,
+                                          const size_t len) {
+  if (cp < 127) {
+    struct range_bool *s = (struct range_bool *)list;
+    for (size_t i = 0; i < len; i++) {
+      if ((cp - s->from) <= (s->to - s->from))
+        return true;
+      if (cp <= s->to) // s is sorted. not found
+        return false;
+      s++;
+    }
+    return false;
+  }
+  else {
+    const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
+    return r ? true : false;
+  }
+}
+
 // without croaring
 static int compar32(const void *a, const void *b) {
   const uint32_t ai = *(const uint32_t *)a;
@@ -140,200 +178,154 @@ static int compar32(const void *a, const void *b) {
   return ai < bi ? -1 : ai == bi ? 0 : 1;
 }
 
+#define PERC(fast,slow) (100.0 * (slow - fast) / (double)fast)
+// favor ASCII 100x over unicode char coverage
+#define DO_LOOP(t1,boolfunc) \
+  begin = timer_start(); \
+  for (int i = 0; i < 100; i++) { \
+    for (uint32_t cp = 20; cp < 128; cp++) { \
+      bool ret = boolfunc; \
+      gret |= ret; \
+    } \
+  } \
+  for (uint32_t cp = 20; cp < 0x11000; cp++) { \
+    bool ret = boolfunc; \
+    gret |= ret; \
+  } \
+  end = timer_end(); \
+  uint64_t t1 = end - begin
+
+#define DO_LOOP_NM(t1,boolfunc,NFPRE)           \
+  begin = timer_start(); \
+  for (int i = 0; i < 100; i++) { \
+    for (uint32_t cp = 20; cp < 128; cp++) { \
+    bool ret; \
+    if (boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
+      ret = true; \
+    else \
+      ret = boolfunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
+    gret |= ret; \
+    } \
+  } \
+  for (uint32_t cp = 20; cp < 0x11000; cp++) { \
+    bool ret; \
+    if (boolfunc(cp, JOIN(NFPRE,N_list), ARRAY_SIZE(JOIN(NFPRE,N_list)))) \
+      ret = true; \
+    else \
+      ret = boolfunc(cp, JOIN(NFPRE,M_list), ARRAY_SIZE(JOIN(NFPRE,M_list))); \
+    gret |= ret; \
+  } \
+  end = timer_end(); \
+  uint64_t t1 = end - begin
+
 void perf_confus(void) {
   printf("confus:\n");
-  uint64_t begin = timer_start();
-  for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
-    const uint32_t cp = confusables[i];
-    bool ret = u8ident_is_confusable(cp);
-    gret |= ret;
-  }
-  uint64_t end = timer_end();
-  uint64_t t1 = end - begin;
+  uint64_t begin, end;
 
-  begin = timer_start();
-  for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
-    const uint32_t cp = confusables[i];
-    void *ret = bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32);
-    gret |= ret ? true : false;
-  }
-  end = timer_end();
-  uint64_t t2 = end - begin;
+  DO_LOOP(t1, u8ident_is_confusable(cp));
+  DO_LOOP(t2, bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
+  //DO_LOOP(t3, search_hybr(cp, confusables, ARRAY_SIZE(confusables)));
+
   if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
-           100.0 * (t2 - t1) / (double)t1);
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2, PERC(t1,t2));
   else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
-           100.0 * (t1 - t2) / (double)t2);
+    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2, PERC(t2,t1));
 }
 
 void perf_nfkc(void) {
   printf("nfkc:\n");
-  uint64_t begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    gret |= u8ident_roar_maybe_nfkc(cp);
-  }
-  uint64_t end = timer_end();
-  uint64_t t1 = end - begin;
+  uint64_t begin, end;
+#undef NFKC
+  DO_LOOP(t1, u8ident_roar_maybe_nfkc(cp));
+  DO_LOOP_NM(t2, range_bool_search, NFKC);
+  DO_LOOP_NM(t3, range_bool_search_hybr, NFKC);
 
-  begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    bool ret;
-    if (range_bool_search(cp, NFKC_N_list, ARRAY_SIZE(NFKC_N_list)))
-      ret = true;
-    else
-      ret = range_bool_search(cp, NFKC_M_list, ARRAY_SIZE(NFKC_M_list));
-    gret |= ret;
-  }
-  end = timer_end();
-  uint64_t t2 = end - begin;
-  if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
-           100.0 * (t2 - t1) / (double)t1);
+  if (t3 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% faster\n", t1, t2, t3,
+           PERC(t3,t2));
   else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
-           100.0 * (t1 - t2) / (double)t2);
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% slower\n", t1, t2, t3,
+           PERC(t2,t3));
 }
 
 void perf_nfc(void) {
   printf("nfc:\n");
-  uint64_t begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    bool ret = u8ident_roar_maybe_nfc(cp);
-    gret |= ret;
-  }
-  uint64_t end = timer_end();
-  uint64_t t1 = end - begin;
+  uint64_t begin, end;
+#undef NFC
+  DO_LOOP(t1, u8ident_roar_maybe_nfc(cp));
+  DO_LOOP_NM(t2, range_bool_search, NFC);
+  DO_LOOP_NM(t3, range_bool_search_hybr, NFC);
 
-  begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    bool ret;
-    if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
-      ret = true;
-    else
-      ret = range_bool_search(cp, NFC_M_list, ARRAY_SIZE(NFC_M_list));
-    gret |= ret;
-  }
-  end = timer_end();
-  uint64_t t2 = end - begin;
-  if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
-           100.0 * (t2 - t1) / (double)t1);
+  if (t3 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% faster\n", t1, t2, t3,
+           PERC(t3,t2));
   else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
-           100.0 * (t1 - t2) / (double)t2);
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% slower\n", t1, t2, t3,
+           PERC(t2,t3));
 }
 
 void perf_nfkd(void) {
   printf("nfkd:\n");
-  uint64_t begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    bool ret = u8ident_roar_maybe_nfkd(cp);
-    gret |= ret;
-  }
-  uint64_t end = timer_end();
-  uint64_t t1 = end - begin;
+  uint64_t begin, end;
+#undef NFKD
+  DO_LOOP(t1, u8ident_roar_maybe_nfkd(cp));
+  DO_LOOP(t2, range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list)));
+  DO_LOOP(t3, range_bool_search_hybr(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list)));
 
-  begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    bool ret = range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
-    gret |= ret;
-  }
-  end = timer_end();
-  uint64_t t2 = end - begin;
-  if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
-           100.0 * (t2 - t1) / (double)t1);
+  if (t3 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% faster\n", t1, t2, t3,
+           PERC(t3,t2));
   else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
-           100.0 * (t1 - t2) / (double)t2);
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% slower\n", t1, t2, t3,
+           PERC(t2,t3));
 }
 
 void perf_nfd(void) {
   printf("nfd:\n");
-  uint64_t begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    bool ret = u8ident_roar_maybe_nfd(cp);
-    gret |= ret;
-  }
-  uint64_t end = timer_end();
-  uint64_t t1 = end - begin;
+  uint64_t begin, end;
+#undef NFD
+  DO_LOOP(t1, u8ident_roar_maybe_nfd(cp));
+  DO_LOOP(t2, range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list)));
+  DO_LOOP(t3, range_bool_search_hybr(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list)));
 
-  begin = timer_start();
-  for (uint32_t cp = 128; cp < 0x11000; cp++) {
-    bool ret = range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
-    gret |= ret;
-  }
-  end = timer_end();
-  uint64_t t2 = end - begin;
-  if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
-           100.0 * (t2 - t1) / (double)t1);
+  if (t3 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% faster\n", t1, t2, t3,
+           PERC(t3,t2));
   else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
-           100.0 * (t1 - t2) / (double)t2);
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% slower\n", t1, t2, t3,
+           PERC(t2,t3));
 }
 
 void perf_allowed_id(void) {
   printf("allowed_id:\n");
-  uint64_t begin = timer_start();
-  for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list); i++) {
-    for (uint32_t cp = allowed_id_list[i].from; cp <= allowed_id_list[i].to;
-         cp++) {
-      bool ret = u8ident_roar_is_allowed(cp);
-      gret |= ret;
-    }
-  }
-  uint64_t end = timer_end();
-  uint64_t t1 = end - begin;
+  uint64_t begin, end;
 
-  begin = timer_start();
-  for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list); i++) {
-    for (uint32_t cp = allowed_id_list[i].from; cp <= allowed_id_list[i].to;
-         cp++) {
-      bool ret = range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
-      gret |= ret;
-    }
-  }
-  end = timer_end();
-  uint64_t t2 = end - begin;
-  if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
-           100.0 * (t2 - t1) / (double)t1);
+  DO_LOOP(t1, u8ident_roar_is_allowed(cp));
+  DO_LOOP(t2, range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
+  DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
+  
+  if (t3 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% faster\n", t1, t2, t3,
+           PERC(t3,t2));
   else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
-           100.0 * (t1 - t2) / (double)t2);
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% slower\n", t1, t2, t3,
+           PERC(t2,t3));
 }
 
 void perf_mark(void) {
   printf("mark:\n");
-  uint64_t begin = timer_start();
-  for (size_t i = 0; i < ARRAY_SIZE(mark_list); i++) {
-    for (uint32_t cp = mark_list[i].from; cp <= mark_list[i].to;
-         cp++) {
-      bool ret = u8ident_roar_is_mark(cp);
-      gret |= ret;
-    }
-  }
-  uint64_t end = timer_end();
-  uint64_t t1 = end - begin;
+  uint64_t begin, end;
 
-  begin = timer_start();
-  for (size_t i = 0; i < ARRAY_SIZE(mark_list); i++) {
-    for (uint32_t cp = mark_list[i].from; cp <= mark_list[i].to;
-         cp++) {
-      bool ret = range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
-      gret |= ret;
-    }
-  }
-  end = timer_end();
-  uint64_t t2 = end - begin;
-  if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2,
-           100.0 * (t2 - t1) / (double)t1);
+  DO_LOOP(t1, u8ident_roar_is_mark(cp));
+  DO_LOOP(t2, range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list)));
+  DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, ARRAY_SIZE(mark_list)));
+
+  if (t3 < t2)
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% faster\n", t1, t2, t3,
+           PERC(t3,t2));
   else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2,
-           100.0 * (t1 - t2) / (double)t2);
+    printf("croaring: %lu\tbsearch: %lu \t linear+bsearch: %lu \t %0.2f%% slower\n", t1, t2, t3,
+           PERC(t2,t3));
 }
 
 int main(void) {
