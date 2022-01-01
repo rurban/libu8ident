@@ -83,6 +83,9 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
+/* Define to 1 if the system has the `__builtin_ffs' built-in function */
+#undef HAVE___BUILTIN_FFS
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 

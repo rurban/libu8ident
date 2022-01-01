@@ -255,6 +255,7 @@ AC_CHECK_SIZEOF(size_t)
 AC_CHECK_FUNCS([ memset strcmp ])
 AC_CHECK_FUNCS([getopt_long],[],
   AC_MSG_WARN([getopt_long not found. u8idlint will not accept long options.]))
+AX_GCC_BUILTIN(__builtin_ffs)
 
 case $host_os in
   mingw*|cygwin*|msys*) have_windows=1 ;;

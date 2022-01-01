@@ -1,5 +1,6 @@
 # -*- Makefile -*-
-#DEFINES = -DU8ID_NORM=NFKC -DU8ID_PROFILE=4 -DDISABLE_CHECK_XID
+DEFINES := -DHAVE___BUILTIN_FFS
+#DEFINES := -DU8ID_NORM=NFKC -DU8ID_PROFILE=4 -DDISABLE_CHECK_XID
 HAVE_CONFUS := 1
 CC := cc
 CFLAGS := -Wall -Wextra
@@ -9,7 +10,7 @@ RANLIB := ranlib
 RONN := ronn
 # Maintainer only
 VERSION = 0.1
-DEFINES := -DPACKAGE_VERSION="\"$(VERSION)\""
+DEFINES += -DPACKAGE_VERSION="\"$(VERSION)\""
 # This should to be a recent perl, matching the target unicode version
 PERL := perl
 WGET := wget
@@ -45,12 +46,12 @@ PREFIX = usr
 PKG = libu8ident-$(VERSION)
 PKG_BIN = $(PKG)-`uname -m`
 
-CFLAGS_REL = $(CFLAGS) -O2 -DNDEBUG
+CFLAGS_REL = $(CFLAGS) -O3 -DNDEBUG
 CFLAGS_DBG = $(CFLAGS) -g -DDEBUG
 
 MACHINE := $(shell uname -m)
 ifeq (x86_64,$(MACHINE))
-CFLAGS_REL += -march=native
+CFLAGS_REL += -march=native -flto
 endif
 # cc prints name as cc, not gcc. so check for the copyright banner
 CC_COPY := $(shell $(CC) --version | head -n2 | tail -n1 | cut -c1-7)
@@ -142,7 +143,8 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h
-	$(CC) $(CFLAGS_REL) -O3 -flto $(DEFINES) -DPERF_TEST -I. -Iinclude perf.c u8idroar.c -o perf && \
+	$(CC) $(CFLAGS_REL) -Wno-unused-function $(DEFINES) -DPERF_TEST -I. -Iinclude \
+	  perf.c u8idroar.c -o perf && \
 	./perf
 
 clean:

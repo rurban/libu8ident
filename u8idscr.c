@@ -162,6 +162,7 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
   return NULL;
 }
 
+// hybrid search: linear or binary
 static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
                                 const size_t len) {
   if (cp < 255) { // 14 ranges a 9 byte (126 byte, i.e cache loads)
@@ -184,8 +185,7 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
-  const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
-  return r ? true : false;
+  return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
 }
 
 uint8_t u8ident_get_script(const uint32_t cp) {

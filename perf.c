@@ -6,18 +6,18 @@
    some range_bool sets, like allowed_id_list[] and the NORM lists.
    croaring is 10-100% faster only for confusables,
    and 70-100% slower for the range_bool sets.
-   A hybrid linear and bsearch is the fastest for most.
-   TODO: branch-free bsearch, eytzinger layout.
+   A hybrid linear and bsearch is the fastest for most, eytzinger for some.
+   TODO: branch-free bsearch.
 
-   confus:
-   croaring: 351442	bsearch: 517036          47.12% faster
-             | croaring | bsearch  | hybrid   |
-   allowed_id: 3265730    1962740    1617538  |	last 21.34% faster
-   mark      : 11379602   3276052    1867788  |	last 75.40% faster
-   nfkd      : 2834130    4376008    2395458  |	last 82.68% faster
-   nfd       : 2703714    1724918    1621802  |	last 6.36% faster
-   nfkc      : 5072808    4014738    4248660  |	last 5.83% slower
-   nfc       : 12601550   2960984    3304444  |	last 11.60% slower
+          | croaring | bsearch  | hybrid   | eytzinger |
+confus    : 4257500    7027410    4020536  |	        last 5.89% faster
+scripts   : 0          5909826    6231238    7159386  |	last 14.90% slower
+allowed_id: 4426084    3329898    3887026    6158386  |	last 58.43% slower
+mark      : 4260646    2567396    3233438    3052608  |	last 5.92% faster
+nfkd      : 5894824    3895112    3491436  |		last 11.56% faster
+nfd       : 4624542    2615210    2102490  |		last 24.39% faster
+nfkc      : 7516834    5473728    5748860  |		last 5.03% slower
+nfc       : 6995690    3933098    3904706  |		last 0.73% faster
 
    with the scripts1.h variant: (first search range, then singles, see branch
    scripts1)
@@ -141,7 +141,8 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
   return NULL;
 }
 
-#if 0
+#if 1
+// TODO branch-free
 static struct sc *binary_search_fast(const uint32_t cp, const char *list,
                                      const size_t len, const size_t size)
 {
@@ -163,6 +164,28 @@ static struct sc *binary_search_fast(const uint32_t cp, const char *list,
   return NULL;
 }
 
+static size_t sc_eytzinger_sort(const struct sc *restrict in,
+                                struct sc *restrict out, const size_t len,
+                                size_t i, const size_t k) {
+  if (k <= len) {
+    i = sc_eytzinger_sort(in, out, len, i, 2 * k);
+    out[k] = in[i++];
+    i = sc_eytzinger_sort(in, out, len, i, 2 * k + 1);
+  }
+  return i;
+}
+static size_t range_bool_eytzinger_sort(const struct range_bool *restrict in,
+                                        struct range_bool *restrict out,
+                                        const size_t len, size_t i,
+                                        const size_t k) {
+  if (k <= len) {
+    i = range_bool_eytzinger_sort(in, out, len, i, 2 * k);
+    out[k] = in[i++];
+    i = range_bool_eytzinger_sort(in, out, len, i, 2 * k + 1);
+  }
+  return i;
+}
+
 static struct sc *eytzinger_search(const uint32_t cp, const char *elist,
                                    const size_t len, const size_t size)
 {
@@ -176,22 +199,53 @@ static struct sc *eytzinger_search(const uint32_t cp, const char *elist,
     else
       k = 2 * k + 1;
   }
+#ifdef HAVE___BUILTIN_FFS
   k >>= __builtin_ffs(~k);
+#else
+  #error no __builtin_ffs
+#endif
   return (struct sc *)(p + (size * k));
 }
 #endif
 
+// without croaring
+static int compar32(const void *a, const void *b) {
+  const uint32_t ai = *(const uint32_t *)a;
+  const uint32_t bi = *(const uint32_t *)b;
+  return ai < bi ? -1 : ai == bi ? 0 : 1;
+}
+
+static inline bool array_search_hybr(const uint32_t cp,
+                                     const uint32_t *list,
+                                     const size_t len) {
+  if (cp < 127) {
+    // linear search
+    uint32_t *s = (uint32_t *)list;
+    for (size_t i = 0; i < len; i++) {
+      if (cp == *s)
+        return true;
+      else if (cp < *s)
+        return false;
+      s++;
+    }
+    return false;
+  }
+  else {
+    return bsearch(&cp, list, len, 4, compar32) ? true : false;
+  }
+}
+
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
-  const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
-  return r ? true : false;
+  return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
 }
 
 static inline bool range_bool_search_hybr(const uint32_t cp,
                                           const struct range_bool *list,
                                           const size_t len) {
   if (cp < 127) {
+    // linear search
     struct range_bool *s = (struct range_bool *)list;
     for (size_t i = 0; i < len; i++) {
       if ((cp - s->from) <= (s->to - s->from)) // faster in-between trick
@@ -203,16 +257,69 @@ static inline bool range_bool_search_hybr(const uint32_t cp,
     return false;
   }
   else {
-    const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
-    return r ? true : false;
+    return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
   }
 }
 
-// without croaring
-static int compar32(const void *a, const void *b) {
-  const uint32_t ai = *(const uint32_t *)a;
-  const uint32_t bi = *(const uint32_t *)b;
-  return ai < bi ? -1 : ai == bi ? 0 : 1;
+// hybrid search: linear or binary
+static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
+                                const size_t len) {
+  if (cp < 255) { // 14 ranges a 9 byte (126 byte, i.e cache loads)
+    struct sc *s = (struct sc *)sc_list;
+    for (size_t i = 0; i < len; i++) {
+      if ((cp - s->from) <= (s->to - s->from)) // faster in-between trick
+        return s->scr;
+      if (cp <= s->to) // s is sorted. not found
+        return 255;
+      s++;
+    }
+    return 255;
+  } else {
+    const struct sc *sc =
+        (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
+    return sc ? sc->scr : 255;
+  }
+}
+
+static inline uint8_t sc_eytzinger_search(const uint32_t cp,
+                                          const struct sc *list,
+                                          const size_t len) {
+  if (cp < 127) {
+    // linear search
+    struct sc *s = (struct sc *)list;
+    for (size_t i = 0; i < len; i++) {
+      if ((cp - s->from) <= (s->to - s->from)) // faster in-between trick
+        return s->scr;
+      if (cp <= s->to) // s is sorted. not found
+        return 255;
+      s++;
+    }
+    return 255;
+  }
+  else {
+    struct sc *s = eytzinger_search(cp, (char *)list, len, sizeof(*list));
+    return s ? s->scr : 255;
+  }
+}
+
+static inline bool range_bool_eytzinger_search(const uint32_t cp,
+                                               const struct range_bool *list,
+                                               const size_t len) {
+  if (cp < 127) {
+    // linear search
+    struct range_bool *s = (struct range_bool *)list;
+    for (size_t i = 0; i < len; i++) {
+      if ((cp - s->from) <= (s->to - s->from)) // faster in-between trick
+        return true;
+      if (cp <= s->to) // s is sorted. not found
+        return false;
+      s++;
+    }
+    return false;
+  }
+  else {
+    return eytzinger_search(cp, (char *)list, len, sizeof(struct range_bool)) ? true : false;
+  }
 }
 
 #define PERC(fast,slow) (100.0 * (slow - fast) / (double)fast)
@@ -265,48 +372,80 @@ static int compar32(const void *a, const void *b) {
   end = timer_end();                                                    \
   uint64_t t1 = end - begin
 
-void perf_confus(void) {
-  printf("confus:\n");
-  uint64_t begin, end;
-
-  // just a uint32_t[] array. not from,to pairs
-  DO_LOOP(t1, u8ident_is_confusable(cp));
-  DO_LOOP(t2, bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
-  //DO_LOOP(t3, search_hybr(cp, confusables, ARRAY_SIZE(confusables)));
-
-  if (t1 < t2)
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% faster\n", t1, t2, PERC(t1,t2));
-  else
-    printf("croaring: %lu\tbsearch: %lu \t %0.2f%% slower\n", t1, t2, PERC(t2,t1));
-}
-
 // with t1 being the slowest, t3 usually the fastest
 #define RESULT(name, t1, t2, t3)                                 \
-  printf("%-10s: %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
+  printf("%-10s: %-10lu %-10lu %-9lu|\t\tlast %0.2f%% %s\n", name, \
          t1, t2, t3,                                             \
          t3 < t2 ? PERC(t3,t2) : PERC(t2,t3),                    \
          t3 < t2 ? "faster" : "slower")
+#define RESULT4(name, t1, t2, t3, t4)                                   \
+  printf("%-10s: %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
+         t1, t2, t3, t4,                                                \
+         t4 < t3 ? PERC(t4,t3) : PERC(t3,t4),                           \
+         t4 < t3 ? "faster" : "slower")
+
+// this is the only one without ranges, thus croaring is fastest
+void perf_confus(void) {
+  uint64_t begin, end;
+
+  // just a uint32_t[] array. not from,to pairs
+  DO_LOOP(t1, bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
+  DO_LOOP(t2, u8ident_is_confusable(cp)); // croaring
+  DO_LOOP(t3, array_search_hybr(cp, confusables, ARRAY_SIZE(confusables)));
+
+  printf("%-10s: %-10lu %-10lu %-9lu|\t\tlast %0.2f%% %s\n", "confus", t1, t2, t3,
+         t3 < t1 ? PERC(t3, t1) : PERC(t1, t3), t3 < t1 ? "faster" : "slower");
+  // RESULT("confus", t1,t2,t3);
+}
+
+void perf_scripts(void) {
+  uint64_t begin, end;
+  const size_t len = ARRAY_SIZE(xid_script_list);
+
+  //DO_LOOP(t1, u8ident_roar_is_allowed(cp));
+  uint64_t t1 = 0;
+  DO_LOOP(t2, binary_search(cp, (const char*)xid_script_list, len, sizeof(struct sc)));
+  DO_LOOP(t3, sc_search(cp, xid_script_list, len));
+  //DO_LOOP(t4, faster_search(cp, allowed_id_list, len));
+
+  struct sc *eytz_list = malloc((len + 1) * sizeof(*xid_script_list));
+  sc_eytzinger_sort(xid_script_list, eytz_list, len, 0, 1);
+  DO_LOOP(t4, sc_eytzinger_search(cp, eytz_list, len));
+  free (eytz_list);
+
+  RESULT4("scripts", t1,t2,t3,t4);
+}
 
 void perf_allowed_id(void) {
   uint64_t begin, end;
+  const size_t len = ARRAY_SIZE(allowed_id_list);
 
   DO_LOOP(t1, u8ident_roar_is_allowed(cp));
-  DO_LOOP(t2, range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
-  DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
-  //DO_LOOP(t4, faster_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
-  //DO_LOOP(t5, eytzinger_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)));
+  DO_LOOP(t2, range_bool_search(cp, allowed_id_list, len));
+  DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, len));
+  //DO_LOOP(t4, faster_search(cp, allowed_id_list, len));
 
-  RESULT("allowed_id", t1,t2,t3);
+  struct range_bool *eytz_list = malloc((len + 1) * sizeof(*allowed_id_list));
+  range_bool_eytzinger_sort(allowed_id_list, eytz_list, len, 0, 1);
+  DO_LOOP(t4, range_bool_eytzinger_search(cp, eytz_list, len));
+  free (eytz_list);
+
+  RESULT4("allowed_id", t1,t2,t3,t4);
 }
 
 void perf_mark(void) {
   uint64_t begin, end;
+  const size_t len = ARRAY_SIZE(mark_list);
 
   DO_LOOP(t1, u8ident_roar_is_mark(cp));
-  DO_LOOP(t2, range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list)));
-  DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, ARRAY_SIZE(mark_list)));
+  DO_LOOP(t2, range_bool_search(cp, mark_list, len));
+  DO_LOOP(t3, range_bool_search_hybr(cp, mark_list, len));
+  struct range_bool *eytz_list = malloc((len + 1) * sizeof(*mark_list));
+  range_bool_eytzinger_sort(mark_list, eytz_list, len, 0, 1);
+  DO_LOOP(t4, range_bool_eytzinger_search(cp, eytz_list, len));
+  free (eytz_list);
 
-  RESULT("mark", t1,t2,t3);
+  RESULT4("mark", t1,t2,t3,t4);
 }
 
 void perf_nfkc(void) {
@@ -351,13 +490,16 @@ void perf_nfd(void) {
 
 int main(void) {
   u8ident_roar_init();
+  printf("\n%-10s| %-8s | %-8s | %-8s | %-8s |\n", "", "croaring", "bsearch", "hybrid", "eytzinger");
+
   perf_confus();
-  printf("\n%-10s| %-8s | %-8s | %-8s |\n", "", "croaring", "bsearch", "hybrid");
+  perf_scripts();
   perf_allowed_id();
   perf_mark();
   perf_nfkd();
   perf_nfd();
   perf_nfkc();
   perf_nfc();
+
   u8ident_roar_free();
 }
