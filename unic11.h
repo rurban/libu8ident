@@ -296,8 +296,9 @@ const struct range_bool c11_cont_list[] = {
     {0xFE20, 0xFE2F}, // ? Mn
 };
 
-// generated with test-c11 by filtering forbidden scripts
-const struct range_bool safec11_start_list[] = {
+// Generated with test-c11 by filtering forbidden scripts.
+// Use c11_cont_list with it.
+const struct range_bool safec23_start_list[] = {
     {'$', '$'},
     {'A', 'Z'},
     {'_', '_'},
@@ -306,7 +307,7 @@ const struct range_bool safec11_start_list[] = {
     {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},
     {0x00B7, 0x00BA},   {0x00BC, 0x00BE},   {0x00C0, 0x00D6},
     {0x00D8, 0x00F6},   {0x00F8, 0x00FF},
-    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (also Bopomofo)
+    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers, 2EA Bopomofo
     {0x100, 0x131}, // Latin
     {0x134, 0x13E}, // Latin
     {0x141, 0x148}, // Latin
@@ -703,6 +704,7 @@ const struct range_bool safec11_start_list[] = {
     {0xFA27, 0xFA29}, // Han
     // FE31-FE44 Pd,Ps,Pe
     // FE47-FE6B, Common (Ps,Pe) + SMALL EQUALS SIGN. not XID
+
     // skipped 0x10000 Linear_B (Excluded)
     // skipped 0x10280 Lycian (Excluded)
     // skipped 0x102A0 Carian (Excluded)

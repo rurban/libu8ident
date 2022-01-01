@@ -122,7 +122,7 @@ static bool isXID_cont(uint32_t cp) {
   return u8ident_is_XID_Start(cp);
 }
 static bool isALLOWED_start(uint32_t cp) {
-  return range_bool_search(cp, safec11_start_list, ARRAY_SIZE(safec11_start_list));
+  return range_bool_search(cp, safec23_start_list, ARRAY_SIZE(safec23_start_list));
 }
 static bool isALLOWED_cont(uint32_t cp) {
   return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));

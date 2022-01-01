@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # libu8ident - Check unicode security guidelines for identifiers.
-# Copyright 2014, 2021 Reini Urban
+# Copyright 2014, 2021, 2022 Reini Urban
 # SPDX-License-Identifier: Apache-2.0
 #
 # Classify and search for the script property https://www.unicode.org/reports/tr24/tr24-32.html
@@ -9,9 +9,13 @@
 # nonxid_script, scx, allowed_id, idtype, NF{K,}{C,D}_N, NF{K,}C_M, bidi.
 #
 # TODO https://www.unicode.org/reports/tr31/
-# xid_{start,cont}, id_{start,cont}, uax31_d1, uax31_r1, uax31_r1b.
-# xid is relevant for NFKC languages (ie python 3), the rest should use id_{start,cont} or
-# better allowed_id, which keeps only recommended scripts.
+# * More uax31_d1, uax31_r1, uax31_r1b.
+#   xid is relevant for NFKC languages (ie python 3), the rest should use id_{start,cont} or
+#   better allowed_id, which keeps only recommended scripts.
+# * An optimized all-in-one start/cont list for SAFEC23, without Excluded and Limited_Use scripts,
+#   with only allowing NFC, with SC and SCX combined. This should be default without
+#   user-added scripts (#pragma unicode Braille). Then you need to fallback to the slow lists.
+# * More statistics, to check against perf results. E.g. why croaring or eytzinger is not good enough.
 
 use strict;
 my $scn = "Scripts.txt";
@@ -35,7 +39,8 @@ for ($idtype, $idstat) {
 
 my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
     @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $id);
-my ($started, @IDTYPES, @ALLOWED, @IDSTART, @IDCONT, @XIDSTART, @XIDCONT);
+my ($started, @IDTYPES, @ALLOWED, @IDSTART, @IDCONT, @XIDSTART, @XIDCONT,
+    @SAFEC23START, @SAFEC23CONT);
 open my $IDTYPE, "<", $idtype or die "$idtype $!";
 while (<$IDTYPE>) {
   if (/^#\tIdentifier_Type:/) { $started++; }
@@ -182,7 +187,7 @@ sub ok_idtype {
   return 0; # unknown identifier type
 }
 
-# TOOD: generate these 2 lists from the IDTYPES
+# TOOD: generate these 2 lists from the IDTYPES or the webpage.
 # http://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 my @recommended = qw(
   Common Inherited Latin Arabic Armenian Bengali Bopomofo Cyrillic
@@ -437,6 +442,9 @@ if (@single_scx) {
   @SCR = merge(\@SCR, \@single_scx);
   @SCRF = merge(\@SCRF, \@single_scx);
 }
+
+# TODO: Optimized SAFEC23 start/cont lists, with enforced NFC. i.e. disallow scripts,
+# and combining marks which do not compose to NFC. Combine SC with SCX.
 
 open my $H, ">", "scripts.h" or die "writing scripts.h $!";
 print $H <<"EOF";

@@ -193,7 +193,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst test-c11$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 c11-all.h c11-safe.h
+DISTCLEANFILES = config.log u8ident.3 c11-all.h c23-safe.h
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
