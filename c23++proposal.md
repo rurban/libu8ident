@@ -38,7 +38,8 @@ none
 3 Summary
 =========
 
-P1949R7 correctly detected that Unicode identifiers are still not
+[P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
+correctly detected that Unicode identifiers are still not
 identifiable, and are prone to bidi- and homoglyph attacks. But it
 stated that implementing TR31 and TR39 would be too hard. Having
 properly implemented the Unicode Security Guidelines for identifers
@@ -47,12 +48,13 @@ contrary.
 
 Further restriction of the TR31 profile to only recommended scripts
 leads to smaller sets for identifiers, and implementation of a proper
-TR39 mixed script profile fixes most of the current security
-problems. The only remaining problems are bidi overrides in strings or
-comments, which cannot be handled with identifier restrictions, but
-tokenizer or preprocessor warnings. #include filename restrictions
-should be done also, but that is out of the scope of this document, as
-the existing filesystems care much less about unicode security than
+TR39 mixed script profile fixes most of the current unicode security
+problems with identifiers. The only remaining problems are bidi
+overrides in strings or comments, which cannot be handled with
+identifier restrictions, but tokenizer or preprocessor warnings, as
+recently added to gcc. `#include filename` restrictions should be done
+also, but that is out of the scope of this document, as the existing
+filesystems care much less about unicode security for identifiers than
 programming languages.
 
 Implementing mixed script detection per document (C++ Header and
@@ -107,7 +109,8 @@ http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 # Documents with identifiers in many multiple scripts/languages will become illegal
 
 C++23 will follow the TR39 Security Profile 4 **Moderately
-Restrictive**, with an exception for Greek. Called C11_4 or SAFEC11 in libu8ident.
+Restrictive**, with an exception for Greek. Called Profile C23_4 or
+SAFEC11 in libu8ident.
 
 * All identifiers in a document qualify as Single Script, or
 * All identifiers in a document are covered by any of the following sets of scripts,
@@ -119,8 +122,9 @@ Restrictive**, with an exception for Greek. Called C11_4 or SAFEC11 in libu8iden
   Recommended script, except Cyrillic.
 
 Thus it prevents Cyrillic mixed with Latin or any other script, but
-does allow any CFK laguage, other common and widely used languages and
-Greek mixed with Latin, mainly used for mathematical symbols.
+does allow any East-Asian CFK language, other common and widely used
+languages and Latin mixed with Greek, mainly used for its mathematical
+symbols.
 
 5 What will this proposal not change?
 =====================================
@@ -153,7 +157,7 @@ depending on them.
 The recent https://trojansource.codes effort caused gcc to emit a new
 bidi warning, and github to implement similar warnings.
 
-There used to be no linter, but there is now one: u8idlint from
+There used to be no linter, but there is now one: **u8idlint** from
 https://github.com/rurban/libu8ident, which can be used to check for
 ALLOWED,ID,XID,C11 or ALLUTF8 TR31 profiles, for various mixed script
 profile violations and normalization methods.
@@ -161,6 +165,58 @@ profile violations and normalization methods.
 So far only Rust, cperl and Java follow a unicode security guideline
 for identifiers, zig and J refused to support non-ASCII
 identifiers. Everbody else is vulnerable to potential security attacks
-and does allow non-identifiable identifiers. They should rename them to
-"symbols".
+and does allow non-identifiable identifiers. They should rename
+identifiers to "symbols".
 
+7 Implementations and Strategies
+================================
+
+I implemented for [cperl](https://github.com/perl11/cperl), a fork of
+perl5, the General Security profile "Moderately restrictive" (4) for
+identifiers in 2017, together with transparent normalization of
+NFC. This is a dynamic language with the need for fast tokenizing, and
+compilation. Still I did not see a need to restrict all source code
+identifiers to be already in NFC. Even with the added unicode checks
+and dynamic normalization the tokenizer is still faster than the
+simplier perl5 tokenizer.
+
+Then I implemented the more general
+[libu8ident](https://github.com/rurban/libu8ident) library, which can
+be used with all known tr39 mixed-script security profiles, tr31 character
+sets and all tr35 normalizations. There I tested various performance
+strategies of the unicode lookups. Tested was CRoaring, which was only
+useful for sets of single codepoints, the list of confusables. Most of
+the needed lists were best structured as binary-search in range pairs.
+Most of them were fastest with special-casing the codepoints below
+U+128 with a simple linear search. Binary search in an Eytzinger
+layout was not convincibly faster.
+
+Still a not yet tested is to store in the script-filtered `XID_Start` and
+`XID_Continue` range lists all the needed information, such as the
+`Sc` and `Scx` properties, and its `NFC` normalization. The NFC composition
+would be useful if the identifier are required to be NFC, as proposed
+in [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html).
+
+8 Issues with binutils, linkers, exported identifiers
+=====================================================
+
+The crux with C and somewhat also C++ identifiers, is that they can be
+used with other earlier compilers or languages without any unicode security
+profile or restriction. ffi's are very common, thanksfully unicode
+names not at all yet.
+
+binutils and linkers treat names as zero-terminated binary chunk, same
+as in current filesystems. Identifiers are not identifiable there, and
+names are charset specific, whilst there are no header fields for the
+used charset (e.g. if SHIFT-JIS or UTF-8), nor are there any rules for
+name lookup (normalization). This is not solvable here, only
+there. Only in the Rust ecosystem there are proper unicode identifier
+rules, and Rust can be linked against C++/C. I haven't seen any
+exported unicode names, they are only used in local symbols
+still. UTF-16 compilers such as MSVC do export their UNICODE names
+either in the local character set or as UTF-8.
+
+The C++/C working groups should urge the binutils/linker working
+groups to adopt a more precise specification how exported identifiers are
+represented in object files and libraries: UTF-8 or any charset,
+and how they are looked up: any normalization, NFC or not at all.
