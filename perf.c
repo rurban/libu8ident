@@ -22,13 +22,13 @@
    with the scripts1.h variant: (first search range, then singles, see branch
    scripts1)
    nfkd:
-   bsearch: 3326908 	2x bsearch: 4575870 	 37.54% faster
+   bsearch: 3326908 	2x bsearch: 4575870 	 37.54% slower
    nfd:
-   bsearch: 2575716 	2x bsearch: 4131504 	 60.40% faster
+   bsearch: 2575716 	2x bsearch: 4131504 	 60.40% slower
    nfkc:
-   bsearch: 5633134 	2x bsearch: 7809620 	 38.64% faster
+   bsearch: 5633134 	2x bsearch: 7809620 	 38.64% slower
    nfc:
-   bsearch: 3747484 	2x bsearch: 7600398 	 102.81% faster
+   bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
 */
 #include <stdlib.h>
 #include <stdio.h>

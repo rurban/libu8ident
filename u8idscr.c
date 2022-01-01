@@ -17,8 +17,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "u8id_private.h"
 #include <u8ident.h>
 
@@ -91,13 +92,14 @@ int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
   if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
     return -1;
   int i = c->count;
-  if (unlikely(i > 8 && (i & 7) == 7)) {
-    c->u8p = realloc(c->u8p, i + 8);
-    c->u8p[i] = scr;
-  } else if (i == 9) {
+  if (unlikely(i == 8)) {
     uint8_t *p = malloc(16);
     memcpy(p, c->scr8, 8);
     c->u8p = p;
+    c->u8p[i] = scr;
+  }
+  else if (unlikely(i > 8 && (i & 7) == 7)) {
+    c->u8p = realloc(c->u8p, i + 8);
     c->u8p[i] = scr;
   } else {
     if (i > 8) {
