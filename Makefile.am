@@ -28,7 +28,7 @@ docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h unic11.h
+	confus_croar.h mark.h unic11.h scripts16.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
         texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
         texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \

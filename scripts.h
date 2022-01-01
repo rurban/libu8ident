@@ -1341,7 +1341,6 @@ const struct sc xid_script_list[] = {
 }; // 817 ranges, 132 single codepoints
 #  endif
 #endif // DISABLE_CHECK_XID
-
 // The fast variant with U8ID_CHECK_XID. No holes for non-identifiers or
 // non-codepoints needed, as the parser or our XID check already disallowed such
 // codepoints.

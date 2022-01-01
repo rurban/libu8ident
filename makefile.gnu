@@ -89,7 +89,7 @@ $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
-scripts.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt DerivedNormalizationProps.txt
+scripts.h scripts16.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt DerivedNormalizationProps.txt
 	$(PERL) mkscripts.pl
 confus.h: mkconfus.pl mkroar.c # confusables.txt
 	$(PERL) mkconfus.pl -c
@@ -142,7 +142,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	./test-asan
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
-      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h
+      nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h
 	$(CC) $(CFLAGS_REL) -Wno-unused-function $(DEFINES) -DPERF_TEST -I. -Iinclude \
 	  perf.c u8idroar.c -o perf && \
 	./perf

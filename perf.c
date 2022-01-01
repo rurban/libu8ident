@@ -6,19 +6,20 @@ Measure binary_search in array vs croaring for confusables[] and
 some range_bool sets, like allowed_id_list[] and the NORM lists.
 croaring is 10-100% faster only for confusables,
 and 70-100% slower for the range_bool sets.
-A hybrid linear and bsearch is the fastest for most, eytzinger for mark.
-TODO: branch-free bsearch.
+A hybrid linear for <128 and bsearch is the fastest for most,
+eytzinger for mark.
+hybrid16 splits into 16bit and 32bit lists.
 
 times in rdtsc cycles, less is better
-          | croaring | bsearch  | hybrid   | eytzinger |
-confus    : 4257500    7027410    4020536  |	        last 5.89% faster
-scripts   : 0          5909826    6231238    7159386  |	last 14.90% slower
-allowed_id: 4426084    3329898    3887026    6158386  |	last 58.43% slower
-mark      : 4260646    2567396    3233438    3052608  |	last 5.92% faster
-nfkd      : 5894824    3895112    3491436  |		last 11.56% faster
-nfd       : 4624542    2615210    2102490  |		last 24.39% faster
-nfkc      : 7516834    5473728    5748860  |		last 5.03% slower
-nfc       : 6995690    3933098    3904706  |		last 0.73% faster
+          | croaring | bsearch  | hybrid   | hybrid16 | eytzinger|
+confus    : 6523088    5702502    3753386  |				last 73.79% faster
+scripts   : -          5949762    7224906    3132948    3537690  |	last 12.92% slower
+allowed_id: 4459598    2818504    2406560    1974154    2650960  |	last 34.28% slower
+mark      : 5170178    4163744    4769986    -          4557982  |	last 4.65% faster
+nfkd      : 4060004    3991052    2812836  |				last 41.89% faster
+nfd       : 4010630    2462746    4459468  |				last 81.08% slower
+nfkc      : 12391002   8207654    7341282  |				last 11.80% faster
+nfc       : 8731164    6352242    7670728  |				last 20.76% slower
 
 with the scripts1.h variant: (first search range, then singles.
 see branch scripts1)
@@ -36,6 +37,7 @@ nfc:  bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
 #include "scripts.h"
 #include "u8idroar.h"
 #undef EXT_SCRIPTS
+#include "scripts16.h"
 #include "confus.h"
 #define EXT_SCRIPTS
 #include "mark.h"
@@ -263,6 +265,29 @@ static inline bool range_bool_search_hybr(const uint32_t cp,
   }
 }
 
+static inline bool rb16_search_hybr(const uint32_t cp,
+                                    const struct range_bool16 *list16,
+                                    const size_t len16,
+                                    const struct range_bool *list32,
+                                    const size_t len32) {
+  if (cp < 127) {
+    // linear search
+    struct range_bool16 *s = (struct range_bool16 *)list16;
+    for (size_t i = 0; i < len16; i++) {
+      if (((uint16_t)cp - s->from) <= (s->to - s->from)) // faster in-between trick
+        return true;
+      if (cp <= s->to) // s is sorted. not found
+        return false;
+      s++;
+    }
+    return false;
+  } else if (cp <= 0xffff) {
+    return binary_search(cp, (char *)list16, len16, sizeof(*list16)) ? true : false;
+  } else {
+    return binary_search(cp, (char *)list32, len32, sizeof(*list32)) ? true : false;
+  }
+}
+
 // hybrid search: linear or binary
 static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
                                 const size_t len) {
@@ -280,6 +305,31 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
     const struct sc *sc =
         (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
     return sc ? sc->scr : 255;
+  }
+}
+
+// hybrid search: linear or binary16 or binary32
+static inline uint8_t
+sc16_search(const uint32_t cp, const struct sc16 *sc_list16, const size_t len16,
+            const struct sc *sc_list32, const size_t len32) {
+  if (cp < 255) { // 14 ranges a 9 byte (126 byte, i.e cache loads)
+    struct sc16 *s = (struct sc16 *)sc_list16;
+    for (size_t i = 0; i < len16; i++) {
+      if (((uint16_t)cp - s->from) <= (s->to - s->from)) // faster in-between trick
+        return s->scr;
+      if (cp <= s->to) // s is sorted. not found
+        return 255;
+      s++;
+    }
+    return 255;
+  } else if (cp <= 0xffff) {
+    const struct sc16 *sc =
+      (struct sc16 *)binary_search(cp, (char *)sc_list16, len16, sizeof(*sc_list16));
+    return sc ? sc->scr : 255;
+  } else {
+      const struct sc *sc =
+        (struct sc *)binary_search(cp, (char *)sc_list32, len32, sizeof(*sc_list32));
+      return sc ? sc->scr : 255;
   }
 }
 
@@ -376,16 +426,22 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
 
 // with t1 being the slowest, t3 usually the fastest
 #define RESULT(name, t1, t2, t3)                                 \
-  printf("%-10s: %-10lu %-10lu %-9lu|\t\tlast %0.2f%% %s\n", name, \
+  printf("%-10s: %-10lu %-10lu %-9lu|\t\t\t\tlast %0.2f%% %s\n", name, \
          t1, t2, t3,                                             \
          t3 < t2 ? PERC(t3,t2) : PERC(t2,t3),                    \
          t3 < t2 ? "faster" : "slower")
 // with t1 being the slowest, t4 usually the fastest, compare to t3
-#define RESULT4(name, t1, t2, t3, t4)                                   \
+/*#define RESULT4(name, t1, t2, t3, t4)                                 \
   printf("%-10s: %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
          t1, t2, t3, t4,                                                \
          t4 < t3 ? PERC(t4,t3) : PERC(t3,t4),                           \
          t4 < t3 ? "faster" : "slower")
+*/
+#define RESULT5(name, t1, t2, t3, t4, t5)                               \
+  printf("%-10s: %-10lu %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
+         t1, t2, t3, t4, t5,                                            \
+         t5 < t4 ? PERC(t5,t4) : PERC(t4,t5),                           \
+         t5 < t4 ? "faster" : "slower")
 
 // this is the only one without ranges, thus croaring is fastest
 void perf_confus(void) {
@@ -396,7 +452,7 @@ void perf_confus(void) {
   DO_LOOP(t2, u8ident_is_confusable(cp)); // croaring
   DO_LOOP(t3, array_search_hybr(cp, confusables, ARRAY_SIZE(confusables)));
 
-  printf("%-10s: %-10lu %-10lu %-9lu|\t\tlast %0.2f%% %s\n", "confus", t1, t2, t3,
+  printf("%-10s: %-10lu %-10lu %-9lu|\t\t\tlast %0.2f%% %s\n", "confus", t1, t2, t3,
          t3 < t1 ? PERC(t3, t1) : PERC(t1, t3), t3 < t1 ? "faster" : "slower");
   // RESULT("confus", t1,t2,t3);
 }
@@ -409,14 +465,15 @@ void perf_scripts(void) {
   uint64_t t1 = 0;
   DO_LOOP(t2, binary_search(cp, (const char*)xid_script_list, len, sizeof(struct sc)));
   DO_LOOP(t3, sc_search(cp, xid_script_list, len));
-  //DO_LOOP(t4, faster_search(cp, allowed_id_list, len));
+  DO_LOOP(t4, sc16_search(cp, xid_script_list16, ARRAY_SIZE(xid_script_list16),
+                          xid_script_list32, ARRAY_SIZE(xid_script_list32)));
 
   struct sc *eytz_list = malloc((len + 1) * sizeof(*xid_script_list));
   sc_eytzinger_sort(xid_script_list, eytz_list, len, 0, 1);
-  DO_LOOP(t4, sc_eytzinger_search(cp, eytz_list, len));
+  DO_LOOP(t5, sc_eytzinger_search(cp, eytz_list, len));
   free (eytz_list);
 
-  RESULT4("scripts", t1,t2,t3,t4);
+  RESULT5("scripts", t1,t2,t3,t4,t5);
 }
 
 void perf_allowed_id(void) {
@@ -427,13 +484,15 @@ void perf_allowed_id(void) {
   DO_LOOP(t2, range_bool_search(cp, allowed_id_list, len));
   DO_LOOP(t3, range_bool_search_hybr(cp, allowed_id_list, len));
   //DO_LOOP(t4, faster_search(cp, allowed_id_list, len));
+  DO_LOOP(t4, rb16_search_hybr(cp, allowed_id_list16, ARRAY_SIZE(allowed_id_list16),
+                               allowed_id_list32, ARRAY_SIZE(allowed_id_list32)));
 
   struct range_bool *eytz_list = malloc((len + 1) * sizeof(*allowed_id_list));
   range_bool_eytzinger_sort(allowed_id_list, eytz_list, len, 0, 1);
-  DO_LOOP(t4, range_bool_eytzinger_search(cp, eytz_list, len));
+  DO_LOOP(t5, range_bool_eytzinger_search(cp, eytz_list, len));
   free (eytz_list);
 
-  RESULT4("allowed_id", t1,t2,t3,t4);
+  RESULT5("allowed_id", t1,t2,t3,t4,t5);
 }
 
 void perf_mark(void) {
@@ -443,12 +502,13 @@ void perf_mark(void) {
   DO_LOOP(t1, u8ident_roar_is_mark(cp));
   DO_LOOP(t2, range_bool_search(cp, mark_list, len));
   DO_LOOP(t3, range_bool_search_hybr(cp, mark_list, len));
+
   struct range_bool *eytz_list = malloc((len + 1) * sizeof(*mark_list));
   range_bool_eytzinger_sort(mark_list, eytz_list, len, 0, 1);
-  DO_LOOP(t4, range_bool_eytzinger_search(cp, eytz_list, len));
+  DO_LOOP(t5, range_bool_eytzinger_search(cp, eytz_list, len));
   free (eytz_list);
 
-  RESULT4("mark", t1,t2,t3,t4);
+  RESULT5("mark", t1,t2,t3,t3,t5);
 }
 
 void perf_nfkc(void) {
@@ -494,7 +554,8 @@ void perf_nfd(void) {
 int main(void) {
   u8ident_roar_init();
   printf("times in rdtsc cycles, less is better\n");
-  printf("%-10s| %-8s | %-8s | %-8s | %-8s |\n", "", "croaring", "bsearch", "hybrid", "eytzinger");
+  printf("%-10s| %-8s | %-8s | %-8s | %-8s | %-8s |\n", "", "croaring",
+         "bsearch", "hybrid", "hybrid16", "eytzinger");
 
   perf_confus();
   perf_scripts();
