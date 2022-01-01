@@ -131,7 +131,7 @@ test-texts.test: test-texts
 
 if !HAVE_CROARING
 perf: perf.c
-	@echo perf requires roaring.c (--with-croaring)
+	@echo "ERROR perf requires roaring.c (--with-croaring)"
 endif
 
 if !HAVE_WINDOWS
