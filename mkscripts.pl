@@ -936,6 +936,12 @@ extern const struct range_short idtype_list[%u];
 #if !defined USE_NORM_CROAR || defined PERF_TEST
 EOF
 
+printf $H16 <<'EOF', $list;
+
+// CROARING uses different lists
+#if !defined USE_NORM_CROAR || defined PERF_TEST
+EOF
+
 # for maybe_normalize
 #   MARK: 1963 mark characters (Combining, Overlay, ...) \p{IsM}
 #   DECOMPOSED_REST: The remaining 869 non-mark and non-hangul normalizables.
@@ -967,13 +973,66 @@ EOF
     }
     printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
   };
-  printf $H <<'EOF', $b, $s;
+  printf $H <<'EOF', $b, $s, $b + $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 #    endif
 #  endif
 EOF
+
+  printf $H16 <<'EOF', $NORM, $maybe, $NORM, $list;
+
+// %s_Quick_Check=%s
+#  if !defined U8ID_NORM || U8ID_NORM == %s
+#    ifndef EXT_SCRIPTS
+const struct range_bool16 %s_list16[] = {
+    // clang-format off
+EOF
+  ($b, $s) = (0, 0);
+  for my $r (@{$name}) {
+    last if $r->[0] > 0xffff;
+    if ($r->[0] == $r->[1]) {
+      $s++;
+    } else {
+      $b++;
+    }
+    printf $H16 "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+  };
+  printf $H16 <<'EOF', $b, $s, $list, $b + $s, $list;
+    // clang-format on
+}; // %u ranges, %u single codepoints
+#  else
+extern const struct range_bool16 %s_list16[%u];
+#  endif
+
+#  ifndef EXT_SCRIPTS
+const struct range_bool %s_list32[] = {
+    // clang-format off
+EOF
+  ($b, $s) = (0, 0);
+  for my $r (@{$name}) {
+    if ($r->[0] > 0xffff) {
+      if ($r->[0] == $r->[1]) {
+        $s++;
+      } else {
+        $b++;
+      }
+      printf $H16 "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+    }
+  };
+  printf $H16 <<'EOF', $b, $s, $list, $b + $s;
+    // clang-format on
+}; // %u ranges, %u single codepoints
+#    else
+extern const struct range_bool %s_list32[%u];
+#    endif
+#  endif
+EOF
 }
+printf $H16 <<'EOF';
+#endif // USE_NORM_CROAR
+EOF
+
 printf $H <<'EOF';
 #endif // USE_NORM_CROAR
 

@@ -16,8 +16,8 @@ confus    : 70008      70022      70037    |				last 0.04% slower
 scripts   : 0          69968      69990      69872      70006    |	last 0.19% slower
 allowed_id: 70013      69888      69934      69905      69894    |	last 0.02% faster
 mark      : 70044      69908      69794      69794      69805    |	last 0.02% slower
-nfkd      : 69988      69857      69836      0          69790    |	last 0.07% faster
-nfd       : 69948      69799      69813      0          69792    |	last 0.03% faster
+nfkd      : 69988      69857      69836      69860      69790    |	last 0.07% faster
+nfd       : 69948      69799      69813      69925      69792    |	last 0.03% faster
 nfkc      : 70172      70100      69990    |				last 0.16% faster
 nfc       : 70225      70040      69926    |				last 0.16% faster
 
@@ -540,7 +540,8 @@ void perf_nfkd(void) {
   DO_LOOP(t1, u8ident_roar_maybe_nfkd(cp));
   DO_LOOP(t2, range_bool_search(cp, NFKD_N_list, len));
   DO_LOOP(t3, range_bool_search_hybr(cp, NFKD_N_list, len));
-  uint64_t t4 = 0; // no hybrid16
+  DO_LOOP(t4, rb16_search_hybr(cp, NFKD_N_list16, ARRAY_SIZE(NFKD_N_list16),
+                               NFKD_N_list32, ARRAY_SIZE(NFKD_N_list32)));
 
   struct range_bool *eytz_list = malloc((len + 1) * sizeof(*NFKD_N_list));
   range_bool_eytzinger_sort(NFKD_N_list, eytz_list, len, 0, 1);
@@ -552,13 +553,14 @@ void perf_nfkd(void) {
 
 void perf_nfd(void) {
   uint64_t begin, end;
-  const size_t len = ARRAY_SIZE(NFKD_N_list);
+  const size_t len = ARRAY_SIZE(NFD_N_list);
 
 #undef NFD
   DO_LOOP(t1, u8ident_roar_maybe_nfd(cp));
-  DO_LOOP(t2, range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list)));
-  DO_LOOP(t3, range_bool_search_hybr(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list)));
-  uint64_t t4 = 0; // no hybrid16
+  DO_LOOP(t2, range_bool_search(cp, NFD_N_list, len));
+  DO_LOOP(t3, range_bool_search_hybr(cp, NFD_N_list, len));
+  DO_LOOP(t4, rb16_search_hybr(cp, NFD_N_list16, ARRAY_SIZE(NFD_N_list16),
+                               NFD_N_list32, ARRAY_SIZE(NFD_N_list32)));
 
   struct range_bool *eytz_list = malloc((len + 1) * sizeof(*NFD_N_list));
   range_bool_eytzinger_sort(NFD_N_list, eytz_list, len, 0, 1);
