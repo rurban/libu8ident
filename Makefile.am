@@ -25,7 +25,7 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE
+doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h mark.h unic11.h scripts16.h
@@ -107,16 +107,16 @@ EXTRA_PROGRAMS = test
 TESTS = test
 if !HAVE_WINDOWS
 EXTRA_PROGRAMS += test-texts mkc23
-TESTS += test-texts.test mkc23 u8idlint.test
+TESTS += test-texts.test u8idlint.test
 endif
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
 test_texts_SOURCES = test-texts.c
 test_texts_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS)
 test_texts_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
-test_c11_SOURCES = mkc23.c
-test_c11_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS) -DU8ID_PROFILE_SAFEC23
-test_c11_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
+mkc23_SOURCES = mkc23.c
+mkc23_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS) -DU8ID_PROFILE_SAFEC23
+mkc23_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
 
 if HAVE_CROARING
 test_LDADD += u8idroar.lo
