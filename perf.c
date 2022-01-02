@@ -2,13 +2,14 @@
    Copyright 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
-   Measure binary_search in array vs croaring for confusables[] and
-   some range_bool sets, like allowed_id_list[] and the NORM lists.
-   croaring is 10-100% faster only for confusables,
-   and 70-100% slower for the range_bool sets.
-   A hybrid linear and bsearch is the fastest for most, eytzinger for some.
-   TODO: branch-free bsearch.
+Measure binary_search in array vs croaring for confusables[] and
+some range_bool sets, like allowed_id_list[] and the NORM lists.
+croaring is 10-100% faster only for confusables,
+and 70-100% slower for the range_bool sets.
+A hybrid linear and bsearch is the fastest for most, eytzinger for mark.
+TODO: branch-free bsearch.
 
+times in rdtsc cycles, less is better
           | croaring | bsearch  | hybrid   | eytzinger |
 confus    : 4257500    7027410    4020536  |	        last 5.89% faster
 scripts   : 0          5909826    6231238    7159386  |	last 14.90% slower
@@ -19,16 +20,12 @@ nfd       : 4624542    2615210    2102490  |		last 24.39% faster
 nfkc      : 7516834    5473728    5748860  |		last 5.03% slower
 nfc       : 6995690    3933098    3904706  |		last 0.73% faster
 
-   with the scripts1.h variant: (first search range, then singles, see branch
-   scripts1)
-   nfkd:
-   bsearch: 3326908 	2x bsearch: 4575870 	 37.54% slower
-   nfd:
-   bsearch: 2575716 	2x bsearch: 4131504 	 60.40% slower
-   nfkc:
-   bsearch: 5633134 	2x bsearch: 7809620 	 38.64% slower
-   nfc:
-   bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
+with the scripts1.h variant: (first search range, then singles.
+see branch scripts1)
+nfkd: bsearch: 3326908 	2x bsearch: 4575870 	 37.54% slower
+nfd:  bsearch: 2575716 	2x bsearch: 4131504 	 60.40% slower
+nfkc: bsearch: 5633134 	2x bsearch: 7809620 	 38.64% slower
+nfc:  bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
 */
 #include <stdlib.h>
 #include <stdio.h>
@@ -142,7 +139,7 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
 }
 
 #if 1
-// TODO branch-free
+// TODO branch-free with ranges
 static struct sc *binary_search_fast(const uint32_t cp, const char *list,
                                      const size_t len, const size_t size)
 {
@@ -193,11 +190,16 @@ static struct sc *eytzinger_search(const uint32_t cp, const char *elist,
   const char *p = elist;
   struct sc *pos;
   while (k <= len) {
+    // __builtin_prefetch(p + (size * k));
     pos = (struct sc *)(p + (size * k));
+#if 0 // cmov is actually slower here
+    k = 2 * k  + (cp < pos->to);
+#else
     if (cp >= pos->to)
       k = 2 * k;
     else
       k = 2 * k + 1;
+#endif
   }
 #ifdef HAVE___BUILTIN_FFS
   k >>= __builtin_ffs(~k);
