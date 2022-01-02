@@ -378,6 +378,7 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
          t1, t2, t3,                                             \
          t3 < t2 ? PERC(t3,t2) : PERC(t2,t3),                    \
          t3 < t2 ? "faster" : "slower")
+// with t1 being the slowest, t4 usually the fastest, compare to t3
 #define RESULT4(name, t1, t2, t3, t4)                                   \
   printf("%-10s: %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
          t1, t2, t3, t4,                                                \
@@ -490,7 +491,8 @@ void perf_nfd(void) {
 
 int main(void) {
   u8ident_roar_init();
-  printf("\n%-10s| %-8s | %-8s | %-8s | %-8s |\n", "", "croaring", "bsearch", "hybrid", "eytzinger");
+  printf("times in rdtsc cycles, less is better\n");
+  printf("%-10s| %-8s | %-8s | %-8s | %-8s |\n", "", "croaring", "bsearch", "hybrid", "eytzinger");
 
   perf_confus();
   perf_scripts();
