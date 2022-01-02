@@ -338,14 +338,14 @@ const char *u8ident_existing_scripts(const u8id_ctx_t i) {
     return NULL;
   const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
   const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
-  int len = c->count * 12;
+  size_t len = c->count * 12;
   char *res = malloc(len);
   *res = 0;
   for (int j = 0; j < c->count; j++) {
     const char *str = u8ident_script_name(u8p[j]);
     if (!str)
       return NULL;
-    const int l = strlen(str);
+    const size_t l = strlen(str);
     if (*res) {
       if (l + 3 > len) {
         len = l + 3;

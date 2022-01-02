@@ -258,7 +258,10 @@ AC_CHECK_FUNCS([getopt_long],[],
 AX_GCC_BUILTIN(__builtin_ffs)
 
 case $host_os in
-  mingw*|cygwin*|msys*) have_windows=1 ;;
+  mingw*|cygwin*|msys*)
+        have_windows=1
+        CFLAGS="$CFLAGS -fstack-protector"
+        ;;
 esac
 AM_CONDITIONAL([HAVE_WINDOWS], [test x1 = x$have_windows])
 

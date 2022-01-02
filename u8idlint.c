@@ -17,15 +17,20 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <sys/types.h>
-#include <getopt.h>
+#ifdef HAVE_GETOPT_H
+#  include <getopt.h>
+#endif
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
 #endif
-#ifdef HAVE_DIRENT_H
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
 #  include <dirent.h>
 #endif
-#ifdef _WIN32
-#  include <fileapi.h>
+#ifdef _MSC_VER
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+//#  include <handleapi.h>
+//#  include <fileapi.h>
 #  include <direct.h>
 #endif
 
@@ -179,7 +184,7 @@ static int dir_exists(const char *dir, const char *fname) {
   path[255] = '\0';
   return (stat(path, &st) == 0) && (st.st_mode & S_IFDIR) == S_IFDIR;
 }
-#elif defined _WIN32
+#elif defined _MSC_VER
 static int file_exists(const char *path) {
   const uint16_t dwAttrib = GetFileAttributes(path);
   return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
@@ -202,6 +207,9 @@ static int dir_exists(const char *dir, const char *fname) {
 static void version(void) { puts("u8idlint " PACKAGE_VERSION); }
 static void usage(void) {
   version();
+#ifndef HAVE_GETOPT_H
+  puts("Usage: u8idlint [dirs or files]...");
+#else
   puts("Usage: u8idlint [OPTIONS] [dirs or files]...");
   puts("OPTIONS:");
   puts(" -n|--normalize=nfc,nfkc,nfd,nfkc            default: nfc");
@@ -232,6 +240,7 @@ static void usage(void) {
   puts(" -v|--verbose");
   puts(" -q|--quiet");
   puts(" --help\n");
+#endif
   puts("u8idlint checks all words in UTF-8 source files for");
   puts("violations against various unicode security guidelines for "
        "identifiers.");
@@ -412,7 +421,7 @@ static int process_dir(const char *dirname, const char *ext);
 
 static int process_dir(const char *dirname, const char *ext) {
   int ret = 0;
-#ifdef HAVE_DIRENT_H
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
   DIR *dir = opendir(dirname);
   if (!dir) {
     perror("opendir");
@@ -423,10 +432,10 @@ static int process_dir(const char *dirname, const char *ext) {
     goto done;
 #  define NEXT_FILE (d = readdir(dir))
 #  define CUR_FILE d->d_name
-#elif defined _WIN32
+#elif defined _MSC_VER
   WIN32_FIND_DATA FindFileData;
   HANDLE hdir = FindFirstFile(dirname, &FindFileData);
-  if (hFind == INVALID_HANDLE_VALUE) {
+  if (hdir == INVALID_HANDLE_VALUE) {
     perror("FindFirstFile");
     goto done;
   }
@@ -470,9 +479,9 @@ static int process_dir(const char *dirname, const char *ext) {
     }
   } while (NEXT_FILE);
 done:
-#ifdef HAVE_DIRENT_H
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
   closedir(dir);
-#elif defined _WIN32
+#elif defined _MSC_VER
   FindClose(hdir);
 #endif
   return ret;
@@ -483,12 +492,12 @@ int main(int argc, char **argv) {
   int ret = 0;
   char *dirname = ".";
   char *ext = NULL;
-  int c;
-  bool opt_xid =
-      false; // if the --xid option was given, to set profile defaults
-  bool opt_profile =
-      false; // if the --profile option was given, to set xid defaults
+  // if the --xid option was given, to set profile defaults
+  bool opt_xid = false;
+  // if the --profile option was given, to set xid defaults
+  bool opt_profile = false;
   xid = ALLOWED;
+
 #ifdef HAVE_GETOPT_LONG
   int option_index = 0;
   static struct option long_options[] = {
@@ -510,13 +519,15 @@ int main(int argc, char **argv) {
     version();
     exit(0);
   }
+#ifdef HAVE_GETOPT_H
+  int c;
   while
-#ifdef HAVE_GETOPT_LONG
+#  ifdef HAVE_GETOPT_LONG
       ((c = getopt_long(argc, argv, "p:n:x:e:rhvq", long_options,
                         &option_index)) != -1)
-#else
+#  else
       ((c = getopt(argc, argv, "p:n:x:e:rhvq")) != -1)
-#endif
+#  endif
   {
     if (c == -1)
       break;
@@ -603,7 +614,7 @@ int main(int argc, char **argv) {
     case 'h':
       usage();
       break;
-#ifdef HAVE_GETOPT_LONG
+#  ifdef HAVE_GETOPT_LONG
     case 0:
       /* This option sets a flag */
       if (strEQc(long_options[option_index].name, "verbose"))
@@ -619,10 +630,23 @@ int main(int argc, char **argv) {
         exit(0);
       }
       break;
-#endif
+#  endif
     }
   }
   i = optind;
+#else
+  (void)opt_profile;
+  (void)opt_xid;
+  i = 1;
+  if (argc > i && (strEQc(argv[i], "--recursive") || strEQc(argv[i], "-r"))) {
+    recursive++;
+    i++;
+  }
+  if (argc > i+1 && (strEQc(argv[i], "--ext") || strEQc(argv[i], "-e"))) {
+    ext = argv[i+1];
+    i += 2;
+  }
+#endif
 
   u8ident_init(profile, norm, u8idopts);
   if (i == argc) // no dir/file args

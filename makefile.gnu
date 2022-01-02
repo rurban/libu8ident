@@ -31,9 +31,18 @@ endif
 ifneq (,$(wildcard /usr/include/dirent.h))
 DEFINES += -DHAVE_DIRENT_H
 endif
+ifneq (,$(wildcard /usr/include/getopt.h))
+DEFINES += -DHAVE_GETOPT_H
+endif
 ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
 HDRS += confus_croar.h roaring.h
+else
+ifneq (,$(wildcard ../CRoaring/roaring.c))
+DEFINES += -DHAVE_CROARING
+CFLAGS += -I../CRoaring
+HDRS += confus_croar.h roaring.h
+endif
 endif
 #OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 OBJS = $(SRC:.c=.o)
@@ -53,6 +62,7 @@ LTOFLAGS =
 
 MACHINE := $(shell uname -m)
 ifeq (x86_64,$(MACHINE))
+DEFINES += -DHAVE_SYS_STAT_H
 LTOFLAGS = -flto
 CFLAGS_REL += -march=native
 CFLAGS_PERF += -march=native
@@ -112,20 +122,20 @@ u8idlint: u8idlint.c $(LIB)
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
-check: test test-texts
+check: test test-texts u8idlint
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
 	./u8idlint.test
 else
 ifeq (-DHAVE_CONFUS -DHAVE_CROARING,$(DEFINES))
-check: test test-texts
+check: test test-texts u8idlint
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
 	./u8idlint.test
 else
-check: test
+check: test u8idlint
 	./test
 	./u8idlint.test
 endif
@@ -153,7 +163,7 @@ perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
 
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
-	       perf mkroar \
+	       perf mkroar u8idlint \
 	       test test-texts test-asan test-xid-{EN,DIS}ABLE \
 	       test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}

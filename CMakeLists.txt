@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.9)
 
 if(MSVC)
     # Disable some overly strict MSVC warnings.
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -wd4244 -wd4800 -wd4805")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -wd4244 -wd4800 -wd4805 -D_CRT_SECURE_NO_WARNINGS")
 endif()
 
 if (EXISTS ".version")
@@ -23,6 +23,7 @@ string(STRIP "${NL_PACKAGE_VERSION}" PACKAGE_VERSION)
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("dlfcn.h" HAVE_DLFCN_H)
 CHECK_INCLUDE_FILE("dirent.h" HAVE_DIRENT_H)
+CHECK_INCLUDE_FILE("getopt.h" HAVE_GETOPT_H)
 CHECK_INCLUDE_FILE("inttypes.h" HAVE_INTTYPES_H)
 CHECK_INCLUDE_FILE("malloc.h" HAVE_MALLOC_H)
 CHECK_INCLUDE_FILE("memory.h" HAVE_MEMORY_H)
@@ -90,6 +91,13 @@ if((CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 9)
   include(CheckIPOSupported)
   check_ipo_supported(RESULT ipo_supported OUTPUT error)
 endif()
+if(ipo_supported)
+  message(STATUS "IPO / LTO enabled")
+  set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+  add_definitions(-DLTO)
+else()
+  message(STATUS "IPO / LTO not supported: <${error}>")
+endif()
 
 set(libu8ident_DOCS
     README.md c11.md NOTICE LICENSE)
@@ -105,8 +113,7 @@ set(libu8ident_SOURCES
 
 if (CRoaring_FOUND)
   set(roaring_HEADERS
-      confus_croar.h
-      )
+      confus_croar.h)
 endif()
 
 set(private_HEADERS
@@ -116,13 +123,47 @@ set(private_HEADERS
   u8idroar.h
   u8id_private.h
   un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
-  mark.h unic11.h confus.h ${roaring_HEADERS}
-  )
+  mark.h unic11.h confus.h ${roaring_HEADERS})
 
-add_library(u8ident
+if(MSVC)
+  if (BUILD_SHARED_LIBS)
+    add_library(u8ident_static STATIC
+      ${libu8ident_HEADERS}
+      ${libu8ident_SOURCES}
+      ${private_HEADERS})
+    add_library(u8ident SHARED
+      ${libu8ident_HEADERS}
+      ${libu8ident_SOURCES}
+      ${private_HEADERS})
+    # FIXME cmake bug:
+    # need full path. u8idlint only gets Release\u8ident.lib, but is in a seperate path.
+    # This is ignored because the target is built, not imported.
+    #set_target_properties(u8ident PROPERTIES
+    #  IMPORTED_IMPLIB_DEBUG "${CMAKE_CURRENT_BINARY_DIR}\\Debug\\u8ident.lib")
+    #set_target_properties(u8ident PROPERTIES
+    #  IMPORTED_IMPLIB_RELEASE "${CMAKE_CURRENT_BINARY_DIR}\\Release\\u8ident.lib")
+    # this is the default already
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      set(LIBPATH "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+      set_target_properties(u8ident PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+    else()
+      set(LIBPATH "${CMAKE_CURRENT_BINARY_DIR}/Release")
+      set_target_properties(u8ident PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release")
+    endif()
+  else(BUILD_SHARED_LIBS)
+    add_library(u8ident
+      ${libu8ident_HEADERS}
+      ${libu8ident_SOURCES}
+      ${private_HEADERS})
+  endif(BUILD_SHARED_LIBS)
+else(MSVC)
+  add_library(u8ident
     ${libu8ident_HEADERS}
     ${libu8ident_SOURCES}
     ${private_HEADERS})
+endif(MSVC)
 #set_target_properties(${libu8ident_HEADERS} PROPERTIES PUBLIC_HEADER)
 set_target_properties(u8ident PROPERTIES PUBLIC_HEADER include/u8ident.h)
 target_include_directories(u8ident PRIVATE
@@ -137,17 +178,15 @@ if (CRoaring_FOUND)
       PROPERTIES COMPILE_FLAGS "-DPERF_TEST -DHAVE___BUILTIN_FFS")
 endif()
 
-link_libraries(u8ident)
-add_executable(u8idlint u8idlint.c)
-
-if(ipo_supported)
-  message(STATUS "IPO / LTO enabled")
-  set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLTO")
-else()
-  message(STATUS "IPO / LTO not supported: <${error}>")
+# cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
+if (NOT MSVC)
+  link_libraries(u8ident)
 endif()
-
+add_executable(u8idlint u8idlint.c)
+if (MSVC)
+  target_link_directories(u8idlint PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_link_libraries(u8idlint ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
+endif()
 include_directories(BEFORE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -157,16 +196,24 @@ if(NOT CMAKE_CROSSCOMPILING)
   enable_testing()
   add_executable(u8idtest test.c)
   add_test(test ./u8idtest)
-  if (NOT WIN32)
+  if (NOT MSVC)
+    add_test(u8idlint.test "${CMAKE_CURRENT_SOURCE_DIR}/u8idlint.test")
+    set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
     add_executable(test-texts test-texts.c)
+    add_test(test-texts ./test-texts)
     add_executable(mkc23 mkc23.c)
     set_source_files_properties(mkc23
       PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_SAFEC23)
-    #add_test(u8idlint.test ${CMAKE_CURRENT_SOURCE_DIR}/u8idlint.test)
-    set($ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
-    #add_test(test-texts ./test-texts)
-    #add_test(mkc23 ./mkc23)
-  endif(NOT WIN32)
+    add_test(mkc23 ./mkc23)
+  else()
+    # cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
+    target_link_directories(u8idtest PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+    target_link_libraries(u8idtest ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
+    #target_link_directories(test-texts PRIVATE ${LIBPATH})
+    #target_link_directories(mkc23 PRIVATE ${LIBPATH})
+    #target_link_libraries(test-texts ${LINKFLAGS})
+    #target_link_libraries(mkc23 ${LINKFLAGS})
+  endif(NOT MSVC)
 endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(
@@ -201,6 +248,9 @@ add_custom_target(
   DEPENDS *.c *.h include/*.h
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
+# make install
+# make install/local
+# make install/strip
 if(MSVC)
   #untested
   install(TARGETS u8ident RUNTIME PUBLIC_HEADER
@@ -212,6 +262,7 @@ install(TARGETS u8ident
   LIBRARY
   COMPONENT u8ident)
 install(TARGETS RUNTIME)
+install(TARGETS u8idlint)
 
 if(MSVC)
   #untested
@@ -220,3 +271,18 @@ if(MSVC)
             include/u8ident.h ${libu8ident_DOCS}
     DEPENDS u8ident)
 endif()
+
+# make package
+# make package_source (only after distclean or git clean -dxf)
+set(CPACK_PACKAGE_VENDOR "Reini Urban")
+set(CPACK_PACKAGE_CONTACT "rurban@cpan.org")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Check unicode security guidelines for identifiers")
+#set(CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION_MAJOR})
+#set(CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION_MINOR})
+#set(CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION_PATCH})
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+set(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
+include(CPack)
