@@ -155,13 +155,13 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   value indicating that the string does not match any of the levels
   1-5.
 
-c11_4. **SAFEC11**
+c11_4. **SAFEC23**
 
 * We also provide a special profile, called **`U8ID_PROFILE_C11_4`**,
-  defined by `-DU8ID_PROFILE_SAFEC11`. This is an extended Moderate
+  defined by `-DU8ID_PROFILE_SAFEC23`. This is an extended Moderate
   Profile (4), plus allowing Greek with Latin, plus only allowing Allowed
   IdentifierStatus.
-* `U8ID_PROFILE_C11_4` aka `U8ID_PROFILE_SAFEC11` is the secure
+* `U8ID_PROFILE_C11_4` aka `U8ID_PROFILE_SAFEC23` is the secure
   extension over C11, disallowing the restricted and limited_use
   scripts and identifiers, arbitrary rtl and ltr overrides, and all
   the insecure mixed scripts combinations.  See `unic11.h`,
@@ -229,8 +229,8 @@ e.g codesizes for u8idnorm.o with -Os
 
 default: 365K with -g on amd64-gcc
 
-For `-DU8ID_PROFILE_SAFEC11` see above. `c11_4` is also called
-**SAFEC11**, `c11_6` is the std insecure C11 profile.
+For `-DU8ID_PROFILE_SAFEC23` see above. `c23_4` is also called
+**SAFEC23**, `c11_6` is the std insecure C11 profile.
 
 With `confus` enabled, the confusable API is added.
 With `croaring` the confus API is about twice as fast, and needs half the size.

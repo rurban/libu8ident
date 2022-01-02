@@ -47,12 +47,14 @@ PKG = libu8ident-$(VERSION)
 PKG_BIN = $(PKG)-`uname -m`
 
 CFLAGS_REL = $(CFLAGS) -O3 -DNDEBUG
-CFLAGS_PERF = $(CFLAGS) -O1 -DNDEBUG
+CFLAGS_PERF = $(CFLAGS) -O2 -DNDEBUG
 CFLAGS_DBG = $(CFLAGS) -g -DDEBUG
+LTOFLAGS =
 
 MACHINE := $(shell uname -m)
 ifeq (x86_64,$(MACHINE))
-CFLAGS_REL += -march=native -flto
+LTOFLAGS = -flto
+CFLAGS_REL += -march=native
 CFLAGS_PERF += -march=native
 endif
 # cc prints name as cc, not gcc. so check for the copyright banner
@@ -82,11 +84,11 @@ endif
 all: $(LIB) $(MAN) u8idlint
 
 .c.o:
-	$(CC) $(CFLAGS_REL) $(DEFINES) -Iinclude -c $< -o $@
+	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c $< -o $@
 u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
-	$(CC) $(CFLAGS_REL) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
+	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
 u8idroar.o: u8idroar.c u8id_private.h $(HEADER) confus_croar.h
-	$(CC) $(CFLAGS_REL) $(DEFINES) -Iinclude -c u8idroar.c -o $@
+	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o $@
 
 $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
