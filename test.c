@@ -517,11 +517,12 @@ void test_mixed_scripts_with_ctx(void) {
 
 void test_init(void) {
   // wrong inits
-  assert(u8ident_init(0,0,0)); // missing profile
-  assert(u8ident_init(0,0,6));
-  assert(u8ident_init(2048,0,0));
-  assert(u8ident_init(0,0,U8ID_TR31_ALLOWED)); // missing PROFILE
-  assert(!u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ALLOWED));
+  assert(u8ident_init(0, 0, 0)); // missing profile
+  assert(u8ident_init(0, 0, 6));
+  assert(u8ident_init(2048, 0, 0));
+  assert(u8ident_init(0, 0, U8ID_TR31_ALLOWED)); // missing PROFILE
+  assert(!u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT,
+                       U8ID_TR31_ALLOWED));
   assert(u8ident_init(U8ID_PROFILE_DEFAULT, 8, 0)); // wrong norm
   assert(u8ident_init(1, 0, 2048));
   u8ident_free();

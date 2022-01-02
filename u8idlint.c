@@ -39,8 +39,8 @@
 #include "mark.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
-#define strEQ(s1,s2) !strcmp ((s1), (s2))
-#define strEQc(s1,s2) !strcmp ((s1), s2 "")
+#define strEQ(s1, s2) !strcmp((s1), (s2))
+#define strEQc(s1, s2) !strcmp((s1), s2 "")
 
 int verbose = 0;
 int quiet = 0;
@@ -49,9 +49,9 @@ int recursive = 0;
 enum xid_e {
   ASCII,   // only ASCII letters
   ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus
-  ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts
-  XID,     // ID plus NFKC quirks
-  C11,     // some AltId ranges from C11
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts
+  XID, // ID plus NFKC quirks
+  C11, // some AltId ranges from C11
   ALLUTF8, // all > 128, e.g. php, nim, crystal
 };
 enum xid_e xid = ALLOWED;
@@ -91,11 +91,7 @@ static inline bool range_bool_search(const uint32_t cp,
 }
 
 const struct range_bool ascii_start_list[] = {
-    {'$', '$'},
-    {'A', 'Z'},
-    {'_', '_'},
-    {'a', 'z'}
-};
+    {'$', '$'}, {'A', 'Z'}, {'_', '_'}, {'a', 'z'}};
 const struct range_bool ascii_cont_list[] = {
     {'$', '$'},
     {'0', '9'},
@@ -109,20 +105,13 @@ static bool isASCII_start(uint32_t cp) {
 static bool isASCII_cont(uint32_t cp) {
   return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
 }
-static bool isID_start(uint32_t cp) {
-  return u8ident_is_ID_Start(cp);
-}
-static bool isID_cont(uint32_t cp) {
-  return u8ident_is_ID_Start(cp);
-}
-static bool isXID_start(uint32_t cp) {
-  return u8ident_is_XID_Start(cp);
-}
-static bool isXID_cont(uint32_t cp) {
-  return u8ident_is_XID_Start(cp);
-}
+static bool isID_start(uint32_t cp) { return u8ident_is_ID_Start(cp); }
+static bool isID_cont(uint32_t cp) { return u8ident_is_ID_Start(cp); }
+static bool isXID_start(uint32_t cp) { return u8ident_is_XID_Start(cp); }
+static bool isXID_cont(uint32_t cp) { return u8ident_is_XID_Start(cp); }
 static bool isALLOWED_start(uint32_t cp) {
-  return range_bool_search(cp, safec23_start_list, ARRAY_SIZE(safec23_start_list));
+  return range_bool_search(cp, safec23_start_list,
+                           ARRAY_SIZE(safec23_start_list));
 }
 static bool isALLOWED_cont(uint32_t cp) {
   return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
@@ -136,9 +125,7 @@ static bool isC11_cont(uint32_t cp) {
 static bool isALLUTF8_start(uint32_t cp) {
   return isASCII_start(cp) || cp > 127;
 }
-static bool isALLUTF8_cont(uint32_t cp) {
-  return isASCII_cont(cp) || cp > 127;
-}
+static bool isALLUTF8_cont(uint32_t cp) { return isASCII_cont(cp) || cp > 127; }
 struct func_start_s {
   func_start *start;
   func_start *cont;
@@ -147,9 +134,8 @@ struct func_start_s {
 /* tokenizers:
   ASCII,   // only ASCII letters
   ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus
-  ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts
-  XID,     // ID plus NFKC quirks
-  C11,     // some AltId ranges from C11
+  ID,      // all letters, plus numbers, punctuation and marks. With exotic
+  scripts XID,     // ID plus NFKC quirks C11,     // some AltId ranges from C11
   ALLUTF8, // all > 128, e.g. php, nim, crystal */
 static struct func_start_s id_funcs[] = {
     {isASCII_start, isASCII_cont}, {isALLOWED_start, isALLOWED_cont},
@@ -213,9 +199,7 @@ static int dir_exists(const char *dir, const char *fname) {
 }
 #endif
 
-static void version(void) {
-  puts("u8idlint " PACKAGE_VERSION);
-}
+static void version(void) { puts("u8idlint " PACKAGE_VERSION); }
 static void usage(void) {
   version();
   puts("Usage: u8idlint [OPTIONS] [dirs or files]...");
@@ -233,10 +217,12 @@ static void usage(void) {
   puts("    c11_6  C11STD. Sets xid c11.");
   puts("    c23_4  SAFEC23 (i.e. 4 with Greek). Sets xid allowed.");
   puts(" -x|--xid=ascii,allowed,id,xid,c11,allutf8     default: allowed");
-  puts("  allowed set of identifiers:"); // sorted from most secure to least secure
+  puts("  allowed set of identifiers:"); // sorted from most secure to least
+                                         // secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
   puts("    allowed   tr31 with only recommended scripts, IdentifierStatus");
-  puts("    id        all letters. plus numbers, punctuations and combining marks");
+  puts("    id        all letters. plus numbers, punctuations and combining "
+       "marks");
   puts("    xid       id plus NFKC quirks");
   puts("    c11       some AltId unicode ranges from C11");
   puts("    allutf8   allow all >128. e.g. php, nim, crystal");
@@ -247,10 +233,13 @@ static void usage(void) {
   puts(" -q|--quiet");
   puts(" --help\n");
   puts("u8idlint checks all words in UTF-8 source files for");
-  puts("violations against various unicode security guidelines for identifiers.");
-  //puts("For special known file extensions it applies rules to parse identifiers,");
-  //puts("macro names and #include names, and handles them stricter than comments or strings.");
-  puts("It adds a special BIDI warning on bidi formatting chars and when the document");
+  puts("violations against various unicode security guidelines for "
+       "identifiers.");
+  // puts("For special known file extensions it applies rules to parse
+  // identifiers,"); puts("macro names and #include names, and handles them
+  // stricter than comments or strings.");
+  puts("It adds a special BIDI warning on bidi formatting chars and when the "
+       "document");
   puts("is not in Hebrew nor Arabic.");
   puts("\nSEE ALSO:");
   puts("  u8ident.3");
@@ -300,7 +289,7 @@ int testfile(const char *dir, const char *fname) {
     perror("fopen");
     fprintf(stderr, "%s/%s\n", dir, fname);
     if (maxlen > 1024)
-      free (word);
+      free(word);
     return -1;
   }
 
@@ -323,7 +312,7 @@ int testfile(const char *dir, const char *fname) {
       if (!cp) {
         printf("ERROR %s illegal UTF-8\n", olds);
         if (maxlen > 1024)
-          free (word);
+          free(word);
         exit(1);
       }
       // unicode #29 word-break, but simplified:
@@ -413,13 +402,13 @@ int testfile(const char *dir, const char *fname) {
   }
 
   if (maxlen > 1024)
-    free (word);
+    free(word);
   u8ident_free_ctx(c);
   fclose(f);
   return err;
 }
 
- static int process_dir(const char *dirname, const char *ext);
+static int process_dir(const char *dirname, const char *ext);
 
 static int process_dir(const char *dirname, const char *ext) {
   int ret = 0;
@@ -495,8 +484,10 @@ int main(int argc, char **argv) {
   char *dirname = ".";
   char *ext = NULL;
   int c;
-  bool opt_xid = false; // if the --xid option was given, to set profile defaults
-  bool opt_profile = false; // if the --profile option was given, to set xid defaults
+  bool opt_xid =
+      false; // if the --xid option was given, to set profile defaults
+  bool opt_profile =
+      false; // if the --profile option was given, to set xid defaults
   xid = ALLOWED;
 #ifdef HAVE_GETOPT_LONG
   int option_index = 0;
@@ -521,120 +512,115 @@ int main(int argc, char **argv) {
   }
   while
 #ifdef HAVE_GETOPT_LONG
-      ((c = getopt_long (argc, argv, "p:n:x:e:rhvq", long_options, &option_index))
-       != -1)
+      ((c = getopt_long(argc, argv, "p:n:x:e:rhvq", long_options,
+                        &option_index)) != -1)
 #else
-      ((c = getopt (argc, argv, "p:n:x:e:rhvq")) != -1)
+      ((c = getopt(argc, argv, "p:n:x:e:rhvq")) != -1)
 #endif
   {
     if (c == -1)
       break;
-    switch (c)
-      {
-      case 'n':
-        if (strEQc(optarg, "nfkc"))
-          norm = U8ID_NFKC;
-        else if (strEQc(optarg, "nfc"))
-          norm = U8ID_NFC;
-        else if (strEQc(optarg, "nfkd"))
-          norm = U8ID_NFKD;
-        else if (strEQc(optarg, "nfd"))
-          norm = U8ID_NFD;
-        else {
-          fprintf(stderr, "Invalid --normalize %s\n", optarg);
-          exit(1);
-        }
-        break;
-      case 'p':
-        opt_profile = true;
-        if (strEQc(optarg, "1")) { // ASCII only
-          profile = U8ID_PROFILE_1;
-          if (!opt_xid)
-            opt_xid = ASCII;
-        } else if (strEQc(optarg, "2")) // single script
-          profile = U8ID_PROFILE_2;
-        else if (strEQc(optarg, "3"))
-          profile = U8ID_PROFILE_3;
-        else if (strEQc(optarg, "4"))
-          profile = U8ID_PROFILE_4;
-        else if (strEQc(optarg, "5"))
-          profile = U8ID_PROFILE_5;
-        else if (strEQc(optarg, "6"))
-          profile = U8ID_PROFILE_6;
-        else if (strEQc(optarg, "c23_4")) {
-          profile = U8ID_PROFILE_C23_4;
-          if (!opt_xid)
-            xid = ALLOWED;
-        }
-        else if (strEQc(optarg, "c11_6")) {
-          profile = U8ID_PROFILE_C11_6;
-          if (!opt_xid)
-            xid = C11;
-        }
-        else {
-          fprintf(stderr, "Invalid --profile %s\n", optarg);
-          exit(1);
-        }
-        break;
-      case 'x': // ascii,allowed,id,xid,c11,allutf8
-        opt_xid = true;
-        if (strEQc(optarg, "ascii")) {
-          xid = ASCII;
-          if (!opt_profile)
-            profile = U8ID_PROFILE_1;
-        }
-        else if (strEQc(optarg, "allowed")) {
-          xid = ALLOWED;
-          u8idopts |= U8ID_TR31_ALLOWED;
-        }
-        else if (strEQc(optarg, "id"))
-          xid = ID;
-        else if (strEQc(optarg, "xid"))
-          xid = XID;
-        else if (strEQc(optarg, "c11"))
-          xid = C11;
-        else if (strEQc(optarg, "allutf8"))
-          xid = ALLUTF8;
-        else {
-          fprintf(stderr, "Invalid --xid %s\n", optarg);
-          exit(1);
-        }
-        break;
-      case 'e':
-        ext = optarg;
-        break;
-      case ':': // missing arg
-        break;
-      case 'v':
-        verbose++;
-        break;
-      case 'q':
-        quiet++;
-        break;
-      case 'r':
-        recursive++;
-        break;
-      case 'h':
-        usage();
-        break;
-#ifdef HAVE_GETOPT_LONG
-      case 0:
-        /* This option sets a flag */
-        if (strEQc (long_options[option_index].name, "verbose"))
-          verbose++;
-        else if (strEQc (long_options[option_index].name, "quiet"))
-          quiet++;
-        else if (strEQc (long_options[option_index].name, "recursive"))
-          recursive++;
-        else if (strEQc (long_options[option_index].name, "help"))
-          usage();
-        else if (strEQc (long_options[option_index].name, "version")) {
-          version();
-          exit(0);
-        }
-        break;
-#endif
+    switch (c) {
+    case 'n':
+      if (strEQc(optarg, "nfkc"))
+        norm = U8ID_NFKC;
+      else if (strEQc(optarg, "nfc"))
+        norm = U8ID_NFC;
+      else if (strEQc(optarg, "nfkd"))
+        norm = U8ID_NFKD;
+      else if (strEQc(optarg, "nfd"))
+        norm = U8ID_NFD;
+      else {
+        fprintf(stderr, "Invalid --normalize %s\n", optarg);
+        exit(1);
       }
+      break;
+    case 'p':
+      opt_profile = true;
+      if (strEQc(optarg, "1")) { // ASCII only
+        profile = U8ID_PROFILE_1;
+        if (!opt_xid)
+          opt_xid = ASCII;
+      } else if (strEQc(optarg, "2")) // single script
+        profile = U8ID_PROFILE_2;
+      else if (strEQc(optarg, "3"))
+        profile = U8ID_PROFILE_3;
+      else if (strEQc(optarg, "4"))
+        profile = U8ID_PROFILE_4;
+      else if (strEQc(optarg, "5"))
+        profile = U8ID_PROFILE_5;
+      else if (strEQc(optarg, "6"))
+        profile = U8ID_PROFILE_6;
+      else if (strEQc(optarg, "c23_4")) {
+        profile = U8ID_PROFILE_C23_4;
+        if (!opt_xid)
+          xid = ALLOWED;
+      } else if (strEQc(optarg, "c11_6")) {
+        profile = U8ID_PROFILE_C11_6;
+        if (!opt_xid)
+          xid = C11;
+      } else {
+        fprintf(stderr, "Invalid --profile %s\n", optarg);
+        exit(1);
+      }
+      break;
+    case 'x': // ascii,allowed,id,xid,c11,allutf8
+      opt_xid = true;
+      if (strEQc(optarg, "ascii")) {
+        xid = ASCII;
+        if (!opt_profile)
+          profile = U8ID_PROFILE_1;
+      } else if (strEQc(optarg, "allowed")) {
+        xid = ALLOWED;
+        u8idopts |= U8ID_TR31_ALLOWED;
+      } else if (strEQc(optarg, "id"))
+        xid = ID;
+      else if (strEQc(optarg, "xid"))
+        xid = XID;
+      else if (strEQc(optarg, "c11"))
+        xid = C11;
+      else if (strEQc(optarg, "allutf8"))
+        xid = ALLUTF8;
+      else {
+        fprintf(stderr, "Invalid --xid %s\n", optarg);
+        exit(1);
+      }
+      break;
+    case 'e':
+      ext = optarg;
+      break;
+    case ':': // missing arg
+      break;
+    case 'v':
+      verbose++;
+      break;
+    case 'q':
+      quiet++;
+      break;
+    case 'r':
+      recursive++;
+      break;
+    case 'h':
+      usage();
+      break;
+#ifdef HAVE_GETOPT_LONG
+    case 0:
+      /* This option sets a flag */
+      if (strEQc(long_options[option_index].name, "verbose"))
+        verbose++;
+      else if (strEQc(long_options[option_index].name, "quiet"))
+        quiet++;
+      else if (strEQc(long_options[option_index].name, "recursive"))
+        recursive++;
+      else if (strEQc(long_options[option_index].name, "help"))
+        usage();
+      else if (strEQc(long_options[option_index].name, "version")) {
+        version();
+        exit(0);
+      }
+      break;
+#endif
+    }
   }
   i = optind;
 
@@ -644,8 +630,7 @@ int main(int argc, char **argv) {
   while (i < argc) {
     if (file_exists(argv[i])) {
       ret |= testfile(".", argv[i]);
-    }
-    else {
+    } else {
       if (dir_exists(".", argv[i]))
         dirname = argv[i];
       ret |= process_dir(dirname, ext);

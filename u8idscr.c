@@ -6,13 +6,12 @@
   https://www.unicode.org/reports/tr24/tr24-32.html Implement
   http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 
-  TODO: seperate is_allowed into start, and cont. special case some TR31 characters.
-  U+B7 MIDDLE DOT is allowed, but should only be in median.
-  U+200D ZERO WIDTH JOINER* is allowed, but should only be in cont and TR31 2.3 special-cases.
-  U+200C ZERO WIDTH NON-JOINER* is allowed, but should only be in median and TR31 special-cases.
-    They are currently in Inherited.
-  HEBREW U+5F3 is only allowed in median.
-  KATAKANA U+30A0, U+30FB are only allowed in median.
+  TODO: seperate is_allowed into start, and cont. special case some TR31
+  characters. U+B7 MIDDLE DOT is allowed, but should only be in median. U+200D
+  ZERO WIDTH JOINER* is allowed, but should only be in cont and TR31 2.3
+  special-cases. U+200C ZERO WIDTH NON-JOINER* is allowed, but should only be in
+  median and TR31 special-cases. They are currently in Inherited. HEBREW U+5F3
+  is only allowed in median. KATAKANA U+30A0, U+30FB are only allowed in median.
 */
 
 #include <string.h>
@@ -97,8 +96,7 @@ int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
     memcpy(p, c->scr8, 8);
     c->u8p = p;
     c->u8p[i] = scr;
-  }
-  else if (unlikely(i > 8 && (i & 7) == 7)) {
+  } else if (unlikely(i > 8 && (i & 7) == 7)) {
     c->u8p = realloc(c->u8p, i + 8);
     c->u8p[i] = scr;
   } else {
@@ -177,7 +175,7 @@ static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
     return 255;
   } else {
     const struct sc *sc =
-      (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
+        (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
     return sc ? sc->scr : 255;
   }
 }

@@ -23,11 +23,12 @@ enum u8id_norm s_u8id_norm = U8ID_NORM_DEFAULT;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
-/* Initialize the library with a profile, normalization and a bitmask of options,
-   which define the performed checks.
-   Recommended is `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
+/* Initialize the library with a profile, normalization and a bitmask of
+   options, which define the performed checks. Recommended is
+   `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
 */
-EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm, unsigned options) {
+EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
+                        unsigned options) {
   if (options > 1023)
     return -1;
   if (profile < U8ID_PROFILE_1 || profile > U8ID_PROFILE_C23_4)
@@ -35,7 +36,7 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm, unsigned
   if (norm > U8ID_FCC)
     return -1;
 #if defined U8ID_NORM
-  // only one is allowed, else fail
+    // only one is allowed, else fail
 #  if U8ID_NORM == NFD
   if (!((norm != U8ID_NFD || norm != U8ID_FCD)))
     return -1;
@@ -67,7 +68,7 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm, unsigned
   s_u8id_profile = U8ID_PROFILE_C23_4;
 #elif defined U8ID_PROFILE_C11STD
   s_u8id_profile = U8ID_PROFILE_C11_6;
-#else  
+#else
   s_u8id_profile = profile;
 #endif
 
@@ -133,14 +134,15 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #endif
     if (unlikely(s_u8id_profile == U8ID_PROFILE_1 && cp > 127)) {
-        struct ctx_t *ctx = u8ident_ctx();
-        ctx->last_cp = cp;
-        return U8ID_ERR_XID;
+      struct ctx_t *ctx = u8ident_ctx();
+      ctx->last_cp = cp;
+      return U8ID_ERR_XID;
     }
 #ifdef HAVE_CONFUS
     /* allow some latin confusables: 0 1 I ` | U+30, U+31, U+49, U+60, U+7C */
     /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6 */
-    if (unlikely(s_u8id_options & (U8ID_WARN_CONFUSABLE | U8ID_ERROR_CONFUSABLE) &&
+    if (unlikely(s_u8id_options &
+                     (U8ID_WARN_CONFUSABLE | U8ID_ERROR_CONFUSABLE) &&
                  cp > 0x7C)) {
       bool yes = u8ident_is_confusable(cp);
       if (yes) {

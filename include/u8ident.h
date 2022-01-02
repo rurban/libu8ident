@@ -11,29 +11,32 @@
 #define U8IDENT_UNICODE_VERSION 14
 
 enum u8id_norm {
-  U8ID_NFC = 0, // the default, shorter canonical composed normalization
-  U8ID_NFD = 1, // the longer, canonical decomposed normalization, as in the
-                // previous Apple HPFS filesystem
+  U8ID_NFC = 0,  // the default, shorter canonical composed normalization
+  U8ID_NFD = 1,  // the longer, canonical decomposed normalization, as in the
+                 // previous Apple HPFS filesystem
   U8ID_NFKC = 2, // the compatibility composed normalization, as in Python 3
   U8ID_NFKD = 3, // the longer compatibility decomposed normalization
   U8ID_FCD = 4,  // the faster variants
   U8ID_FCC = 5
 };
 enum u8id_profile {
-  U8ID_PROFILE_1 = 1,       // ASCII only
-  U8ID_PROFILE_2 = 2,       // Single Script only
-  U8ID_PROFILE_3 = 3,       // Highly Restrictive
-  U8ID_PROFILE_4 = 4,       // Moderately Restrictive
-  U8ID_PROFILE_5 = 5,       // Minimally Restrictive
-  U8ID_PROFILE_6 = 6,       // Unrestricted
-  U8ID_PROFILE_C11_6 = 7,   // The C11 std
-  U8ID_PROFILE_C23_4 = 8,   // PROFILE_4 + Greek with only Allowed ID's ("SAFEC23")
+  U8ID_PROFILE_1 = 1,     // ASCII only
+  U8ID_PROFILE_2 = 2,     // Single Script only
+  U8ID_PROFILE_3 = 3,     // Highly Restrictive
+  U8ID_PROFILE_4 = 4,     // Moderately Restrictive
+  U8ID_PROFILE_5 = 5,     // Minimally Restrictive
+  U8ID_PROFILE_6 = 6,     // Unrestricted
+  U8ID_PROFILE_C11_6 = 7, // The C11 std
+  U8ID_PROFILE_C23_4 =
+      8, // PROFILE_4 + Greek with only Allowed ID's ("SAFEC23")
 };
 enum u8id_options {
-  //  Note: The parser/tokenizer should do that. Without, the checker can be faster.
+  //  Note: The parser/tokenizer should do that. Without, the checker can be
+  //  faster.
   //  Can be disallowed with --disable-check-xid
-  U8ID_TR31_ALLOWED = 64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
-  U8ID_TR31_ID = 65,      // tr31 variants
+  U8ID_TR31_ALLOWED =
+      64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
+  U8ID_TR31_ID = 65, // tr31 variants
   U8ID_TR31_XID = 66,
   U8ID_TR31_C11 = 67,
   U8ID_TR31_ALLUTF8 = 68,
@@ -52,17 +55,17 @@ typedef unsigned u8id_ctx_t;
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
 #endif
 
-/* Initialize the library with a tr39 profile, normalization and bitmask of options,
-   which define more performed checks.
-   Recommended is `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
-   return -1 on error, 0 if options are valid.
+/* Initialize the library with a tr39 profile, normalization and bitmask of
+   options, which define more performed checks. Recommended is
+   `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`. return -1 on error, 0 if
+   options are valid.
 */
 int u8ident_init(enum u8id_profile, enum u8id_norm, unsigned options);
 
-/* maxlength of an identifier. Default: 1024. Beware that such longs identifiers,
-   are not really identifiable anymore, and keep them under 80 or even less.
-   Some filesystems do allow now 32K identifiers, which is a glaring security
-   hole, waiting to be exploited */
+/* maxlength of an identifier. Default: 1024. Beware that such longs
+   identifiers, are not really identifiable anymore, and keep them under 80 or
+   even less. Some filesystems do allow now 32K identifiers, which is a glaring
+   security hole, waiting to be exploited */
 void u8ident_set_maxlength(unsigned maxlen);
 
 /* Generates a new identifier document/context/directory, which
