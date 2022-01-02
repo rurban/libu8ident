@@ -52,14 +52,14 @@ add_definitions(-DHAVE_CONFIG_H)
 # Supported options:
 #  -DBUILD_SHARED_LIBS=ON,OFF
 #  -DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD
-#  -DLIBU8IDENT_PROFILE=2,3,4,5,6,C11_4,C11_6
+#  -DLIBU8IDENT_PROFILE=2,3,4,5,6,C23_4,C11_6
 #  -DENABLE_CHECK_XID=On
 #  -DDISABLE_CHECK_XID=On
 #  -DHAVE_CONFUS=ON
 #  -DHAVE_CROARING=ON
 option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
 option(LIBU8IDENT_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
-option(LIBU8IDENT_PROFILE "force a single profile: 2-6,C11_4,C11_6" OFF)
+option(LIBU8IDENT_PROFILE "force a single profile: 2-6,C23_4,C11_6" OFF)
 option(ENABLE_CHECK_XID "en- or disabled check_xid" OFF)
 option(DISABLE_CHECK_XID "en- or disabled check_xid" OFF)
 option(HAVE_CONFUS "add confus.h set" OFF)
@@ -131,7 +131,14 @@ target_include_directories(u8ident PRIVATE
 target_include_directories(u8ident PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-#link_libraries(u8ident)
+if (CRoaring_FOUND)
+  add_executable(perf perf.c u8idroar.c)
+  set_source_files_properties(perf.c
+      PROPERTIES COMPILE_FLAGS "-DPERF_TEST -DHAVE___BUILTIN_FFS")
+endif()
+
+link_libraries(u8ident)
+add_executable(u8idlint u8idlint.c)
 
 if(ipo_supported)
   message(STATUS "IPO / LTO enabled")
@@ -148,23 +155,17 @@ include_directories(BEFORE
 
 if(NOT CMAKE_CROSSCOMPILING)
   enable_testing()
-  add_executable(u8idtest
-    test.c
-    ${libu8ident_SOURCES}
-    ${libu8ident_HEADERS})
-  set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
+  add_executable(u8idtest test.c)
   add_test(test ./u8idtest)
   if (NOT WIN32)
-    add_executable(test-texts
-      test-texts.c
-      ${libu8ident_SOURCES}
-      ${libu8ident_HEADERS})
-    add_executable(test-c11
-      test-c11.c
-      ${libu8ident_SOURCES}
-      ${libu8ident_HEADERS})
+    add_executable(test-texts test-texts.c)
+    add_executable(mkc23 mkc23.c)
+    set_source_files_properties(mkc23
+      PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_SAFEC23)
+    #add_test(u8idlint.test ${CMAKE_CURRENT_SOURCE_DIR}/u8idlint.test)
+    set($ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
     #add_test(test-texts ./test-texts)
-    #add_test(test-c11 ./test-c11)
+    #add_test(mkc23 ./mkc23)
   endif(NOT WIN32)
 endif(NOT CMAKE_CROSSCOMPILING)
 

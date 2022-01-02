@@ -87,6 +87,21 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1
 
+/* Define to the full name of this package. */
+#define PACKAGE_NAME "libu8ident"
+
+/* Define to the full name and version of this package. */
+#define PACKAGE_STRING "libu8ident ${PACKAGE_VERSION}"
+
+/* Define to the one symbol short name of this package. */
+#define PACKAGE_TARNAME "libu8ident"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL "http://github.com/rurban/libu8ident/"
+
+/* Define to the version of this package. */
+#define PACKAGE_VERSION "${PACKAGE_VERSION}"
+
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
    #define below would cause a syntax error. */
