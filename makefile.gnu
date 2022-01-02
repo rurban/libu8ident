@@ -47,11 +47,13 @@ PKG = libu8ident-$(VERSION)
 PKG_BIN = $(PKG)-`uname -m`
 
 CFLAGS_REL = $(CFLAGS) -O3 -DNDEBUG
+CFLAGS_PERF = $(CFLAGS) -O1 -DNDEBUG
 CFLAGS_DBG = $(CFLAGS) -g -DDEBUG
 
 MACHINE := $(shell uname -m)
 ifeq (x86_64,$(MACHINE))
 CFLAGS_REL += -march=native -flto
+CFLAGS_PERF += -march=native
 endif
 # cc prints name as cc, not gcc. so check for the copyright banner
 CC_COPY := $(shell $(CC) --version | head -n2 | tail -n1 | cut -c1-7)
@@ -63,6 +65,7 @@ CC_COPY := $(shell $(CC) --version | head -n2 | tail -n1 | cut -c1-7)
 ifeq (Copyrig,$(CC_COPY))
 IS_GCC = 1
 CFLAGS_REL += -Werror -Wno-return-local-addr
+CFLAGS_PERF += -Wno-return-local-addr
 CFLAGS_DBG += -Wno-return-local-addr
 else
 ifeq (Target:,$(CC_COPY))
@@ -143,7 +146,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h
-	$(CC) $(CFLAGS_REL) -Wno-unused-function -Wno-error $(DEFINES) -DPERF_TEST -I. -Iinclude \
+	$(CC) $(CFLAGS_PERF) -Wno-unused-function $(DEFINES) -DPERF_TEST -I. -Iinclude \
 	  perf.c u8idroar.c -o perf && \
 	./perf
 

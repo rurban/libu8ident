@@ -45,6 +45,7 @@ nfc:  bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
 volatile bool gret = false;
+uint64_t tbase = 0UL; // time to run the loop with empty payload
 
 #if defined(_MSC_VER)
 #  define timer_start() __rdtsc()
@@ -395,7 +396,7 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
     gret |= ret;                                        \
   }                                                     \
   end = timer_end();                                    \
-  uint64_t t1 = (end - begin) / LOOPS
+  uint64_t t1 = ((end - begin) - tbase) / LOOPS
 
 #define DO_LOOP_NM(t1,boolfunc,NFPRE)                   \
   /* warmup */                                          \
@@ -423,7 +424,22 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
     gret |= ret;                                                        \
   }                                                                     \
   end = timer_end();                                                    \
-  uint64_t t1 = (end - begin) / LOOPS
+  uint64_t t1 = ((end - begin) - tbase) / LOOPS
+
+bool empty_basefunc(uint32_t cp, uint32_t* arr, size_t len) {
+  arr[len-1] = cp;
+  return true;
+}
+
+void measure_baseline(void) {
+  uint64_t begin, end;
+  uint32_t arr[10];
+  DO_LOOP(_tbase, empty_basefunc(32, arr, 10));
+  tbase = _tbase;
+#ifdef DEBUG  
+  printf("empty loop: %lu\n", tbase);
+#endif
+}
 
 // with t1 being the slowest, t3 usually the fastest
 #define RESULT(name, t1, t2, t3)                                 \
@@ -462,7 +478,7 @@ void perf_scripts(void) {
   uint64_t begin, end;
   const size_t len = ARRAY_SIZE(xid_script_list);
 
-  //DO_LOOP(t1, u8ident_roar_is_allowed(cp));
+  //DO_LOOP(t1, u8ident_roar_has_uncommonscript(cp));
   uint64_t t1 = 0;
   DO_LOOP(t2, binary_search(cp, (const char*)xid_script_list, len, sizeof(struct sc)));
   DO_LOOP(t3, sc_search(cp, xid_script_list, len));
@@ -573,9 +589,9 @@ void perf_nfd(void) {
 int main(void) {
   u8ident_roar_init();
   printf("times in rdtsc cycles per lookup, less is better.\n");
+  measure_baseline();
   printf("%-10s| %-8s | %-8s | %-8s | %-8s | %-8s |\n", "", "croaring",
          "bsearch", "hybrid", "hybrid16", "eytzinger");
-
   perf_confus();
   perf_scripts();
   perf_allowed_id();
