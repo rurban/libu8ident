@@ -274,7 +274,6 @@ enum u8id_profile:
 
 enum u8id_options:
 
-    U8ID_FOLDCASE  = 64,        .
     U8ID_TR31_ALLOWED = 64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
     U8ID_TR31_ID = 65,      // tr31 variants
     U8ID_TR31_XID = 66,
