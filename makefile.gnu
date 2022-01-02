@@ -112,24 +112,21 @@ u8idlint: u8idlint.c $(LIB)
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
-check: test test-texts test-c11
+check: test test-texts
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
-	./test-c11
 	./u8idlint.test
 else
 ifeq (-DHAVE_CONFUS -DHAVE_CROARING,$(DEFINES))
-check: test test-texts test-c11
+check: test test-texts
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
-	./test-c11
 	./u8idlint.test
 else
-check: test test-c11
+check: test
 	./test
-	./test-c11
 	./u8idlint.test
 endif
 endif
@@ -140,8 +137,10 @@ test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
-test-c11: test-c11.c $(SRC) $(HEADER) $(HDRS) mark.h
-	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude test-c11.c $(SRC) -o test-c11
+c11-all.h c23-safe.h: mkc23
+	./mkc23
+mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS) mark.h
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude mkc23.c $(SRC) -o $@
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan

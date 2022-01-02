@@ -15,7 +15,7 @@ u8idroar.o
 /test
 /test-asan
 /test-texts
-/test-c11
+/mkc23
 /build*
 /Scripts.txt
 /ScriptExtensions.txt

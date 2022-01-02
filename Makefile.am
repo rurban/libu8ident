@@ -106,15 +106,15 @@ regen-all: regen-scripts regen-norm regen-confus regen-man
 EXTRA_PROGRAMS = test
 TESTS = test
 if !HAVE_WINDOWS
-EXTRA_PROGRAMS += test-texts test-c11
-TESTS += test-texts.test test-c11 u8idlint.test
+EXTRA_PROGRAMS += test-texts mkc23
+TESTS += test-texts.test mkc23 u8idlint.test
 endif
 test_SOURCES = test.c
 test_LDADD = $(lib_LTLIBRARIES)
 test_texts_SOURCES = test-texts.c
 test_texts_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS)
 test_texts_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
-test_c11_SOURCES = test-c11.c
+test_c11_SOURCES = mkc23.c
 test_c11_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS) -DU8ID_PROFILE_SAFEC23
 test_c11_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
 
@@ -133,6 +133,9 @@ if !HAVE_CROARING
 perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
 endif
+
+c11-all.h c23-safe.h: mkc23
+	./mk23$(EXEXT)
 
 if !HAVE_WINDOWS
 check-all: check check-asan check-norms check-profiles check-xid
@@ -192,7 +195,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) \
 	     test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
-	     texts.tst test-c11$(EXEEXT)
+	     texts.tst mkc23$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 c11-all.h c23-safe.h
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
