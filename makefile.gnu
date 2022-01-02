@@ -143,7 +143,7 @@ check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h
-	$(CC) $(CFLAGS_REL) -Wno-unused-function $(DEFINES) -DPERF_TEST -I. -Iinclude \
+	$(CC) $(CFLAGS_REL) -Wno-unused-function -Wno-error $(DEFINES) -DPERF_TEST -I. -Iinclude \
 	  perf.c u8idroar.c -o perf && \
 	./perf
 

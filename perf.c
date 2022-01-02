@@ -10,16 +10,16 @@ A hybrid linear for <128 and bsearch is the fastest for most,
 eytzinger for mark.
 hybrid16 splits into 16bit and 32bit lists.
 
-times in rdtsc cycles, less is better
-          | croaring | bsearch  | hybrid   | hybrid16 | eytzinger|
-confus    : 6523088    5702502    3753386  |				last 73.79% faster
-scripts   : -          5949762    7224906    3132948    3537690  |	last 12.92% slower
-allowed_id: 4459598    2818504    2406560    1974154    2650960  |	last 34.28% slower
-mark      : 5170178    4163744    4769986    -          4557982  |	last 4.65% faster
-nfkd      : 4060004    3991052    2812836  |				last 41.89% faster
-nfd       : 4010630    2462746    4459468  |				last 81.08% slower
-nfkc      : 12391002   8207654    7341282  |				last 11.80% faster
-nfc       : 8731164    6352242    7670728  |				last 20.76% slower
+times in rdtsc cycles per lookup, less is better.
+          | croaring | bsearch  | hybrid   | hybrid16 | eytzinger |
+confus    : 70008      70022      70037    |				last 0.04% slower
+scripts   : 0          69968      69990      69872      70006    |	last 0.19% slower
+allowed_id: 70013      69888      69934      69905      69894    |	last 0.02% faster
+mark      : 70044      69908      69794      69794      69805    |	last 0.02% slower
+nfkd      : 69988      69857      69836      0          69790    |	last 0.07% faster
+nfd       : 69948      69799      69813      0          69792    |	last 0.03% faster
+nfkc      : 70172      70100      69990    |				last 0.16% faster
+nfc       : 70225      70040      69926    |				last 0.16% faster
 
 with the scripts1.h variant: (first search range, then singles.
 see branch scripts1)
@@ -375,6 +375,7 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
 }
 
 #define PERC(fast,slow) (100.0 * (slow - fast) / (double)fast)
+#define LOOPS (100 * (128-20)) + (0x11000 - 20)
 // favor ASCII 100x over unicode char coverage
 #define DO_LOOP(t1,boolfunc)                            \
   /* warmup */                                          \
@@ -394,7 +395,7 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
     gret |= ret;                                        \
   }                                                     \
   end = timer_end();                                    \
-  uint64_t t1 = end - begin
+  uint64_t t1 = (end - begin) / LOOPS
 
 #define DO_LOOP_NM(t1,boolfunc,NFPRE)                   \
   /* warmup */                                          \
@@ -422,12 +423,12 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
     gret |= ret;                                                        \
   }                                                                     \
   end = timer_end();                                                    \
-  uint64_t t1 = end - begin
+  uint64_t t1 = (end - begin) / LOOPS
 
 // with t1 being the slowest, t3 usually the fastest
 #define RESULT(name, t1, t2, t3)                                 \
   printf("%-10s: %-10lu %-10lu %-9lu|\t\t\t\tlast %0.2f%% %s\n", name, \
-         t1, t2, t3,                                             \
+         t1, t2, t3,                                                   \
          t3 < t2 ? PERC(t3,t2) : PERC(t2,t3),                    \
          t3 < t2 ? "faster" : "slower")
 // with t1 being the slowest, t4 usually the fastest, compare to t3
@@ -439,9 +440,9 @@ static inline bool range_bool_eytzinger_search(const uint32_t cp,
 */
 #define RESULT5(name, t1, t2, t3, t4, t5)                               \
   printf("%-10s: %-10lu %-10lu %-10lu %-10lu %-9lu|\tlast %0.2f%% %s\n", name, \
-         t1, t2, t3, t4, t5,                                            \
-         t5 < t4 ? PERC(t5,t4) : PERC(t4,t5),                           \
-         t5 < t4 ? "faster" : "slower")
+         t1, t2, t3, t4, t5,    \
+         t4 ? (t5 < t4 ? PERC(t5,t4) : PERC(t4,t5)) : (t5 < t3 ? PERC(t5,t3) : PERC(t3,t5)), \
+         t5 < (t4 ? t4 : t3) ? "faster" : "slower")
 
 // this is the only one without ranges, thus croaring is fastest
 void perf_confus(void) {
@@ -452,7 +453,7 @@ void perf_confus(void) {
   DO_LOOP(t2, u8ident_is_confusable(cp)); // croaring
   DO_LOOP(t3, array_search_hybr(cp, confusables, ARRAY_SIZE(confusables)));
 
-  printf("%-10s: %-10lu %-10lu %-9lu|\t\t\tlast %0.2f%% %s\n", "confus", t1, t2, t3,
+  printf("%-10s: %-10lu %-10lu %-9lu|\t\t\t\tlast %0.2f%% %s\n", "confus", t1, t2, t3,
          t3 < t1 ? PERC(t3, t1) : PERC(t1, t3), t3 < t1 ? "faster" : "slower");
   // RESULT("confus", t1,t2,t3);
 }
@@ -533,27 +534,43 @@ void perf_nfc(void) {
 
 void perf_nfkd(void) {
   uint64_t begin, end;
+  const size_t len = ARRAY_SIZE(NFKD_N_list);
 #undef NFKD
-  DO_LOOP(t1, u8ident_roar_maybe_nfkd(cp));
-  DO_LOOP(t2, range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list)));
-  DO_LOOP(t3, range_bool_search_hybr(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list)));
 
-  RESULT("nfkd", t1,t2,t3);
+  DO_LOOP(t1, u8ident_roar_maybe_nfkd(cp));
+  DO_LOOP(t2, range_bool_search(cp, NFKD_N_list, len));
+  DO_LOOP(t3, range_bool_search_hybr(cp, NFKD_N_list, len));
+  uint64_t t4 = 0; // no hybrid16
+
+  struct range_bool *eytz_list = malloc((len + 1) * sizeof(*NFKD_N_list));
+  range_bool_eytzinger_sort(NFKD_N_list, eytz_list, len, 0, 1);
+  DO_LOOP(t5, range_bool_eytzinger_search(cp, NFKD_N_list, len));
+  free (eytz_list);
+
+  RESULT5("nfkd", t1,t2,t3,t4,t5);
 }
 
 void perf_nfd(void) {
   uint64_t begin, end;
+  const size_t len = ARRAY_SIZE(NFKD_N_list);
+
 #undef NFD
   DO_LOOP(t1, u8ident_roar_maybe_nfd(cp));
   DO_LOOP(t2, range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list)));
   DO_LOOP(t3, range_bool_search_hybr(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list)));
+  uint64_t t4 = 0; // no hybrid16
 
-  RESULT("nfd", t1,t2,t3);
+  struct range_bool *eytz_list = malloc((len + 1) * sizeof(*NFD_N_list));
+  range_bool_eytzinger_sort(NFD_N_list, eytz_list, len, 0, 1);
+  DO_LOOP(t5, range_bool_eytzinger_search(cp, NFD_N_list, len));
+  free (eytz_list);
+
+  RESULT5("nfd", t1,t2,t3,t4,t5);
 }
 
 int main(void) {
   u8ident_roar_init();
-  printf("times in rdtsc cycles, less is better\n");
+  printf("times in rdtsc cycles per lookup, less is better.\n");
   printf("%-10s| %-8s | %-8s | %-8s | %-8s | %-8s |\n", "", "croaring",
          "bsearch", "hybrid", "hybrid16", "eytzinger");
 
