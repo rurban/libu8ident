@@ -35,6 +35,16 @@ CHECK_INCLUDE_FILE("string.h" HAVE_STRING_H)
 CHECK_INCLUDE_FILE("strings.h" HAVE_STRINGS_H)
 CHECK_INCLUDE_FILE("sys/stat.h" HAVE_SYS_STAT_H)
 CHECK_INCLUDE_FILE("sys/types.h" HAVE_SYS_TYPES_H)
+include(CheckFunctionExists)
+check_function_exists(getopt_long HAVE_GETOPT_LONG)
+include(CheckCSourceCompiles)
+# Returns one plus the index of the least significant 1-bit of x, or if x is zero, returns zero.
+check_c_source_compiles("
+int main() { (void)__builtin_ffs(0); return 0; }
+" HAVE___BUILTIN_FFS)
+#check_function_exists(__builtin_ffs HAVE___BUILTIN_FFS)
+#check_function_exists(strcmp HAVE_STRCMP)
+#check_function_exists(strcasestr HAVE_STRCASESTR)
 include(CheckTypeSize)
 check_type_size(size_t SIZE_T)
 #check_type_size(wchar_t WCHAR_T)
@@ -143,15 +153,15 @@ if(MSVC)
     #set_target_properties(u8ident PROPERTIES
     #  IMPORTED_IMPLIB_RELEASE "${CMAKE_CURRENT_BINARY_DIR}\\Release\\u8ident.lib")
     # this is the default already
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-      set(LIBPATH "${CMAKE_CURRENT_BINARY_DIR}/Debug")
-      set_target_properties(u8ident PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug")
-    else()
-      set(LIBPATH "${CMAKE_CURRENT_BINARY_DIR}/Release")
-      set_target_properties(u8ident PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release")
-    endif()
+    #if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      #set(LIBPATH "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+      #set_target_properties(u8ident PROPERTIES
+      #  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+    #else()
+      #set(LIBPATH "${CMAKE_CURRENT_BINARY_DIR}/Release")
+      #set_target_properties(u8ident PROPERTIES
+      #  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release")
+    #endif()
   else(BUILD_SHARED_LIBS)
     add_library(u8ident
       ${libu8ident_HEADERS}
@@ -184,7 +194,7 @@ if (NOT MSVC)
 endif()
 add_executable(u8idlint u8idlint.c)
 if (MSVC)
-  target_link_directories(u8idlint PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  #target_link_directories(u8idlint PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   target_link_libraries(u8idlint ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
 endif()
 include_directories(BEFORE
@@ -207,12 +217,12 @@ if(NOT CMAKE_CROSSCOMPILING)
     add_test(mkc23 ./mkc23)
   else()
     # cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
-    target_link_directories(u8idtest PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+    #target_link_directories(u8idtest PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
     target_link_libraries(u8idtest ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
     #target_link_directories(test-texts PRIVATE ${LIBPATH})
     #target_link_directories(mkc23 PRIVATE ${LIBPATH})
-    #target_link_libraries(test-texts ${LINKFLAGS})
-    #target_link_libraries(mkc23 ${LINKFLAGS})
+    #target_link_libraries(test-texts u8ident.lib)
+    #target_link_libraries(mkc23 u8ident.lib)
   endif(NOT MSVC)
 endif(NOT CMAKE_CROSSCOMPILING)
 

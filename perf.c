@@ -51,6 +51,11 @@ uint64_t tbase = 0UL; // time to run the loop with empty payload
 #if defined(_MSC_VER)
 #  define timer_start() __rdtsc()
 #  define timer_end() __rdtsc()
+#  if (SIZEOF_SIZE_T == 8)
+#    pragma intrinsic (_BitsScanForward64)
+#  else
+#    pragma intrinsic (_BitsScanForward)
+#  endif
 #else
 // see
 // https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/ia-32-ia-64-benchmark-code-execution-paper.pdf
@@ -206,6 +211,15 @@ static struct sc *eytzinger_search(const uint32_t cp, const char *elist,
   }
 #  ifdef HAVE___BUILTIN_FFS
   k >>= __builtin_ffs(~k);
+#  elif (_MSC_VER)
+  unsigned long index;
+  if
+#    if (SIZEOF_SIZE_T == 8)
+  (_BitsScanForward64(&index, ~k))
+#    else
+  (_BitsScanForward(&index, ~k))
+#    endif
+    k >>= index;
 #  else
 #    error no __builtin_ffs
 #  endif

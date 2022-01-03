@@ -10,17 +10,25 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <sys/types.h>
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
 #endif
 #ifdef HAVE_DIRENT_H
 #  include <dirent.h>
 #endif
-#ifdef _WIN32
-#  include <direct.h>
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
+#  include <dirent.h>
 #endif
-#include <libgen.h>
+#ifdef _MSC_VER
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+#endif
+#ifdef HAVE_LIBGEN_H
+#  include <libgen.h>
+#endif
 
 #include "u8ident.h"
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
@@ -218,7 +226,12 @@ int main(int argc, char **argv) {
                                                    mark_croar_bin_len);
 #endif
 
-#if !defined _WIN32 && defined HAVE_SYS_STAT_H
+  if (getenv("U8IDTEST_TEXTS"))
+    dirname = getenv("U8IDTEST_TEXTS");
+  else if (argc == 2)
+    dirname = argv[2];
+
+#if !defined _MSC_VER && defined HAVE_SYS_STAT_H
   if (argc > 1 && stat(argv[1], &st) == 0) {
     testdir(NULL, argv[1]);
     u8ident_free();
@@ -229,9 +242,6 @@ int main(int argc, char **argv) {
   }
 #endif
 
-  if (getenv("U8IDTEST_TEXTS")) {
-    dirname = getenv("U8IDTEST_TEXTS");
-  }
   DIR *dir = opendir(dirname);
   if (!dir) {
     perror("opendir");
