@@ -252,7 +252,7 @@ API
 
 **u8id_options** is the sum of the following bits:
 
-enum u8id_norm:
+enum u8id_norm: [TR15](http://www.unicode.org/reports/tr15/)
 
     U8ID_NFC  = 0  // the default, shortest canonical composed normalization
     U8ID_NFD  = 1  // the longer, decomposed normalization
@@ -261,7 +261,7 @@ enum u8id_norm:
     U8ID_FCD  = 4, // the faster variants
     U8ID_FCC  = 5, //
 
-enum u8id_profile:
+enum u8id_profile: [TR39](http://www.unicode.org/reports/tr39/)
 
     U8ID_PROFILE_1 = 1      // ASCII only
     U8ID_PROFILE_2 = 2      // Single Script only
@@ -272,7 +272,7 @@ enum u8id_profile:
     U8ID_PROFILE_C11_6 = 7, // "C11STD"
     U8ID_PROFILE_C23_4 = 8, // 4 + Greek with only Allowed ID's ("SAFEC23")
 
-enum u8id_options:
+enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
 
     U8ID_TR31_ALLOWED = 64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
     U8ID_TR31_ID = 65,      // tr31 variants
@@ -317,7 +317,7 @@ Changes to the context generated with `u8ident_new_ctx`.
 
 Adds the script to the context, if it's known or declared
 beforehand. Such as `use utf8 "Greek";` in cperl, or a
-`#pragma unicode Braille` in some C to add some Limited_Use scripts.
+`#pragma unicode Braille` in some C to add some Excluded scripts.
 
 `int u8ident_free_ctx (u8id_ctx_t ctx)`
 
@@ -451,8 +451,9 @@ The character to script lookup is done with a sorted list of ranges,
 for less space.  This is also generated from the current UCD.  The
 internally used script indices are arbitrarily created via
 `mkscripts.pl` from the current UCD, sorted into *Recommended Scripts*
-(sorted by codepoints), *Not Recommended Scripts* (sorted
-alphabetically) and *Limited Use Scripts* (sorted by codepoint).
+(sorted by codepoints), *Not Recommended Scripts*, i.e. *Excluded
+Scripts* (sorted alphabetically) and *Limited Use Scripts* (sorted by
+codepoint).
 
 With `-DDISABLE_CHECK_XID` and `-DENABLE_CHECK_XID` we can use the
 shorter `nonxid_script_list[]`, as we know that only valid XID's are
