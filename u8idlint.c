@@ -654,10 +654,10 @@ int main(int argc, char **argv) {
   while (i < argc) {
     if (file_exists(argv[i])) {
       ret |= testfile(".", argv[i]);
-    } else {
-      if (dir_exists(".", argv[i]))
+    } else if (dir_exists(".", argv[i])) {
         dirname = argv[i];
-      ret |= process_dir(dirname, ext);
+    } else {
+      fprintf(stderr, "Invalid arg %s\n", argv[i]);
     }
     i++;
   }
