@@ -194,9 +194,12 @@ int testdir(const char *dir, const char *fname) {
         const char *scripts = u8ident_existing_scripts(ctx);
         printf("%s: %s (%s", word, errstr(ret), scripts);
         if (ret < 0) {
-          uint32_t cp = u8ident_failed_char(ctx);
-          printf(" + U+%X %s)!\n", cp,
-                 u8ident_script_name(u8ident_get_script(cp)));
+          const uint32_t cp = u8ident_failed_char(ctx);
+          const uint8_t scr = u8ident_get_script(cp);
+          if (scr != SC_Unknown)
+            printf(" + U+%X %s)!\n", cp, u8ident_script_name(scr));
+          else
+            printf(" + U+%X)!\n", cp);
         } else
           printf(")\n");
         free((char *)scripts);

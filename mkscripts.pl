@@ -323,6 +323,9 @@ while (<$NORMP>) {
 }
 close $NORMP;
 
+# @SCR bug
+push @SCR, [0x1e00, 0x1eff, 'Latin'];
+
 # sort the scripts by ->from
 @SCR = sort { $a->[0] <=> $b->[0] } @SCR;
 @SCXR = sort { $a->[0] <=> $b->[0] } @SCXR;

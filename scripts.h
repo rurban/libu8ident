@@ -384,7 +384,7 @@ extern const char *const all_scripts[161];
 // non-codepoints. Not needed with U8ID_CHECK_XID or when the parser checks
 // all XID's properly.
 #  ifdef EXT_SCRIPTS
-extern const struct sc xid_script_list[949];
+extern const struct sc xid_script_list[950];
 #  else
 const struct sc xid_script_list[] = {
     // clang-format off
@@ -728,6 +728,7 @@ const struct sc xid_script_list[] = {
     {0x1D79, 0x1DBE, 2},	// Latin
     {0x1DBF, 0x1DC1, 11},	// Greek
     {0x1DFA, 0x1DFA, 153},	// Syriac
+    {0x1E00, 0x1EFF, 2},	// Latin
     {0x1F00, 0x1F15, 11},	// Greek
     {0x1F18, 0x1F1D, 11},	// Greek
     {0x1F20, 0x1F45, 11},	// Greek
@@ -1338,7 +1339,7 @@ const struct sc xid_script_list[] = {
     {0xE0020, 0xE007F, 0},	// Common
     {0xE0100, 0xE01EF, 1},	// Inherited
     // clang-format on
-}; // 817 ranges, 132 single codepoints
+}; // 818 ranges, 132 single codepoints
 #  endif
 #endif // DISABLE_CHECK_XID
 // The fast variant with U8ID_CHECK_XID. No holes for non-identifiers or

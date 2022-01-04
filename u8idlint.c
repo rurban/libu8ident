@@ -395,9 +395,12 @@ int testfile(const char *dir, const char *fname) {
           if (quiet)
             printfile(dir, fname);
           printf("  %s: %s (%s", word, errstr(ret), scripts);
-          uint32_t cp = u8ident_failed_char(c);
-          printf(" + U+%X %s)!\n", cp,
-                 u8ident_script_name(u8ident_get_script(cp)));
+          const uint32_t cp = u8ident_failed_char(c);
+          const uint8_t scr = u8ident_get_script(cp);
+          if (scr != SC_Unknown)
+            printf(" + U+%X %s)!\n", cp, u8ident_script_name(scr));
+          else
+            printf(" + U+%X)!\n", cp);
         } else if (verbose && !quiet) {
           printf("  %s: %s (%s)\n", word, errstr(ret), scripts);
         }

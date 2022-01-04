@@ -1,5 +1,4 @@
 #!/bin/sh
 set -e
-U8IDTEST_TEXTS="@top_srcdir@/texts"
-@LTEXEC@ ./test-texts@EXEEXT@ > texts.tst && \
-  diff texts.tst @top_srcdir@/texts/result.lst && rm texts.tst
+U8IDTEST_TEXTS="@top_srcdir@/texts" @LTEXEC@ ./test-texts@EXEEXT@ > texts.tst && \
+  diff "@top_srcdir@/texts/result.lst" texts.tst && rm texts.tst

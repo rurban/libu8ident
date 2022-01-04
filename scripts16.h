@@ -371,6 +371,7 @@ const struct sc16 xid_script_list16[] = {
     {0x1D79, 0x1DBE, 2},	// Latin
     {0x1DBF, 0x1DC1, 11},	// Greek
     {0x1DFA, 0x1DFA, 153},	// Syriac
+    {0x1E00, 0x1EFF, 2},	// Latin
     {0x1F00, 0x1F15, 11},	// Greek
     {0x1F18, 0x1F1D, 11},	// Greek
     {0x1F20, 0x1F45, 11},	// Greek
@@ -581,9 +582,9 @@ const struct sc16 xid_script_list16[] = {
     {0xFFE8, 0xFFEE, 0},	// Common
     {0xFFF9, 0xFFFD, 0},	// Common
     // clang-format on
-}; // 465 ranges, 84 single codepoints
+}; // 466 ranges, 84 single codepoints
 #  else
-extern const struct sc16 xid_script_list16[549];
+extern const struct sc16 xid_script_list16[550];
 #  endif
 
 #  ifndef EXT_SCRIPTS

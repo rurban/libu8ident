@@ -420,8 +420,8 @@ egymással.: EOK (Latin)
 -- texts/igbo-1.txt
 Igbo: EOK (Latin)
 A: EOK (Latin)
-mụrụ: ERR_SCRIPT (Latin + U+1EE5 (null))!
-mmadụ: ERR_SCRIPT (Latin + U+1EE5 (null))!
+mụrụ: EOK (Latin)
+mmadụ: EOK (Latin)
 niile: EOK (Latin)
 nweere: EOK (Latin)
 onwe: EOK (Latin)
@@ -435,18 +435,18 @@ Enyere: EOK (Latin)
 ha: EOK (Latin)
 uche: EOK (Latin)
 na: EOK (Latin)
-akọ: ERR_SCRIPT (Latin + U+1ECD (null))!
+akọ: EOK (Latin)
 na: EOK (Latin)
 uche: EOK (Latin)
 ma: EOK (Latin)
-kwesị: ERR_SCRIPT (Latin + U+1ECB (null))!
-ịkpakọrịta: ERR_SCRIPT (Latin + U+1ECB (null))!
+kwesị: EOK (Latin)
+ịkpakọrịta: EOK (Latin)
 ibe: EOK (Latin)
 ha: EOK (Latin)
 n'ime: EOK (Latin)
-mmụọ: ERR_SCRIPT (Latin + U+1EE5 (null))!
+mmụọ: EOK (Latin)
 nke: EOK (Latin)
-ụmụnna.: ERR_SCRIPT (Latin + U+1EE5 (null))!
+ụmụnna.: EOK (Latin)
 -- texts/japanese-1.txt
 日本語の台本: EOK (Han, Hiragana)
 すべての人間は自由に生まれ: EOK (Han, Hiragana)
@@ -873,27 +873,27 @@ etmelidirler.: EOK (Latin)
 کرنا: EOK (Arabic)
 چاہیے: EOK (Arabic)
 -- texts/vietnamese-1.txt
-Chữ: ERR_SCRIPT (Latin + U+1EEF (null))!
-quốc: ERR_SCRIPT (Latin + U+1ED1 (null))!
-ngữ: ERR_SCRIPT (Latin + U+1EEF (null))!
-Tất: ERR_SCRIPT (Latin + U+1EA5 (null))!
-cả: ERR_SCRIPT (Latin + U+1EA3 (null))!
+Chữ: EOK (Latin)
+quốc: EOK (Latin)
+ngữ: EOK (Latin)
+Tất: EOK (Latin)
+cả: EOK (Latin)
 con: EOK (Latin)
-người: ERR_SCRIPT (Latin + U+1EDD (null))!
+người: EOK (Latin)
 sinh: EOK (Latin)
 ra: EOK (Latin)
-đều: ERR_SCRIPT (Latin + U+1EC1 (null))!
-tự: ERR_SCRIPT (Latin + U+1EF1 (null))!
+đều: EOK (Latin)
+tự: EOK (Latin)
 do: EOK (Latin)
 bình: EOK (Latin)
-đẳng: ERR_SCRIPT (Latin + U+1EB3 (null))!
-về: ERR_SCRIPT (Latin + U+1EC1 (null))!
+đẳng: EOK (Latin)
+về: EOK (Latin)
 nhân: EOK (Latin)
-phẩm: ERR_SCRIPT (Latin + U+1EA9 (null))!
+phẩm: EOK (Latin)
 và: EOK (Latin)
-quyền.: ERR_SCRIPT (Latin + U+1EC1 (null))!
-Họ: ERR_SCRIPT (Latin + U+1ECD (null))!
-được: ERR_SCRIPT (Latin + U+1EE3 (null))!
+quyền.: EOK (Latin)
+Họ: EOK (Latin)
+được: EOK (Latin)
 phú: EOK (Latin)
 cho: EOK (Latin)
 lý: EOK (Latin)
@@ -904,11 +904,11 @@ tâm: EOK (Latin)
 và: EOK (Latin)
 nên: EOK (Latin)
 hành: EOK (Latin)
-động: ERR_SCRIPT (Latin + U+1ED9 (null))!
-với: ERR_SCRIPT (Latin + U+1EDB (null))!
+động: EOK (Latin)
+với: EOK (Latin)
 nhau: EOK (Latin)
 trong: EOK (Latin)
 tinh: EOK (Latin)
-thần: ERR_SCRIPT (Latin + U+1EA7 (null))!
+thần: EOK (Latin)
 anh: EOK (Latin)
 em.: EOK (Latin)
