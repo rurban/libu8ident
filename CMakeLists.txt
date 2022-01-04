@@ -1,14 +1,14 @@
 project(libu8ident C)
 cmake_minimum_required(VERSION 2.9)
-# Supported options -DU8ID_NORM=NFC,NFKC,NFD,NFKD
-#                   -DU8ID_PROFILE=2,3,4,5,6,C11_4,C11_6
-#                   -DU8ID_CHECK_XID=On,Off
+# Supported options:
+#  -DBUILD_SHARED_LIBS=ON,OFF
+#  -DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD
+#  -DLIBU8IDENT_PROFILE=2,3,4,5,6,C23_4,C11_6
+#  -DENABLE_CHECK_XID=On
+#  -DDISABLE_CHECK_XID=On
+#  -DHAVE_CONFUS=ON
+#  -DHAVE_CROARING=ON
 # for smaller builds and lib.
-
-if(MSVC)
-    # Disable some overly strict MSVC warnings.
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -wd4244 -wd4800 -wd4805 -D_CRT_SECURE_NO_WARNINGS")
-endif()
 
 if (EXISTS ".version")
     file(READ .version NL_PACKAGE_VERSION)
@@ -60,14 +60,15 @@ if(CMAKE_MAJOR_VERSION GREATER 2)
 endif()
 add_definitions(-DHAVE_CONFIG_H)
 
-# Supported options:
-#  -DBUILD_SHARED_LIBS=ON,OFF
-#  -DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD
-#  -DLIBU8IDENT_PROFILE=2,3,4,5,6,C23_4,C11_6
-#  -DENABLE_CHECK_XID=On
-#  -DDISABLE_CHECK_XID=On
-#  -DHAVE_CONFUS=ON
-#  -DHAVE_CROARING=ON
+if(MSVC)
+    # Disable some overly strict MSVC warnings.
+    add_compile_options(-wd4244 -wd4800 -wd4805 -D_CRT_SECURE_NO_WARNINGS)
+endif()
+if(MINGW) # WINDOWS AND CMAKE_COMPILER_IS_GNUCC
+    add_compile_options(-fstack-protector)
+    add_link_options(-fstack-protector)
+endif()
+
 option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
 option(LIBU8IDENT_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
 option(LIBU8IDENT_PROFILE "force a single profile: 2-6,C23_4,C11_6" OFF)
@@ -110,7 +111,7 @@ else()
 endif()
 
 set(libu8ident_DOCS
-    README.md c11.md NOTICE LICENSE)
+    README.md c11.md c23++proposal.md NOTICE LICENSE)
 
 set(libu8ident_HEADERS
     include/u8ident.h)
@@ -128,7 +129,7 @@ endif()
 
 set(private_HEADERS
   scripts.h
-  config.h
+  config.h.in
   u8idscr.h
   u8idroar.h
   u8id_private.h
@@ -185,7 +186,7 @@ target_include_directories(u8ident PUBLIC
 if (CRoaring_FOUND)
   add_executable(perf perf.c u8idroar.c)
   set_source_files_properties(perf.c
-      PROPERTIES COMPILE_FLAGS "-DPERF_TEST -DHAVE___BUILTIN_FFS")
+      PROPERTIES COMPILE_FLAGS "-DPERF_TEST")
 endif()
 
 # cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
@@ -228,14 +229,22 @@ endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(
   clang-format
-  COMMAND clang-format -i ${CMAKE_CURRENT_SOURCE_DIR}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-                          ${CMAKE_CURRENT_SOURCE_DIR}/scripts.h ${CMAKE_CURRENT_SOURCE_DIR}/u8id*.h)
+  COMMAND clang-format -i
+      ${CMAKE_CURRENT_SOURCE_DIR}/*.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/confus.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/u8id*.h)
 
 add_custom_target(
   regen-scripts
   COMMAND wget -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
   COMMAND wget -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
   COMMAND wget -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
+  COMMAND wget -N https://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
+  COMMAND wget -N https://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
+  COMMAND wget -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
+  COMMAND wget -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
   COMMAND perl mkscripts.pl
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
