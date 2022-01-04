@@ -47,7 +47,7 @@ endif
 #OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
-DOCS = README.md NOTICE LICENSE
+DOCS = README.md NOTICE LICENSE c23++proposal.html c23++proposal.md c11.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
 MAN = $(MAN1) $(MAN3)
@@ -221,6 +221,8 @@ regen-scripts:
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
+c23++proposal.html: c23++proposal.md
+	-markdown c23++proposal.md >$@
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h u8id*.h

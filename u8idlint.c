@@ -231,7 +231,7 @@ static void usage(void) {
   puts("    allowed   tr31 with only recommended scripts, IdentifierStatus");
   puts("    id        all letters. plus numbers, punctuations and combining "
        "marks");
-  puts("    xid       id plus NFKC quirks");
+  puts("    xid       stable id subset, no NFKC quirks");
   puts("    c11       some AltId unicode ranges from C11");
   puts("    allutf8   allow all >128. e.g. php, nim, crystal");
   // see below for recognized extensions

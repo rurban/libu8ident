@@ -25,7 +25,7 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md
+doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.html
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h mark.h unic11.h scripts16.h
@@ -99,7 +99,9 @@ regen-scripts:
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
-regen-all: regen-scripts regen-norm regen-confus regen-man
+c23++proposal.html: $(srcdir)/c23++proposal.md
+	-markdown $(srcdir)/c23++proposal.md >$@
+regen-all: regen-scripts regen-norm regen-confus regen-man c23++proposal.html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man
 
@@ -196,7 +198,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 c11-all.h c23-safe.h
+DISTCLEANFILES = config.log u8ident.3 c11-all.h c23-safe.h c23++proposal.html
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
