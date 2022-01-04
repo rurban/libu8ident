@@ -13,10 +13,12 @@ jobs:
       matrix:
         CFLAGS:
           -
-          - -DU8ID_NORM=NFD
-          - -DDISABLE_CHECK_XID 
-          - -DENABLE_CHECK_XID
           - -march=native -Wall -Wextra -O2
+          - -march=native -O3 -flto
+          - -m32
+        CC:
+          - gcc
+          - clang
     steps:
     - uses: actions/checkout@v2
       with:
@@ -27,8 +29,8 @@ jobs:
     - run: make V=1
     - run: make V=1 check || (cat test-suite.log; false)
     - run: make V=1 check-all
-    - if: matrix.CFLAGS == ''
-      run: make distcheck && ./test-all-fast.sh
+    - if: matrix.CFLAGS == '' && matrix.CC == 'clang'
+      run: make distcheck && make check-all-combinations
   macOS:
     name: macOS
     runs-on: macOS-latest

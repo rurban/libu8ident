@@ -38,15 +38,15 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
 #if defined U8ID_NORM
     // only one is allowed, else fail
 #  if U8ID_NORM == NFD
-  if (!((norm != U8ID_NFD || norm != U8ID_FCD)))
+  if (norm != U8ID_NFD)
     return -1;
 #  endif
 #  if U8ID_NORM == NFC
-  if (!((norm == U8ID_NFD || norm == U8ID_FCD || norm == U8ID_NFC)))
+  if (norm != U8ID_NFC)
     return -1;
 #  endif
 #  if U8ID_NORM == NFKC
-  if (!((norm != U8ID_NFKD || norm != U8ID_NFKC)))
+  if (norm != U8ID_NFKC)
     return -1;
 #  endif
 #  if U8ID_NORM == NFKD
@@ -107,13 +107,13 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   char *s = (char *)buf;
   const char *e = (char *)&buf[len];
   bool need_normalize = false;
+  struct ctx_t *ctx = u8ident_ctx();
   // char scx[32]; // combination of all scx
   // scx[0] = '\0';
   //  check mixed scripts
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
     if (unlikely(!cp)) {
-      struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
       return U8ID_ERR_ENCODING; // not well-formed UTF-8
     }
@@ -127,14 +127,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #  endif
     {
       if (unlikely(!u8ident_is_allowed(cp))) {
-        struct ctx_t *ctx = u8ident_ctx();
         ctx->last_cp = cp;
         return U8ID_ERR_XID;
       }
     }
 #endif
     if (unlikely(s_u8id_profile == U8ID_PROFILE_1 && cp > 127)) {
-      struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
       return U8ID_ERR_XID;
     }
@@ -168,7 +166,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
                  s_u8id_profile != U8ID_PROFILE_6 &&
                  s_u8id_profile != U8ID_PROFILE_C11_6)) {
-      struct ctx_t *ctx = u8ident_ctx();
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
     }
@@ -177,7 +174,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       need_normalize = u8ident_maybe_normalized(cp);
     }
 
-    struct ctx_t *ctx = u8ident_ctx();
     // disallow bidi formatting
     if (unlikely(ctx->is_rtl && u8ident_is_bidi(cp))) {
       ctx->last_cp = cp;
@@ -307,8 +303,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);
-    if (!norm || strcmp(norm, buf))
+    if (!norm || strcmp(norm, buf)) {
+      ctx->last_cp = 0;
       ret = U8ID_EOK_NORM | ret;
+    }
     if (outnorm)
       *outnorm = norm;
     else

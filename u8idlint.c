@@ -330,7 +330,7 @@ int testfile(const char *dir, const char *fname) {
       bool iscont = (*id_cont)(cp);
       bool isword = prev_isword ? ((*id_start)(cp) || iscont) : (*id_start)(cp);
       char force_break = (prev_isword != isword && !iscont);
-      if (wp - word + (s - olds) > maxlen) {
+      if (wp - word + (s - olds) > (signed)maxlen) {
         force_break = true;
         skip = true;
       }

@@ -30,15 +30,15 @@ HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h mark.h unic11.h scripts16.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
-        texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
-        texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
-        texts/bengali-1.txt       texts/gujarati-1.txt   texts/korean-2.txt     texts/swedish-1.txt \
-        texts/bopomofo-1.txt      texts/hebrew-1.txt     texts/lao-1.txt        texts/tamil-1.txt \
-        texts/bulgarian-1.txt     texts/hindi-1.txt      texts/latin-1.txt      texts/telugu-1.txt \
-        texts/chinese-s-1.txt     texts/hungarian-1.txt  texts/malayalam-1.txt  texts/thai-1.txt \
-        texts/chinese-trad-1.txt  texts/igbo-1.txt       texts/marathi-1.txt    texts/turkish-1.txt \
-        texts/cyrillic-1.txt      texts/japanese-1.txt   texts/myanmar-1.txt    texts/urdu-1.txt \
-        texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt \
+	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
+	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
+	texts/bengali-1.txt       texts/gujarati-1.txt   texts/korean-2.txt     texts/swedish-1.txt \
+	texts/bopomofo-1.txt      texts/hebrew-1.txt     texts/lao-1.txt        texts/tamil-1.txt \
+	texts/bulgarian-1.txt     texts/hindi-1.txt      texts/latin-1.txt      texts/telugu-1.txt \
+	texts/chinese-s-1.txt     texts/hungarian-1.txt  texts/malayalam-1.txt  texts/thai-1.txt \
+	texts/chinese-trad-1.txt  texts/igbo-1.txt       texts/marathi-1.txt    texts/turkish-1.txt \
+	texts/cyrillic-1.txt      texts/japanese-1.txt   texts/myanmar-1.txt    texts/urdu-1.txt \
+	texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt \
 	texts/arabic-1.c          texts/math-1.c         texts/bidi-sec-1.c     texts/bidi-sec-2.c \
 	texts/bidi-sec-3.c        texts/homo-1.c         texts/nfc-1.c          texts/nfkc-1.c \
 	texts/bidi-sec-1.tst      texts/bidi-sec-2.tst   texts/homo-1-p4.tst
@@ -157,30 +157,50 @@ check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 # clang has no -Wno-return-local-addr
 check-norms:
 	for n in NFKC NFC FCC NFKD NFD FCD; do \
-            echo $$n; \
-            $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors -c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
-            ls -gGh u8idnorm.o; \
-        done
+		echo $$n; \
+		$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors \
+		  -c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
+		ls -gGh u8idnorm.o; \
+	done
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6 C11_6 C23_4; do \
-            echo PROFILE_$${n}; \
+	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile; \
-        done
+	done
 	for n in SAFEC23 C11STD; do \
-            echo PROFILE_$${n}; \
+	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile; \
-        done
+	done
 check-xid: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in DISABLE ENABLE; do \
-            echo $${n}_CHECK_XID; \
+	    echo $${n}_CHECK_XID; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-xid$(EXEEXT) && \
 	    ./test-xid$(EXEEXT) xid; \
-        done
+	done
+check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
+	for n in NFKC NFC NFKD NFD FCD FCC; do \
+	  for p in 2 3 4 5 6 C11_6 C23_4; do \
+	    for x in DDISABLE_CHECK_XID DENABLE_CHECK_XID UIGNORE; do \
+	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -$${x}"; \
+	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -$${x} \
+		-Wfatal-errors $(srcdir)/test.c \
+		$(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
+		$(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
+	      ./test-profiles$(EXEEXT); \
+	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -$${x} \
+		-O2 -fsanitize=address \
+		$(srcdir)/test.c $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
+		$(srcdir)/u8idroar.c -o test-asan$(EXEEXT) && \
+	      ./test-asan$(EXEEXT); \
+	    done; \
+	  done; \
+	done; \
+	rm ./test-asan$(EXEEXT) ./test-profiles$(EXEEXT);
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
 SCAN_BUILD = scan-build
@@ -217,4 +237,3 @@ LIBTOOL_DISTCLEAN_FILES = \
 	m4/ltversion.m4 \
 	m4/lt~obsolete.m4 \
 	test-texts.test
-

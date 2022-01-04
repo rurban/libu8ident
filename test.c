@@ -144,15 +144,19 @@ static char *xstr(const char *s) {
 
 static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
   if (ret != wanted) {
+    if (ret == U8ID_EOK_NORM) {
+      printf("ERROR %s in profile %u, expected %s.\n", // print hexstr diff?
+             errstr(ret), u8ident_profile(), errstr(wanted));
+      return;
+    }
     const char *scripts = u8ident_existing_scripts(ctx);
-    if (ret) {
+    if (ret)
       printf("ERROR %s U+%X %s in profile %u, expected %s. Have scripts: %s\n",
              u8ident_failed_script_name(ctx), u8ident_failed_char(ctx),
              errstr(ret), u8ident_profile(), errstr(wanted), scripts);
-    } else {
+    else
       printf("ERROR %s in profile %u, expected %s. Have scripts: %s\n",
              errstr(ret), u8ident_profile(), errstr(wanted), scripts);
-    }
     free((void *)scripts);
   }
 }
@@ -491,14 +495,20 @@ void test_mixed_scripts_with_ctx(void) {
   assert(!u8ident_init(u8ident_profile(), u8ident_norm(), u8ident_options()));
   ctx = u8ident_new_ctx();
   assert(ctx == 1);
-  ret = u8ident_check((const uint8_t *)"ѝ", NULL);
-  CHECK_RET(ret, U8ID_EOK, ctx); // Cyrillic alone
+  ret = u8ident_check((const uint8_t *)"ѝ", NULL); // Cyrillic alone
+#if (U8ID_NORM == NFD || U8ID_NORM == NFKD) && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
+  CHECK_RET(ret, U8ID_EOK_NORM, ctx);
+#else
+  CHECK_RET(ret, U8ID_EOK, ctx);
+#endif
   assert(u8ident_free_ctx(ctx) == 0);
 
   // back to old ctx 0 (which has latin already)
   ret = u8ident_check((const uint8_t *)"abͻώ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0); // Latin + Greek disallowed in 2-4
+#elif defined(U8ID_NORM) && U8ID_NORM == NFKD
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // Latin + Greek
   // assert(ret >= 0); // Latin + Greek
@@ -506,7 +516,7 @@ void test_mixed_scripts_with_ctx(void) {
 
   ctx = u8ident_new_ctx(); // new ctx
   ret = u8ident_check((const uint8_t *)"\xf0\x91\x8c\x81", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 6
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C23_4
   CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+11301 Grantha is excluded
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // 6 allows even these
