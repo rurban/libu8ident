@@ -34,12 +34,13 @@ enum u8id_options {
   //  Note: The parser/tokenizer should do that. Without, the checker can be
   //  faster.
   //  Can be disallowed with --disable-check-xid
-  U8ID_TR31_ALLOWED =
-      64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
-  U8ID_TR31_ID = 65, // tr31 variants
-  U8ID_TR31_XID = 66,
-  U8ID_TR31_C11 = 67,
-  U8ID_TR31_ALLUTF8 = 68,
+  //  hardcoded with --enable-check-xid.
+  U8ID_TR31_ALLOWED = 64, // The UCD IdentifierStatus.txt
+  U8ID_TR31_SAFEC23 = 65, // XID without Limited_Use and Excluded Scripts
+  U8ID_TR31_ID = 66,      // The usual tr31 variants
+  U8ID_TR31_XID = 67,     // without NFKC quirks, labelled stable
+  U8ID_TR31_C11 = 68,     // See C11 Annex D for the ranges
+  U8ID_TR31_ALLUTF8 = 69,
   // room for more tr31 profiles
 
   U8ID_FOLDCASE = 128,

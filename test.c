@@ -22,6 +22,7 @@
 #endif
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
+#define strEQc(s1, s2) !strcmp((s1), s2 "")
 static char buf[128]; // for hex display
 
 // private access
@@ -165,11 +166,11 @@ static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
 void test_script(void) {
   int ctx = u8ident_new_ctx();
   // first in a range 0x0388 .. 0x03E1
-  assert(strcmp(u8ident_script_name(u8ident_get_script(0x388)), "Greek") == 0);
+  assert(strEQc(u8ident_script_name(u8ident_get_script(0x388)), "Greek"));
   // middle
-  assert(strcmp(u8ident_script_name(u8ident_get_script(0x3BB)), "Greek") == 0);
+  assert(strEQc(u8ident_script_name(u8ident_get_script(0x3BB)), "Greek"));
   // last
-  assert(strcmp(u8ident_script_name(u8ident_get_script(0x3E1)), "Greek") == 0);
+  assert(strEQc(u8ident_script_name(u8ident_get_script(0x3E1)), "Greek"));
   // U+3BB Greek
   int ret = u8ident_check((const uint8_t *)"λ2", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek only
@@ -183,7 +184,7 @@ void test_script(void) {
   CHECK_RET(ret, U8ID_EOK, ctx);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   s = u8ident_existing_scripts(ctx);
-  assert(strcmp(s, "Greek, Latin") == 0);
+  assert(strEQc(s, "Greek, Latin"));
   free((char *)s);
 #endif
   assert(u8ident_free_ctx(ctx) == 0);
@@ -290,7 +291,7 @@ void test_norm_nfkc(void) {
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
-  assert(strcmp(norm, "Caf\xc3\xa9") == 0);
+  assert(strEQc(norm, "Caf\xc3\xa9"));
   free(norm);
 }
 #endif
@@ -312,7 +313,7 @@ void test_norm_nfc(void) {
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
-  assert(strcmp(norm, "Caf\xc3\xa9") == 0);
+  assert(strEQc(norm, "Caf\xc3\xa9"));
   free(norm);
 }
 #endif
@@ -351,7 +352,7 @@ void test_norm_nfkd(void) {
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
-  assert(strcmp(norm, "Cafe\xcc\x81") == 0);
+  assert(strEQc(norm, "Cafe\xcc\x81"));
   free(norm);
 }
 #endif
@@ -374,7 +375,7 @@ void test_norm_nfd(void) {
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
-  assert(strcmp(norm, "Cafe\xcc\x81") == 0);
+  assert(strEQc(norm, "Cafe\xcc\x81"));
   free(norm);
 }
 #endif
@@ -495,8 +496,10 @@ void test_mixed_scripts_with_ctx(void) {
   assert(!u8ident_init(u8ident_profile(), u8ident_norm(), u8ident_options()));
   ctx = u8ident_new_ctx();
   assert(ctx == 1);
+  // U+45D
   ret = u8ident_check((const uint8_t *)"ѝ", NULL); // Cyrillic alone
-#if (U8ID_NORM == NFD || U8ID_NORM == NFKD) && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
+  // NFD to U+438,U+300 (d0b8cc800a)
+#if (U8ID_NORM == NFD || U8ID_NORM == NFKD)
   CHECK_RET(ret, U8ID_EOK_NORM, ctx);
 #else
   CHECK_RET(ret, U8ID_EOK, ctx);
@@ -633,12 +636,13 @@ void test_confus(void) {
 #endif
 
 int main(int argc, char **argv) {
-  const int norm = (argc > 1 && !strcmp(argv[1], "norm"));
-  const int profile = (argc > 1 && !strcmp(argv[1], "profile"));
+  int i = 1;
+  const int norm = (argc > i && strEQc(argv[i], "norm") && i++);
+  const int profile = (argc > i && strEQc(argv[i], "profile") && i++);
 #ifndef DISABLE_CHECK_XID
-  const int xid = (argc > 1 && !strcmp(argv[1], "xid"));
+  const int xid = (argc > i && strEQc(argv[i], "xid") && i++);
 #endif
-  const int scx = (argc > 1 && !strcmp(argv[1], "scx"));
+  const int scx = (argc > i && strEQc(argv[i], "scx") && i++);
 
   if (argc == 1) {
     test_scripts_no_init();
@@ -675,14 +679,14 @@ int main(int argc, char **argv) {
 #ifndef DISABLE_CHECK_XID
   if (profile || xid || argc == 1) {
     test_mixed_scripts(U8ID_TR31_ALLOWED);
-  } else
+  }
 #endif
 #ifdef ENABLE_CHECK_XID
-    test_mixed_scripts(U8ID_TR31_ALLOWED);
+  test_mixed_scripts(U8ID_TR31_ALLOWED);
 #endif
 
   test_mixed_scripts_with_ctx();
-  if (scx) {
+  if (scx || argc == 1) {
     test_scx_singles();
     test_add_scripts();
   }

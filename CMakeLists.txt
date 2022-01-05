@@ -210,6 +210,7 @@ if(NOT CMAKE_CROSSCOMPILING)
   if (NOT MSVC)
     add_test(u8idlint.test "${CMAKE_CURRENT_SOURCE_DIR}/u8idlint.test")
     set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
+    # still broken for MSVC
     add_executable(test-texts test-texts.c)
     add_test(test-texts ./test-texts)
     add_executable(mkc23 mkc23.c)

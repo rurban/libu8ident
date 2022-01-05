@@ -24,7 +24,7 @@ enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
 /* Initialize the library with a profile, normalization and a bitmask of
-   options, which define the performed checks. Recommended is
+   enum u8id_options, which define the performed checks. Recommended is
    `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
 */
 EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
@@ -152,13 +152,18 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #endif
 
+    // profile 6 shortcuts: skip all script checks
+    // advance to normalize checks
 #if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
-    continue; // skip all script checks
+    need_normalize = true;
+    goto norm;
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 6 && U8ID_PROFILE != C11_6
 #else
     if (s_u8id_profile == U8ID_PROFILE_6 ||
-        s_u8id_profile == U8ID_PROFILE_C11_6)
-      continue;
+        s_u8id_profile == U8ID_PROFILE_C11_6) {
+      need_normalize = true;
+      goto norm;
+    }
 #endif
 
     const uint8_t scr = u8ident_get_script(cp);
@@ -169,23 +174,21 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
     }
-
-    if (!need_normalize) {
-      need_normalize = u8ident_maybe_normalized(cp);
-    }
-
     // disallow bidi formatting
     if (unlikely(ctx->is_rtl && u8ident_is_bidi(cp))) {
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
     }
+    if (!need_normalize) {
+      need_normalize = u8ident_maybe_normalized(cp);
+    }
 
 #if defined U8ID_PROFILE && U8ID_PROFILE == 5
-    continue; // skip all mixed scripts checks
+    goto ok;
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 5
 #else
     if (s_u8id_profile == U8ID_PROFILE_5)
-      continue; // skip all mixed scripts checks
+      goto ok;
 #endif
     bool is_new = false;
     // check scx on Common or Inherited. keep list of possible scripts, and
@@ -294,12 +297,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
   }
 
-#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
-  need_normalize = true;
-#elif defined U8ID_PROFILE && U8ID_PROFILE != 6 && U8ID_PROFILE != C11_6
-#else
-  if (s_u8id_profile == U8ID_PROFILE_6 || s_u8id_profile == U8ID_PROFILE_C11_6)
-    need_normalize = true;
+#if !defined U8ID_PROFILE || U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6
+ norm:
 #endif
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);
