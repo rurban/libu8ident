@@ -103,7 +103,7 @@ c23++proposal.html: $(srcdir)/c23++proposal.md
 	-markdown $(srcdir)/c23++proposal.md >$@
 regen-all: regen-scripts regen-norm regen-confus regen-man c23++proposal.html
 
-.PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man
+.PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg
 
 EXTRA_PROGRAMS = test
 TESTS = test
@@ -212,6 +212,16 @@ man: $(dist_man1_MANS) $(dist_man3_MANS)
 RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
 u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < $< > $@
+
+pkg:
+	-rm -rf inst
+	$(MAKE) install DESTDIR="`pwd`/inst" prefix=/$(PACKAGE_TARNAME)
+if HAVE_WINDOWS
+	(cd inst && zip ../$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-$(host_triplet).zip -r $(PACKAGE_TARNAME) && cd -)
+else
+	tar cfz $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-$(host_triplet).tar.gz -C inst $(PACKAGE_TARNAME)
+endif
+	rm -rf inst
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) \

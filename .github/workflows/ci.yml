@@ -31,6 +31,18 @@ jobs:
     - run: make V=1 check-all
     - if: matrix.CFLAGS == '' && matrix.CC == 'clang'
       run: make distcheck && make check-all-combinations
+    - name: Prep-Release
+      if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
+      run: make dist pkg && echo ${{ github.sha }} > Release.txt
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          Release.txt
+          libu8ident-*-x86_64-pc-linux-gnu.tar.gz
+          libu8ident-*.tar.gz
+          libu8ident-*.tar.xz
   macOS:
     name: macOS
     runs-on: macOS-latest
@@ -63,6 +75,7 @@ jobs:
         install: >-
           base-devel
           coreutils
+          zip
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-libtool
           mingw-w64-x86_64-perl
@@ -75,12 +88,20 @@ jobs:
       #run: libtoolize -f && aclocal -I m4 && autoconf && automake --add-missing
       continue-on-error: true
     # msys2 is broken for today
-    #- shell: msys2 {0}
-    #  run: ./configure
-    #- shell: msys2 {0}
-    #  run: make
-    #- shell: msys2 {0}
-    #  run: make check
+    - shell: msys2 {0}
+      run: ./configure
+    - shell: msys2 {0}
+      run: make
+    - shell: msys2 {0}
+      run: make check
+    - shell: msys2 {0}
+      run: make pkg
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          libu8ident-*-x86_64-w64-mingw32.zip
   linux-cmake:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -91,7 +112,6 @@ jobs:
     - run: cmake .
     - run: make
     - run: make test
-    - run: sudo make install DESTDIR=`pwd`/inst
   macos-cmake:
     runs-on: macOS-latest
     timeout-minutes: 10
