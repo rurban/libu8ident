@@ -33,13 +33,14 @@ jobs:
       run: make distcheck && make check-all-combinations
     - name: Prep-Release
       if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
-      run: make dist pkg && echo ${{ github.sha }} > Release.txt
+      run: make dist pkg && echo ${{ github.sha }} > Release.txt; sha256sum libu8ident-*-x86_64-pc-linux-gnu.tar.gz > linux.sha256
     - name: Release
       uses: softprops/action-gh-release@v1
       if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
       with:
         files: |
           Release.txt
+          linux.sha256
           libu8ident-*-x86_64-pc-linux-gnu.tar.gz
           libu8ident-*.tar.gz
           libu8ident-*.tar.xz
@@ -95,12 +96,13 @@ jobs:
     - shell: msys2 {0}
       run: make check
     - shell: msys2 {0}
-      run: make pkg
+      run: make pkg; sha256sum libu8ident-*-x86_64-w64-mingw32.zip > mingw.sha256
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
+          mingw.sha256
           libu8ident-*-x86_64-w64-mingw32.zip
   linux-cmake:
     runs-on: ubuntu-latest
