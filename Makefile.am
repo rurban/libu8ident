@@ -68,7 +68,7 @@ check-syntax:
 clang-format:
 	clang-format -i $(srcdir)/*.c $(srcdir)/include/*.h $(srcdir)/scripts.h $(srcdir)/confus.h $(srcdir)/u8id*.h
 
-regen-man: $(bin_PROGRAMS)
+$(dist_man1_MANS) regen-man: $(bin_PROGRAMS)
 	-for p in $(dist_man1_MANS); do \
 	  base=`basename $$p .1`; \
 	  help2man -N -s1 -p $(PACKAGE_NAME) --manual "U8IDENT Manual $(VERSION)" -o $$p ./$$base$(EXEEXT); done
@@ -129,15 +129,18 @@ perf_LDADD = u8idroar.lo
 endif
 TESTS_ENVIRONMENT = U8IDTEST_TEXTS='@top_srcdir@/texts'
 
-test-texts.test: test-texts
+test-texts.test: test-texts$(EXEEXT)
 
 if !HAVE_CROARING
 perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
 endif
 
-c11-all.h c23-safe.h: mkc23
-	./mk23$(EXEXT)
+if !HAVE_WINDOWS
+c11-all.h c23-safe.h: mkc23$(EXEEXT) scripts.h mark.h
+#	./mkc23$(EXEXT)
+#	-mv c11-all.h c23-safe.h $(srcdir)/
+endif
 
 if !HAVE_WINDOWS
 check-all: check check-asan check-norms check-profiles check-xid
@@ -228,8 +231,8 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 c23++proposal.html
-MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html
+MAINTAINERCLEANFILES  = *~ Makefile.in Makefile c11-all.h c23-safe.h
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
 	compile \

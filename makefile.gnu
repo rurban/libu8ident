@@ -18,7 +18,7 @@ WGET := wget
 
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
-HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h
+HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h mark.h unic11.h scripts16.h
 SRC = u8ident.c u8idscr.c u8idnorm.c
 ifeq (${HAVE_CONFUS}, 1)
 SRC += u8idroar.c
@@ -151,7 +151,7 @@ test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
 c11-all.h c23-safe.h: mkc23 scripts.h mark.h
 	./mkc23
-mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS) mark.h
+mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude mkc23.c $(SRC) -o $@
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
@@ -243,17 +243,7 @@ u8idlint.1: u8idlint
 
 dist-bin: $(LIB) $(MAN)
 	-rm -rf $(PKG)
-	-mkdir -p $(PKG)/$(PREFIX)/include
-	-mkdir -p $(PKG)/$(PREFIX)/lib
-	-mkdir -p $(PKG)/$(PREFIX)/bin
-	-mkdir -p $(PKG)/$(PREFIX)/share/doc/libu8ident
-	-mkdir -p $(PKG)/$(PREFIX)/share/man/man3
-	install -m0644 $(HEADER) $(PKG)/$(PREFIX)/include
-	install -m0755 u8idlint $(PKG)/$(PREFIX)/bin
-	install -m0644 $(LIB) $(PKG)/$(PREFIX)/lib
-	install -m0644 $(MAN1) $(PKG)/$(PREFIX)/share/man/man1
-	install -m0644 $(MAN3) $(PKG)/$(PREFIX)/share/man/man3
-	install -m0644 $(DOCS) $(PKG)/$(PREFIX)/share/doc/libu8ident
+	$(MAKE) -f makefile.gnu install DESTDIR="$(PKG)"
 	tar cfz $(PKG_BIN).tar.gz -C $(PKG) .
 	-rm -rf $(PKG)
 
@@ -275,5 +265,5 @@ install: $(LIB) $(MAN)
 	install -m0644 $(LIB) $(DESTDIR)/$(PREFIX)/lib
 	install -m0755 u8idlint $(DESTDIR)/$(PREFIX)/bin
 	install -m0644 $(MAN1) $(DESTDIR)/$(PREFIX)/share/man/man1
-	install -m0644 $(MAN2) $(DESTDIR)/$(PREFIX)/share/man/man3
+	install -m0644 $(MAN3) $(DESTDIR)/$(PREFIX)/share/man/man3
 	install -m0644 $(DOCS) $(DESTDIR)/$(PREFIX)/share/doc/libu8ident
