@@ -2,7 +2,7 @@
    Copyright 2021 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
-   check some files, wordbreak them to valid identifiers in some common scripts.
+   Check some files, wordbreak them to valid identifiers in some common scripts.
 */
 #include "u8id_private.h"
 #include <stdlib.h>
@@ -40,16 +40,14 @@ static roaring_bitmap_t *rmark = NULL;
 #endif
 #include "u8idscr.h"
 #undef EXT_SCRIPTS
+#include "unic11.h"
 #include "mark.h"
-
-#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
 // private access
 unsigned u8ident_options(void);
 unsigned u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
-#ifndef HAVE_CROARING
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
   int n = (int)len;
@@ -77,15 +75,35 @@ static inline bool range_bool_search(const uint32_t cp,
   const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
   return r ? true : false;
 }
-#endif
 
-bool isMARK(uint32_t cp) {
+static inline bool isC11_start(uint32_t cp) {
+  return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
+}
+
+static inline bool isC11_cont(uint32_t cp) {
+  return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
+}
+
+static inline bool isMARK(uint32_t cp) {
 #ifdef HAVE_CROARING
   return roaring_bitmap_contains(rmark, cp);
 #else
   return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
 #endif
 }
+
+#ifdef HAVE_SYS_STAT_H
+static int file_exists(const char *path) {
+  struct stat st;
+  return (stat(path, &st) == 0) && (st.st_mode & S_IFDIR) != S_IFDIR;
+}
+#elif defined _MSC_VER
+static int file_exists(const char *path) {
+  const uint16_t dwAttrib = GetFileAttributes(path);
+  return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+         !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY);
+}
+#endif
 
 static const char *errstr(int errcode) {
   static const char *const _str[] = {
@@ -151,9 +169,9 @@ int testdir(const char *dir, const char *fname) {
       // unicode #29 word-break, but simplified:
       // must not split at continuations (Combining marks). e.g. for
       // texts/arabic-1.txt
-      bool isword = u8ident_is_allowed(cp);
-      bool ismark = isMARK(cp);
-      char force_break = (prev_isword != isword && !ismark);
+      const bool iscont = isC11_cont(cp);
+      bool isword = prev_isword ? (isC11_start(cp) || iscont) : isC11_start(cp);
+      char force_break = (prev_isword != isword && !iscont);
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
       if (force_break != brks[s - olds])
         fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
@@ -220,9 +238,6 @@ int cmp_str(const void *a, const void *b) {
 
 int main(int argc, char **argv) {
   char *dirname = "texts";
-#ifdef HAVE_SYS_STAT_H
-  struct stat st;
-#endif
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
 #ifdef HAVE_CROARING
   rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
@@ -232,10 +247,10 @@ int main(int argc, char **argv) {
   if (getenv("U8IDTEST_TEXTS"))
     dirname = getenv("U8IDTEST_TEXTS");
   else if (argc == 2)
-    dirname = argv[2];
+    dirname = argv[1];
 
 #if !defined _MSC_VER && defined HAVE_SYS_STAT_H
-  if (argc > 1 && stat(argv[1], &st) == 0) {
+  if (argc > 1 && file_exists(argv[1])) {
     testdir(NULL, argv[1]);
     u8ident_free();
 #  ifdef HAVE_CROARING
@@ -245,45 +260,79 @@ int main(int argc, char **argv) {
   }
 #endif
 
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
   DIR *dir = opendir(dirname);
   if (!dir) {
     perror("opendir");
     exit(1);
   }
-
-#ifdef HAVE_DIRENT_H
-  struct dirent *d;
-  int s = 0;
-  // sort the names, to compare against the result
-  while ((d = readdir(dir))) {
-    size_t l = strlen(d->d_name);
-    if (l > 4 && strcmp(&d->d_name[l - 4], ".txt") == 0) {
-      s++;
-    }
-  }
-  rewinddir(dir);
-  const char **files = calloc(s, sizeof(char *));
-  int i = 0;
-  while ((d = readdir(dir))) {
-    size_t l = strlen(d->d_name);
-    if (l > 4 && strcmp(&d->d_name[l - 4], ".txt") == 0) {
-      assert(i < s);
-      files[i] = malloc(strlen(d->d_name) + 1);
-      strcpy((char *)files[i], d->d_name);
-      i++;
-    }
-  }
-  qsort(files, s, sizeof(char *), cmp_str);
 #endif
 
-  for (i = 0; i < s; i++) {
-    // printf("%s\n", files[i]);
-    testdir(dirname, files[i]);
+  const char* const exts[] = {".txt", ".c"};
+  for (size_t j=0; j < ARRAY_SIZE(exts); j++) {
+    const char* ext = exts[j];
+    int s = 0;
+    size_t lext = strlen(ext);
+
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
+    struct dirent *d;
+#  define NEXT_FILE (d = readdir(dir))
+#  define CUR_FILE d->d_name
+#elif defined _MSC_VER
+  WIN32_FIND_DATA FindFileData;
+  HANDLE hdir = FindFirstFile(dirname, &FindFileData);
+  if (hdir == INVALID_HANDLE_VALUE) {
+    perror("FindFirstFile");
+    goto done;
   }
+#  define NEXT_FILE FindNextFile(hdir, &FindFileData)
+#  define CUR_FILE FindFileData.cFileName
+#endif
+   
+    // sort the names, to compare against the result
+    while (NEXT_FILE) {
+      size_t l = strlen(CUR_FILE);
+      if (l > lext && '.' != CUR_FILE[0] && strEQ(&CUR_FILE[l - lext], ext)) {
+        s++;
+      }
+    }
+
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
+    rewinddir(dir);
+#elif defined _MSC_VER
+    FindClose(hdir);
+    hdir = FindFirstFile(dirname, &FindFileData);
+#endif
+
+    const char **files = calloc(s, sizeof(char *));
+    int i = 0;
+    while (NEXT_FILE) {
+      size_t l = strlen(CUR_FILE);
+      if (l > lext && '.' != CUR_FILE[0] && strEQ(&CUR_FILE[l - lext], ext)) {
+        if (i >= s)
+          break;
+        assert(i < s);
+        files[i] = malloc(l + 1);
+        strcpy((char *)files[i], CUR_FILE);
+        i++;
+      }
+    }
+    if (s)
+	qsort(files, s, sizeof(char *), cmp_str);
+    for (i = 0; i < s; i++) {
+      // printf("%s\n", files[i]);
+      testdir(dirname, files[i]);
+    }
+    for (int i = 0; i < s; i++)
+	free((void *)files[i]);
+    free(files);
+  }
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
   closedir(dir);
-  for (i = 0; i < s; i++)
-    free((void *)files[i]);
-  free(files);
+#elif defined _MSC_VER
+  FindClose(hdir);
+#endif
+  
   u8ident_free();
 #ifdef HAVE_CROARING
   roaring_bitmap_free(rmark);

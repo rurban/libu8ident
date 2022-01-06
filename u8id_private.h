@@ -33,6 +33,10 @@
 #  define unlikely(expr) _expect((long)((expr) != 0), 0)
 #endif
 
+#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
+#define strEQ(s1, s2) !strcmp((s1), (s2))
+#define strEQc(s1, s2) !strcmp((s1), s2 "")
+
 #define NFC 0
 #define NFD 1
 #define NFKC 2

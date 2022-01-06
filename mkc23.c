@@ -4,8 +4,6 @@
 
    Create and test a secure variant of C11 identifiers, the SAFEC23 profile:
    * Moderately Restrictive (4), but allow Greek scripts,
-   * Disallow all restricted identifier codepoints as in Table TR10176-4
-     https://www.unicode.org/Public/security/latest/IdentifierStatus.txt,
    * Disallow all Limited_Use and Excluded scripts,
    * Demand NFC normalization.
    See c11.md and c23++proposal.md
@@ -16,17 +14,25 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <sys/types.h>
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
 #endif
 #ifdef HAVE_DIRENT_H
 #  include <dirent.h>
 #endif
-#ifdef _WIN32
-#  include <direct.h>
+#if defined HAVE_DIRENT_H && !defined _MSC_VER
+#  include <dirent.h>
 #endif
-#include <libgen.h>
+#ifdef _MSC_VER
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+#endif
+#ifdef HAVE_LIBGEN_H
+#  include <libgen.h>
+#endif
 
 #include "u8ident.h"
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
@@ -40,8 +46,6 @@ static roaring_bitmap_t *rmark = NULL;
 #undef EXT_SCRIPTS
 #include "unic11.h"
 #include "mark.h"
-
-#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
 // private access
 unsigned u8ident_options(void);
@@ -72,8 +76,7 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
-  const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
-  return r ? true : false;
+  return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
 }
 
 static inline bool isC11_start(uint32_t cp) {
@@ -199,9 +202,12 @@ int testdir(const char *dir, const char *fname) {
         const char *scripts = u8ident_existing_scripts(ctx);
         printf("%s: %s (%s", word, errstr(ret), scripts);
         if (ret < 0) {
-          uint32_t cp = u8ident_failed_char(ctx);
-          printf(" + U+%X %s)!\n", cp,
-                 u8ident_script_name(u8ident_get_script(cp)));
+          const uint32_t cp = u8ident_failed_char(ctx);
+          const uint8_t scr = u8ident_get_script(cp);
+          if (scr != SC_Unknown)
+            printf(" + U+%X %s)!\n", cp, u8ident_script_name(scr));
+          else
+            printf(" + U+%X)!\n", cp);
         } else
           printf(")\n");
         free((char *)scripts);

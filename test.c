@@ -21,8 +21,6 @@
 #  include "confus.h"
 #endif
 
-#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
-#define strEQc(s1, s2) !strcmp((s1), s2 "")
 static char buf[128]; // for hex display
 
 // private access

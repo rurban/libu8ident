@@ -43,10 +43,6 @@
 #include "unic11.h"
 #include "mark.h"
 
-#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
-#define strEQ(s1, s2) !strcmp((s1), (s2))
-#define strEQc(s1, s2) !strcmp((s1), s2 "")
-
 int verbose = 0;
 int quiet = 0;
 int recursive = 0;
