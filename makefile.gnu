@@ -91,7 +91,9 @@ endif
 endif
 endif
 
-all: $(LIB) $(MAN) u8idlint
+most: $(LIB) $(MAN) u8idlint
+
+all: most mkc23 test-texts test perf c23++proposal.html
 
 .c.o:
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c $< -o $@
@@ -147,7 +149,7 @@ test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
-c11-all.h c23-safe.h: mkc23
+c11-all.h c23-safe.h: mkc23 scripts.h mark.h
 	./mkc23
 mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS) mark.h
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude mkc23.c $(SRC) -o $@
