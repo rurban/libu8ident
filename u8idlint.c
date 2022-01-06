@@ -1,5 +1,5 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021 Reini Urban
+   Copyright 2021, 2022 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
    Parts of the chibicc tokenizer.c was used:
@@ -343,7 +343,7 @@ int testfile(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          } else {
+          } else if (wp + l < &word[maxlen - 1]) {
             memcpy(wp, olds, l);
             wp += l;
           }
@@ -356,7 +356,7 @@ int testfile(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          } else {
+          } else if (wp + l < &word[maxlen - 1]) {
             memcpy(wp, olds, l);
             wp += l;
           }

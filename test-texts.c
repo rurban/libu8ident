@@ -1,5 +1,5 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021 Reini Urban
+   Copyright 2021, 2022 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
    Check some files, wordbreak them to valid identifiers in some common scripts.
@@ -185,7 +185,7 @@ int testdir(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          } else {
+          } else if (wp + l < &word[128]) {
             memcpy(wp, olds, l);
             wp += l;
           }
@@ -198,7 +198,7 @@ int testdir(const char *dir, const char *fname) {
           int l = s - olds;
           if (l == 1) {
             *wp++ = *olds;
-          } else {
+          } else if (wp + l < &word[128]) {
             memcpy(wp, olds, l);
             wp += l;
           }
