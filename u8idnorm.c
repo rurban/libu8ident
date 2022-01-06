@@ -252,7 +252,7 @@ static int _decomp_canonical_s(char *dest, size_t dmax, uint32_t cp) {
 #  if defined(__DEBUG)
       printf("U+%04X vi=0x%x (>>12, &fff) => TBL(%d)|%d\n", cp, vi, l, i);
 #  endif
-      assert(l > 0 && l <= 4);
+      assert(l > 0 && l <= UN8IF_canon_MAXLEN);
 #  if 0
             /* 13.0: tbl sizes: (917,763,227,36) */
             /* l: 1-4 */
@@ -905,4 +905,3 @@ EXTERN char *u8ident_normalize(const char *src, int len) {
 #  endif // !(NFD or NFKD)
 #endif   // !FCD
 }
-GCC_DIAG_POP

@@ -127,11 +127,9 @@ struct ctx_t {
 #if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 480)
 #  define GCC_DIAG_PRAGMA(x) _Pragma (#x)
 #  define GCC_DIAG_IGNORE(x)                                                  \
-    _Pragma ("GCC diagnostic push") GCC_DIAG_PRAGMA (GCC diagnostic ignored #x)
-#  define GCC_DIAG_POP _Pragma ("GCC diagnostic pop")
+    GCC_DIAG_PRAGMA (GCC diagnostic ignored #x)
 #else
 #  define GCC_DIAG_IGNORE(w)
-#  define GCC_DIAG_POP
 #endif
 
 enum u8id_norm u8ident_norm(void);
