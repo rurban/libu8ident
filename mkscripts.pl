@@ -739,7 +739,7 @@ extern const struct scx scx_list[%u];
 #endif
 
 #ifndef DISABLE_CHECK_XID
-// Allowed scripts from IdentifierStatus.txt.
+// Allowed scripts from IdentifierStatus.txt. TR 39
 #  ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
     // clang-format off
@@ -889,7 +889,8 @@ extern const struct range_bool xid_start_list[%u];
 extern const struct range_bool xid_cont_list[%u];
 #  endif
 
-// IdentifierType bit-values
+// Identifier_Type bit-values TR 39
+// http://www.unicode.org/reports/tr39
 enum u8id_idtypes {
 EOF
 $i = 1;
@@ -907,12 +908,20 @@ print $H <<"EOF";
 };
 
 //#if 0
-/* IdentifierType
-   Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC,
-   Default_Ignorable, Deprecated
+/* Identifier_Type property TR 39
+   https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1
 
-   Allowed: keep Recommended, Inclusion
-   Maybe allow by request Technical
+   The possible values are:
+   Not_Character, Deprecated, Default_Ignorable, Not_NFKC, Not_XID,
+   Exclusion, Obsolete, Technical, Uncommon_Use, Limited_Use, Inclusion, Recommended
+   See enum u8id_idtypes
+
+   Restricted: Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC,
+               Default_Ignorable, Deprecated, Not_Character
+   Allowed:    Recommended, Inclusion
+   Maybe allow by request: Technical. C23 should include Technical.
+
+   Not_XID, Not_NFKC, Not_Character are not in XID already.
 */
 #  ifndef EXT_SCRIPTS
 const struct range_short idtype_list[] = {

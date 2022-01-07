@@ -3,10 +3,19 @@
    SPDX-License-Identifier: Apache-2.0
 
    Create and test a secure variant of C11 identifiers, the SAFEC23 profile:
-   * Moderately Restrictive (4), but allow Greek scripts,
+   * TR39#5.2 Mixed-Scripts Moderately Restrictive (4), but allow Greek scripts (hence C23_4),
    * Disallow all Limited_Use and Excluded scripts,
+   * Only allow TR 39#1 Recommended, Inclusion, Technical Identifier Type properties,
    * Demand NFC normalization. Reject all composable sequences as ill-formed.
+   * Reject illegal mark sequences (Lm, Mn, Mc) with mixed-scripts (SCX) as ill-formed.
+
    See c11.md and c23++proposal.md
+
+   TODO:
+   List of Lm chars in the resulting list, for c23++proposal 7.3
+   Number of Identifier_Type filtering (before, after).
+   Number of Script filtering (before, after)
+   Number of NFC filtering (before, after)
 */
 #include "u8id_private.h"
 #include <stdlib.h>
