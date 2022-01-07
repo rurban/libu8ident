@@ -202,7 +202,7 @@ uint8_t u8ident_get_script(const uint32_t cp) {
 const char *u8ident_get_scx(const uint32_t cp) {
   const struct scx *scx = (struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
-  return scx ? scx->list : NULL;
+  return scx ? scx->scx : NULL;
 }
 
 bool u8ident_is_bidi(const uint32_t cp) {
@@ -533,9 +533,27 @@ http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 
 Scripts: ignore Latin, Common and Inherited.
 
+Multiple SCX list entries can resolved when the previous scripts in the identifier context
+are already resolved to one or the other possibility. Thus for SCX=(Arab Syrc) we need to
+check if Arabic or Syriac was already seen. If not, the new character with that SCX is illegal,
+violating our Mixed Script profile.
+
 Beware that some Common codes need the scx also.
 Using the Script property alone, for example, will not detect that the
 U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common)
 should not be mixed with Latin. See [UTS39] and [UTS46].
+
+U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK should not continue a Latin
+script run, but instead should only continue runs of Hiragana and Katakana scripts, observing
+the Lm property (Modifier_Letter) and SCX=Hira Kana.
+
+Check for unlikely sequences of **combining marks**:
+
+- Forbid sequences of the same nonspacing mark.
+- Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).
+- Forbid sequences of base character + nonspacing mark that look the
+  same as or confusingly similar to the base character alone (because
+  the nonspacing mark overlays a portion of the base character). An
+  example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE.
 
 */

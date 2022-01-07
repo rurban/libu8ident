@@ -547,8 +547,8 @@ void test_scx_singles(void) {
   struct ctx_t *ctx = u8ident_ctx();
   // uint8_t oldscr = 0;
   for (size_t i = 0; i < ARRAY_SIZE(scx_list); i++) {
-    if (scx_list[i].list && strlen(scx_list[i].list) == 1) {
-      uint8_t scrx = (uint8_t)scx_list[i].list[0];
+    if (scx_list[i].scx && strlen(scx_list[i].scx) == 1) {
+      uint8_t scrx = (uint8_t)scx_list[i].scx[0];
       for (uint32_t j = scx_list[i].from; j <= scx_list[i].from; j++) {
         uint8_t scr = u8ident_get_script(j);
         if (!u8ident_has_script_ctx(scr, ctx)) {

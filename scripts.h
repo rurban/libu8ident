@@ -7,16 +7,371 @@
    UNICODE version 14.0
 */
 
+/* Provide a mapping of the 161 Script properties to an index byte.
+   Sorted into usages.
+ */
+#ifndef EXT_SCRIPTS
+const char *const all_scripts[] = {
+    // clang-format off
+    // Recommended Scripts (not need to add them)
+    // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
+    "Common",	// 0
+    "Inherited",	// 1
+    "Latin",	// 2
+    "Arabic",	// 3
+    "Armenian",	// 4
+    "Bengali",	// 5
+    "Bopomofo",	// 6
+    "Cyrillic",	// 7
+    "Devanagari",	// 8
+    "Ethiopic",	// 9
+    "Georgian",	// 10
+    "Greek",	// 11
+    "Gujarati",	// 12
+    "Gurmukhi",	// 13
+    "Hangul",	// 14
+    "Han",	// 15
+    "Hebrew",	// 16
+    "Hiragana",	// 17
+    "Katakana",	// 18
+    "Kannada",	// 19
+    "Khmer",	// 20
+    "Lao",	// 21
+    "Malayalam",	// 22
+    "Myanmar",	// 23
+    "Oriya",	// 24
+    "Sinhala",	// 25
+    "Tamil",	// 26
+    "Telugu",	// 27
+    "Thaana",	// 28
+    "Thai",	// 29
+    "Tibetan",	// 30
+    // Excluded Scripts (but can be added expliclitly)
+    // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
+    "Ahom",	// 31
+    "Anatolian_Hieroglyphs",	// 32
+    "Avestan",	// 33
+    "Bassa_Vah",	// 34
+    "Bhaiksuki",	// 35
+    "Brahmi",	// 36
+    "Braille",	// 37
+    "Buginese",	// 38
+    "Buhid",	// 39
+    "Carian",	// 40
+    "Caucasian_Albanian",	// 41
+    "Chorasmian",	// 42
+    "Coptic",	// 43
+    "Cuneiform",	// 44
+    "Cypriot",	// 45
+    "Cypro_Minoan",	// 46
+    "Deseret",	// 47
+    "Dives_Akuru",	// 48
+    "Dogra",	// 49
+    "Duployan",	// 50
+    "Egyptian_Hieroglyphs",	// 51
+    "Elbasan",	// 52
+    "Elymaic",	// 53
+    "Glagolitic",	// 54
+    "Gothic",	// 55
+    "Grantha",	// 56
+    "Gunjala_Gondi",	// 57
+    "Hanunoo",	// 58
+    "Hatran",	// 59
+    "Imperial_Aramaic",	// 60
+    "Inscriptional_Pahlavi",	// 61
+    "Inscriptional_Parthian",	// 62
+    "Kaithi",	// 63
+    "Kharoshthi",	// 64
+    "Khitan_Small_Script",	// 65
+    "Khojki",	// 66
+    "Khudawadi",	// 67
+    "Linear_A",	// 68
+    "Linear_B",	// 69
+    "Lycian",	// 70
+    "Lydian",	// 71
+    "Mahajani",	// 72
+    "Makasar",	// 73
+    "Manichaean",	// 74
+    "Marchen",	// 75
+    "Masaram_Gondi",	// 76
+    "Medefaidrin",	// 77
+    "Mende_Kikakui",	// 78
+    "Meroitic_Cursive",	// 79
+    "Meroitic_Hieroglyphs",	// 80
+    "Modi",	// 81
+    "Mongolian",	// 82
+    "Mro",	// 83
+    "Multani",	// 84
+    "Nabataean",	// 85
+    "Nandinagari",	// 86
+    "Nushu",	// 87
+    "Ogham",	// 88
+    "Old_Hungarian",	// 89
+    "Old_Italic",	// 90
+    "Old_North_Arabian",	// 91
+    "Old_Permic",	// 92
+    "Old_Persian",	// 93
+    "Old_Sogdian",	// 94
+    "Old_South_Arabian",	// 95
+    "Old_Turkic",	// 96
+    "Old_Uyghur",	// 97
+    "Osmanya",	// 98
+    "Pahawh_Hmong",	// 99
+    "Palmyrene",	// 100
+    "Pau_Cin_Hau",	// 101
+    "Phags_Pa",	// 102
+    "Phoenician",	// 103
+    "Psalter_Pahlavi",	// 104
+    "Rejang",	// 105
+    "Runic",	// 106
+    "Samaritan",	// 107
+    "Sharada",	// 108
+    "Shavian",	// 109
+    "Siddham",	// 110
+    "SignWriting",	// 111
+    "Sogdian",	// 112
+    "Sora_Sompeng",	// 113
+    "Soyombo",	// 114
+    "Tagalog",	// 115
+    "Tagbanwa",	// 116
+    "Takri",	// 117
+    "Tangsa",	// 118
+    "Tangut",	// 119
+    "Tirhuta",	// 120
+    "Toto",	// 121
+    "Ugaritic",	// 122
+    "Vithkuqi",	// 123
+    "Warang_Citi",	// 124
+    "Yezidi",	// 125
+    "Zanabazar_Square",	// 126
+    // Limited Use Scripts
+    // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
+    "Adlam",	// 127
+    "Balinese",	// 128
+    "Bamum",	// 129
+    "Batak",	// 130
+    "Canadian_Aboriginal",	// 131
+    "Chakma",	// 132
+    "Cham",	// 133
+    "Cherokee",	// 134
+    "Hanifi_Rohingya",	// 135
+    "Javanese",	// 136
+    "Kayah_Li",	// 137
+    "Lepcha",	// 138
+    "Limbu",	// 139
+    "Lisu",	// 140
+    "Mandaic",	// 141
+    "Meetei_Mayek",	// 142
+    "Miao",	// 143
+    "New_Tai_Lue",	// 144
+    "Newa",	// 145
+    "Nko",	// 146
+    "Nyiakeng_Puachue_Hmong",	// 147
+    "Ol_Chiki",	// 148
+    "Osage",	// 149
+    "Saurashtra",	// 150
+    "Sundanese",	// 151
+    "Syloti_Nagri",	// 152
+    "Syriac",	// 153
+    "Tai_Le",	// 154
+    "Tai_Tham",	// 155
+    "Tai_Viet",	// 156
+    "Tifinagh",	// 157
+    "Vai",	// 158
+    "Wancho",	// 159
+    "Yi",	// 160
+    "Unknown",	// 161
+    // clang-format on
+};
+#else
+extern const char *const all_scripts[161];
+#endif
+
+enum u8id_sc {
+#define FIRST_RECOMMENDED_SCRIPT 0
+  SC_Common     = 0,
+  SC_Inherited  = 1,
+  SC_Latin      = 2,
+  SC_Arabic     = 3,
+  SC_Armenian   = 4,
+  SC_Bengali    = 5,
+  SC_Bopomofo   = 6,
+  SC_Cyrillic   = 7,
+  SC_Devanagari = 8,
+  SC_Ethiopic   = 9,
+  SC_Georgian   = 10,
+  SC_Greek      = 11,
+  SC_Gujarati   = 12,
+  SC_Gurmukhi   = 13,
+  SC_Hangul     = 14,
+  SC_Han        = 15,
+  SC_Hebrew     = 16,
+  SC_Hiragana   = 17,
+  SC_Katakana   = 18,
+  SC_Kannada    = 19,
+  SC_Khmer      = 20,
+  SC_Lao        = 21,
+  SC_Malayalam  = 22,
+  SC_Myanmar    = 23,
+  SC_Oriya      = 24,
+  SC_Sinhala    = 25,
+  SC_Tamil      = 26,
+  SC_Telugu     = 27,
+  SC_Thaana     = 28,
+  SC_Thai       = 29,
+  SC_Tibetan    = 30,
+#define FIRST_EXCLUDED_SCRIPT 31
+  SC_Ahom       = 31,
+  SC_Anatolian_Hieroglyphs = 32,
+  SC_Avestan    = 33,
+  SC_Bassa_Vah  = 34,
+  SC_Bhaiksuki  = 35,
+  SC_Brahmi     = 36,
+  SC_Braille    = 37,
+  SC_Buginese   = 38,
+  SC_Buhid      = 39,
+  SC_Carian     = 40,
+  SC_Caucasian_Albanian = 41,
+  SC_Chorasmian = 42,
+  SC_Coptic     = 43,
+  SC_Cuneiform  = 44,
+  SC_Cypriot    = 45,
+  SC_Cypro_Minoan = 46,
+  SC_Deseret    = 47,
+  SC_Dives_Akuru = 48,
+  SC_Dogra      = 49,
+  SC_Duployan   = 50,
+  SC_Egyptian_Hieroglyphs = 51,
+  SC_Elbasan    = 52,
+  SC_Elymaic    = 53,
+  SC_Glagolitic = 54,
+  SC_Gothic     = 55,
+  SC_Grantha    = 56,
+  SC_Gunjala_Gondi = 57,
+  SC_Hanunoo    = 58,
+  SC_Hatran     = 59,
+  SC_Imperial_Aramaic = 60,
+  SC_Inscriptional_Pahlavi = 61,
+  SC_Inscriptional_Parthian = 62,
+  SC_Kaithi     = 63,
+  SC_Kharoshthi = 64,
+  SC_Khitan_Small_Script = 65,
+  SC_Khojki     = 66,
+  SC_Khudawadi  = 67,
+  SC_Linear_A   = 68,
+  SC_Linear_B   = 69,
+  SC_Lycian     = 70,
+  SC_Lydian     = 71,
+  SC_Mahajani   = 72,
+  SC_Makasar    = 73,
+  SC_Manichaean = 74,
+  SC_Marchen    = 75,
+  SC_Masaram_Gondi = 76,
+  SC_Medefaidrin = 77,
+  SC_Mende_Kikakui = 78,
+  SC_Meroitic_Cursive = 79,
+  SC_Meroitic_Hieroglyphs = 80,
+  SC_Modi       = 81,
+  SC_Mongolian  = 82,
+  SC_Mro        = 83,
+  SC_Multani    = 84,
+  SC_Nabataean  = 85,
+  SC_Nandinagari = 86,
+  SC_Nushu      = 87,
+  SC_Ogham      = 88,
+  SC_Old_Hungarian = 89,
+  SC_Old_Italic = 90,
+  SC_Old_North_Arabian = 91,
+  SC_Old_Permic = 92,
+  SC_Old_Persian = 93,
+  SC_Old_Sogdian = 94,
+  SC_Old_South_Arabian = 95,
+  SC_Old_Turkic = 96,
+  SC_Old_Uyghur = 97,
+  SC_Osmanya    = 98,
+  SC_Pahawh_Hmong = 99,
+  SC_Palmyrene  = 100,
+  SC_Pau_Cin_Hau = 101,
+  SC_Phags_Pa   = 102,
+  SC_Phoenician = 103,
+  SC_Psalter_Pahlavi = 104,
+  SC_Rejang     = 105,
+  SC_Runic      = 106,
+  SC_Samaritan  = 107,
+  SC_Sharada    = 108,
+  SC_Shavian    = 109,
+  SC_Siddham    = 110,
+  SC_SignWriting = 111,
+  SC_Sogdian    = 112,
+  SC_Sora_Sompeng = 113,
+  SC_Soyombo    = 114,
+  SC_Tagalog    = 115,
+  SC_Tagbanwa   = 116,
+  SC_Takri      = 117,
+  SC_Tangsa     = 118,
+  SC_Tangut     = 119,
+  SC_Tirhuta    = 120,
+  SC_Toto       = 121,
+  SC_Ugaritic   = 122,
+  SC_Vithkuqi   = 123,
+  SC_Warang_Citi = 124,
+  SC_Yezidi     = 125,
+  SC_Zanabazar_Square = 126,
+#define FIRST_LIMITED_USE_SCRIPT 127
+  SC_Adlam      = 127,
+  SC_Balinese   = 128,
+  SC_Bamum      = 129,
+  SC_Batak      = 130,
+  SC_Canadian_Aboriginal = 131,
+  SC_Chakma     = 132,
+  SC_Cham       = 133,
+  SC_Cherokee   = 134,
+  SC_Hanifi_Rohingya = 135,
+  SC_Javanese   = 136,
+  SC_Kayah_Li   = 137,
+  SC_Lepcha     = 138,
+  SC_Limbu      = 139,
+  SC_Lisu       = 140,
+  SC_Mandaic    = 141,
+  SC_Meetei_Mayek = 142,
+  SC_Miao       = 143,
+  SC_New_Tai_Lue = 144,
+  SC_Newa       = 145,
+  SC_Nko        = 146,
+  SC_Nyiakeng_Puachue_Hmong = 147,
+  SC_Ol_Chiki   = 148,
+  SC_Osage      = 149,
+  SC_Saurashtra = 150,
+  SC_Sundanese  = 151,
+  SC_Syloti_Nagri = 152,
+  SC_Syriac     = 153,
+  SC_Tai_Le     = 154,
+  SC_Tai_Tham   = 155,
+  SC_Tai_Viet   = 156,
+  SC_Tifinagh   = 157,
+  SC_Vai        = 158,
+  SC_Wancho     = 159,
+  SC_Yi         = 160,
+  SC_Unknown    = 161,
+};
+#define LAST_SCRIPT 161
+
+enum u8id_gc {
+    GC_Ll,
+    GC_Lu,
+};
+
 struct sc {
   uint32_t from;
   uint32_t to;
-  uint8_t scr; // index
+  enum u8id_sc scr;
 };
 
 struct scx {
   uint32_t from;
   uint32_t to;
-  const char *list; // indices
+  enum u8id_gc gc;
+  const char *scx; // indices into sc
 };
 
 struct range_bool {
@@ -29,355 +384,6 @@ struct range_short {
   uint32_t to;
   uint16_t types;
 };
-
-/* Provide a mapping of the 161 Script properties to an index byte.
-   Sorted into usages.
- */
-#ifndef EXT_SCRIPTS
-const char *const all_scripts[] = {
-    // clang-format off
-    // Recommended Scripts (not need to add them)
-    // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
-    "Common",
-    "Inherited",
-    "Latin",
-    "Arabic",
-    "Armenian",
-    "Bengali",
-    "Bopomofo",
-    "Cyrillic",
-    "Devanagari",
-    "Ethiopic",
-    "Georgian",
-    "Greek",
-    "Gujarati",
-    "Gurmukhi",
-    "Hangul",
-    "Han",
-    "Hebrew",
-    "Hiragana",
-    "Katakana",
-    "Kannada",
-    "Khmer",
-    "Lao",
-    "Malayalam",
-    "Myanmar",
-    "Oriya",
-    "Sinhala",
-    "Tamil",
-    "Telugu",
-    "Thaana",
-    "Thai",
-    "Tibetan",
-    // Excluded Scripts (but can be added expliclitly)
-    // https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
-    "Ahom",
-    "Anatolian_Hieroglyphs",
-    "Avestan",
-    "Bassa_Vah",
-    "Bhaiksuki",
-    "Brahmi",
-    "Braille",
-    "Buginese",
-    "Buhid",
-    "Carian",
-    "Caucasian_Albanian",
-    "Chorasmian",
-    "Coptic",
-    "Cuneiform",
-    "Cypriot",
-    "Cypro_Minoan",
-    "Deseret",
-    "Dives_Akuru",
-    "Dogra",
-    "Duployan",
-    "Egyptian_Hieroglyphs",
-    "Elbasan",
-    "Elymaic",
-    "Glagolitic",
-    "Gothic",
-    "Grantha",
-    "Gunjala_Gondi",
-    "Hanunoo",
-    "Hatran",
-    "Imperial_Aramaic",
-    "Inscriptional_Pahlavi",
-    "Inscriptional_Parthian",
-    "Kaithi",
-    "Kharoshthi",
-    "Khitan_Small_Script",
-    "Khojki",
-    "Khudawadi",
-    "Linear_A",
-    "Linear_B",
-    "Lycian",
-    "Lydian",
-    "Mahajani",
-    "Makasar",
-    "Manichaean",
-    "Marchen",
-    "Masaram_Gondi",
-    "Medefaidrin",
-    "Mende_Kikakui",
-    "Meroitic_Cursive",
-    "Meroitic_Hieroglyphs",
-    "Modi",
-    "Mongolian",
-    "Mro",
-    "Multani",
-    "Nabataean",
-    "Nandinagari",
-    "Nushu",
-    "Ogham",
-    "Old_Hungarian",
-    "Old_Italic",
-    "Old_North_Arabian",
-    "Old_Permic",
-    "Old_Persian",
-    "Old_Sogdian",
-    "Old_South_Arabian",
-    "Old_Turkic",
-    "Old_Uyghur",
-    "Osmanya",
-    "Pahawh_Hmong",
-    "Palmyrene",
-    "Pau_Cin_Hau",
-    "Phags_Pa",
-    "Phoenician",
-    "Psalter_Pahlavi",
-    "Rejang",
-    "Runic",
-    "Samaritan",
-    "Sharada",
-    "Shavian",
-    "Siddham",
-    "SignWriting",
-    "Sogdian",
-    "Sora_Sompeng",
-    "Soyombo",
-    "Tagalog",
-    "Tagbanwa",
-    "Takri",
-    "Tangsa",
-    "Tangut",
-    "Tirhuta",
-    "Toto",
-    "Ugaritic",
-    "Vithkuqi",
-    "Warang_Citi",
-    "Yezidi",
-    "Zanabazar_Square",
-    // Limited Use Scripts
-    // https://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
-    "Adlam",
-    "Balinese",
-    "Bamum",
-    "Batak",
-    "Canadian_Aboriginal",
-    "Chakma",
-    "Cham",
-    "Cherokee",
-    "Hanifi_Rohingya",
-    "Javanese",
-    "Kayah_Li",
-    "Lepcha",
-    "Limbu",
-    "Lisu",
-    "Mandaic",
-    "Meetei_Mayek",
-    "Miao",
-    "New_Tai_Lue",
-    "Newa",
-    "Nko",
-    "Nyiakeng_Puachue_Hmong",
-    "Ol_Chiki",
-    "Osage",
-    "Saurashtra",
-    "Sundanese",
-    "Syloti_Nagri",
-    "Syriac",
-    "Tai_Le",
-    "Tai_Tham",
-    "Tai_Viet",
-    "Tifinagh",
-    "Vai",
-    "Wancho",
-    "Yi",
-    "Unknown",
-    // clang-format on
-};
-#else
-extern const char *const all_scripts[161];
-#endif
-
-#define FIRST_RECOMMENDED_SCRIPT 0
-// clang-format off
-#define SC_Common     0
-#define SC_Inherited  1
-#define SC_Latin      2
-#define SC_Arabic     3
-#define SC_Armenian   4
-#define SC_Bengali    5
-#define SC_Bopomofo   6
-#define SC_Cyrillic   7
-#define SC_Devanagari 8
-#define SC_Ethiopic   9
-#define SC_Georgian   10
-#define SC_Greek      11
-#define SC_Gujarati   12
-#define SC_Gurmukhi   13
-#define SC_Hangul     14
-#define SC_Han        15
-#define SC_Hebrew     16
-#define SC_Hiragana   17
-#define SC_Katakana   18
-#define SC_Kannada    19
-#define SC_Khmer      20
-#define SC_Lao        21
-#define SC_Malayalam  22
-#define SC_Myanmar    23
-#define SC_Oriya      24
-#define SC_Sinhala    25
-#define SC_Tamil      26
-#define SC_Telugu     27
-#define SC_Thaana     28
-#define SC_Thai       29
-#define SC_Tibetan    30
-#define FIRST_EXCLUDED_SCRIPT 31
-#define SC_Ahom       31
-#define SC_Anatolian_Hieroglyphs 32
-#define SC_Avestan    33
-#define SC_Bassa_Vah  34
-#define SC_Bhaiksuki  35
-#define SC_Brahmi     36
-#define SC_Braille    37
-#define SC_Buginese   38
-#define SC_Buhid      39
-#define SC_Carian     40
-#define SC_Caucasian_Albanian 41
-#define SC_Chorasmian 42
-#define SC_Coptic     43
-#define SC_Cuneiform  44
-#define SC_Cypriot    45
-#define SC_Cypro_Minoan 46
-#define SC_Deseret    47
-#define SC_Dives_Akuru 48
-#define SC_Dogra      49
-#define SC_Duployan   50
-#define SC_Egyptian_Hieroglyphs 51
-#define SC_Elbasan    52
-#define SC_Elymaic    53
-#define SC_Glagolitic 54
-#define SC_Gothic     55
-#define SC_Grantha    56
-#define SC_Gunjala_Gondi 57
-#define SC_Hanunoo    58
-#define SC_Hatran     59
-#define SC_Imperial_Aramaic 60
-#define SC_Inscriptional_Pahlavi 61
-#define SC_Inscriptional_Parthian 62
-#define SC_Kaithi     63
-#define SC_Kharoshthi 64
-#define SC_Khitan_Small_Script 65
-#define SC_Khojki     66
-#define SC_Khudawadi  67
-#define SC_Linear_A   68
-#define SC_Linear_B   69
-#define SC_Lycian     70
-#define SC_Lydian     71
-#define SC_Mahajani   72
-#define SC_Makasar    73
-#define SC_Manichaean 74
-#define SC_Marchen    75
-#define SC_Masaram_Gondi 76
-#define SC_Medefaidrin 77
-#define SC_Mende_Kikakui 78
-#define SC_Meroitic_Cursive 79
-#define SC_Meroitic_Hieroglyphs 80
-#define SC_Modi       81
-#define SC_Mongolian  82
-#define SC_Mro        83
-#define SC_Multani    84
-#define SC_Nabataean  85
-#define SC_Nandinagari 86
-#define SC_Nushu      87
-#define SC_Ogham      88
-#define SC_Old_Hungarian 89
-#define SC_Old_Italic 90
-#define SC_Old_North_Arabian 91
-#define SC_Old_Permic 92
-#define SC_Old_Persian 93
-#define SC_Old_Sogdian 94
-#define SC_Old_South_Arabian 95
-#define SC_Old_Turkic 96
-#define SC_Old_Uyghur 97
-#define SC_Osmanya    98
-#define SC_Pahawh_Hmong 99
-#define SC_Palmyrene  100
-#define SC_Pau_Cin_Hau 101
-#define SC_Phags_Pa   102
-#define SC_Phoenician 103
-#define SC_Psalter_Pahlavi 104
-#define SC_Rejang     105
-#define SC_Runic      106
-#define SC_Samaritan  107
-#define SC_Sharada    108
-#define SC_Shavian    109
-#define SC_Siddham    110
-#define SC_SignWriting 111
-#define SC_Sogdian    112
-#define SC_Sora_Sompeng 113
-#define SC_Soyombo    114
-#define SC_Tagalog    115
-#define SC_Tagbanwa   116
-#define SC_Takri      117
-#define SC_Tangsa     118
-#define SC_Tangut     119
-#define SC_Tirhuta    120
-#define SC_Toto       121
-#define SC_Ugaritic   122
-#define SC_Vithkuqi   123
-#define SC_Warang_Citi 124
-#define SC_Yezidi     125
-#define SC_Zanabazar_Square 126
-#define FIRST_LIMITED_USE_SCRIPT 127
-#define SC_Adlam      127
-#define SC_Balinese   128
-#define SC_Bamum      129
-#define SC_Batak      130
-#define SC_Canadian_Aboriginal 131
-#define SC_Chakma     132
-#define SC_Cham       133
-#define SC_Cherokee   134
-#define SC_Hanifi_Rohingya 135
-#define SC_Javanese   136
-#define SC_Kayah_Li   137
-#define SC_Lepcha     138
-#define SC_Limbu      139
-#define SC_Lisu       140
-#define SC_Mandaic    141
-#define SC_Meetei_Mayek 142
-#define SC_Miao       143
-#define SC_New_Tai_Lue 144
-#define SC_Newa       145
-#define SC_Nko        146
-#define SC_Nyiakeng_Puachue_Hmong 147
-#define SC_Ol_Chiki   148
-#define SC_Osage      149
-#define SC_Saurashtra 150
-#define SC_Sundanese  151
-#define SC_Syloti_Nagri 152
-#define SC_Syriac     153
-#define SC_Tai_Le     154
-#define SC_Tai_Tham   155
-#define SC_Tai_Viet   156
-#define SC_Tifinagh   157
-#define SC_Vai        158
-#define SC_Wancho     159
-#define SC_Yi         160
-#define SC_Unknown    161
-// clang-format on
-#define LAST_SCRIPT 161
 
 #if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
 // The slow variant without U8ID_CHECK_XID. Add all holes for non-identifiers or
@@ -1780,126 +1786,126 @@ const struct sc nonxid_script_list[] = {
 #ifndef EXT_SCRIPTS
 const struct scx scx_list[] = {
     // clang-format off
-    // {0x0342, 0x0345, "\x0b"},	// Greek, moved to sc proper
-    // {0x0363, 0x036F, "\x02"},	// Latin, moved to sc proper
-    {0x0483, 0x0483, "\x07\x5c"},	// Cyrl Perm
-    {0x0484, 0x0484, "\x07\x36"},	// Cyrl Glag
-    {0x0485, 0x0486, "\x07\x02"},	// Cyrl Latn
-    {0x0487, 0x0487, "\x07\x36"},	// Cyrl Glag
-    {0x060C, 0x060C, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
-    {0x061B, 0x061B, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
-    {0x061C, 0x061C, "\x03\x99\x1c"},	// Arab Syrc Thaa
-    {0x061F, 0x061F, "\x7f\x03\x92\x87\x99\x1c\x7d"},	// Adlm Arab Nkoo Rohg Syrc Thaa Yezi
-    {0x0640, 0x0640, "\x7f\x03\x8d\x4a\x61\x68\x87\x70\x99"},	// Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
-    {0x064B, 0x0655, "\x03\x99"},	// Arab Syrc
-    {0x0660, 0x0669, "\x03\x1c\x7d"},	// Arab Thaa Yezi
-    {0x0670, 0x0670, "\x03\x99"},	// Arab Syrc
-    {0x06D4, 0x06D4, "\x03\x87"},	// Arab Rohg
-    {0x0951, 0x0951, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x6c\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
-    {0x0952, 0x0952, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
-    {0x0964, 0x0964, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
-    {0x0965, 0x0965, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x8b\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
-    {0x0966, 0x096F, "\x08\x31\x3f\x48"},	// Deva Dogr Kthi Mahj
-    {0x09E6, 0x09EF, "\x05\x84\x98"},	// Beng Cakm Sylo
-    {0x0A66, 0x0A6F, "\x0d\x54"},	// Guru Mult
-    {0x0AE6, 0x0AEF, "\x0c\x42"},	// Gujr Khoj
-    {0x0BE6, 0x0BF3, "\x38\x1a"},	// Gran Taml
-    {0x0CE6, 0x0CEF, "\x13\x56"},	// Knda Nand
-    {0x1040, 0x1049, "\x84\x17\x9a"},	// Cakm Mymr Tale
-    {0x10FB, 0x10FB, "\x0a\x02"},	// Geor Latn
-    {0x1735, 0x1736, "\x27\x3a\x74\x73"},	// Buhd Hano Tagb Tglg
-    {0x1802, 0x1803, "\x52\x66"},	// Mong Phag
-    {0x1805, 0x1805, "\x52\x66"},	// Mong Phag
-    {0x1CD0, 0x1CD0, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
-    // {0x1CD1, 0x1CD1, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CD2, 0x1CD2, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
-    {0x1CD3, 0x1CD3, "\x08\x38"},	// Deva Gran
-    // {0x1CD4, 0x1CD4, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CD5, 0x1CD6, "\x05\x08"},	// Beng Deva
-    {0x1CD7, 0x1CD7, "\x08\x6c"},	// Deva Shrd
-    {0x1CD8, 0x1CD8, "\x05\x08"},	// Beng Deva
-    {0x1CD9, 0x1CD9, "\x08\x6c"},	// Deva Shrd
-    {0x1CDA, 0x1CDA, "\x08\x13\x16\x18\x1a\x1b"},	// Deva Knda Mlym Orya Taml Telu
-    // {0x1CDB, 0x1CDB, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CDC, 0x1CDD, "\x08\x6c"},	// Deva Shrd
-    // {0x1CDE, 0x1CDF, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CE0, 0x1CE0, "\x08\x6c"},	// Deva Shrd
-    {0x1CE1, 0x1CE1, "\x05\x08"},	// Beng Deva
-    // {0x1CE2, 0x1CE8, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CE9, 0x1CE9, "\x08\x56"},	// Deva Nand
-    {0x1CEA, 0x1CEA, "\x05\x08"},	// Beng Deva
-    // {0x1CEB, 0x1CEC, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CED, 0x1CED, "\x05\x08"},	// Beng Deva
-    // {0x1CEE, 0x1CF1, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CF2, 0x1CF2, "\x05\x08\x38\x13\x56\x18\x1b\x78"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
-    {0x1CF3, 0x1CF3, "\x08\x38"},	// Deva Gran
-    {0x1CF4, 0x1CF4, "\x08\x38\x13"},	// Deva Gran Knda
-    {0x1CF5, 0x1CF6, "\x05\x08"},	// Beng Deva
-    // {0x1CF7, 0x1CF7, "\x05"},	// Bengali, moved to sc proper
-    {0x1CF8, 0x1CF9, "\x08\x38"},	// Deva Gran
-    // {0x1CFA, 0x1CFA, "\x56"},	// Nandinagari, moved to sc proper
-    // {0x1DC0, 0x1DC1, "\x0b"},	// Greek, moved to sc proper
-    {0x1DF8, 0x1DF8, "\x07\x99"},	// Cyrl Syrc
-    // {0x1DFA, 0x1DFA, "\x99"},	// Syriac, moved to sc proper
-    {0x202F, 0x202F, "\x02\x52"},	// Latn Mong
-    {0x20F0, 0x20F0, "\x08\x38\x02"},	// Deva Gran Latn
-    {0x2E43, 0x2E43, "\x07\x36"},	// Cyrl Glag
-    {0x3001, 0x3002, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x3003, 0x3003, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    // {0x3006, 0x3006, "\x0f"},	// Han, moved to sc proper
-    {0x3008, 0x3011, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x3013, 0x3013, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x3014, 0x301B, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x301C, 0x301F, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x302A, 0x302D, "\x06\x0f"},	// Bopo Hani
-    {0x3030, 0x3030, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x3031, 0x3035, "\x11\x12"},	// Hira Kana
-    {0x3037, 0x3037, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x303C, 0x303D, "\x0f\x11\x12"},	// Hani Hira Kana
-    // {0x303E, 0x303F, "\x0f"},	// Han, moved to sc proper
-    {0x3099, 0x309C, "\x11\x12"},	// Hira Kana
-    {0x30A0, 0x30A0, "\x11\x12"},	// Hira Kana
-    {0x30FB, 0x30FB, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x30FC, 0x30FC, "\x11\x12"},	// Hira Kana
-    // {0x3190, 0x319F, "\x0f"},	// Han, moved to sc proper
-    // {0x31C0, 0x31E3, "\x0f"},	// Han, moved to sc proper
-    // {0x3220, 0x3247, "\x0f"},	// Han, moved to sc proper
-    // {0x3280, 0x32B0, "\x0f"},	// Han, moved to sc proper
-    // {0x32C0, 0x32CB, "\x0f"},	// Han, moved to sc proper
-    // {0x32FF, 0x32FF, "\x0f"},	// Han, moved to sc proper
-    // {0x3358, 0x3370, "\x0f"},	// Han, moved to sc proper
-    // {0x337B, 0x337F, "\x0f"},	// Han, moved to sc proper
-    // {0x33E0, 0x33FE, "\x0f"},	// Han, moved to sc proper
-    {0xA66F, 0xA66F, "\x07\x36"},	// Cyrl Glag
-    {0xA700, 0xA707, "\x0f\x02"},	// Hani Latn
-    {0xA830, 0xA832, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x16\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
-    {0xA833, 0xA835, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh
-    {0xA836, 0xA839, "\x08\x31\x0c\x0d\x42\x3f\x48\x51\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh
-    {0xA8F1, 0xA8F1, "\x05\x08"},	// Beng Deva
-    {0xA8F3, 0xA8F3, "\x08\x1a"},	// Deva Taml
-    {0xA92E, 0xA92E, "\x89\x02\x17"},	// Kali Latn Mymr
-    {0xA9CF, 0xA9CF, "\x26\x88"},	// Bugi Java
-    {0xFD3E, 0xFD3F, "\x03\x92"},	// Arab Nkoo
-    {0xFDF2, 0xFDF2, "\x03\x1c"},	// Arab Thaa
-    {0xFDFD, 0xFDFD, "\x03\x1c"},	// Arab Thaa
-    {0xFE45, 0xFE46, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0xFF61, 0xFF65, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0xFF70, 0xFF70, "\x11\x12"},	// Hira Kana
-    {0xFF9E, 0xFF9F, "\x11\x12"},	// Hira Kana
-    {0x10100, 0x10101, "\x2e\x2d\x45"},	// Cpmn Cprt Linb
-    {0x10102, 0x10102, "\x2d\x45"},	// Cprt Linb
-    {0x10107, 0x10133, "\x2d\x44\x45"},	// Cprt Lina Linb
-    {0x10137, 0x1013F, "\x2d\x45"},	// Cprt Linb
-    {0x102E0, 0x102FB, "\x03\x2b"},	// Arab Copt
-    {0x10AF2, 0x10AF2, "\x4a\x61"},	// Mani Ougr
-    {0x11301, 0x11301, "\x38\x1a"},	// Gran Taml
-    {0x11303, 0x11303, "\x38\x1a"},	// Gran Taml
-    {0x1133B, 0x1133C, "\x38\x1a"},	// Gran Taml
-    {0x11FD0, 0x11FD1, "\x38\x1a"},	// Gran Taml
-    {0x11FD3, 0x11FD3, "\x38\x1a"},	// Gran Taml
-    // {0x1BCA0, 0x1BCA3, "\x32"},	// Duployan, moved to sc proper
-    // {0x1D360, 0x1D371, "\x0f"},	// Han, moved to sc proper
-    // {0x1F250, 0x1F251, "\x0f"},	// Han, moved to sc proper
+    // {0x0342, 0x0345, GC_Lu, "\x0b"},	// Greek, moved to sc proper
+    // {0x0363, 0x036F, GC_Lu, "\x02"},	// Latin, moved to sc proper
+    {0x0483, 0x0483, GC_Lu, "\x07\x5c"},	// Cyrl Perm
+    {0x0484, 0x0484, GC_Lu, "\x07\x36"},	// Cyrl Glag
+    {0x0485, 0x0486, GC_Lu, "\x07\x02"},	// Cyrl Latn
+    {0x0487, 0x0487, GC_Lu, "\x07\x36"},	// Cyrl Glag
+    {0x060C, 0x060C, GC_Lu, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+    {0x061B, 0x061B, GC_Lu, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+    {0x061C, 0x061C, GC_Lu, "\x03\x99\x1c"},	// Arab Syrc Thaa
+    {0x061F, 0x061F, GC_Lu, "\x7f\x03\x92\x87\x99\x1c\x7d"},	// Adlm Arab Nkoo Rohg Syrc Thaa Yezi
+    {0x0640, 0x0640, GC_Lu, "\x7f\x03\x8d\x4a\x61\x68\x87\x70\x99"},	// Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
+    {0x064B, 0x0655, GC_Lu, "\x03\x99"},	// Arab Syrc
+    {0x0660, 0x0669, GC_Lu, "\x03\x1c\x7d"},	// Arab Thaa Yezi
+    {0x0670, 0x0670, GC_Lu, "\x03\x99"},	// Arab Syrc
+    {0x06D4, 0x06D4, GC_Lu, "\x03\x87"},	// Arab Rohg
+    {0x0951, 0x0951, GC_Lu, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x6c\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
+    {0x0952, 0x0952, GC_Lu, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
+    {0x0964, 0x0964, GC_Lu, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+    {0x0965, 0x0965, GC_Lu, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x8b\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+    {0x0966, 0x096F, GC_Lu, "\x08\x31\x3f\x48"},	// Deva Dogr Kthi Mahj
+    {0x09E6, 0x09EF, GC_Lu, "\x05\x84\x98"},	// Beng Cakm Sylo
+    {0x0A66, 0x0A6F, GC_Lu, "\x0d\x54"},	// Guru Mult
+    {0x0AE6, 0x0AEF, GC_Lu, "\x0c\x42"},	// Gujr Khoj
+    {0x0BE6, 0x0BF3, GC_Lu, "\x38\x1a"},	// Gran Taml
+    {0x0CE6, 0x0CEF, GC_Lu, "\x13\x56"},	// Knda Nand
+    {0x1040, 0x1049, GC_Lu, "\x84\x17\x9a"},	// Cakm Mymr Tale
+    {0x10FB, 0x10FB, GC_Lu, "\x0a\x02"},	// Geor Latn
+    {0x1735, 0x1736, GC_Lu, "\x27\x3a\x74\x73"},	// Buhd Hano Tagb Tglg
+    {0x1802, 0x1803, GC_Lu, "\x52\x66"},	// Mong Phag
+    {0x1805, 0x1805, GC_Lu, "\x52\x66"},	// Mong Phag
+    {0x1CD0, 0x1CD0, GC_Lu, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
+    // {0x1CD1, 0x1CD1, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CD2, 0x1CD2, GC_Lu, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
+    {0x1CD3, 0x1CD3, GC_Lu, "\x08\x38"},	// Deva Gran
+    // {0x1CD4, 0x1CD4, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CD5, 0x1CD6, GC_Lu, "\x05\x08"},	// Beng Deva
+    {0x1CD7, 0x1CD7, GC_Lu, "\x08\x6c"},	// Deva Shrd
+    {0x1CD8, 0x1CD8, GC_Lu, "\x05\x08"},	// Beng Deva
+    {0x1CD9, 0x1CD9, GC_Lu, "\x08\x6c"},	// Deva Shrd
+    {0x1CDA, 0x1CDA, GC_Lu, "\x08\x13\x16\x18\x1a\x1b"},	// Deva Knda Mlym Orya Taml Telu
+    // {0x1CDB, 0x1CDB, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CDC, 0x1CDD, GC_Lu, "\x08\x6c"},	// Deva Shrd
+    // {0x1CDE, 0x1CDF, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CE0, 0x1CE0, GC_Lu, "\x08\x6c"},	// Deva Shrd
+    {0x1CE1, 0x1CE1, GC_Lu, "\x05\x08"},	// Beng Deva
+    // {0x1CE2, 0x1CE8, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CE9, 0x1CE9, GC_Lu, "\x08\x56"},	// Deva Nand
+    {0x1CEA, 0x1CEA, GC_Lu, "\x05\x08"},	// Beng Deva
+    // {0x1CEB, 0x1CEC, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CED, 0x1CED, GC_Lu, "\x05\x08"},	// Beng Deva
+    // {0x1CEE, 0x1CF1, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CF2, 0x1CF2, GC_Lu, "\x05\x08\x38\x13\x56\x18\x1b\x78"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
+    {0x1CF3, 0x1CF3, GC_Lu, "\x08\x38"},	// Deva Gran
+    {0x1CF4, 0x1CF4, GC_Lu, "\x08\x38\x13"},	// Deva Gran Knda
+    {0x1CF5, 0x1CF6, GC_Lu, "\x05\x08"},	// Beng Deva
+    // {0x1CF7, 0x1CF7, GC_Lu, "\x05"},	// Bengali, moved to sc proper
+    {0x1CF8, 0x1CF9, GC_Lu, "\x08\x38"},	// Deva Gran
+    // {0x1CFA, 0x1CFA, GC_Lu, "\x56"},	// Nandinagari, moved to sc proper
+    // {0x1DC0, 0x1DC1, GC_Lu, "\x0b"},	// Greek, moved to sc proper
+    {0x1DF8, 0x1DF8, GC_Lu, "\x07\x99"},	// Cyrl Syrc
+    // {0x1DFA, 0x1DFA, GC_Lu, "\x99"},	// Syriac, moved to sc proper
+    {0x202F, 0x202F, GC_Lu, "\x02\x52"},	// Latn Mong
+    {0x20F0, 0x20F0, GC_Lu, "\x08\x38\x02"},	// Deva Gran Latn
+    {0x2E43, 0x2E43, GC_Lu, "\x07\x36"},	// Cyrl Glag
+    {0x3001, 0x3002, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x3003, 0x3003, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    // {0x3006, 0x3006, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    {0x3008, 0x3011, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x3013, 0x3013, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x3014, 0x301B, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x301C, 0x301F, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x302A, 0x302D, GC_Lu, "\x06\x0f"},	// Bopo Hani
+    {0x3030, 0x3030, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x3031, 0x3035, GC_Lu, "\x11\x12"},	// Hira Kana
+    {0x3037, 0x3037, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x303C, 0x303D, GC_Lu, "\x0f\x11\x12"},	// Hani Hira Kana
+    // {0x303E, 0x303F, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    {0x3099, 0x309C, GC_Lu, "\x11\x12"},	// Hira Kana
+    {0x30A0, 0x30A0, GC_Lu, "\x11\x12"},	// Hira Kana
+    {0x30FB, 0x30FB, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x30FC, 0x30FC, GC_Lu, "\x11\x12"},	// Hira Kana
+    // {0x3190, 0x319F, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x31C0, 0x31E3, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x3220, 0x3247, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x3280, 0x32B0, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x32C0, 0x32CB, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x32FF, 0x32FF, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x3358, 0x3370, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x337B, 0x337F, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x33E0, 0x33FE, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    {0xA66F, 0xA66F, GC_Lu, "\x07\x36"},	// Cyrl Glag
+    {0xA700, 0xA707, GC_Lu, "\x0f\x02"},	// Hani Latn
+    {0xA830, 0xA832, GC_Lu, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x16\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
+    {0xA833, 0xA835, GC_Lu, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh
+    {0xA836, 0xA839, GC_Lu, "\x08\x31\x0c\x0d\x42\x3f\x48\x51\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh
+    {0xA8F1, 0xA8F1, GC_Lu, "\x05\x08"},	// Beng Deva
+    {0xA8F3, 0xA8F3, GC_Lu, "\x08\x1a"},	// Deva Taml
+    {0xA92E, 0xA92E, GC_Lu, "\x89\x02\x17"},	// Kali Latn Mymr
+    {0xA9CF, 0xA9CF, GC_Lu, "\x26\x88"},	// Bugi Java
+    {0xFD3E, 0xFD3F, GC_Lu, "\x03\x92"},	// Arab Nkoo
+    {0xFDF2, 0xFDF2, GC_Lu, "\x03\x1c"},	// Arab Thaa
+    {0xFDFD, 0xFDFD, GC_Lu, "\x03\x1c"},	// Arab Thaa
+    {0xFE45, 0xFE46, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0xFF61, 0xFF65, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0xFF70, 0xFF70, GC_Lu, "\x11\x12"},	// Hira Kana
+    {0xFF9E, 0xFF9F, GC_Lu, "\x11\x12"},	// Hira Kana
+    {0x10100, 0x10101, GC_Lu, "\x2e\x2d\x45"},	// Cpmn Cprt Linb
+    {0x10102, 0x10102, GC_Lu, "\x2d\x45"},	// Cprt Linb
+    {0x10107, 0x10133, GC_Lu, "\x2d\x44\x45"},	// Cprt Lina Linb
+    {0x10137, 0x1013F, GC_Lu, "\x2d\x45"},	// Cprt Linb
+    {0x102E0, 0x102FB, GC_Lu, "\x03\x2b"},	// Arab Copt
+    {0x10AF2, 0x10AF2, GC_Lu, "\x4a\x61"},	// Mani Ougr
+    {0x11301, 0x11301, GC_Lu, "\x38\x1a"},	// Gran Taml
+    {0x11303, 0x11303, GC_Lu, "\x38\x1a"},	// Gran Taml
+    {0x1133B, 0x1133C, GC_Lu, "\x38\x1a"},	// Gran Taml
+    {0x11FD0, 0x11FD1, GC_Lu, "\x38\x1a"},	// Gran Taml
+    {0x11FD3, 0x11FD3, GC_Lu, "\x38\x1a"},	// Gran Taml
+    // {0x1BCA0, 0x1BCA3, GC_Lu, "\x32"},	// Duployan, moved to sc proper
+    // {0x1D360, 0x1D371, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x1F250, 0x1F251, GC_Lu, "\x0f"},	// Han, moved to sc proper
     // clang-format on
 }; // 57 ranges, 63 single codepoints
 #else
@@ -1907,7 +1913,7 @@ extern const struct scx scx_list[93];
 #endif
 
 #ifndef DISABLE_CHECK_XID
-// Allowed scripts from IdentifierStatus.txt.
+// Allowed scripts from IdentifierStatus.txt. TR 39
 #  ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
     // clang-format off
@@ -6421,7 +6427,8 @@ extern const struct range_bool xid_start_list[730];
 extern const struct range_bool xid_cont_list[1315];
 #  endif
 
-// IdentifierType bit-values
+// Identifier_Type bit-values TR 39
+// http://www.unicode.org/reports/tr39
 enum u8id_idtypes {
   U8ID_Default_Ignorable = 1,
   U8ID_Deprecated = 2,
@@ -6437,12 +6444,20 @@ enum u8id_idtypes {
 };
 
 //#if 0
-/* IdentifierType
-   Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC,
-   Default_Ignorable, Deprecated
+/* Identifier_Type property TR 39
+   https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1
 
-   Allowed: keep Recommended, Inclusion
-   Maybe allow by request Technical
+   The possible values are:
+   Not_Character, Deprecated, Default_Ignorable, Not_NFKC, Not_XID,
+   Exclusion, Obsolete, Technical, Uncommon_Use, Limited_Use, Inclusion, Recommended
+   See enum u8id_idtypes
+
+   Restricted: Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC,
+               Default_Ignorable, Deprecated, Not_Character
+   Allowed:    Recommended, Inclusion
+   Maybe allow by request: Technical. C23 should include Technical.
+
+   Not_XID, Not_NFKC, Not_Character are not in XID already.
 */
 #  ifndef EXT_SCRIPTS
 const struct range_short idtype_list[] = {

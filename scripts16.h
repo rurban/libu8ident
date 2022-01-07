@@ -13,12 +13,13 @@
 struct sc16 {
   uint16_t from;
   uint16_t to;
-  uint8_t scr; // index
+  enum u8id_sc scr;
 };
 
 struct scx16 {
   uint16_t from;
   uint16_t to;
+  enum u8id_gc gc;
   const char *list; // indices
 };
 

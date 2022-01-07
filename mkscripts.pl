@@ -469,16 +469,19 @@ print $H <<"EOF";
    UNICODE version $ucd_version[0].$ucd_version[1]
 */
 
+EOF
+my $structs = <<'EOF';
 struct sc {
   uint32_t from;
   uint32_t to;
-  uint8_t scr; // index
+  enum u8id_sc scr;
 };
 
 struct scx {
   uint32_t from;
   uint32_t to;
-  const char *list; // indices
+  enum u8id_gc gc;
+  const char *scx; // indices into sc
 };
 
 struct range_bool {
@@ -492,6 +495,9 @@ struct range_short {
   uint16_t types;
 };
 
+EOF
+
+print $H <<"EOF";
 /* Provide a mapping of the $num_scripts Script properties to an index byte.
    Sorted into usages.
  */
@@ -501,7 +507,6 @@ const char *const all_scripts[] = {
     // Recommended Scripts (not need to add them)
     // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 EOF
-
 open my $H16, ">", "scripts16.h" or die "writing scripts16.h $!";
 print $H16 <<"EOF";
 /* ex: set ro ft=c: -*- mode: c; buffer-read-only: t -*- */
@@ -519,12 +524,13 @@ print $H16 <<"EOF";
 struct sc16 {
   uint16_t from;
   uint16_t to;
-  uint8_t scr; // index
+  enum u8id_sc scr;
 };
 
 struct scx16 {
   uint16_t from;
   uint16_t to;
+  enum u8id_gc gc;
   const char *list; // indices
 };
 
@@ -535,12 +541,13 @@ struct range_bool16 {
 EOF
 
 $i = 0;
-my $defines = "";
+my $defines = "enum u8id_sc {\n";
+$defines .= "#define FIRST_RECOMMENDED_SCRIPT 0\n";
 for my $sc (@recommended) {
   my $n = 10 - length($sc);
   my $ws = $n > 0 ? " " x $n : "";
-  $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-  printf $H "    \"%s\",\n", $sc;
+  $defines .= sprintf("  SC_%s%s = %u,\n", $sc, $ws, $i);
+  printf $H "    \"%s\",\t// %d\n", $sc, $i;
   $i++;
 }
 $defines .= "#define FIRST_EXCLUDED_SCRIPT $i\n";
@@ -552,8 +559,8 @@ for my $sc (sort keys %scripts) {
   unless ($other{$sc}) {
     my $n = 10 - length($sc);
     my $ws = $n > 0 ? " " x $n : "";
-    $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-    printf $H "    \"%s\",\n", $sc;
+    $defines .= sprintf("  SC_%s%s = %u,\n", $sc, $ws, $i);
+    printf $H "    \"%s\",\t// %d\n", $sc, $i;
     $i++;
   }
 }
@@ -565,11 +572,12 @@ EOF
 for my $sc (@limited) {
   my $n = 10 - length($sc);
   my $ws = $n > 0 ? " " x $n : "";
-  $defines .= sprintf("#define SC_%s%s %d\n", $sc, $ws, $i);
-  printf $H "    \"%s\",\n", $sc;
+  $defines .= sprintf("  SC_%s%s = %u,\n", $sc, $ws, $i);
+  printf $H "    \"%s\",\t// %d\n", $sc, $i;
   $i++;
 }
 $i--;
+$defines .= "#define LAST_SCRIPT $i\n";
 printf $H <<"EOF", $i;
     // clang-format on
 };
@@ -577,15 +585,20 @@ printf $H <<"EOF", $i;
 extern const char *const all_scripts[%u];
 #endif
 
-#define FIRST_RECOMMENDED_SCRIPT 0
-// clang-format off
 EOF
+$defines .= "};\n";
 print $H $defines;
+printf $H <<'EOF', $i;
 
-printf $H <<"EOF", $i, scalar @SCR;
-// clang-format on
-#define LAST_SCRIPT %u
+enum u8id_gc {
+    GC_Ll,
+    GC_Lu,
+};
 
+EOF
+print $H $structs;
+
+printf $H <<"EOF", scalar @SCR;
 #if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
 // The slow variant without U8ID_CHECK_XID. Add all holes for non-identifiers or
 // non-codepoints. Not needed with U8ID_CHECK_XID or when the parser checks
@@ -724,11 +737,14 @@ for my $r (@SCXR) {
   } else {
     $b++;
   }
+  my $gc = 'GC_Lu'; # FIXME gc lookup
   if (@list == 1) {
     $size--;
-    printf $H "    // {0x%04X, 0x%04X, \"%s\"},\t// %s, moved to sc proper\n", $r->[0], $r->[1], $code, $r->[2];
+    printf $H "    // {0x%04X, 0x%04X, %s, \"%s\"},\t// %s, moved to sc proper\n",
+	$r->[0], $r->[1], $gc, $code, $r->[2];
   } else {
-    printf $H "    {0x%04X, 0x%04X, \"%s\"},\t// %s\n", $r->[0], $r->[1], $code, $r->[2];
+      printf $H "    {0x%04X, 0x%04X, %s, \"%s\"},\t// %s\n",
+	  $r->[0], $r->[1], $gc, $code, $r->[2];
   }
 };
 printf $H <<"EOF", $b, $s, $size;
