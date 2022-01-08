@@ -19,7 +19,7 @@ struct sc16 {
 struct scx16 {
   uint16_t from;
   uint16_t to;
-  enum u8id_gc gc;
+  uint8_t gc;
   const char *list; // indices
 };
 
@@ -349,17 +349,17 @@ const struct sc16 xid_script_list16[] = {
     {0x1CD1, 0x1CD1, 8},	// Devanagari, originally SC Inherited
     {0x1CD2, 0x1CD2, 1},	// Inherited
     {0x1CD3, 0x1CD3, 0},	// Common
-    {0x1CD4, 0x1CD4, 8},	// Devanagari
-    {0x1CDB, 0x1CDB, 8},	// Devanagari
-    {0x1CDE, 0x1CDF, 8},	// Devanagari
-    {0x1CE2, 0x1CE8, 8},	// Devanagari
-    {0x1CEB, 0x1CEC, 8},	// Devanagari
-    {0x1CEE, 0x1CF1, 8},	// Devanagari
+    {0x1CD4, 0x1CD4, 8},	// Devanagari, originally SC Mn
+    {0x1CDB, 0x1CDB, 8},	// Devanagari, originally SC Mn
+    {0x1CDE, 0x1CDF, 8},	// Devanagari, originally SC Mn
+    {0x1CE2, 0x1CE8, 8},	// Devanagari, originally SC Mn
+    {0x1CEB, 0x1CEC, 8},	// Devanagari, originally SC Lo
+    {0x1CEE, 0x1CF1, 8},	// Devanagari, originally SC Lo
     {0x1CF4, 0x1CF4, 1},	// Inherited
     {0x1CF5, 0x1CF6, 0},	// Common
     {0x1CF7, 0x1CF7, 5},	// Bengali, originally SC Common
     {0x1CF8, 0x1CF9, 1},	// Inherited
-    {0x1CFA, 0x1CFA, 86},	// Nandinagari
+    {0x1CFA, 0x1CFA, 86},	// Nandinagari, originally SC Lo
     {0x1D00, 0x1D25, 2},	// Latin
     {0x1D26, 0x1D2A, 11},	// Greek
     {0x1D2B, 0x1D2B, 7},	// Cyrillic
@@ -371,7 +371,7 @@ const struct sc16 xid_script_list16[] = {
     {0x1D78, 0x1D78, 7},	// Cyrillic
     {0x1D79, 0x1DBE, 2},	// Latin
     {0x1DBF, 0x1DC1, 11},	// Greek
-    {0x1DFA, 0x1DFA, 153},	// Syriac
+    {0x1DFA, 0x1DFA, 153},	// Syriac, originally SC Mn
     {0x1E00, 0x1EFF, 2},	// Latin
     {0x1F00, 0x1F15, 11},	// Greek
     {0x1F18, 0x1F1D, 11},	// Greek
@@ -463,12 +463,12 @@ const struct sc16 xid_script_list16[] = {
     {0x30FD, 0x30FF, 18},	// Katakana
     {0x3105, 0x312F, 6},	// Bopomofo
     {0x3131, 0x318E, 14},	// Hangul
-    {0x3190, 0x319F, 15},	// Han
+    {0x3190, 0x319F, 15},	// Han, originally SC So
     {0x31A0, 0x31BF, 6},	// Bopomofo
-    {0x31C0, 0x31E3, 15},	// Han
+    {0x31C0, 0x31E3, 15},	// Han, originally SC So
     {0x31F0, 0x31FF, 18},	// Katakana
     {0x3200, 0x321E, 14},	// Hangul
-    {0x3220, 0x3247, 15},	// Han
+    {0x3220, 0x3247, 15},	// Han, originally SC No
     {0x3260, 0x327E, 14},	// Hangul
     {0x327F, 0x327F, 0},	// Common
     {0x3280, 0x32B0, 15},	// Han, originally SC Common
@@ -476,11 +476,11 @@ const struct sc16 xid_script_list16[] = {
     {0x32C0, 0x32CB, 15},	// Han, originally SC Common
     {0x32CC, 0x32CF, 0},	// Common
     {0x32D0, 0x32FE, 18},	// Katakana
-    {0x32FF, 0x32FF, 15},	// Han
+    {0x32FF, 0x32FF, 15},	// Han, originally SC So
     {0x3300, 0x3357, 18},	// Katakana
-    {0x3358, 0x3370, 15},	// Han
-    {0x337B, 0x337F, 15},	// Han
-    {0x33E0, 0x33FE, 15},	// Han
+    {0x3358, 0x3370, 15},	// Han, originally SC So
+    {0x337B, 0x337F, 15},	// Han, originally SC So
+    {0x33E0, 0x33FE, 15},	// Han, originally SC So
     {0x4E00, 0x9FFF, 15},	// Han
     {0xA000, 0xA48C, 160},	// Yi
     {0xA490, 0xA4C6, 160},	// Yi
@@ -857,7 +857,7 @@ const struct sc xid_script_list32[] = {
     {0x1D200, 0x1D245, 11},	// Greek
     {0x1D2E0, 0x1D2F3, 0},	// Common
     {0x1D300, 0x1D356, 0},	// Common
-    {0x1D360, 0x1D371, 15},	// Han
+    {0x1D360, 0x1D371, 15},	// Han, originally SC No
     {0x1D400, 0x1D454, 0},	// Common
     {0x1D456, 0x1D49C, 0},	// Common
     {0x1D49E, 0x1D49F, 0},	// Common
@@ -952,7 +952,7 @@ const struct sc xid_script_list32[] = {
     {0x1F201, 0x1F202, 0},	// Common
     {0x1F210, 0x1F23B, 0},	// Common
     {0x1F240, 0x1F248, 0},	// Common
-    {0x1F250, 0x1F251, 15},	// Han
+    {0x1F250, 0x1F251, 15},	// Han, originally SC So
     {0x1F260, 0x1F265, 0},	// Common
     {0x1F300, 0x1F6D7, 0},	// Common
     {0x1F6DD, 0x1F6EC, 0},	// Common
@@ -997,6 +997,7 @@ const struct sc xid_script_list32[] = {
 extern const struct sc xid_script_list32[400];
 #  endif
 #endif // DISABLE_CHECK_XID
+
 
 #ifndef DISABLE_CHECK_XID
 #  ifndef EXT_SCRIPTS

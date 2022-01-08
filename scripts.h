@@ -188,6 +188,7 @@ extern const char *const all_scripts[161];
 #endif
 
 enum u8id_sc {
+// clang-format off
 #define FIRST_RECOMMENDED_SCRIPT 0
   SC_Common     = 0,
   SC_Inherited  = 1,
@@ -354,13 +355,28 @@ enum u8id_sc {
   SC_Yi         = 160,
   SC_Unknown    = 161,
 #define LAST_SCRIPT 161
+  // clang-format on
 };
 
-/* partial list of UCD General_Category
-   only interested in the Identifier parts */
+/* Partial list of UCD General_Category
+   We are only interested for the Identifier parts in scx_list[]
+   to detect illegal runs. */
 enum u8id_gc {
-    GC_Ll,
-    GC_Lu,
+  GC_Cf,
+  GC_Lm,
+  GC_Lo,
+  GC_Mc,
+  GC_Mn,
+  GC_Nd,
+  GC_No,
+  GC_Pd,
+  GC_Pe,
+  GC_Po,
+  GC_Ps,
+  GC_Sc,
+  GC_Sk,
+  GC_So,
+  GC_Zs,
 };
 
 struct sc {
@@ -372,7 +388,7 @@ struct sc {
 struct scx {
   uint32_t from;
   uint32_t to;
-  enum u8id_gc gc;
+  uint8_t gc; // enum u8id_gc is too large
   const char *scx; // indices into sc
 };
 
@@ -713,17 +729,17 @@ const struct sc xid_script_list[] = {
     {0x1CD1, 0x1CD1, 8},	// Devanagari, originally SC Inherited
     {0x1CD2, 0x1CD2, 1},	// Inherited
     {0x1CD3, 0x1CD3, 0},	// Common
-    {0x1CD4, 0x1CD4, 8},	// Devanagari
-    {0x1CDB, 0x1CDB, 8},	// Devanagari
-    {0x1CDE, 0x1CDF, 8},	// Devanagari
-    {0x1CE2, 0x1CE8, 8},	// Devanagari
-    {0x1CEB, 0x1CEC, 8},	// Devanagari
-    {0x1CEE, 0x1CF1, 8},	// Devanagari
+    {0x1CD4, 0x1CD4, 8},	// Devanagari, originally SC Mn
+    {0x1CDB, 0x1CDB, 8},	// Devanagari, originally SC Mn
+    {0x1CDE, 0x1CDF, 8},	// Devanagari, originally SC Mn
+    {0x1CE2, 0x1CE8, 8},	// Devanagari, originally SC Mn
+    {0x1CEB, 0x1CEC, 8},	// Devanagari, originally SC Lo
+    {0x1CEE, 0x1CF1, 8},	// Devanagari, originally SC Lo
     {0x1CF4, 0x1CF4, 1},	// Inherited
     {0x1CF5, 0x1CF6, 0},	// Common
     {0x1CF7, 0x1CF7, 5},	// Bengali, originally SC Common
     {0x1CF8, 0x1CF9, 1},	// Inherited
-    {0x1CFA, 0x1CFA, 86},	// Nandinagari
+    {0x1CFA, 0x1CFA, 86},	// Nandinagari, originally SC Lo
     {0x1D00, 0x1D25, 2},	// Latin
     {0x1D26, 0x1D2A, 11},	// Greek
     {0x1D2B, 0x1D2B, 7},	// Cyrillic
@@ -735,7 +751,7 @@ const struct sc xid_script_list[] = {
     {0x1D78, 0x1D78, 7},	// Cyrillic
     {0x1D79, 0x1DBE, 2},	// Latin
     {0x1DBF, 0x1DC1, 11},	// Greek
-    {0x1DFA, 0x1DFA, 153},	// Syriac
+    {0x1DFA, 0x1DFA, 153},	// Syriac, originally SC Mn
     {0x1E00, 0x1EFF, 2},	// Latin
     {0x1F00, 0x1F15, 11},	// Greek
     {0x1F18, 0x1F1D, 11},	// Greek
@@ -827,12 +843,12 @@ const struct sc xid_script_list[] = {
     {0x30FD, 0x30FF, 18},	// Katakana
     {0x3105, 0x312F, 6},	// Bopomofo
     {0x3131, 0x318E, 14},	// Hangul
-    {0x3190, 0x319F, 15},	// Han
+    {0x3190, 0x319F, 15},	// Han, originally SC So
     {0x31A0, 0x31BF, 6},	// Bopomofo
-    {0x31C0, 0x31E3, 15},	// Han
+    {0x31C0, 0x31E3, 15},	// Han, originally SC So
     {0x31F0, 0x31FF, 18},	// Katakana
     {0x3200, 0x321E, 14},	// Hangul
-    {0x3220, 0x3247, 15},	// Han
+    {0x3220, 0x3247, 15},	// Han, originally SC No
     {0x3260, 0x327E, 14},	// Hangul
     {0x327F, 0x327F, 0},	// Common
     {0x3280, 0x32B0, 15},	// Han, originally SC Common
@@ -840,11 +856,11 @@ const struct sc xid_script_list[] = {
     {0x32C0, 0x32CB, 15},	// Han, originally SC Common
     {0x32CC, 0x32CF, 0},	// Common
     {0x32D0, 0x32FE, 18},	// Katakana
-    {0x32FF, 0x32FF, 15},	// Han
+    {0x32FF, 0x32FF, 15},	// Han, originally SC So
     {0x3300, 0x3357, 18},	// Katakana
-    {0x3358, 0x3370, 15},	// Han
-    {0x337B, 0x337F, 15},	// Han
-    {0x33E0, 0x33FE, 15},	// Han
+    {0x3358, 0x3370, 15},	// Han, originally SC So
+    {0x337B, 0x337F, 15},	// Han, originally SC So
+    {0x33E0, 0x33FE, 15},	// Han, originally SC So
     {0x4E00, 0x9FFF, 15},	// Han
     {0xA000, 0xA48C, 160},	// Yi
     {0xA490, 0xA4C6, 160},	// Yi
@@ -1212,7 +1228,7 @@ const struct sc xid_script_list[] = {
     {0x1D200, 0x1D245, 11},	// Greek
     {0x1D2E0, 0x1D2F3, 0},	// Common
     {0x1D300, 0x1D356, 0},	// Common
-    {0x1D360, 0x1D371, 15},	// Han
+    {0x1D360, 0x1D371, 15},	// Han, originally SC No
     {0x1D400, 0x1D454, 0},	// Common
     {0x1D456, 0x1D49C, 0},	// Common
     {0x1D49E, 0x1D49F, 0},	// Common
@@ -1307,7 +1323,7 @@ const struct sc xid_script_list[] = {
     {0x1F201, 0x1F202, 0},	// Common
     {0x1F210, 0x1F23B, 0},	// Common
     {0x1F240, 0x1F248, 0},	// Common
-    {0x1F250, 0x1F251, 15},	// Han
+    {0x1F250, 0x1F251, 15},	// Han, originally SC So
     {0x1F260, 0x1F265, 0},	// Common
     {0x1F300, 0x1F6D7, 0},	// Common
     {0x1F6DD, 0x1F6EC, 0},	// Common
@@ -1783,131 +1799,131 @@ const struct sc nonxid_script_list[] = {
 }; // 367 ranges, 54 single codepoints
 #endif
 
-// Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
-// TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5
+// Fixed up SCX list: Replaced SC Common/Inherited with a single SCX.
+// Maybe remove all Limited Use SC's from the list on hardcoded profiles 3-5.
 #ifndef EXT_SCRIPTS
 const struct scx scx_list[] = {
     // clang-format off
-    // {0x0342, 0x0345, GC_Lu, "\x0b"},	// Greek, moved to sc proper
-    // {0x0363, 0x036F, GC_Lu, "\x02"},	// Latin, moved to sc proper
-    {0x0483, 0x0483, GC_Lu, "\x07\x5c"},	// Cyrl Perm
-    {0x0484, 0x0484, GC_Lu, "\x07\x36"},	// Cyrl Glag
-    {0x0485, 0x0486, GC_Lu, "\x07\x02"},	// Cyrl Latn
-    {0x0487, 0x0487, GC_Lu, "\x07\x36"},	// Cyrl Glag
-    {0x060C, 0x060C, GC_Lu, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
-    {0x061B, 0x061B, GC_Lu, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
-    {0x061C, 0x061C, GC_Lu, "\x03\x99\x1c"},	// Arab Syrc Thaa
-    {0x061F, 0x061F, GC_Lu, "\x7f\x03\x92\x87\x99\x1c\x7d"},	// Adlm Arab Nkoo Rohg Syrc Thaa Yezi
-    {0x0640, 0x0640, GC_Lu, "\x7f\x03\x8d\x4a\x61\x68\x87\x70\x99"},	// Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
-    {0x064B, 0x0655, GC_Lu, "\x03\x99"},	// Arab Syrc
-    {0x0660, 0x0669, GC_Lu, "\x03\x1c\x7d"},	// Arab Thaa Yezi
-    {0x0670, 0x0670, GC_Lu, "\x03\x99"},	// Arab Syrc
-    {0x06D4, 0x06D4, GC_Lu, "\x03\x87"},	// Arab Rohg
-    {0x0951, 0x0951, GC_Lu, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x6c\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
-    {0x0952, 0x0952, GC_Lu, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
-    {0x0964, 0x0964, GC_Lu, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
-    {0x0965, 0x0965, GC_Lu, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x8b\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
-    {0x0966, 0x096F, GC_Lu, "\x08\x31\x3f\x48"},	// Deva Dogr Kthi Mahj
-    {0x09E6, 0x09EF, GC_Lu, "\x05\x84\x98"},	// Beng Cakm Sylo
-    {0x0A66, 0x0A6F, GC_Lu, "\x0d\x54"},	// Guru Mult
-    {0x0AE6, 0x0AEF, GC_Lu, "\x0c\x42"},	// Gujr Khoj
-    {0x0BE6, 0x0BF3, GC_Lu, "\x38\x1a"},	// Gran Taml
-    {0x0CE6, 0x0CEF, GC_Lu, "\x13\x56"},	// Knda Nand
-    {0x1040, 0x1049, GC_Lu, "\x84\x17\x9a"},	// Cakm Mymr Tale
-    {0x10FB, 0x10FB, GC_Lu, "\x0a\x02"},	// Geor Latn
-    {0x1735, 0x1736, GC_Lu, "\x27\x3a\x74\x73"},	// Buhd Hano Tagb Tglg
-    {0x1802, 0x1803, GC_Lu, "\x52\x66"},	// Mong Phag
-    {0x1805, 0x1805, GC_Lu, "\x52\x66"},	// Mong Phag
-    {0x1CD0, 0x1CD0, GC_Lu, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
-    // {0x1CD1, 0x1CD1, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CD2, 0x1CD2, GC_Lu, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
-    {0x1CD3, 0x1CD3, GC_Lu, "\x08\x38"},	// Deva Gran
-    // {0x1CD4, 0x1CD4, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CD5, 0x1CD6, GC_Lu, "\x05\x08"},	// Beng Deva
-    {0x1CD7, 0x1CD7, GC_Lu, "\x08\x6c"},	// Deva Shrd
-    {0x1CD8, 0x1CD8, GC_Lu, "\x05\x08"},	// Beng Deva
-    {0x1CD9, 0x1CD9, GC_Lu, "\x08\x6c"},	// Deva Shrd
-    {0x1CDA, 0x1CDA, GC_Lu, "\x08\x13\x16\x18\x1a\x1b"},	// Deva Knda Mlym Orya Taml Telu
-    // {0x1CDB, 0x1CDB, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CDC, 0x1CDD, GC_Lu, "\x08\x6c"},	// Deva Shrd
-    // {0x1CDE, 0x1CDF, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CE0, 0x1CE0, GC_Lu, "\x08\x6c"},	// Deva Shrd
-    {0x1CE1, 0x1CE1, GC_Lu, "\x05\x08"},	// Beng Deva
-    // {0x1CE2, 0x1CE8, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CE9, 0x1CE9, GC_Lu, "\x08\x56"},	// Deva Nand
-    {0x1CEA, 0x1CEA, GC_Lu, "\x05\x08"},	// Beng Deva
-    // {0x1CEB, 0x1CEC, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CED, 0x1CED, GC_Lu, "\x05\x08"},	// Beng Deva
-    // {0x1CEE, 0x1CF1, GC_Lu, "\x08"},	// Devanagari, moved to sc proper
-    {0x1CF2, 0x1CF2, GC_Lu, "\x05\x08\x38\x13\x56\x18\x1b\x78"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
-    {0x1CF3, 0x1CF3, GC_Lu, "\x08\x38"},	// Deva Gran
-    {0x1CF4, 0x1CF4, GC_Lu, "\x08\x38\x13"},	// Deva Gran Knda
-    {0x1CF5, 0x1CF6, GC_Lu, "\x05\x08"},	// Beng Deva
-    // {0x1CF7, 0x1CF7, GC_Lu, "\x05"},	// Bengali, moved to sc proper
-    {0x1CF8, 0x1CF9, GC_Lu, "\x08\x38"},	// Deva Gran
-    // {0x1CFA, 0x1CFA, GC_Lu, "\x56"},	// Nandinagari, moved to sc proper
-    // {0x1DC0, 0x1DC1, GC_Lu, "\x0b"},	// Greek, moved to sc proper
-    {0x1DF8, 0x1DF8, GC_Lu, "\x07\x99"},	// Cyrl Syrc
-    // {0x1DFA, 0x1DFA, GC_Lu, "\x99"},	// Syriac, moved to sc proper
-    {0x202F, 0x202F, GC_Lu, "\x02\x52"},	// Latn Mong
-    {0x20F0, 0x20F0, GC_Lu, "\x08\x38\x02"},	// Deva Gran Latn
-    {0x2E43, 0x2E43, GC_Lu, "\x07\x36"},	// Cyrl Glag
-    {0x3001, 0x3002, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x3003, 0x3003, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    // {0x3006, 0x3006, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    {0x3008, 0x3011, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x3013, 0x3013, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x3014, 0x301B, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x301C, 0x301F, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x302A, 0x302D, GC_Lu, "\x06\x0f"},	// Bopo Hani
-    {0x3030, 0x3030, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x3031, 0x3035, GC_Lu, "\x11\x12"},	// Hira Kana
-    {0x3037, 0x3037, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0x303C, 0x303D, GC_Lu, "\x0f\x11\x12"},	// Hani Hira Kana
-    // {0x303E, 0x303F, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    {0x3099, 0x309C, GC_Lu, "\x11\x12"},	// Hira Kana
-    {0x30A0, 0x30A0, GC_Lu, "\x11\x12"},	// Hira Kana
-    {0x30FB, 0x30FB, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0x30FC, 0x30FC, GC_Lu, "\x11\x12"},	// Hira Kana
-    // {0x3190, 0x319F, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x31C0, 0x31E3, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x3220, 0x3247, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x3280, 0x32B0, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x32C0, 0x32CB, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x32FF, 0x32FF, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x3358, 0x3370, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x337B, 0x337F, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x33E0, 0x33FE, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    {0xA66F, 0xA66F, GC_Lu, "\x07\x36"},	// Cyrl Glag
-    {0xA700, 0xA707, GC_Lu, "\x0f\x02"},	// Hani Latn
-    {0xA830, 0xA832, GC_Lu, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x16\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
-    {0xA833, 0xA835, GC_Lu, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh
-    {0xA836, 0xA839, GC_Lu, "\x08\x31\x0c\x0d\x42\x3f\x48\x51\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh
-    {0xA8F1, 0xA8F1, GC_Lu, "\x05\x08"},	// Beng Deva
-    {0xA8F3, 0xA8F3, GC_Lu, "\x08\x1a"},	// Deva Taml
-    {0xA92E, 0xA92E, GC_Lu, "\x89\x02\x17"},	// Kali Latn Mymr
-    {0xA9CF, 0xA9CF, GC_Lu, "\x26\x88"},	// Bugi Java
-    {0xFD3E, 0xFD3F, GC_Lu, "\x03\x92"},	// Arab Nkoo
-    {0xFDF2, 0xFDF2, GC_Lu, "\x03\x1c"},	// Arab Thaa
-    {0xFDFD, 0xFDFD, GC_Lu, "\x03\x1c"},	// Arab Thaa
-    {0xFE45, 0xFE46, GC_Lu, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
-    {0xFF61, 0xFF65, GC_Lu, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
-    {0xFF70, 0xFF70, GC_Lu, "\x11\x12"},	// Hira Kana
-    {0xFF9E, 0xFF9F, GC_Lu, "\x11\x12"},	// Hira Kana
-    {0x10100, 0x10101, GC_Lu, "\x2e\x2d\x45"},	// Cpmn Cprt Linb
-    {0x10102, 0x10102, GC_Lu, "\x2d\x45"},	// Cprt Linb
-    {0x10107, 0x10133, GC_Lu, "\x2d\x44\x45"},	// Cprt Lina Linb
-    {0x10137, 0x1013F, GC_Lu, "\x2d\x45"},	// Cprt Linb
-    {0x102E0, 0x102FB, GC_Lu, "\x03\x2b"},	// Arab Copt
-    {0x10AF2, 0x10AF2, GC_Lu, "\x4a\x61"},	// Mani Ougr
-    {0x11301, 0x11301, GC_Lu, "\x38\x1a"},	// Gran Taml
-    {0x11303, 0x11303, GC_Lu, "\x38\x1a"},	// Gran Taml
-    {0x1133B, 0x1133C, GC_Lu, "\x38\x1a"},	// Gran Taml
-    {0x11FD0, 0x11FD1, GC_Lu, "\x38\x1a"},	// Gran Taml
-    {0x11FD3, 0x11FD3, GC_Lu, "\x38\x1a"},	// Gran Taml
-    // {0x1BCA0, 0x1BCA3, GC_Lu, "\x32"},	// Duployan, moved to sc proper
-    // {0x1D360, 0x1D371, GC_Lu, "\x0f"},	// Han, moved to sc proper
-    // {0x1F250, 0x1F251, GC_Lu, "\x0f"},	// Han, moved to sc proper
+    // {0x0342, 0x0345, GC_Mn, "\x0b"},	// Greek, moved to sc proper
+    // {0x0363, 0x036F, GC_Mn, "\x02"},	// Latin, moved to sc proper
+    {0x0483, 0x0483, GC_Mn, "\x07\x5c"},	// Cyrl Perm
+    {0x0484, 0x0484, GC_Mn, "\x07\x36"},	// Cyrl Glag
+    {0x0485, 0x0486, GC_Mn, "\x07\x02"},	// Cyrl Latn
+    {0x0487, 0x0487, GC_Mn, "\x07\x36"},	// Cyrl Glag
+    {0x060C, 0x060C, GC_Po, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+    {0x061B, 0x061B, GC_Po, "\x03\x92\x87\x99\x1c\x7d"},	// Arab Nkoo Rohg Syrc Thaa Yezi
+    {0x061C, 0x061C, GC_Cf, "\x03\x99\x1c"},	// Arab Syrc Thaa
+    {0x061F, 0x061F, GC_Po, "\x7f\x03\x92\x87\x99\x1c\x7d"},	// Adlm Arab Nkoo Rohg Syrc Thaa Yezi
+    {0x0640, 0x0640, GC_Lm, "\x7f\x03\x8d\x4a\x61\x68\x87\x70\x99"},	// Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
+    {0x064B, 0x0655, GC_Mn, "\x03\x99"},	// Arab Syrc
+    {0x0660, 0x0669, GC_Nd, "\x03\x1c\x7d"},	// Arab Thaa Yezi
+    {0x0670, 0x0670, GC_Mn, "\x03\x99"},	// Arab Syrc
+    {0x06D4, 0x06D4, GC_Po, "\x03\x87"},	// Arab Rohg
+    {0x0951, 0x0951, GC_Mn, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x6c\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
+    {0x0952, 0x0952, GC_Mn, "\x05\x08\x38\x0c\x0d\x13\x02\x16\x18\x1a\x1b\x78"},	// Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
+    {0x0964, 0x0964, GC_Po, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+    {0x0965, 0x0965, GC_Po, "\x05\x08\x31\x39\x4c\x38\x0c\x0d\x13\x8b\x48\x16\x56\x18\x43\x19\x98\x75\x1a\x1b\x78"},	// Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh
+    {0x0966, 0x096F, GC_Nd, "\x08\x31\x3f\x48"},	// Deva Dogr Kthi Mahj
+    {0x09E6, 0x09EF, GC_Nd, "\x05\x84\x98"},	// Beng Cakm Sylo
+    {0x0A66, 0x0A6F, GC_Nd, "\x0d\x54"},	// Guru Mult
+    {0x0AE6, 0x0AEF, GC_Nd, "\x0c\x42"},	// Gujr Khoj
+    {0x0BE6, 0x0BF3, GC_Nd, "\x38\x1a"},	// Gran Taml
+    {0x0CE6, 0x0CEF, GC_Nd, "\x13\x56"},	// Knda Nand
+    {0x1040, 0x1049, GC_Nd, "\x84\x17\x9a"},	// Cakm Mymr Tale
+    {0x10FB, 0x10FB, GC_Po, "\x0a\x02"},	// Geor Latn
+    {0x1735, 0x1736, GC_Po, "\x27\x3a\x74\x73"},	// Buhd Hano Tagb Tglg
+    {0x1802, 0x1803, GC_Po, "\x52\x66"},	// Mong Phag
+    {0x1805, 0x1805, GC_Po, "\x52\x66"},	// Mong Phag
+    {0x1CD0, 0x1CD0, GC_Mn, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
+    // {0x1CD1, 0x1CD1, GC_Mn, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CD2, 0x1CD2, GC_Mn, "\x05\x08\x38\x13"},	// Beng Deva Gran Knda
+    {0x1CD3, 0x1CD3, GC_Po, "\x08\x38"},	// Deva Gran
+    // {0x1CD4, 0x1CD4, GC_Mn, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CD5, 0x1CD6, GC_Mn, "\x05\x08"},	// Beng Deva
+    {0x1CD7, 0x1CD7, GC_Mn, "\x08\x6c"},	// Deva Shrd
+    {0x1CD8, 0x1CD8, GC_Mn, "\x05\x08"},	// Beng Deva
+    {0x1CD9, 0x1CD9, GC_Mn, "\x08\x6c"},	// Deva Shrd
+    {0x1CDA, 0x1CDA, GC_Mn, "\x08\x13\x16\x18\x1a\x1b"},	// Deva Knda Mlym Orya Taml Telu
+    // {0x1CDB, 0x1CDB, GC_Mn, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CDC, 0x1CDD, GC_Mn, "\x08\x6c"},	// Deva Shrd
+    // {0x1CDE, 0x1CDF, GC_Mn, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CE0, 0x1CE0, GC_Mn, "\x08\x6c"},	// Deva Shrd
+    {0x1CE1, 0x1CE1, GC_Mc, "\x05\x08"},	// Beng Deva
+    // {0x1CE2, 0x1CE8, GC_Mn, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CE9, 0x1CE9, GC_Lo, "\x08\x56"},	// Deva Nand
+    {0x1CEA, 0x1CEA, GC_Lo, "\x05\x08"},	// Beng Deva
+    // {0x1CEB, 0x1CEC, GC_Lo, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CED, 0x1CED, GC_Mn, "\x05\x08"},	// Beng Deva
+    // {0x1CEE, 0x1CF1, GC_Lo, "\x08"},	// Devanagari, moved to sc proper
+    {0x1CF2, 0x1CF2, GC_Lo, "\x05\x08\x38\x13\x56\x18\x1b\x78"},	// Beng Deva Gran Knda Nand Orya Telu Tirh
+    {0x1CF3, 0x1CF3, GC_Lo, "\x08\x38"},	// Deva Gran
+    {0x1CF4, 0x1CF4, GC_Mn, "\x08\x38\x13"},	// Deva Gran Knda
+    {0x1CF5, 0x1CF6, GC_Lo, "\x05\x08"},	// Beng Deva
+    // {0x1CF7, 0x1CF7, GC_Mc, "\x05"},	// Bengali, moved to sc proper
+    {0x1CF8, 0x1CF9, GC_Mn, "\x08\x38"},	// Deva Gran
+    // {0x1CFA, 0x1CFA, GC_Lo, "\x56"},	// Nandinagari, moved to sc proper
+    // {0x1DC0, 0x1DC1, GC_Mn, "\x0b"},	// Greek, moved to sc proper
+    {0x1DF8, 0x1DF8, GC_Mn, "\x07\x99"},	// Cyrl Syrc
+    // {0x1DFA, 0x1DFA, GC_Mn, "\x99"},	// Syriac, moved to sc proper
+    {0x202F, 0x202F, GC_Zs, "\x02\x52"},	// Latn Mong
+    {0x20F0, 0x20F0, GC_Mn, "\x08\x38\x02"},	// Deva Gran Latn
+    {0x2E43, 0x2E43, GC_Po, "\x07\x36"},	// Cyrl Glag
+    {0x3001, 0x3002, GC_Po, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x3003, 0x3003, GC_Po, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    // {0x3006, 0x3006, GC_Lo, "\x0f"},	// Han, moved to sc proper
+    {0x3008, 0x3011, GC_Ps, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x3013, 0x3013, GC_So, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x3014, 0x301B, GC_Ps, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x301C, 0x301F, GC_Pd, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x302A, 0x302D, GC_Mn, "\x06\x0f"},	// Bopo Hani
+    {0x3030, 0x3030, GC_Pd, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x3031, 0x3035, GC_Lm, "\x11\x12"},	// Hira Kana
+    {0x3037, 0x3037, GC_So, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0x303C, 0x303D, GC_Lo, "\x0f\x11\x12"},	// Hani Hira Kana
+    // {0x303E, 0x303F, GC_So, "\x0f"},	// Han, moved to sc proper
+    {0x3099, 0x309C, GC_Mn, "\x11\x12"},	// Hira Kana
+    {0x30A0, 0x30A0, GC_Pd, "\x11\x12"},	// Hira Kana
+    {0x30FB, 0x30FB, GC_Po, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x30FC, 0x30FC, GC_Lm, "\x11\x12"},	// Hira Kana
+    // {0x3190, 0x319F, GC_So, "\x0f"},	// Han, moved to sc proper
+    // {0x31C0, 0x31E3, GC_So, "\x0f"},	// Han, moved to sc proper
+    // {0x3220, 0x3247, GC_No, "\x0f"},	// Han, moved to sc proper
+    // {0x3280, 0x32B0, GC_No, "\x0f"},	// Han, moved to sc proper
+    // {0x32C0, 0x32CB, GC_So, "\x0f"},	// Han, moved to sc proper
+    // {0x32FF, 0x32FF, GC_So, "\x0f"},	// Han, moved to sc proper
+    // {0x3358, 0x3370, GC_So, "\x0f"},	// Han, moved to sc proper
+    // {0x337B, 0x337F, GC_So, "\x0f"},	// Han, moved to sc proper
+    // {0x33E0, 0x33FE, GC_So, "\x0f"},	// Han, moved to sc proper
+    {0xA66F, 0xA66F, GC_Mn, "\x07\x36"},	// Cyrl Glag
+    {0xA700, 0xA707, GC_Sk, "\x0f\x02"},	// Hani Latn
+    {0xA830, 0xA832, GC_No, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x16\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Sind Takr Tirh
+    {0xA833, 0xA835, GC_No, "\x08\x31\x0c\x0d\x42\x13\x3f\x48\x51\x56\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Sind Takr Tirh
+    {0xA836, 0xA839, GC_So, "\x08\x31\x0c\x0d\x42\x3f\x48\x51\x43\x75\x78"},	// Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh
+    {0xA8F1, 0xA8F1, GC_Mn, "\x05\x08"},	// Beng Deva
+    {0xA8F3, 0xA8F3, GC_Lo, "\x08\x1a"},	// Deva Taml
+    {0xA92E, 0xA92E, GC_Po, "\x89\x02\x17"},	// Kali Latn Mymr
+    {0xA9CF, 0xA9CF, GC_Lm, "\x26\x88"},	// Bugi Java
+    {0xFD3E, 0xFD3F, GC_Pe, "\x03\x92"},	// Arab Nkoo
+    {0xFDF2, 0xFDF2, GC_Lo, "\x03\x1c"},	// Arab Thaa
+    {0xFDFD, 0xFDFD, GC_So, "\x03\x1c"},	// Arab Thaa
+    {0xFE45, 0xFE46, GC_Po, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana
+    {0xFF61, 0xFF65, GC_Po, "\x06\x0e\x0f\x11\x12\xa0"},	// Bopo Hang Hani Hira Kana Yiii
+    {0xFF70, 0xFF70, GC_Lm, "\x11\x12"},	// Hira Kana
+    {0xFF9E, 0xFF9F, GC_Lm, "\x11\x12"},	// Hira Kana
+    {0x10100, 0x10101, GC_Po, "\x2e\x2d\x45"},	// Cpmn Cprt Linb
+    {0x10102, 0x10102, GC_Po, "\x2d\x45"},	// Cprt Linb
+    {0x10107, 0x10133, GC_No, "\x2d\x44\x45"},	// Cprt Lina Linb
+    {0x10137, 0x1013F, GC_So, "\x2d\x45"},	// Cprt Linb
+    {0x102E0, 0x102FB, GC_Mn, "\x03\x2b"},	// Arab Copt
+    {0x10AF2, 0x10AF2, GC_Po, "\x4a\x61"},	// Mani Ougr
+    {0x11301, 0x11301, GC_Mn, "\x38\x1a"},	// Gran Taml
+    {0x11303, 0x11303, GC_Mc, "\x38\x1a"},	// Gran Taml
+    {0x1133B, 0x1133C, GC_Mn, "\x38\x1a"},	// Gran Taml
+    {0x11FD0, 0x11FD1, GC_No, "\x38\x1a"},	// Gran Taml
+    {0x11FD3, 0x11FD3, GC_No, "\x38\x1a"},	// Gran Taml
+    // {0x1BCA0, 0x1BCA3, GC_Cf, "\x32"},	// Duployan, moved to sc proper
+    // {0x1D360, 0x1D371, GC_No, "\x0f"},	// Han, moved to sc proper
+    // {0x1F250, 0x1F251, GC_So, "\x0f"},	// Han, moved to sc proper
     // clang-format on
 }; // 57 ranges, 63 single codepoints
 #else
@@ -6432,6 +6448,7 @@ extern const struct range_bool xid_cont_list[1315];
 #  endif
 
 // All (X)ID_Continue with gc=Lm. For SCX checks, invalid runs.
+// https://www.unicode.org/reports/tr31/#Modifier_Letters
 #  ifdef EXT_SCRIPTS
 extern const struct range_bool id_lm_list[92];
 extern const struct range_bool xid_lm_list[31];

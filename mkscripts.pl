@@ -47,7 +47,7 @@ for ($idtype, $idstat) {
 }
 
 my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
-    @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, $id);
+    @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, %GC, $id);
 my ($started, @IDTYPES, @ALLOWED, @IDSTART, @IDCONT, @XIDSTART, @XIDCONT,
     @SAFEC23START, @SAFEC23CONT);
 open my $IDTYPE, "<", $idtype or die "$idtype $!";
@@ -280,15 +280,17 @@ close $PVA;
 $started = 0;
 $oldto = 0; $oldsc = "";
 open my $SCX, "<", $scxn or die "$scxn $!";
-my $scl;
+my ($scl, $gc);
 while (<$SCX>) {
   if (/^# Script_Extensions=/) { $started++; }
   next unless $started;
-  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; ([\w ]+) #/) {
-    ($from, $to, $scl) = (hex($1), hex($2), $3);
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; ([\w ]+) # (\w.) /) {
+    ($from, $to, $scl, $gc) = (hex($1), hex($2), $3, $4);
+    $GC{$gc}++;
   }
-  elsif (/^([0-9A-F]{4,5})\s+; ([\w ]+) #/) {
-    ($from, $to, $scl) = (hex($1), hex($1), $2);
+  elsif (/^([0-9A-F]{4,5})\s+; ([\w ]+) # (\w.) /) {
+    ($from, $to, $scl, $gc) = (hex($1), hex($1), $2, $3);
+    $GC{$gc}++;
     if ($from == 0x0345) { # UCD bug
       $from = 0x342;
       $oldto = 0x341; # update the prev. range
@@ -300,7 +302,7 @@ while (<$SCX>) {
   # only if the Sc is new or there is a hole
   if (($from != $oldto + 1) or ($oldsc ne $scl) or !@SCXR) {
     # scl is a string, list of short script names
-    push @SCXR, [$from, $to, $scl];
+    push @SCXR, [$from, $to, $scl, $gc];
     $oldsc = $scl;
   } else { # update the range
     my $range = $SCXR[$#SCXR];
@@ -502,7 +504,7 @@ struct sc {
 struct scx {
   uint32_t from;
   uint32_t to;
-  enum u8id_gc gc;
+  uint8_t gc; // enum u8id_gc is too large
   const char *scx; // indices into sc
 };
 
@@ -552,7 +554,7 @@ struct sc16 {
 struct scx16 {
   uint16_t from;
   uint16_t to;
-  enum u8id_gc gc;
+  uint8_t gc;
   const char *list; // indices
 };
 
@@ -564,6 +566,7 @@ EOF
 
 $i = 0;
 my $defines = "enum u8id_sc {\n";
+$defines .= "  // clang-format off\n";
 $defines .= "#define FIRST_RECOMMENDED_SCRIPT 0\n";
 for my $sc (@recommended) {
   my $n = 10 - length($sc);
@@ -608,15 +611,20 @@ extern const char *const all_scripts[%u];
 #endif
 
 EOF
+$defines .= "  // clang-format on\n";
 $defines .= "};\n";
 print $H $defines;
-printf $H <<'EOF', $i;
+printf $H <<'EOF';
 
-/* partial list of UCD General_Category
-   only interested in the Identifier parts */
+/* Partial list of UCD General_Category
+   We are only interested for the Identifier parts in scx_list[]
+   to detect illegal runs. */
 enum u8id_gc {
-    GC_Ll,
-    GC_Lu,
+EOF
+for my $g (sort keys %GC) {
+  printf $H "  GC_%s,\n", $g;
+}
+printf $H <<'EOF', $i;
 };
 
 EOF
@@ -709,6 +717,7 @@ printf $H16 <<'EOF', $b, $s, $b + $s;
 extern const struct sc xid_script_list32[%u];
 #  endif
 #endif // DISABLE_CHECK_XID
+
 EOF
 
 printf $H <<"EOF", scalar(@SCRF);
@@ -740,8 +749,8 @@ printf $H <<"EOF", $b, $s;
 }; // %u ranges, %u single codepoints
 #endif
 
-// Fixed up SCX list: Replaced SC Common/Inherited with a single SCX
-// TODO: Remove all Limited Use SC's from the list on hardcoded profiles 3-5
+// Fixed up SCX list: Replaced SC Common/Inherited with a single SCX.
+// Maybe remove all Limited Use SC's from the list on hardcoded profiles 3-5.
 #ifndef EXT_SCRIPTS
 const struct scx scx_list[] = {
     // clang-format off
@@ -761,7 +770,8 @@ for my $r (@SCXR) {
   } else {
     $b++;
   }
-  my $gc = 'GC_Lu'; # FIXME gc lookup
+  $gc = 'GC_' . $r->[3];
+  $gc = 'GC_Lu' if $gc eq 'GC_';
   if (@list == 1) {
     $size--;
     printf $H "    // {0x%04X, 0x%04X, %s, \"%s\"},\t// %s, moved to sc proper\n",
@@ -941,6 +951,7 @@ extern const struct range_bool xid_lm_list[%u];
 const struct range_bool id_lm_list[] = {
     // clang-format off
 EOF
+
 ($b, $s) = (0, 0);
 for my $r (@LM) {
   if ($r->[0] == $r->[1]) {
