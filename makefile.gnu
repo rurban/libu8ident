@@ -137,8 +137,10 @@ check: test test-texts u8idlint
 	diff texts.tst texts/result.lst && rm texts.tst
 	./u8idlint.test
 else
-check: test u8idlint
+check: test test-texts u8idlint
 	./test
+	./test-texts > texts.tst
+	diff texts.tst texts/result.lst && rm texts.tst
 	./u8idlint.test
 endif
 endif
@@ -181,24 +183,24 @@ check-norms: $(SRC) $(HEADER) $(HDRS)
             $(CC) $(CFLAGS_REL) -DU8ID_NORM=$$n -Wfatal-errors -Iinclude -c u8idnorm.c -o u8idnorm.o && \
 	      ls -gGh u8idnorm.o; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_NORM=$$n -I. -Iinclude test.c $(SRC) \
-	      -o test-norm-$$n && ./test-norm-$$n norm; \
+	      -o test-norm-$$n && ./test-norm-$$n norm && rm test-norm-$$n; \
         done
 check-profiles: $(SRC) $(HEADER) $(HDRS)
 	for n in 2 3 4 5 6 C11_6 C23_4; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
-	      -o test-prof$$n && ./test-prof$$n profile; \
+	      -o test-prof$$n && ./test-prof$$n profile && rm test-prof$$n; \
         done
 	for n in SAFEC23 C11STD; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE_$${n} -I. -Iinclude test.c $(SRC) \
-	      -o test-prof$$n && ./test-prof$$n profile; \
+	      -o test-prof$$n && ./test-prof$$n profile && rm test-prof$$n; \
         done
 check-xid: $(SRC) $(HEADER) $(HDRS)
 	for n in DISABLE ENABLE; do \
             echo $${n}_CHECK_XID; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -D$${n}_CHECK_XID -I. -Iinclude test.c $(SRC) \
-	      -o test-xid-$$n && ./test-xid-$$n xid; \
+	      -o test-xid-$$n && ./test-xid-$$n xid && rm test-xid-$$n; \
         done
 
 # Create the normalization headers via a current perl
