@@ -95,37 +95,59 @@ undef @_ID;
 
 open my $COREP, "<", $corep or die "$corep $!";
 $started = 0;
-my $ref;
+my ($ref, $is_ID, $is_XID, @LM, @LMX);
 while (<$COREP>) {
   if (/^# Derived Property: (\w+)/) {
     if ($1 eq 'ID_Start') {
+      #      Lu + Ll + Lt + Lm + Lo + Nl
+      #    + Other_ID_Start
+      #    - Pattern_Syntax
+      #    - Pattern_White_Space
       $ref = \@IDSTART;
       $started = 1;
     }
     elsif ($1 eq 'ID_Continue') {
+      # ID_Start
+      #    + Mn + Mc + Nd + Pc
+      #    + Other_ID_Continue
+      #    - Pattern_Syntax
+      #    - Pattern_White_Space
       $ref = \@IDCONT;
       $started = 1;
+      # ID_Continue includes ID_Start, so all identifier chars
+      $is_ID = 1;
     }
     elsif ($1 eq 'XID_Start') {
+      # if isIdentifer(string) then isIdentifier(NFKx(string))
       $ref = \@XIDSTART;
       $started = 1;
     }
     elsif ($1 eq 'XID_Continue') {
+      # if isIdentifer(string) then isIdentifier(NFKx(string))
       $ref = \@XIDCONT;
       $started = 1;
+      $is_XID = 1;
     }
     else {
-      $started = 0;
+      $started = 0; # another property we are not interested in
     }
   }
   next unless $started;
-  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; [\w ]+\s+#/) {
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; [\w ]+\s+# (\w.) /) {
     ($from, $to) = (hex($1), hex($2));
     push @$ref, [$from, $to];
+    if ($3 eq 'Lm') {
+      push @LM, [$from, $to] if $is_ID;
+      push @LMX, [$from, $to] if $is_XID;
+    }
   }
-  elsif (/^([0-9A-F]{4,5})\s+; [\w ]+\s+#/) {
+  elsif (/^([0-9A-F]{4,5})\s+; [\w ]+\s+# (\w.) /) {
     $from = hex($1);
     push @$ref, [$from, $from];
+    if ($3 eq 'Lm') {
+      push @LM, [$from, $to] if $is_ID;
+      push @LMX, [$from, $to] if $is_XID;
+    }
   }
 }
 close $COREP;
@@ -590,6 +612,8 @@ $defines .= "};\n";
 print $H $defines;
 printf $H <<'EOF', $i;
 
+/* partial list of UCD General_Category
+   only interested in the Identifier parts */
 enum u8id_gc {
     GC_Ll,
     GC_Lu,
@@ -846,6 +870,7 @@ printf $H <<"EOF", $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 
+// FIXME: This includes the id_start still
 const struct range_bool id_cont_list[] = {
     // clang-format off
 EOF
@@ -885,10 +910,12 @@ printf $H <<"EOF", $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 
+// FIXME: This includes the xid_start still
 const struct range_bool xid_cont_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
+# FIXME only the chars not in XIDSTART
 for my $r (@XIDCONT) {
   if ($r->[0] == $r->[1]) {
     $s++;
@@ -897,12 +924,51 @@ for my $r (@XIDCONT) {
   }
   printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
 };
-printf $H <<"EOF", $b, $s, scalar(@XIDSTART), scalar(@XIDCONT);
+printf $H <<'EOF', $b, $s, scalar(@XIDSTART), scalar(@XIDCONT), scalar(@LM), scalar(@LMX);
     // clang-format on
 }; // %u ranges, %u single codepoints
 #  else
 extern const struct range_bool xid_start_list[%u];
 extern const struct range_bool xid_cont_list[%u];
+#  endif
+
+// All (X)ID_Continue with gc=Lm. For SCX checks, invalid runs.
+// https://www.unicode.org/reports/tr31/#Modifier_Letters
+#  ifdef EXT_SCRIPTS
+extern const struct range_bool id_lm_list[%u];
+extern const struct range_bool xid_lm_list[%u];
+#  else
+const struct range_bool id_lm_list[] = {
+    // clang-format off
+EOF
+($b, $s) = (0, 0);
+for my $r (@LM) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
+  printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+};
+printf $H <<'EOF', $b, $s;
+    // clang-format on
+}; // %u ranges, %u single codepoints
+
+const struct range_bool xid_lm_list[] = {
+    // clang-format off
+EOF
+($b, $s) = (0, 0);
+for my $r (@LMX) {
+  if ($r->[0] == $r->[1]) {
+    $s++;
+  } else {
+    $b++;
+  }
+  printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
+};
+printf $H <<'EOF', $b, $s;
+    // clang-format on
+}; // %u ranges, %u single codepoints
 #  endif
 
 // Identifier_Type bit-values TR 39
