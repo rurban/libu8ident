@@ -156,6 +156,9 @@ mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS)
 check-asan: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
+# gem install mdl
+check-mdl:
+	mdl *.md
 
 perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h

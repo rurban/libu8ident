@@ -67,8 +67,8 @@ Normalization
 All utf8 identifiers and literals are parsed and stored as normalized
 NFC variants (unlike Python 3), which prevents from various TR31, TR36 and TR39
 unicode confusable and spoofing security problems with identifiers. See
-http://www.unicode.org/reports/tr31/, http://www.unicode.org/reports/tr36/
-and http://www.unicode.org/reports/tr39
+<http://www.unicode.org/reports/tr31/>, <http://www.unicode.org/reports/tr36/>
+and <http://www.unicode.org/reports/tr39>
 Optionally we also support the NFKC, NFKD and NFD methods.
 
 For example with NFKC the following two characters would be equal:
@@ -82,7 +82,7 @@ Mixed Scripts
 Many mixed scripts combinations in unicode identifiers for a certain
 context (such as a document or directory) are forbidden, but they can
 be declared via a special API.  The 'Common', 'Latin' and 'Inherited'
-scripts are always allowed and don't need to be declared. 
+scripts are always allowed and don't need to be declared.
 With some Common and Inherited the SCX Extended scripts needs to be checked.
 Also the following combinations are allowed without any declaration: Latin +
 Hangul + Han (:Korean), Latin + Katakana + Hiregana (::Japanese) and
@@ -93,34 +93,33 @@ Greek.
 The first allowed undeclared unicode script for an identifier is the
 only allowed one. This qualifies as single-script.  More scripts lead
 to parsers errors.
-See http://www.unicode.org/reports/tr36/#Mixed_Script_Spoofing and
-http://www.unicode.org/reports/tr31/.
+See <http://www.unicode.org/reports/tr36/#Mixed_Script_Spoofing> and
+<http://www.unicode.org/reports/tr31/>.
 
 I.e. you may still declare those scripts as valid, but they are not
 automatically allowed, similar to the need to declare mixed scripts.
-
 
 General Security Profiles
 -------------------------
 
 Certain combinations of mixed scripts are defined with a user-defined
 identifier security profile, the Restriction Levels 1-6.
-https://www.unicode.org/reports/tr39/#Restriction_Level_Detection
+<https://www.unicode.org/reports/tr39/#Restriction_Level_Detection>
 
-1. **ASCII-Only**
+`1`. **ASCII-Only**
 
 All characters in the string are in the ASCII range. You don't need this library
 for that use-case. (*Maybe still allow that for conformance testing*.
 This is the recommended profile, don't fall into the unicode identifier trap.
 *E.g. zig was right, rejecting those proposals.*)
 
-2. **Single Script**
+`2`. **Single Script**
 
 * The string qualifies as ASCII-Only, or
 * The string is single-script, according to the definition in
   [Mixed Scripts](http://www.unicode.org/reports/tr39/#Mixed_Script_Detection).
 
-3. **Highly Restrictive**
+`3`. **Highly Restrictive**
 
 * The string qualifies as Single Script, or
 * The string is covered by any of the following sets of scripts,
@@ -130,13 +129,13 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   * Latin + Han + Bopomofo; or equivalently: Latn + Hanb
   * Latin + Han + Hangul; or equivalently: Latn + Kore
 
-4. **Moderately Restrictive**
+`4`. **Moderately Restrictive**
 
 * The string qualifies as Highly Restrictive, or
 * The string is covered by Latin and any one other Recommended script, except
   Cyrillic or Greek.
 
-5. **Minimally Restrictive**
+`5`. **Minimally Restrictive**
 
 * There are no restrictions on the set of scripts that cover the string.
 * The only restrictions are the identifier well-formedness criteria
@@ -144,7 +143,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   as Ωmega, Teχ, HλLF-LIFE, Toys-Я-Us.
   Bidi-formatting is only allowed with Hebrew or Arabic. (an extension over TR39)
 
-6. **Unrestricted**
+`6`. **Unrestricted**
 
 * There are no restrictions on the script coverage of the string.
 * The only restrictions are the criteria on identifier
@@ -155,7 +154,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   value indicating that the string does not match any of the levels
   1-5.
 
-c11_4. **SAFEC23**
+`c23_4`. **SAFEC23**
 
 * We also provide a special profile, called **`U8ID_PROFILE_C11_4`**,
   defined by `-DU8ID_PROFILE_SAFEC23`. This is an extended Moderate
@@ -167,17 +166,17 @@ c11_4. **SAFEC23**
   the insecure mixed scripts combinations.  See `unic11.h`,
   `test-c11.c` and [c11.md](c11.md).
 
-c11_6. **C11STD**
+`c11_6`. **C11STD**
 
 * The C11 standard allows a certain range of (mostly insecure)
   codepoints, and did not define combinations of mixed scripts, not a
   security profile.  Thus an insecure Unrestricted profile 6, ignoring
   the UCD IdentifierStatus.  This is `U8ID_PROFILE_C11_6`, defined by
   `-DU8ID_PROFILE_C11STD`
-  See [c11.md](c11.md), `unic11.h` and http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf
-  Annex D (p. 425)
+  See [c11.md](c11.md), `unic11.h` and [N2731](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf)
+  Annex D (p. 425).
 
-Recommended is Level 4, the **Moderately Restrictive level** or its **C11_4** variant.
+Recommended is Level 4, the **Moderately Restrictive level** or its **C23_4** variant.
 It is always easier to widen restrictions than narrow them.
 
 configure options
@@ -235,7 +234,7 @@ For `-DU8ID_PROFILE_SAFEC23` see above. `c23_4` is also called
 With `confus` enabled, the confusable API is added.
 With `croaring` the confus API is about twice as fast, and needs half the size.
 
-See the likewise **cmake** options: 
+See the likewise **cmake** options:
 
 * `-DBUILD_SHARED_LIBS=ON,OFF`
 * `-DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD`
@@ -280,7 +279,7 @@ enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
     U8ID_TR31_C11 = 67,
     U8ID_TR31_ALLUTF8 = 68,
     // room for more tr31 profiles
-    
+
     U8ID_FOLDCASE = 128,         // optional for case-insensitive idents. case-folded
                                  // when normalized
     U8ID_WARN_CONFUSABLE = 256,  // requires -DHAVE_CONFUS
@@ -352,15 +351,15 @@ set to a fresh normalized string if valid.
 
 Return values (`enum u8id_errors`):
 
-  * 0  - valid without need to normalize.
-  * 1   - valid with need to normalize.
-  * 2   - warn about confusable
-  * 3   - warn about confusable and need to normalize
-  * -1  - invalid character class (only with `U8ID_CHECK_XID`)
-  * -2  - invalid script
-  * -3  - invalid mixed scripts
-  * -4  - invalid UTF-8 encoding
-  * -5  - invalid because confusable
+* 0  - valid without need to normalize.
+* 1   - valid with need to normalize.
+* 2   - warn about confusable
+* 3   - warn about confusable and need to normalize
+* -1  - invalid character class (only with `U8ID_CHECK_XID`)
+* -2  - invalid script
+* -3  - invalid mixed scripts
+* -4  - invalid UTF-8 encoding
+* -5  - invalid because confusable
 
 Note that we explicitly allow the Latin confusables: 0 1 I ` |
 i.e. U+30, U+31, U+49, U+60, U+7C
@@ -417,8 +416,8 @@ Build dependencies: ronn (`dnf install rubygem-ronn-ng`)
 
 Optional dependencies:
 
-  * CRoaring (the two amalgamated sources only).
-    autotools downloads it automatically with `--enable-confus --with-roaring`.
+* CRoaring (the two amalgamated sources only).
+  autotools downloads it automatically with `--enable-confus --with-roaring`.
 
 Maintainer dependencies: wget, perl, xxd. Needed every year when the UCD changes.
 
@@ -510,4 +509,5 @@ TODO
 
 AUTHOR
 ------
+
 Reini Urban <rurban@cpan.org> 2014,2021

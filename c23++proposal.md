@@ -1,16 +1,14 @@
 C++ Identifier Security using Unicode Standard Annex 39
 =======================================================
 
-Date: 	    2022-01-07
-Project: 	Programming Language C++
-Audience: 	EWG
-            CWG
-			WG14
-			WG21
-			SG-16
-Reply-to: 	Reini Urban <reini.urban@gmail.com>
-
-Contents
+    Date:       2022-01-07
+    Project:    Programming Language C++
+    Audience:   EWG
+                CWG
+                WG14
+                WG21
+                SG-16
+    Reply-to:   Reini Urban <reini.urban@gmail.com>
 
 1 Abstract
 ==========
@@ -19,21 +17,28 @@ In response to [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021
 
 Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++ 23 (and C23).
 
-- TR39#5.2 Mixed-Scripts Moderately Restrictive profile, but allow Greek scripts,
-- Disallow all Limited_Use and Excluded scripts,
-- Only allow TR 39#1 Recommended, Inclusion, Technical Identifier Type properties,
-- Demand NFC normalization. Reject all composable sequences as ill-formed. (from P1949)
-- Reject illegal mark sequences (Lm, Mn, Mc) with mixed-scripts (SCX) as ill-formed.
+* TR39#5.2 Mixed-Scripts Moderately Restrictive profile, but allow
+  Greek scripts,
+* Disallow all Limited_Use and Excluded scripts,
+* Only allow TR 39#1 Recommended, Inclusion, Technical Identifier Type
+  properties,
+* Demand NFC normalization. Reject all composable sequences as
+  ill-formed. (from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
+* Reject illegal mark sequences (Lm, Mn, Mc) with mixed-scripts (SCX)
+  as ill-formed.
 
 Optionally:
-- Implementations may allow an optional `#pragma unicode <LongScript>` that 
+
+* Implementations may allow an optional `#pragma unicode <LongScript>` that
   Excluded scripts can be added to the allowed set of scripts.
 
-Recommend binutils/linker identifier rules: Require UTF-8 and NFC. Maybe even unicode security.
+Recommend binutils/linker identifier rules: Require UTF-8 and
+NFC. Maybe even unicode security.
 
 In addition adopt this proposal as a Defect Report against C++20 and
-earlier. The author provides the [libu8ident](https://github.com/rurban/libu8ident/)
-library (Apache 2 licensed) and its generated tables to all implementors.
+earlier. The author provides the
+[libu8ident](https://github.com/rurban/libu8ident/) library (Apache 2
+licensed) and its generated tables to all implementors.
 
 2 Changes
 =========
@@ -71,16 +76,18 @@ Arabic RTL bidi attacks and most confusables. You can still write in
 your language, but then only in commonly written languages, and not
 mixed with others. Identifiers are still identifiable.
 
-4 What will this proposal change?
-=================================
+4 What will this proposal change
+================================
 
-# The set of TR31 XID ranges will become smaller.
+4.1 The set of TR31 XID ranges will become smaller
+----------------------------------------------
 
 Restricting the **Identifier_Type** plus the Allowed Scripts, plus demanding NFC
 will shrink the original XID set from 971267 codepoints to 93036 codepoints.
 The ranges expand from 36 to 315. (when split by scripts already, 25 splits happen).
 
-# Only Recommended scripts are now allowed, Excluded and Limited_Use scripts are excluded.
+4.2 Only Recommended scripts are now allowed, Excluded and Limited_Use not
+--------------------------------------------------------------------------
 
 These scripts will stay allowed:
 
@@ -89,8 +96,8 @@ These scripts will stay allowed:
     Hiragana Katakana Kannada Khmer Lao Malayalam Myanmar Oriya
     Sinhala Tamil Telugu Thaana Thai Tibetan
 
-These Excluded Scripts are initially disallowed 
-https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers
+These Excluded Scripts are initially disallowed
+[TR31#Table_Candidate_Characters_for_Exclusion_from_Identifiers](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers)
 but can be optionally be allowed via a new `#pragma unicode Script`:
 
     Ahom Anatolian_Hieroglyphs Avestan Bassa_Vah Bhaiksuki Brahmi
@@ -111,8 +118,7 @@ but can be optionally be allowed via a new `#pragma unicode Script`:
     Tangsa Tangut Tirhuta Toto Ugaritic Vithkuqi Warang_Citi Yezidi
     Zanabazar_Square
 
-These Limited Use Scripts are now disallowed:
-http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
+These Limited Use Scripts are now disallowed [TR31#Table_Limited_Use_Scripts](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
 
     Adlam Balinese Bamum Batak Canadian_Aboriginal Chakma Cham Cherokee
     Hanifi_Rohingya Javanese Kayah_Li Lepcha Limbu Lisu Mandaic
@@ -120,29 +126,33 @@ http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
     Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
     Tai_Viet Tifinagh Vai Wancho Yi Unknown
 
-The script property and its name are defined in [TR24](https://www.unicode.org/reports/tr24/).
-We use the long Unicode Script property value, not the abbrevated 4-letter short name, which
-maps somehow to the 4-letter [ISO 15924 Codes](https://www.unicode.org/reports/tr24/#Relation_To_ISO15924).
+The script property and its name are defined in
+[TR24](https://www.unicode.org/reports/tr24/).  We use the long
+Unicode Script property value, not the abbrevated 4-letter short name,
+which maps somehow to the 4-letter [ISO 15924
+Codes](https://www.unicode.org/reports/tr24/#Relation_To_ISO15924).
 
-# Documents with identifiers in many multiple scripts/languages will become illegal
+4.3 Documents with identifiers in many multiple scripts/languages will become illegal
+---------------------------------------------------------------------------------
 
 C++23 (and C23) will follow the TR39 Security Profile 4 **Moderately
 Restrictive**, with an exception for Greek. We call this profile **C23_4** or
 **SAFEC23**.
 
 * All identifiers in a document qualify as Single Script, or
-* All identifiers in a document are covered by any of the following sets of scripts,
-  according to the definition in Mixed Scripts:
-  * Latin + Han + Hiragana + Katakana (Japanese)
-  * Latin + Han + Bopomofo (Chinese)
-  * Latin + Han + Hangul (Korean), or
+* All identifiers in a document are covered by any of the following sets of
+  scripts, according to the definition in Mixed Scripts:
+  + Latin + Han + Hiragana + Katakana (Japanese)
+  + Latin + Han + Bopomofo (Chinese)
+  + Latin + Han + Hangul (Korean), or
 * All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
 
-5 What will this proposal not change?
-=====================================
+5 What will this proposal not change
+====================================
 
-# 5.1 The validity of “extended”" characters in identifiers.
+5.1 The validity of “extended”" characters in identifiers
+---------------------------------------------------------
 
 All current compilers allow characters outside the basic source
 character set directly in source today.
@@ -165,11 +175,11 @@ misuse in C ABI's from linkers and binutils.
 Restricting the profile of characters is much easier if no one is
 depending on them.
 
-The recent https://trojansource.codes effort caused gcc to emit a new
+The recent <https://trojansource.codes> effort caused gcc to emit a new
 bidi warning, and github to implement similar warnings.
 
 There used to be no linter, but there is now one: **u8idlint** from
-https://github.com/rurban/libu8ident, which can be used to check for
+<https://github.com/rurban/libu8ident>, which can be used to check for
 ALLOWED,ID,XID,C11 or ALLUTF8 TR31 profiles, for various TR39 mixed script
 profile violations and TR15 normalization problems.
 
@@ -182,7 +192,8 @@ identifiers to "symbols".
 7 TR24 Scripts, the SC and SCX properties
 =========================================
 
-# 7.1 SC
+7.1 SC
+-----
 
 C++ only needs to map unicode characters to a script property via a
 single byte.  There are currently 161 scripts assigned, 32 of them are
@@ -199,65 +210,76 @@ identifier profile by scripts, rather went with insecure identifiers.
 
 For error messages and an optional pragma to allow certain Exluded
 scripts, we use the long **Script property value**. Do not use the
-term "script name", as this is ambigious and [misused](https://www.unicode.org/reports/tr24/#Script_Names).  The
+term "script name", as this is ambigious and
+[misused](https://www.unicode.org/reports/tr24/#Script_Names).  The
 Script Property Value is the titlecased name of the script from the
 UCD, with spaces replaced by underscores. They are defined in the
-yearly updated [Scripts.txt](https://www.unicode.org/Public/UNIDATA/Scripts.txt)
+yearly updated
+[Scripts.txt](https://www.unicode.org/Public/UNIDATA/Scripts.txt)
 
-# 7.2 SCX Extensions
+7.2 SCX Extensions
+------------------
 
 Not all characters are uniquely used in a single script only.  Many
 are used in a variable numbers of scripts. These are assigned to the
 Common or Inherited script, and are exactly specified in the
 [ScriptExtensions.txt](https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt),
 aka SCX. The SCX property is a list of possible scripts per character.
-This list is using the short 4-letter script property, which needs
-to be resolved via the [PropertyValueAliases.txt](https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt)
+This list is using the short 4-letter script property, which needs to
+be resolved via the
+[PropertyValueAliases.txt](https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt)
 to its long script property value. (E.g. Syrc to Syriac)
 
     # Script_Extensions=Arab Syrc
 
-    064B..0655    ; Arab Syrc # Mn  [11] ARABIC FATHATAN..ARABIC HAMZA BELOW
+    064B..0655 ; Arab Syrc # Mn  [11] ARABIC FATHATAN..ARABIC HAMZA BELOW
 
     # Script_Extensions=Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
 
-    0640          ; Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc # Lm       ARABIC TATWEEL
+    0640       ; Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc # Lm  ARABIC TATWEEL
 
 Some of the SCX scripts contain only a single script. These are directly added
 to the list of SC scripts for the purpose of identifier security checks.
 
 E.g.
 
-    3006          ; Hani # Lo       IDEOGRAPHIC CLOSING MARK
+    3006       ; Hani # Lo       IDEOGRAPHIC CLOSING MARK
 
 U+3006 with the Common script property is assigned to the Hani -> Han script.
 
-Multiple SCX list entries can resolved when the previous scripts in the identifier context
-are already resolved to one or the other possibility. Thus for SCX=(Arab Syrc) we need to
-check if Arabic or Syriac was already seen. If not, the new character with that SCX is illegal,
-violating our Mixed Script profile.
+Multiple SCX list entries can resolved when the previous scripts in
+the identifier context are already resolved to one or the other
+possibility. Thus for SCX=(Arab Syrc) we need to check if Arabic or
+Syriac was already seen. If not, the new character with that SCX is
+illegal, violating our Mixed Script profile.
 
-## 7.3 Combining marks script run detection for spoofing
+7.3 Combining marks script run detection for spoofing
+-----------------------------------------------------
 
-Using the Script property alone will not detect that the
-U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana, gc=Lm)
-should not be mixed with Latin. See [UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection) and [UTS46](https://www.unicode.org/reports/tr46/).
+Using the Script property alone will not detect that the U+30FC ( ー )
+KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana,
+gc=Lm) should not be mixed with Latin. See
+[UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
+and [UTS46](https://www.unicode.org/reports/tr46/).
 
-U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK should not continue a Latin
-script run, but instead should only continue runs of Hiragana and Katakana scripts, observing
-the Lm property (Modifier_Letter) and SCX=Hira Kana.
+U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK should not
+continue a Latin script run, but instead should only continue runs of
+Hiragana and Katakana scripts, observing the Lm property
+(Modifier_Letter) and SCX=Hira Kana.
 
 Check for unlikely sequences of **combining marks**:
 
-- Forbid sequences of the same nonspacing mark.
-- Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).
-- Forbid sequences of base character + nonspacing mark that look the
+* Forbid sequences of the same nonspacing mark.
+* Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).
+* Forbid sequences of base character + nonspacing mark that look the
   same as or confusingly similar to the base character alone (because
   the nonspacing mark overlays a portion of the base character). An
   example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE.
 
 Since we disallow already most combining marks (at least the Latin
-ones) with the requirement of NFC [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html), this set of cases is quite small.
+ones) with the requirement of NFC
+[P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html),
+this set of cases is quite small.
 
 The list of allowed combining mark characters (with Common or Inherited
 scripts) in the C23++ TR31 profile is: XXX TODO
@@ -265,15 +287,17 @@ scripts) in the C23++ TR31 profile is: XXX TODO
 8 TR39 Identifier Type
 ======================
 
-The **Identifier_Type** property [TR 39#1][https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1] recommendation should be mandatory,
-with the addition of the `Technical` Identifier\_Type to be allowed. 
+The **Identifier_Type** property [TR 39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type
+Table 1) recommendation should be mandatory, with the addition of the
+`Technical` Identifier\_Type to be allowed.
 
 I.e. `Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,`
 `Deprecated, Not_Character` are not part of identifiers.
 
 Allowed are `Recommended, Inclusion, Technical`.
 
-There are XXX Technical ids added to the original list of XXX Recommended, Inclusion ids.
+There are XXX Technical ids added to the original list of XXX
+Recommended, Inclusion ids.
 
 9 TR39 Mixed Scripts
 ====================
@@ -287,11 +311,11 @@ exception for Greek.  I called this profile **C23_4** or **SAFEC23**
 in libu8ident.
 
 * All identifiers in a document qualify as Single Script, or
-* All identifiers in a document are covered by any of the following sets of scripts,
-  according to the definition in Mixed Scripts:
-  * Latin + Han + Hiragana + Katakana (Japanese)
-  * Latin + Han + Bopomofo (Chinese)
-  * Latin + Han + Hangul (Korean), or
+* All identifiers in a document are covered by any of the following
+  sets of scripts, according to the definition in Mixed Scripts:
+  + Latin + Han + Hiragana + Katakana (Japanese)
+  + Latin + Han + Bopomofo (Chinese)
+  + Latin + Han + Hangul (Korean), or
 * All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
 
@@ -300,17 +324,20 @@ does allow any East-Asian CFK language, other common and widely used
 languages and Latin mixed with Greek, mainly used for its mathematical
 symbols. Many mathematical symbols already exists outside of Greek,
 but these are mainly used for operators in advanced programming languages,
-not as identifiers.  See also http://xahlee.info/comp/unicode_math_operators.html
+not as identifiers.  See also <http://xahlee.info/comp/unicode_math_operators.html>
 for a nice overview.
 
 E.g. here we have some:
 
-    U+2217 (∗) ASTERISK OPERATOR (Script=Common). Not_XID
-    U+2107 (ℇ) EULER CONSTANT (Script=Common, Lu) is a proper letter, but with Restricted IdentifierStatus.
-    U+2126 (Ω) OHM SIGN (Script=Greek, L&) is a greek letter, but with Restricted IdentifierStatus.
-    U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete, Not_XID
+* U+2217 (∗) ASTERISK OPERATOR (Script=Common). Not_XID
+* U+2107 (ℇ) EULER CONSTANT (Script=Common, Lu) is a proper letter,
+             but with Restricted IdentifierStatus.
+* U+2126 (Ω) OHM SIGN (Script=Greek, L&) is a greek letter,
+             but with Restricted IdentifierStatus.
+* U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete, Not_XID
 
-TR39 also compiles a convenient [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
+TR39 also compiles a convenient
+[IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
 list. But all the math letters with Script=Common from U+2100 to
 U+2200 are restricted, as Greek is forbidden mixed with Latin in the
 original TR39 Moderately Restrictive profile. These are allowed
@@ -332,9 +359,11 @@ script run detection for spoofing" are kept tiny.
 10 Contexts
 ==========
 
-This is not discussed in any of the unicode security guidelines for identifiers.
-One could argue that a mixed-script profile is valid only for a single identifier,
-or it is valid for whole source file document.
+T
+his is not discussed in any of the unicode security guidelines for
+identifiers.  One could argue that a mixed-script profile is valid
+only for a single identifier, or it is valid for whole source file
+document.
 
 If valid for only a single identifier you could arbitralily mix up
 Cyrillic with Greek identifiers in a C++ namespace, and thus these
@@ -353,7 +382,6 @@ already seen scripts and how many.  The maximal number of scripts is
 4, for the case of Japanese mixed with Latin. (`Katakana + Hiragana +`
 `Han + Latin`), thus we can save that list in a single 4-byte word, and
 the lookup and memory management is trivial.
-
 
 11 Implementations and Strategies
 ================================
