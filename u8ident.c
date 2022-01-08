@@ -108,6 +108,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   const char *e = (char *)&buf[len];
   bool need_normalize = false;
   struct ctx_t *ctx = u8ident_ctx();
+  // char *scx = NULL;
   // char scx[32]; // combination of all scx
   // scx[0] = '\0';
   //  check mixed scripts
@@ -166,7 +167,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #endif
 
-    const uint8_t scr = u8ident_get_script(cp);
+    const enum u8id_sc scr = (enum u8id_sc)u8ident_get_script(cp);
     // disallow Excluded
     if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
                  s_u8id_profile != U8ID_PROFILE_6 &&
@@ -191,21 +192,47 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       goto ok;
 #endif
     bool is_new = false;
-    // check scx on Common or Inherited. keep list of possible scripts, and
-    // reduce them
+    // check scx on Common or Inherited. Keep list of possible scripts and
+    // reduce them.
     if (scr == SC_Common || scr == SC_Inherited) {
-      const char *this_scx = u8ident_get_scx(cp);
+      // everybody may mix with latin
+      const bool has_latin = u8ident_has_script_ctx(SC_Latin, ctx);
+      const struct scx *this_scx = u8ident_get_scx(cp);
       if (this_scx) {
-        char *x = (char *)this_scx;
+        char *x = (char *)this_scx->scx;
+        // enum u8id_gc gc = (enum u8id_gc)this_scx->gc;
         int n = 0;
+        if (ctx->count && (s_u8id_profile < 5 || s_u8id_profile == C23_4)) {
+          // Special-case for runs: only after japanese
+          if (!ctx->is_japanese &&
+              ((cp >= 0x30FC && cp <= 0x30FE) || cp == 0xFF70)) {
+            ctx->last_cp = cp;
+            return U8ID_ERR_SCRIPTS;
+          }
+          if (!has_latin) {
+            if (strEQc(x, "\x11\x12") && !ctx->is_japanese) {
+              ctx->last_cp = cp;
+              return U8ID_ERR_SCRIPTS;
+            }
+            // any cfk
+            if (strEQc(x, "\x06\x0e\x0f\x11\x12") && !ctx->is_japanese &&
+                !ctx->has_han && !ctx->is_korean) {
+              ctx->last_cp = cp;
+              return U8ID_ERR_SCRIPTS;
+            }
+          }
+        }
         while (*x) {
           bool has = u8ident_has_script_ctx(*x, ctx);
           n += has ? 1 : 0;
           x++;
         }
-        if (!n) { // We have SCX and none of the SCX occured yet. so
-          // we have a new one.
-          is_new = true; // we dont know which yet, but we can set is_new.
+        /* We have SCX and none of the SCX occured yet.
+           So we have a new one.
+           We dont know which yet, but we can set is_new. */
+        if (!n) {
+          is_new = true;
+          // scx = (char *)this_scx->scx; // for errors
         }
       }
     }
@@ -223,7 +250,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       // if Limited Use it must have been already manually added
       if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
                    (s_u8id_profile < U8ID_PROFILE_5 ||
-                    s_u8id_profile < U8ID_PROFILE_C23_4))) {
+                    s_u8id_profile == U8ID_PROFILE_C23_4))) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }
@@ -256,6 +283,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             return U8ID_ERR_SCRIPTS;
           } else
             goto ok;
+        } else if (scr == SC_Common || scr == SC_Inherited) {
+          // may we now collapse it?
+          goto ok;
         }
         // and disallow all other combinations
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 3
@@ -298,7 +328,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   }
 
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6
- norm:
+norm:
 #endif
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, len);

@@ -14,7 +14,7 @@ int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *ctx);
 struct ctx_t *u8ident_ctx(void);
 uint8_t u8ident_get_script(const uint32_t cp);
 /* list of script indices */
-const char *u8ident_get_scx(const uint32_t cp);
+const struct scx *u8ident_get_scx(const uint32_t cp);
 // member of the Allowed IdentifierStatus list
 bool u8ident_is_allowed(const uint32_t cp);
 bool u8ident_is_ID_Start(const uint32_t cp);

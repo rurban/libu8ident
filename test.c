@@ -60,21 +60,24 @@ void test_scripts_no_init(void) {
   assert(strcmp(u8ident_script_name(u8ident_get_script(0x3132)), "Hangul") ==
          0);
   assert(!u8ident_get_scx(0x3132));
-  const char *scx = u8ident_get_scx(0x309A);
+  const struct scx *scx = u8ident_get_scx(0x309A);
   assert(scx);
-  assert(strlen(scx) == 2);
-  assert(scx[0] == 0x11); // Hiragana
-  assert(scx[1] == 0x12); // Katakana
+  assert(scx->gc == GC_Mn);
+  assert(strlen(scx->scx) == 2);
+  assert(scx->scx[0] == 0x11); // Hiragana
+  assert(scx->scx[1] == 0x12); // Katakana
   scx = u8ident_get_scx(0x30FC);
   assert(scx);
-  assert(strlen(scx) == 2);
-  assert(scx[0] == 0x11); // Hiragana
-  assert(scx[1] == 0x12); // Katakana
+  assert(scx->gc == GC_Lm);
+  assert(strlen(scx->scx) == 2);
+  assert(scx->scx[0] == 0x11); // Hiragana
+  assert(scx->scx[1] == 0x12); // Katakana
   scx = u8ident_get_scx(0x064B);
   assert(scx);
-  assert(strlen(scx) == 2);
-  assert(scx[0] == 0x03);   // Arab
-  assert(scx[1] == '\x99'); // Syrc, signed!
+  assert(scx->gc == GC_Mn);
+  assert(strlen(scx->scx) == 2);
+  assert(scx->scx[0] == 0x03);   // Arab
+  assert(scx->scx[1] == '\x99'); // Syrc, signed!
 #ifndef DISABLE_CHECK_XID
   assert(u8ident_is_allowed(0x27));
   assert(!u8ident_is_allowed(0x26));
@@ -523,6 +526,46 @@ void test_mixed_scripts_with_ctx(void) {
   CHECK_RET(ret, U8ID_EOK, 0); // 6 allows even these
 #endif
   assert(u8ident_free_ctx(ctx) == 0);
+  u8ident_free();
+
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
+  ctx = u8ident_new_ctx(); // new ctx
+  // check legal and illegal 0x30FC runs. KATAKANA-HIRAGANA PROLONGED SOUND MARK
+  ret = u8ident_check((const uint8_t *)"\u30fa\u30fc", NULL);
+  CHECK_RET(ret, U8ID_EOK, 0);
+  assert(u8ident_free_ctx(ctx) == 0);
+  u8ident_free();
+
+  // disallow Latin + 0x30FC
+  ret = u8ident_check((const uint8_t *)"a\u30fc", NULL);
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C23_4
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK, 0);
+#endif
+  u8ident_free();
+
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
+  // But allow Latin plus other Japanese Lm (but this is not in TR31_ALLOWED,
+  // just XID)
+  ret = u8ident_check((const uint8_t *)"a\u3031", NULL);
+#if defined ENABLE_CHECK_XID
+  CHECK_RET(ret, U8ID_ERR_XID, 0);
+#elif defined U8ID_PROFILE && U8ID_PROFILE < 3
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK, 0);
+#endif
+  u8ident_free();
+
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
+  ret = u8ident_check((const uint8_t *)"أحرارًا", NULL);
+  // huh?
+#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK, 0);
+#endif
   u8ident_free();
 }
 

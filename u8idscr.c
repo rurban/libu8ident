@@ -198,11 +198,10 @@ uint8_t u8ident_get_script(const uint32_t cp) {
 #endif
 }
 
-/* list of script indices */
-const char *u8ident_get_scx(const uint32_t cp) {
-  const struct scx *scx = (struct scx *)binary_search(
+/* Search for list of script indices */
+const struct scx *u8ident_get_scx(const uint32_t cp) {
+  return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
-  return scx ? scx->scx : NULL;
 }
 
 bool u8ident_is_bidi(const uint32_t cp) {

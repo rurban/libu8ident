@@ -27,8 +27,8 @@ enum u8id_profile {
   U8ID_PROFILE_5 = 5,     // Minimally Restrictive
   U8ID_PROFILE_6 = 6,     // Unrestricted
   U8ID_PROFILE_C11_6 = 7, // The C11 std
-  U8ID_PROFILE_C23_4 =
-      8, // PROFILE_4 + Greek with only Allowed ID's ("SAFEC23")
+  // PROFILE_4 + Greek with only Allowed ID's ("SAFEC23")
+  U8ID_PROFILE_C23_4 = 8,
 };
 enum u8id_options {
   //  Note: The parser/tokenizer should do that. Without, the checker can be

@@ -272,17 +272,6 @@ illegal, violating our Mixed Script profile.
 7.3 Combining marks script run detection for spoofing
 -----------------------------------------------------
 
-Using the Script property alone will not detect that the U+30FC ( ー )
-KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana,
-gc=Lm) should not be mixed with Latin. See
-[UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
-and [UTS46](https://www.unicode.org/reports/tr46/).
-
-U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK should not
-continue a Latin script run, but instead should only continue runs of
-Hiragana and Katakana scripts, observing the Lm property
-(Modifier_Letter) and SCX=Hira Kana.
-
 Check for unlikely sequences of **combining marks**:
 
 * Forbid sequences of the same nonspacing mark.
@@ -296,6 +285,16 @@ Since we disallow already most combining marks (at least the Latin
 ones) with the requirement of NFC
 [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html),
 this set of cases is quite small.
+
+Special-cases:
+
+Using the Script property alone will not detect that the U+30FC ( ー )
+KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana,
+gc=Lm) should not be mixed with Latin. See
+[UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
+and [UTS46](https://www.unicode.org/reports/tr46/).
+We only have 4 such explicitly japanese-only PROLONGED SOUND MARKs,
+all other Lm modifiers may mix with all SCX.
 
 The list of allowed combining mark characters (with Common or Inherited
 scripts) in the C23++ TR31 profile is: Lm `Modifier_Letter`,
