@@ -532,10 +532,11 @@ http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts
 
 Scripts: ignore Latin, Common and Inherited.
 
-Multiple SCX list entries can resolved when the previous scripts in the identifier context
-are already resolved to one or the other possibility. Thus for SCX=(Arab Syrc) we need to
-check if Arabic or Syriac was already seen. If not, the new character with that SCX is illegal,
-violating our Mixed Script profile.
+Multiple SCX list entries can resolved when the previous scripts in the
+identifier context are already resolved to one or the other possibility. Thus
+for SCX=(Arab Syrc) we need to check if Arabic or Syriac was already seen. If
+not, the new character with that SCX is illegal, violating our Mixed Script
+profile.
 
 Beware that some Common codes need the scx also.
 Using the Script property alone, for example, will not detect that the
@@ -543,8 +544,8 @@ U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common)
 should not be mixed with Latin. See [UTS39] and [UTS46].
 
 U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK should not continue a Latin
-script run, but instead should only continue runs of Hiragana and Katakana scripts, observing
-the Lm property (Modifier_Letter) and SCX=Hira Kana.
+script run, but instead should only continue runs of Hiragana and Katakana
+scripts, observing the Lm property (Modifier_Letter) and SCX=Hira Kana.
 
 Check for unlikely sequences of **combining marks**:
 

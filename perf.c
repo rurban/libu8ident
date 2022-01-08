@@ -52,9 +52,9 @@ uint64_t tbase = 0UL; // time to run the loop with empty payload
 #  define timer_start() __rdtsc()
 #  define timer_end() __rdtsc()
 #  if (SIZEOF_SIZE_T == 8)
-#    pragma intrinsic (_BitsScanForward64)
+#    pragma intrinsic(_BitsScanForward64)
 #  else
-#    pragma intrinsic (_BitsScanForward)
+#    pragma intrinsic(_BitsScanForward)
 #  endif
 #else
 // see
@@ -215,9 +215,9 @@ static struct sc *eytzinger_search(const uint32_t cp, const char *elist,
   unsigned long index;
   if
 #    if (SIZEOF_SIZE_T == 8)
-  (_BitsScanForward64(&index, ~k))
+      (_BitsScanForward64(&index, ~k))
 #    else
-  (_BitsScanForward(&index, ~k))
+      (_BitsScanForward(&index, ~k))
 #    endif
     k >>= index;
 #  else

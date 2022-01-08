@@ -268,9 +268,9 @@ int main(int argc, char **argv) {
   }
 #endif
 
-  const char* const exts[] = {".txt", ".c"};
-  for (size_t j=0; j < ARRAY_SIZE(exts); j++) {
-    const char* ext = exts[j];
+  const char *const exts[] = {".txt", ".c"};
+  for (size_t j = 0; j < ARRAY_SIZE(exts); j++) {
+    const char *ext = exts[j];
     int s = 0;
     size_t lext = strlen(ext);
 
@@ -279,16 +279,16 @@ int main(int argc, char **argv) {
 #  define NEXT_FILE (d = readdir(dir))
 #  define CUR_FILE d->d_name
 #elif defined _MSC_VER
-  WIN32_FIND_DATA FindFileData;
-  HANDLE hdir = FindFirstFile(dirname, &FindFileData);
-  if (hdir == INVALID_HANDLE_VALUE) {
-    perror("FindFirstFile");
-    goto done;
-  }
+    WIN32_FIND_DATA FindFileData;
+    HANDLE hdir = FindFirstFile(dirname, &FindFileData);
+    if (hdir == INVALID_HANDLE_VALUE) {
+      perror("FindFirstFile");
+      goto done;
+    }
 #  define NEXT_FILE FindNextFile(hdir, &FindFileData)
 #  define CUR_FILE FindFileData.cFileName
 #endif
-   
+
     // sort the names, to compare against the result
     while (NEXT_FILE) {
       size_t l = strlen(CUR_FILE);
@@ -318,13 +318,13 @@ int main(int argc, char **argv) {
       }
     }
     if (s)
-	qsort(files, s, sizeof(char *), cmp_str);
+      qsort(files, s, sizeof(char *), cmp_str);
     for (i = 0; i < s; i++) {
       // printf("%s\n", files[i]);
       testdir(dirname, files[i]);
     }
     for (int i = 0; i < s; i++)
-	free((void *)files[i]);
+      free((void *)files[i]);
     free(files);
   }
 #if defined HAVE_DIRENT_H && !defined _MSC_VER
@@ -332,7 +332,7 @@ int main(int argc, char **argv) {
 #elif defined _MSC_VER
   FindClose(hdir);
 #endif
-  
+
   u8ident_free();
 #ifdef HAVE_CROARING
   roaring_bitmap_free(rmark);

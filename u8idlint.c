@@ -641,8 +641,8 @@ int main(int argc, char **argv) {
     recursive++;
     i++;
   }
-  if (argc > i+1 && (strEQc(argv[i], "--ext") || strEQc(argv[i], "-e"))) {
-    ext = argv[i+1];
+  if (argc > i + 1 && (strEQc(argv[i], "--ext") || strEQc(argv[i], "-e"))) {
+    ext = argv[i + 1];
     i += 2;
   }
 #endif
@@ -654,7 +654,7 @@ int main(int argc, char **argv) {
     if (file_exists(argv[i])) {
       ret |= testfile(".", argv[i]);
     } else if (dir_exists(".", argv[i])) {
-        dirname = argv[i];
+      dirname = argv[i];
     } else {
       fprintf(stderr, "Invalid arg %s\n", argv[i]);
     }

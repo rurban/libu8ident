@@ -188,7 +188,7 @@ extern const char *const all_scripts[161];
 #endif
 
 enum u8id_sc {
-// clang-format off
+  // clang-format off
 #define FIRST_RECOMMENDED_SCRIPT 0
   SC_Common     = 0,
   SC_Inherited  = 1,
