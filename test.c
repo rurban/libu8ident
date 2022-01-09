@@ -700,10 +700,10 @@ void test_confus(void) {
   assert(!(ret & U8ID_EOK_WARN_CONFUS));
 
   u8ident_add_script(SC_Coptic);
-  ret = u8ident_check((const uint8_t *)"ͮ", NULL);
+  ret = u8ident_check((const uint8_t *)"\u01a6", NULL); // Ʀ
 #  if !defined ENABLE_CHECK_XID
-  if (ret != U8ID_EOK_WARN_CONFUS)
-    printf("ERROR \"ͮ\" U+36E not detected as confusable");
+  if (!(ret & U8ID_EOK_WARN_CONFUS))
+    printf("ERROR \"ͮ\" U+1A6 not detected as confusable");
   assert(ret == U8ID_EOK_WARN_CONFUS);
 #  endif
 

@@ -990,7 +990,6 @@ extern const struct sc xid_script_list32[401];
 #  endif
 #endif // DISABLE_CHECK_XID
 
-
 #ifndef DISABLE_CHECK_XID
 #  ifndef EXT_SCRIPTS
 const struct range_bool16 allowed_id_list16[] = {
@@ -1640,11 +1639,11 @@ const struct range_bool16 NFD_N_list16[] = {
     {0xFB46, 0xFB4E},
     // clang-format on
 }; // 114 ranges, 117 single codepoints
-#  else
+#    else
 extern const struct range_bool16 NFD_N_list16[231];
-#  endif
+#    endif
 
-#  ifndef EXT_SCRIPTS
+#    ifndef EXT_SCRIPTS
 const struct range_bool NFD_N_list32[] = {
     // clang-format off
     {0x1109A, 0x1109A},
@@ -1744,11 +1743,11 @@ const struct range_bool16 NFC_N_list16[] = {
     {0xFB46, 0xFB4E},
     // clang-format on
 }; // 20 ranges, 51 single codepoints
-#  else
+#    else
 extern const struct range_bool16 NFC_N_list16[71];
-#  endif
+#    endif
 
-#  ifndef EXT_SCRIPTS
+#    ifndef EXT_SCRIPTS
 const struct range_bool NFC_N_list32[] = {
     // clang-format off
     {0x1D15E, 0x1D164},
@@ -1802,11 +1801,11 @@ const struct range_bool16 NFC_M_list16[] = {
     {0x3099, 0x309A},
     // clang-format on
 }; // 11 ranges, 23 single codepoints
-#  else
+#    else
 extern const struct range_bool16 NFC_M_list16[34];
-#  endif
+#    endif
 
-#  ifndef EXT_SCRIPTS
+#    ifndef EXT_SCRIPTS
 const struct range_bool NFC_M_list32[] = {
     // clang-format off
     {0x110BA, 0x110BA},
@@ -2280,11 +2279,11 @@ const struct range_bool16 NFKD_N_list16[] = {
     {0xFFED, 0xFFEE},
     // clang-format on
 }; // 217 ranges, 231 single codepoints
-#  else
+#    else
 extern const struct range_bool16 NFKD_N_list16[448];
-#  endif
+#    endif
 
-#  ifndef EXT_SCRIPTS
+#    ifndef EXT_SCRIPTS
 const struct range_bool NFKD_N_list32[] = {
     // clang-format off
     {0x10781, 0x10785},
@@ -2702,11 +2701,11 @@ const struct range_bool16 NFKC_N_list16[] = {
     {0xFFED, 0xFFEE},
     // clang-format on
 }; // 132 ranges, 170 single codepoints
-#  else
+#    else
 extern const struct range_bool16 NFKC_N_list16[302];
-#  endif
+#    endif
 
-#  ifndef EXT_SCRIPTS
+#    ifndef EXT_SCRIPTS
 const struct range_bool NFKC_N_list32[] = {
     // clang-format off
     {0x10781, 0x10785},
@@ -2847,11 +2846,11 @@ const struct range_bool16 NFKC_M_list16[] = {
     {0x3099, 0x309A},
     // clang-format on
 }; // 11 ranges, 23 single codepoints
-#  else
+#    else
 extern const struct range_bool16 NFKC_M_list16[34];
-#  endif
+#    endif
 
-#  ifndef EXT_SCRIPTS
+#    ifndef EXT_SCRIPTS
 const struct range_bool NFKC_M_list32[] = {
     // clang-format off
     {0x110BA, 0x110BA},

@@ -170,16 +170,16 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     // advance to normalize checks
 #if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
     need_normalize = true;
-    //if (scr != SC_Common && scr != SC_Inherited)
-    //  basesc = scr;
+    // if (scr != SC_Common && scr != SC_Inherited)
+    //   basesc = scr;
     goto norm;
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 6 && U8ID_PROFILE != C11_6
 #else
     if (s_u8id_profile == U8ID_PROFILE_6 ||
         s_u8id_profile == U8ID_PROFILE_C11_6) {
       need_normalize = true;
-      //if (scr != SC_Common && scr != SC_Inherited)
-      //  basesc = scr;
+      // if (scr != SC_Common && scr != SC_Inherited)
+      //   basesc = scr;
       goto norm;
     }
 #endif
