@@ -29,6 +29,7 @@ unsigned s_maxlen = 1024;
 */
 EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
                         unsigned options) {
+  u8ident_free(); // clear and reset the ctx
   if (options > 1023)
     return -1;
   if (profile < U8ID_PROFILE_1 || profile > U8ID_PROFILE_C23_4)

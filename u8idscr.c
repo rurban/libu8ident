@@ -299,7 +299,7 @@ EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
   if (i <= i_ctx) {
     if (ctxp[i].count > 8)
       free(ctxp[i].u8p);
-    ctxp[i].count = 0;
+    memset(&ctxp[i], 0, sizeof(u8id_ctx_t));
     if (i > 0)
       i_ctx = i - 1; // switch to the previous context
     else
