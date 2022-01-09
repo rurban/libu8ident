@@ -183,44 +183,70 @@ It is always easier to widen restrictions than narrow them.
 configure options
 -----------------
 
-* `--with-norm=NFC,NFD,NFKC,NFKD,FCC,FCD`. Default: none (at run-time,
-  NFC is the default)
+* `--with-tr31=ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE`. Default: empty
+  (select at run-time, ALLOWED is the default)
 
-* `--with-profile=2,3,4,5,6,c23_4,c11_6`. Default: none (at run-time, 4 is the default)
+  This hardcodes the identifer charset, which is normally defined by
+  the parser.  If you trust the parser, set it to NONE or the charset used there.
+  NONE disables the TR31 check.
+
+  + **ALLOWED** sets the most secure
+  [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
+
+  + **SAFEC23** is a practical subset of the XID charset, with only
+    the recommended scripts, Skipped Ids (only the TR39#1 Recommended,
+    Inclusion, Technical Identifer_Type) and NFC.
+
+  + **ID** selects the standard `ID_Start`/`ID_Continue`
+    properties. `ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +
+    `Other_ID_Start`, -`Pattern_Syntax`, -`Pattern_White_Space`.
+    `ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc, +
+    `Other_ID_Continue`, -`Pattern_Syntax`, - `Pattern_White_Space`.
+
+  + **XID** selects the stable `XID_Start` and `XID_Continue`
+    properties, which ensure that `isIdentifer(string)` then
+    `isIdentifier(NFKx(string))` (_removing the NFKC quirks_).
+
+  + **C11** selects the AltID range from the C11 standard, which is
+    highly insecure.
+
+  + **ALLUTF8** treat all unicode codepoints > 127 as Unicode letters,
+    as in D, nim, crystal or php.
+
+  A normal unicode-aware parser might check for the XID property
+  already, but in 2021 99% of all parsers still do the wrong thing
+  for unicode identifiers, even for this simple static check. Not yet
+  talking about allowed scripts, mixed scripts or confusables.
+
+  With the `--with-tr31=NONE`, i.e. `-DDISABLE_U8ID_TR31` definition,
+  all identifiers need to contain valid codepoints already, all tr31
+  checks are bypassed.  This can then use a shorter script lists to
+  check against. On the other hand a hardcoded tr31 charset helps in
+  selecting shorter lists for scripts et el. at compile-time.
+
+* `--with-profile=2,3,4,5,6,C23_4,C11_6`. Default: empty
+  (select at run-time, 4 is the default)
+
+  This hardcodes a TR39 mixed-script security profile, which cannot
+  be changed later at run-time.
+
+* `--with-norm=NFC,NFD,NFKC,NFKD,FCC,FCD`. Default: empty
+  (select at run-time, NFC is the default)
+
+  This hardcodes a normalization method, which cannot be changed later
+  at run-time.
 
 * `--enable-confus`
 
 * `--with-croaring[=path-to-CRoaring]`
 
-* `--enable-check-xid`, `--disable-check-xid` or none
-
-If to check for the Allowed
-[IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
-or not. `--disable-check-xid` sets `-DDISABLE_CHECK_XID`, `--enable-check-xid`
-sets `-DENABLE_CHECK_XID`.
-A normal unicode-aware parser might check for the XID property
-this already, but in 2021 99% of all parsers still do the wrong thing
-for unicode identifiers, even for this simple static check. Not yet
-talking about allowed scripts, mixed scripts or confusables.
-
-With the optional `-DDISABLE_CHECK_XID` define, all identifiers need
-to contain valid codepoints, XID_Start/Continue characters, and accept
-only Allowed Identifier codepoints. This can then use a shorter script
-list to check against, skipping all the undefined holes or
-non-identifier characters.
-
-With the optional `-DENABLE_CHECK_XID` define, this library ensures that
-all identifiers accept only Allowed Identifier codepoints. It can use the
-same optimizations as `-DDISABLE_CHECK_XID`, it just adds the mandatory
-is_allowed check at run-time.
-
 When you know beforehand which normalization or profile you will need,
 and your parsers knows about allowed identifier codepoints, define
-that via `./configure --with-norm=NFC --with-profile=4 --disable-check-xid`,
-resp. `cmake -DLIBU8IDENT_NORM=NFC -DLIBU8IDENT_PROFILE=4 -DBUILD_SHARED_LIBS=OFF`.
+that via `./configure --with-norm=NFC --with-profile=4 --with-tr31=NONE`,
+resp. `cmake -DU8ID_NORM=NFC -DU8ID_PROFILE=4 -DU8ID_TR31=NONE -DBUILD_SHARED_LIBS=OFF`.
 This skips a lot of unused code and branches.
 The generic shared library has all the code for all normalizations,
-profiles, xid check and branches at run-time.
+all tr39 profiles, all tr31 xid checks and branches at run-time.
 
 e.g codesizes for u8idnorm.o with -Os
 
@@ -517,4 +543,4 @@ TODO
 AUTHOR
 ------
 
-Reini Urban <rurban@cpan.org> 2014,2021
+Reini Urban <rurban@cpan.org> 2021-2022

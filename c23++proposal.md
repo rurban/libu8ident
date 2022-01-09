@@ -196,8 +196,9 @@ bidi warning, and github to implement similar warnings.
 
 There used to be no linter, but there is now one: **u8idlint** from
 <https://github.com/rurban/libu8ident>, which can be used to check for
-ALLOWED,ID,XID,C11 or ALLUTF8 TR31 profiles, for various TR39 mixed script
-profile violations and TR15 normalization problems.
+ALLOWED,SAFEC23,ID,XID,C11 or ALLUTF8 TR31 profiles, for various TR39
+mixed script profile violations, confusables, invalid combining marks
+and TR15 normalization problems.
 
 So far only Rust, cperl and Java follow a unicode security guideline
 for identifiers, zig and J refused to support non-ASCII

@@ -25,6 +25,46 @@ AC_MSG_NOTICE([
 Check options])
 # ===============================================
 # hardcode certain options, to creater smaller and faster binaries
+
+# TR31 charset profile for identifiers
+# Recommended: --with-tr31=allowed or none
+AC_MSG_CHECKING([for --with-tr31=])
+AC_ARG_WITH([tr31],
+      [AS_HELP_STRING([--with-tr31={ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE}],
+      	[support only this TR31 identifier profile. @<:@default=xid@:>@
+      	 Recommended: --with-tr31=allowed])],
+      [case "${with_tr31}" in
+      ALLOWED|SAFEC23|ID|XID|C11|ALLUTF8) U8ID_TR31=${with_tr31}; AC_MSG_RESULT([$with_tr31]) ;;
+      NONE) CFLAGS="$CFLAGS -DDISABLE_U8ID_TR31"; AC_MSG_RESULT([$with_tr31]) ;;
+      *)    AC_MSG_RESULT([invalid ${with_tr31}: only ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE]) ;;
+      esac],
+      [ U8ID_TR31=; AC_MSG_RESULT([none. support all (default). Recommended: ALLOWED]) ]
+      )
+if test -n "$U8ID_TR31"; then
+  CFLAGS="$CFLAGS -DU8ID_TR31=$U8ID_TR31"
+  dnl AC_DEFINE([U8IDP_TR31],[$U8ID_TR31],[Define to ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8 to support only this TR31 identifier charset])
+fi
+AC_SUBST([U8ID_TR31])
+
+# TR39 Mixed-script security profile for identifiers
+# Recommended: --with-profile=4
+AC_MSG_CHECKING([for --with-profile=])
+AC_ARG_WITH([profile],
+	[AS_HELP_STRING([--with-profile={2,3,4,5,6,C23_4,C11_6}],
+		[support only this TR39 Unicode security profile. @<:@default=4@:>@
+		 Recommended: --with-profile=4])],
+	[case "${with_profile}" in
+	2|3|4|5|6|C23_4|C11_6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
+	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6,C23_4,C11_6]) ;;
+	esac],
+        [ U8ID_PROFILE=; AC_MSG_RESULT([none. support all (default). Recommended: 4]) ]
+	)
+if test -n "$U8ID_PROFILE"; then
+  CFLAGS="$CFLAGS -DU8ID_PROFILE=$U8ID_PROFILE"
+  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 2-6,C23_4,C11_6 to support only this Unicode security profile])
+fi
+AC_SUBST([U8ID_PROFILE])
+
 # Recommended: --with-norm=NFC
 AC_MSG_CHECKING([for --with-norm=])
 AC_ARG_WITH([norm],
@@ -43,37 +83,6 @@ if test -n "$U8ID_NORM"; then
   dnl AC_DEFINE([U8ID_NORM],[$U8ID_NORM],[Define to NF{K,}{C,D} to support only this Unicode normalization])
 fi
 AC_SUBST([U8ID_NORM])
-
-# Recommended: --with-profile=4
-AC_MSG_CHECKING([for --with-profile=])
-AC_ARG_WITH([profile],
-	[AS_HELP_STRING([--with-profile={2,3,4,5,6,C11_4,C11_6}],
-		[support only this Unicode security profile. @<:@default=4@:>@
-		 Recommended: --with-profile=4])],
-	[case "${with_profile}" in
-	2|3|4|5|6|C11_4|C11_6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
-	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6,C11_4,C11_6]) ;;
-	esac],
-        [ U8ID_PROFILE=; AC_MSG_RESULT([none. support all (default). Recommended: 4]) ]
-	)
-if test -n "$U8ID_PROFILE"; then
-  CFLAGS="$CFLAGS -DU8ID_PROFILE=$U8ID_PROFILE"
-  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 2-6,C11_4,C11_6 to support only this Unicode security profile])
-fi
-AC_SUBST([U8ID_PROFILE])
-
-AC_MSG_CHECKING([for --{dis,en}able-check-xid])
-AC_ARG_ENABLE([check_xid],
-        [AS_HELP_STRING([--enable-check-xid],
-	  [en- or disable checking for valid XID's, i.e Allowed IdentifierStatus. @<:@default=none@:>@])],
-	[case "${enableval}" in
-	yes) enable_check_xid=yes; AC_MSG_RESULT([enable]); CFLAGS="$CFLAGS -DENABLE_CHECK_XID" ;;
-	no)  enable_check_xid=no ; AC_MSG_RESULT([disable]); CFLAGS="$CFLAGS -DDISABLE_CHECK_XID" ;; 
-	*)   ;;
-	esac], [enable_check_xid= ])
-if test -z "$enable_check_xid"; then
-  AC_MSG_RESULT([none])
-fi
 
 AC_MSG_CHECKING([for --enable-confus])
 AC_ARG_ENABLE([confus],
