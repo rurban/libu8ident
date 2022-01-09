@@ -117,7 +117,7 @@ mark.h: mkmark.pl # UnicodeData.txt
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
-u8idlint: u8idlint.c $(LIB)
+u8idlint: u8idlint.c $(LIB) c23-safe.h unic11.h
 	$(CC) $(CFLAGS_REL) $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB)
 
 .PHONY: check check-asan check-norms check-profiles check-xid \

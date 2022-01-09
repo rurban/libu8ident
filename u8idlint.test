@@ -9,11 +9,11 @@ if [ "$ROOT" != "." ] && [ ! -d texts ]; then
     chmod +w texts || exit 0
 fi
 
-./u8idlint -p4 texts/homo-1.c > homo-1-p4.rst &&
+./u8idlint -p4 -xc11 texts/homo-1.c > homo-1-p4.rst &&
     diff texts/homo-1-p4.tst homo-1-p4.rst
-./u8idlint texts/bidi-sec-1.c > bidi-sec-1.rst &&
+./u8idlint -xc11 texts/bidi-sec-1.c > bidi-sec-1.rst &&
     diff texts/bidi-sec-1.tst bidi-sec-1.rst
-./u8idlint texts/bidi-sec-2.c > bidi-sec-2.rst &&
+./u8idlint -xc11 texts/bidi-sec-2.c > bidi-sec-2.rst &&
     diff texts/bidi-sec-2.tst bidi-sec-2.rst
 
 rm -f homo-1-p4.rst bidi-sec-1.rst bidi-sec-2.rst

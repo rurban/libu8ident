@@ -29,8 +29,6 @@
 #ifdef _MSC_VER
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
-//#  include <handleapi.h>
-//#  include <fileapi.h>
 #  include <direct.h>
 #endif
 
@@ -41,6 +39,7 @@
 #include "u8idscr.h"
 #undef EXT_SCRIPTS
 #include "unic11.h"
+#include "c23-safe.h"
 //#include "mark.h"
 
 int verbose = 0;
@@ -49,11 +48,12 @@ int recursive = 0;
 // allowed set of identifiers (--xid tokenizer options)
 enum xid_e {
   ASCII,   // only ASCII letters
-  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus
-  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts
-  XID, // ID plus NFKC quirks
-  C11, // some AltId ranges from C11
-  ALLUTF8, // all > 128, e.g. php, nim, crystal
+  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
+  SAFEC23, // see c23++proposal
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  XID, // ID plus NFKC quirks.
+  C11, // the AltId ranges from the C11 standard
+  ALLUTF8, // all > 128, e.g. D, php, nim, crystal
 };
 enum xid_e xid = ALLOWED;
 enum u8id_norm norm = U8ID_NFC;
@@ -87,8 +87,7 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
 static inline bool range_bool_search(const uint32_t cp,
                                      const struct range_bool *list,
                                      const size_t len) {
-  const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
-  return r ? true : false;
+  return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
 }
 
 const struct range_bool ascii_start_list[] = {
@@ -111,11 +110,22 @@ static bool isID_cont(uint32_t cp) { return u8ident_is_ID_Start(cp); }
 static bool isXID_start(uint32_t cp) { return u8ident_is_XID_Start(cp); }
 static bool isXID_cont(uint32_t cp) { return u8ident_is_XID_Start(cp); }
 static bool isALLOWED_start(uint32_t cp) {
-  return range_bool_search(cp, safec23_start_list,
-                           ARRAY_SIZE(safec23_start_list));
+  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
 static bool isALLOWED_cont(uint32_t cp) {
-  return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
+  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
+}
+static bool isSAFEC23_start(uint32_t cp) {
+  return binary_search(cp, (char *)safec23_start_list,
+                       ARRAY_SIZE(safec23_start_list),
+                       sizeof(*safec23_start_list))
+      ? true : false;
+}
+static bool isSAFEC23_cont(uint32_t cp) {
+  return binary_search(cp, (char *)safec23_cont_list,
+                       ARRAY_SIZE(safec23_cont_list),
+                       sizeof(*safec23_cont_list))
+      ? true : false;
 }
 static bool isC11_start(uint32_t cp) {
   return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
@@ -135,11 +145,13 @@ struct func_start_s {
 /* tokenizers:
   ASCII,   // only ASCII letters
   ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus
+  SAFEC23,
   ID,      // all letters, plus numbers, punctuation and marks. With exotic
   scripts XID,     // ID plus NFKC quirks C11,     // some AltId ranges from C11
   ALLUTF8, // all > 128, e.g. php, nim, crystal */
 static struct func_start_s id_funcs[] = {
     {isASCII_start, isASCII_cont}, {isALLOWED_start, isALLOWED_cont},
+    {isSAFEC23_start, isSAFEC23_cont},
     {isID_start, isID_cont},       {isXID_start, isXID_cont},
     {isC11_start, isC11_cont},     {isALLUTF8_start, isALLUTF8_cont},
 };
@@ -216,12 +228,12 @@ static void usage(void) {
   puts("    5      Minimally Restrictive");
   puts("    6      Unrestricted");
   puts("    c11_6  C11STD. Sets xid c11.");
-  puts("    c23_4  SAFEC23 (i.e. 4 with Greek). Sets xid allowed.");
-  puts(" -x|--xid=ascii,allowed,id,xid,c11,allutf8     default: allowed");
-  puts("  allowed set of identifiers:"); // sorted from most secure to least
-                                         // secure
+  puts("    c23_4  SAFEC23 (i.e. 4 with Greek). Sets xid safec23.");
+  puts(" -x|--xid=ascii,allowed,safec23,id,xid,c11,allutf8     default: allowed");
+  puts("  TR31 set of identifiers:"); // sorted from most secure to least secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
   puts("    allowed   tr31 with only recommended scripts, IdentifierStatus");
+  puts("    safec23   allowed but different Identifer_Type and NFC");
   puts("    id        all letters. plus numbers, punctuations and combining "
        "marks");
   puts("    xid       stable id subset, no NFKC quirks");
@@ -560,8 +572,10 @@ int main(int argc, char **argv) {
         profile = U8ID_PROFILE_6;
       else if (strEQc(optarg, "c23_4")) {
         profile = U8ID_PROFILE_C23_4;
-        if (!opt_xid)
-          xid = ALLOWED;
+        if (!opt_xid) {
+          xid = SAFEC23;
+          u8idopts |= U8ID_TR31_SAFEC23;
+        }
       } else if (strEQc(optarg, "c11_6")) {
         profile = U8ID_PROFILE_C11_6;
         if (!opt_xid)
@@ -580,14 +594,25 @@ int main(int argc, char **argv) {
       } else if (strEQc(optarg, "allowed")) {
         xid = ALLOWED;
         u8idopts |= U8ID_TR31_ALLOWED;
-      } else if (strEQc(optarg, "id"))
+      } else if (strEQc(optarg, "safec23")) {
+        xid = SAFEC23;
+        u8idopts |= U8ID_TR31_SAFEC23;
+      } else if (strEQc(optarg, "id")) {
         xid = ID;
-      else if (strEQc(optarg, "xid"))
+        u8idopts |= U8ID_TR31_ID;
+      }
+      else if (strEQc(optarg, "xid")) {
         xid = XID;
-      else if (strEQc(optarg, "c11"))
+        u8idopts |= U8ID_TR31_XID;
+      }
+      else if (strEQc(optarg, "c11")) {
         xid = C11;
-      else if (strEQc(optarg, "allutf8"))
+        u8idopts |= U8ID_TR31_C11;
+      }
+      else if (strEQc(optarg, "allutf8")) {
         xid = ALLUTF8;
+        u8idopts |= U8ID_TR31_ALLUTF8;
+      }
       else {
         fprintf(stderr, "Invalid --xid %s\n", optarg);
         exit(1);

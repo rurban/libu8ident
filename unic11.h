@@ -296,6 +296,7 @@ const struct range_bool c11_cont_list[] = {
     {0xFE20, 0xFE2F}, // ? Mn
 };
 
+#if 0
 // Generated with test-c11 by filtering forbidden scripts.
 // Use c11_cont_list with it.
 const struct range_bool safec23_start_list[] = {
@@ -847,5 +848,6 @@ const struct range_bool safec23_start_list[] = {
     {0xE0100, 0xE01EF}, // Inherited Restr?
     */
 };
+#endif
 
 #endif
