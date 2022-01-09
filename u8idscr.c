@@ -444,7 +444,7 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #  if defined HAVE_CROARING && defined USE_NORM_CROAR
     return u8ident_roar_maybe_nfd(cp);
 #  else
-    return !range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
+    return range_bool_search(cp, NFD_N_list, ARRAY_SIZE(NFD_N_list));
 #  endif
   }
 #endif
@@ -457,7 +457,7 @@ bool u8ident_maybe_normalized(const uint32_t cp) {
 #  if defined HAVE_CROARING && defined USE_NORM_CROAR
     return u8ident_roar_maybe_nfkd(cp);
 #  else
-    return !range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
+    return range_bool_search(cp, NFKD_N_list, ARRAY_SIZE(NFKD_N_list));
 #  endif
   }
 #endif

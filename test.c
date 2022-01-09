@@ -506,7 +506,7 @@ void test_mixed_scripts_with_ctx(void) {
   // U+45D
   ret = u8ident_check((const uint8_t *)"ѝ", NULL); // Cyrillic alone
   // NFD to U+438,U+300 (d0b8cc800a)
-#if U8ID_NORM == NFD || U8ID_NORM == NFKD
+#if U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, ctx);
 #else
   CHECK_RET(ret, U8ID_EOK, ctx);
@@ -515,9 +515,10 @@ void test_mixed_scripts_with_ctx(void) {
 
   // back to old ctx 0 (which has latin already)
   ret = u8ident_check((const uint8_t *)"abͻώ", NULL);
+  // C23_4 allows Greek
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0); // Latin + Greek disallowed in 2-4
-#elif defined(U8ID_NORM) && U8ID_NORM == NFKD
+#elif U8ID_NORM == NFKD || U8ID_NORM == NFD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // Latin + Greek
@@ -527,9 +528,9 @@ void test_mixed_scripts_with_ctx(void) {
   ctx = u8ident_new_ctx(); // new ctx
   ret = u8ident_check((const uint8_t *)"\xf0\x91\x8c\x81", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C23_4
-  CHECK_RET(ret, U8ID_ERR_SCRIPT, 0); // U+11301 Grantha is excluded
+  CHECK_RET(ret, U8ID_ERR_SCRIPT, ctx); // U+11301 Grantha is excluded
 #else
-  CHECK_RET(ret, U8ID_EOK, 0); // 6 allows even these
+  CHECK_RET(ret, U8ID_EOK, ctx); // 6 allows even these
 #endif
   assert(u8ident_free_ctx(ctx) == 0);
   u8ident_free();
@@ -538,7 +539,11 @@ void test_mixed_scripts_with_ctx(void) {
   ctx = u8ident_new_ctx(); // new ctx
   // check legal and illegal 0x30FC runs. KATAKANA-HIRAGANA PROLONGED SOUND MARK
   ret = u8ident_check((const uint8_t *)"\u30fa\u30fc", NULL);
-  CHECK_RET(ret, U8ID_EOK, 0);
+#if U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
+  CHECK_RET(ret, U8ID_EOK_NORM, ctx);
+#else
+  CHECK_RET(ret, U8ID_EOK, ctx);
+#endif
   assert(u8ident_free_ctx(ctx) == 0);
   u8ident_free();
 
@@ -568,6 +573,8 @@ void test_mixed_scripts_with_ctx(void) {
   ret = u8ident_check((const uint8_t *)"أحرارًا", NULL);
   // huh? 6 norms, but 5 not?
 #if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+#elif U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0);
@@ -627,6 +634,8 @@ void test_combine() {
   ret = u8ident_check((const uint8_t *)"أحرارًا", NULL);
   // FIXME
 #if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+#elif U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0);
@@ -801,8 +810,10 @@ int main(int argc, char **argv) {
   test_mixed_scripts(U8ID_TR31_ALLOWED);
 #endif
 
+#if U8ID_NORM != FCD && U8ID_NORM != FCC
   test_mixed_scripts_with_ctx();
   test_combine();
+#endif
 
   if (scx || argc == 1) {
     test_scx_singles();

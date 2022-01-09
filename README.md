@@ -273,11 +273,12 @@ enum u8id_profile: [TR39](http://www.unicode.org/reports/tr39/)
 
 enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
 
-    U8ID_TR31_ALLOWED = 64, // hardcoded with --enable-check-xid. The UCD IdentifierStatis.txt
-    U8ID_TR31_ID = 65,      // tr31 variants
-    U8ID_TR31_XID = 66,
-    U8ID_TR31_C11 = 67,
-    U8ID_TR31_ALLUTF8 = 68,
+    U8ID_TR31_ALLOWED = 64, // The UCD IdentifierStatus.txt (default)
+    U8ID_TR31_SAFEC23 = 65, // XID without Limited_Use and Excluded Scripts
+    U8ID_TR31_ID = 66,      // The usual tr31 variants
+    U8ID_TR31_XID = 67,     // without NFKC quirks, labelled stable
+    U8ID_TR31_C11 = 68,     // See C11 Annex D for the ranges
+    U8ID_TR31_ALLUTF8 = 69,
     // room for more tr31 profiles
 
     U8ID_FOLDCASE = 128,         // optional for case-insensitive idents. case-folded
