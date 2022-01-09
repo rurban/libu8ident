@@ -74,6 +74,9 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
 #endif
 
   s_u8id_options = options;
+#ifdef ENABLE_CHECK_XID
+  s_u8id_options |= U8ID_TR31_ALLOWED;
+#endif
 #ifdef HAVE_CROARING
   if (u8ident_roar_init())
     return -1;
@@ -120,6 +123,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   const char *e = (char *)&buf[len];
   bool need_normalize = false;
   struct ctx_t *ctx = u8ident_ctx();
+  enum u8id_sc scr;
   enum u8id_sc basesc = SC_Unknown;
   char *scx = NULL;
 
@@ -166,8 +170,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
 
     // profile 6 shortcuts: skip all script checks.
+    // when we need TR31 checks.
     // advance to normalize checks
-#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
+#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6) && DISABLE_CHECK_XID
     need_normalize = true;
     // if (scr != SC_Common && scr != SC_Inherited)
     //   basesc = scr;
@@ -177,13 +182,16 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (s_u8id_profile == U8ID_PROFILE_6 ||
         s_u8id_profile == U8ID_PROFILE_C11_6) {
       need_normalize = true;
-      // if (scr != SC_Common && scr != SC_Inherited)
-      //   basesc = scr;
-      goto norm;
+      if (!(s_u8id_options & U8ID_TR31_ALLOWED))
+        goto norm;
+      else {
+        scr = (enum u8id_sc)u8ident_get_script(cp);
+        goto ok;
+      }
     }
 #endif
 
-    const enum u8id_sc scr = (enum u8id_sc)u8ident_get_script(cp);
+    scr = (enum u8id_sc)u8ident_get_script(cp);
     // disallow Excluded
     if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
                  s_u8id_profile != U8ID_PROFILE_6 &&
