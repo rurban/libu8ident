@@ -165,16 +165,20 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #endif
 
-    // profile 6 shortcuts: skip all script checks
+    // profile 6 shortcuts: skip all script checks.
     // advance to normalize checks
 #if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
     need_normalize = true;
+    //if (scr != SC_Common && scr != SC_Inherited)
+    //  basesc = scr;
     goto norm;
 #elif defined U8ID_PROFILE && U8ID_PROFILE != 6 && U8ID_PROFILE != C11_6
 #else
     if (s_u8id_profile == U8ID_PROFILE_6 ||
         s_u8id_profile == U8ID_PROFILE_C11_6) {
       need_normalize = true;
+      //if (scr != SC_Common && scr != SC_Inherited)
+      //  basesc = scr;
       goto norm;
     }
 #endif
@@ -188,7 +192,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       return U8ID_ERR_SCRIPT;
     }
     // disallow bidi formatting
-    if (unlikely(ctx->is_rtl && u8ident_is_bidi(cp))) {
+    if (unlikely(!ctx->is_rtl && u8ident_is_bidi(cp))) {
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
     }
@@ -215,9 +219,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         const enum u8id_gc gc = (const enum u8id_gc)this_scx->gc;
         int n = 0;
         if (ctx->count && (s_u8id_profile < 5 || s_u8id_profile == C23_4)) {
-          // Special-case for runs: only after japanese
+          // Special-case for runs: only after japanese.
           // This is the only context dependent Lm case.
-          // All others are Combining Marks. TODO
+          // All others are Combining Marks.
           if (!ctx->is_japanese &&
               ((cp >= 0x30FC && cp <= 0x30FE) || cp == 0xFF70)) {
             ctx->last_cp = cp;
@@ -235,9 +239,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
               return U8ID_ERR_SCRIPTS;
             }
           }
-          // we have 2 Mc cases, and 30 Mn in SCX. No Me. More of them are in SC
-          // though
-        } else if (gc == GC_Mn || gc == GC_Mc) {
+        }
+        // We have 2 Mc cases, and 30 Mn in SCX. No Me. More of them are in SC
+        // though.
+        if (gc == GC_Mn || gc == GC_Mc) {
           if (!ctx->count || basesc == SC_Unknown) {
             // Disallow combiners without any base char (which does have a
             // script) This catches only a mark as very first char. We check the
@@ -268,6 +273,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     else if (scr == SC_Latin) {
       if (!u8ident_has_script_ctx(scr, ctx))
         u8ident_add_script_ctx(scr, ctx);
+      basesc = scr;
       continue;
     }
 

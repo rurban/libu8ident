@@ -555,7 +555,7 @@ void test_mixed_scripts_with_ctx(void) {
 #elif defined U8ID_PROFILE && U8ID_PROFILE < 3
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
-  CHECK_RET(ret, U8ID_EOK, 0); // FIXME
+  CHECK_RET(ret, U8ID_EOK, 0);
 #endif
   u8ident_free();
 
@@ -583,7 +583,7 @@ void test_combine() {
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
 
-  // Disallow Latin plus Mn (in SCX)
+  // Disallow Latin plus Vedic Mn (in SCX)
   ret = u8ident_check((const uint8_t *)"a\u1cd0", NULL);
 #if defined ENABLE_CHECK_XID
   CHECK_RET(ret, U8ID_ERR_XID, 0);
@@ -591,7 +591,7 @@ void test_combine() {
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
 
-  // Disallow Latin plus Deva Mn. ex-SCX, moved to SC. FIXME
+  // Disallow Latin plus Deva Mn (now also in SCX)
   ret = u8ident_check((const uint8_t *)"a\u1cd1", NULL);
 #if defined ENABLE_CHECK_XID
   CHECK_RET(ret, U8ID_ERR_XID, 0);
@@ -599,13 +599,18 @@ void test_combine() {
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
 
-  // Disallow Latin plus Cyrillic Mn (not in SCX)
+  // Disallow Latin plus Cyrillic Mn. not in SCX, so ERR_SCRIPTS
   ret = u8ident_check((const uint8_t *)"a\u2dfa", NULL);
 #if defined ENABLE_CHECK_XID
   CHECK_RET(ret, U8ID_ERR_XID, 0);
 #else
-  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #endif
+
+  // Arabic-only combiners
+  // "\xd8\xa3\xd8\xad\xd8\xb1\xd8\xa7\xd8\xb1\xd9\x8b\xd8\xa7" from texts/arabic-1.txt
+  ret = u8ident_check((const uint8_t *)"أحرارًا", NULL);
+  CHECK_RET(ret, U8ID_EOK, 0);
 
   u8ident_free();
 }
@@ -632,7 +637,9 @@ void test_scx_singles(void) {
   // uint8_t oldscr = 0;
   for (size_t i = 0; i < ARRAY_SIZE(scx_list); i++) {
     if (scx_list[i].scx && strlen(scx_list[i].scx) == 1) {
+#ifdef PRINT_SCX_SINGLES
       uint8_t scrx = (uint8_t)scx_list[i].scx[0];
+#endif
       for (uint32_t j = scx_list[i].from; j <= scx_list[i].from; j++) {
         uint8_t scr = u8ident_get_script(j);
         if (!u8ident_has_script_ctx(scr, ctx)) {
@@ -640,8 +647,10 @@ void test_scx_singles(void) {
           // oldscr = 0;
         }
         // if (scr != oldscr)
+#ifdef PRINT_SCX_SINGLES
         printf("SCX single: U+%X %s => %s\n", (unsigned)j,
                u8ident_script_name(scr), u8ident_script_name(scrx));
+#endif
         // oldscr = scr;
         if (scx_list[i].from == scx_list[i].to)
           break;
