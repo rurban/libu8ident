@@ -372,6 +372,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         basesc = scr;
       }
       u8ident_add_script_ctx(scr, ctx);
+    } else if (scr != SC_Common && scr != SC_Inherited) {
+      basesc = scr;
     }
   }
 

@@ -201,7 +201,7 @@ int testdir(const char *dir, const char *fname) {
           continue;
       }
       // bad case "\xd8\xa8\xd8\xb1\xd9\x88\xd8\xad" "بروح" Arabic
-      // also bad case "أحرارًا" Arabic at pos 12
+      // also bad case "أحرارًا" Arabic at pos 12 (missing basesc)
       if (!*wp && *word && force_break) { // non-empty word-end
         int ret = u8ident_check((uint8_t *)word, NULL);
         const char *scripts = u8ident_existing_scripts(ctx);
