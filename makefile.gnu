@@ -232,7 +232,7 @@ c23++proposal.html: c23++proposal.md
 	-markdown c23++proposal.md >$@
 
 clang-format:
-	clang-format -i *.c include/*.h scripts.h confus.h u8id*.h
+	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h
 GTAGS: $(SRC) $(HEADER) $(HDRS)
 	ls $(SRC) $(HEADER) $(HDRS) | gtags -f -
 

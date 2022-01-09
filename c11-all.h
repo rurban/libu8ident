@@ -55,7 +55,7 @@ const struct range_bool c11_cont_list[] = {
     {'$', '$'},
     {'0', '9'},
     {0x300, 0x36F}, // Inherited ̀..ͯ
-    {0x1DC0, 0x1DFF}, // Greek ᷀..᷿
+    {0x1DC0, 0x1DFF}, // Inherited ᷀..᷿
     {0x20D0, 0x20FF}, // Inherited ⃐..⃿
     {0xFE20, 0xFE2F}, // Inherited ︠..︯
 };// 4 ranges, 0 singles, 236 codepoints

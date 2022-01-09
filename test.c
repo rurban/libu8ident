@@ -555,7 +555,7 @@ void test_mixed_scripts_with_ctx(void) {
 #elif defined U8ID_PROFILE && U8ID_PROFILE < 3
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
-  CHECK_RET(ret, U8ID_EOK, 0);
+  CHECK_RET(ret, U8ID_EOK, 0); // FIXME
 #endif
   u8ident_free();
 

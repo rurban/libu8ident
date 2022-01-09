@@ -351,10 +351,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
       }
     ok:
-      // check illegal runs
-      if (scr == SC_Common || scr == SC_Inherited) {
-        if (basesc == SC_Unknown && u8ident_is_MARK(cp)) {
-          // Only for Mark, not Lm
+      // check illegal runs.
+      // A generic is_MARK(cp) would be too slow here. we rather should keep the
+      // SCX, and check the marks there.
+      if (scr == SC_Common || scr == SC_Inherited /*|| u8ident_is_MARK(cp)*/) {
+        if (basesc == SC_Unknown) {
+          // Only for Mark, not Lm.
           // Disallow combiners without any base char (which do have a script)
           ctx->last_cp = cp;
           return U8ID_ERR_COMBINE;
