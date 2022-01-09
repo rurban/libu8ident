@@ -410,17 +410,19 @@ void test_mixed_scripts(int xid_check) {
   CHECK_RET(ret, U8ID_EOK, 0); // Latin only
 
   ret = u8ident_check((const uint8_t *)"aঅ", NULL); // Latin + Bengali U+985
-#if defined U8ID_PROFILE && U8ID_PROFILE < 4
+#if !defined U8ID_PROFILE || U8ID_PROFILE > 3
+  CHECK_RET(ret, U8ID_EOK, 0);
+#else
   // 2 single script, 3 +CFK.
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#else
-  CHECK_RET(ret, U8ID_EOK, 0);
 #endif
+  u8ident_free();
 
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   // Latin + U+386 Greek
   ret = u8ident_check((const uint8_t *)"a\xce\x86", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
-  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0); // c23 allows greek
 #elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
     U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
@@ -438,14 +440,15 @@ void test_mixed_scripts(int xid_check) {
 
   ret = u8ident_check((const uint8_t *)"\xc3\xb7", NULL);
   if (u8ident_options() & U8ID_TR31_ALLOWED) {
-    CHECK_RET(ret, U8ID_ERR_XID, 0); // division sign U+F7 forbidden as XID
+    CHECK_RET(ret, U8ID_ERR_XID, 0); // division sign U+F7 Sm forbidden as XID
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_ERR_XID,
               0); // small letter b with stroke U+180 is not allowed
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
     CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
   } else {
-    CHECK_RET(ret, U8ID_EOK, 0); // division sign U+F7 allowed without XID check
+    // division sign U+F7 Math_Symbol allowed without XID check.
+    CHECK_RET(ret, U8ID_EOK, 0);
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_EOK, 0); // small letter b with stroke U+180
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
@@ -462,9 +465,11 @@ void test_mixed_scripts(int xid_check) {
 #else
   CHECK_RET(ret, U8ID_EOK, 0);
 #endif
+  u8ident_free();
 
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   ret = u8ident_check((const uint8_t *)"abcͻѝ", NULL); // Greek + Cyrillic
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C23_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
     U8ID_NORM == FCC
@@ -475,7 +480,7 @@ void test_mixed_scripts(int xid_check) {
 
   // U+37B Greek, U+985 Bengali
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C23_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // multi-scripts allowed in 5 and 6
@@ -501,7 +506,7 @@ void test_mixed_scripts_with_ctx(void) {
   // U+45D
   ret = u8ident_check((const uint8_t *)"ѝ", NULL); // Cyrillic alone
   // NFD to U+438,U+300 (d0b8cc800a)
-#if (U8ID_NORM == NFD || U8ID_NORM == NFKD)
+#if U8ID_NORM == NFD || U8ID_NORM == NFKD
   CHECK_RET(ret, U8ID_EOK_NORM, ctx);
 #else
   CHECK_RET(ret, U8ID_EOK, ctx);
@@ -577,8 +582,10 @@ void test_combine() {
 
   // Disallow Latin plus Japanese Mn
   ret = u8ident_check((const uint8_t *)"a\u3099", NULL);
-#if defined ENABLE_CHECK_XID
-  CHECK_RET(ret, U8ID_ERR_XID, 0);
+  //#if defined ENABLE_CHECK_XID
+  //CHECK_RET(ret, U8ID_ERR_XID, 0);
+#if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
+  CHECK_RET(ret, U8ID_EOK, 0);
 #else
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
@@ -587,6 +594,8 @@ void test_combine() {
   ret = u8ident_check((const uint8_t *)"a\u1cd0", NULL);
 #if defined ENABLE_CHECK_XID
   CHECK_RET(ret, U8ID_ERR_XID, 0);
+#elif defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
+  CHECK_RET(ret, U8ID_EOK, 0);
 #else
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
@@ -595,6 +604,8 @@ void test_combine() {
   ret = u8ident_check((const uint8_t *)"a\u1cd1", NULL);
 #if defined ENABLE_CHECK_XID
   CHECK_RET(ret, U8ID_ERR_XID, 0);
+#elif defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
+  CHECK_RET(ret, U8ID_EOK, 0);
 #else
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
@@ -603,14 +614,23 @@ void test_combine() {
   ret = u8ident_check((const uint8_t *)"a\u2dfa", NULL);
 #if defined ENABLE_CHECK_XID
   CHECK_RET(ret, U8ID_ERR_XID, 0);
+#elif defined U8ID_PROFILE && U8ID_PROFILE > 4 && U8ID_PROFILE != C23_4
+  CHECK_RET(ret, U8ID_EOK, 0);
 #else
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #endif
+  u8ident_free();
 
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   // Arabic-only combiners
   // "\xd8\xa3\xd8\xad\xd8\xb1\xd8\xa7\xd8\xb1\xd9\x8b\xd8\xa7" from texts/arabic-1.txt
   ret = u8ident_check((const uint8_t *)"أحرارًا", NULL);
+  // FIXME
+#if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+#else
   CHECK_RET(ret, U8ID_EOK, 0);
+#endif
 
   u8ident_free();
 }

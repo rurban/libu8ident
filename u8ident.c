@@ -121,10 +121,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   bool need_normalize = false;
   struct ctx_t *ctx = u8ident_ctx();
   enum u8id_sc basesc = SC_Unknown;
-  // char *scx = NULL;
-  // char scx[32]; // combination of all scx
-  // scx[0] = '\0';
-  //  check mixed scripts
+  char *scx = NULL;
+
   while (s < e) {
     const uint32_t cp = dec_utf8(&s);
     if (unlikely(!cp)) {
@@ -201,13 +199,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       need_normalize = u8ident_maybe_normalized(cp);
     }
 
-#if defined U8ID_PROFILE && U8ID_PROFILE == 5
-    goto ok;
-#elif defined U8ID_PROFILE && U8ID_PROFILE != 5
-#else
-    if (s_u8id_profile == U8ID_PROFILE_5)
-      goto ok;
-#endif
     bool is_new = false;
     // check scx on Common or Inherited.
     // TODO Keep list of possible scripts and reduce them.
@@ -216,7 +207,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       const bool has_latin = u8ident_has_script_ctx(SC_Latin, ctx);
       const struct scx *this_scx = u8ident_get_scx(cp);
       if (this_scx) {
-        char *x = (char *)this_scx->scx;
+        scx = (char *)this_scx->scx;
         const enum u8id_gc gc = (const enum u8id_gc)this_scx->gc;
         int n = 0;
         if (ctx->count && (s_u8id_profile < 5 || s_u8id_profile == C23_4)) {
@@ -229,12 +220,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             return U8ID_ERR_SCRIPTS;
           }
           if (!has_latin) { // 6 cases for Hira Kana
-            if (strEQc(x, "\x11\x12") && !ctx->is_japanese) {
+            if (strEQc(scx, "\x11\x12") && !ctx->is_japanese) {
               ctx->last_cp = cp;
               return U8ID_ERR_SCRIPTS;
             }
             // any cfk, also 6 cases for Bopo Hang Hani Hira Kana
-            if (strEQc(x, "\x06\x0e\x0f\x11\x12") && !ctx->is_japanese &&
+            if (strEQc(scx, "\x06\x0e\x0f\x11\x12") && !ctx->is_japanese &&
                 !ctx->has_han && !ctx->is_korean) {
               ctx->last_cp = cp;
               return U8ID_ERR_SCRIPTS;
@@ -256,6 +247,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             return U8ID_ERR_COMBINE;
           }
         }
+        char *x = scx;
         while (*x) {
           bool has = u8ident_has_script_ctx(*x, ctx);
           n += has ? 1 : 0;
@@ -270,8 +262,17 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         }
       }
     }
+
+#if defined U8ID_PROFILE && U8ID_PROFILE == 5
+    goto ok;
+#elif defined U8ID_PROFILE && U8ID_PROFILE != 5
+#else
+    if (s_u8id_profile == U8ID_PROFILE_5)
+      goto ok;
+#endif
+
     // ignore Latin. This is compatible with everything
-    else if (scr == SC_Latin) {
+    if (likely(scr == SC_Latin)) {
       if (!u8ident_has_script_ctx(scr, ctx))
         u8ident_add_script_ctx(scr, ctx);
       basesc = scr;
@@ -331,6 +332,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
 #if !defined U8ID_PROFILE || U8ID_PROFILE == C23_4
         else if (s_u8id_profile == U8ID_PROFILE_C23_4) {
+          if (ctx->count >= 2 || scr == SC_Cyrillic) { // not more than 2
+            ctx->last_cp = cp;
+            return U8ID_ERR_SCRIPTS;
+          }
           if (scr == SC_Greek) {
             assert(s_u8id_profile == U8ID_PROFILE_C23_4);
             goto ok;
@@ -342,13 +347,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         // the only remaining profile
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 4
         else if (scr == SC_Greek || scr == SC_Cyrillic) {
-          assert(s_u8id_profile == U8ID_PROFILE_4 ||
-                 s_u8id_profile == U8ID_PROFILE_C23_4);
+          assert(s_u8id_profile == U8ID_PROFILE_4);
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         } else {
-          assert(s_u8id_profile == U8ID_PROFILE_4 ||
-                 s_u8id_profile == U8ID_PROFILE_C23_4);
+          assert(s_u8id_profile == U8ID_PROFILE_4);
           // but not more than 2
           if (ctx->count >= 2) {
             ctx->last_cp = cp;
@@ -362,12 +365,15 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       // A generic is_MARK(cp) would be too slow here. we rather should keep the
       // SCX, and check the marks there.
       if (scr == SC_Common || scr == SC_Inherited /*|| u8ident_is_MARK(cp)*/) {
+#if defined U8ID_PROFILE && (U8ID_PROFILE < 5 || U8ID_PROFILE == C11_4)
+        // what with a Sm as first?
         if (basesc == SC_Unknown) {
           // Only for Mark, not Lm.
           // Disallow combiners without any base char (which do have a script)
           ctx->last_cp = cp;
           return U8ID_ERR_COMBINE;
         } // SCX already checked above
+#endif
       } else {
         basesc = scr;
       }
