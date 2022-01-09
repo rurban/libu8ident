@@ -160,30 +160,33 @@ check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 # clang has no -Wno-return-local-addr
 check-norms:
 	for n in NFKC NFC FCC NFKD NFD FCD; do \
-		echo $$n; \
-		$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors \
-		  -c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
-		ls -gGh u8idnorm.o; \
+	  echo $$n; \
+	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors \
+		-c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
+	  ls -gGh u8idnorm.o; \
+	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Wfatal-errors $(srcdir)/test.c \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-norm$(EXEEXT) && \
+	  ./test-norm$(EXEEXT) norm || exit; \
 	done
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6 C11_6 C23_4; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
-	    ./test-profiles$(EXEEXT) profile; \
+	    ./test-profiles$(EXEEXT) profile || exit; \
 	done
 	for n in SAFEC23 C11STD; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
-	    ./test-profiles$(EXEEXT) profile; \
+	    ./test-profiles$(EXEEXT) profile || exit; \
 	done
 check-xid: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in DISABLE ENABLE; do \
 	    echo $${n}_CHECK_XID; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-xid$(EXEEXT) && \
-	    ./test-xid$(EXEEXT) xid; \
+	    ./test-xid$(EXEEXT) xid || exit; \
 	done
 check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
@@ -194,12 +197,12 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 		-Wfatal-errors $(srcdir)/test.c \
 		$(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
 		$(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
-	      ./test-profiles$(EXEEXT); \
+	      ./test-profiles$(EXEEXT) || exit; \
 	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -$${x} \
 		-O2 -fsanitize=address \
 		$(srcdir)/test.c $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
 		$(srcdir)/u8idroar.c -o test-asan$(EXEEXT) && \
-	      ./test-asan$(EXEEXT); \
+	      ./test-asan$(EXEEXT) || exit; \
 	    done; \
 	  done; \
 	done; \
