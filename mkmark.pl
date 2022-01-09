@@ -103,7 +103,7 @@ extern const unsigned char mark_croar_bin[1219]; // checkme on updates
 EOF
 }
 
-chmod 0444, $H;
 close $H;
+chmod 0444, $mark_h;
 print "Created mark.h\n";
 

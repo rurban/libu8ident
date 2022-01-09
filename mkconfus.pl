@@ -132,8 +132,8 @@ print $H <<'EOF';
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 EOF
-chmod 0444, $H;
 close $H;
+chmod 0444, $ofile;
 
 print $H1 <<"EOF";
     // clang-format on
@@ -142,8 +142,8 @@ print $H1 <<"EOF";
 extern const uint32_t confusables[$i];
 #endif
 EOF
-chmod 0444, $H1;
 close $H1;
+chmod 0444, $ofile1;
 
 print "Create serialized roaring bitmaps:\n";
 my $arg = $c ? "confus" : "";

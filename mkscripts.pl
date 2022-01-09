@@ -1180,10 +1180,10 @@ const struct range_bool bidi_list[] = {
 };
 #endif
 EOF
-chmod 0444, $H;
-chmod 0444, $H16;
 close $H;
 close $H16;
+chmod 0444, $scripts_h;
+chmod 0444, $scripts16_h;
 
 # patch our header
 my $inc = "include/u8ident.h";
