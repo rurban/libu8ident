@@ -35,7 +35,7 @@ enum u8id_options {
   //  faster.
   //  Can be disallowed with --disable-check-xid
   //  hardcoded with --enable-check-xid.
-  U8ID_TR31_ALLOWED = 64, // The UCD IdentifierStatus.txt
+  U8ID_TR31_ALLOWED = 64, // The UCD IdentifierStatus.txt (default)
   U8ID_TR31_SAFEC23 = 65, // XID without Limited_Use and Excluded Scripts
   U8ID_TR31_ID = 66,      // The usual tr31 variants
   U8ID_TR31_XID = 67,     // without NFKC quirks, labelled stable

@@ -131,11 +131,12 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     }
 #ifndef DISABLE_CHECK_XID
     // check for the Allowed IdentifierStatus (tr39)
+    // FIXME implement all the TR31 XID checks. also allow hardcoded TR31 profiles.
     if
 #  ifdef ENABLE_CHECK_XID
         (1)
 #  else
-        (s_u8id_options & U8ID_TR31_XID)
+        (s_u8id_options & U8ID_TR31_ALLOWED)
 #  endif
     {
       if (unlikely(!u8ident_is_allowed(cp))) {
