@@ -41,7 +41,7 @@
 #include "u8idscr.h"
 #undef EXT_SCRIPTS
 #include "unic11.h"
-#include "mark.h"
+//#include "mark.h"
 
 int verbose = 0;
 int quiet = 0;
@@ -144,13 +144,10 @@ static struct func_start_s id_funcs[] = {
     {isC11_start, isC11_cont},     {isALLUTF8_start, isALLUTF8_cont},
 };
 
-static inline bool isMARK(uint32_t cp) {
-  return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
-}
-
 static const char *errstr(int errcode) {
   static const char *const _str[] = {
-      "ERR_CONFUS",           // -5
+      "ERR_CONFUS",           // -6
+      "ERR_COMBINE",          // -5
       "ERR_ENCODING",         // -4
       "ERR_SCRIPTS",          //-3
       "ERR_SCRIPT",           //-2
@@ -160,8 +157,8 @@ static const char *errstr(int errcode) {
       "EOK_WARN_CONFUS",      // 2
       "EOK_NORM_WARN_CONFUS", // 3
   };
-  assert(errcode >= -5 && errcode <= 3);
-  return _str[errcode + 5];
+  assert(errcode >= -6 && errcode <= 3);
+  return _str[errcode + 6];
 }
 
 #ifdef HAVE_SYS_STAT_H

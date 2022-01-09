@@ -34,14 +34,15 @@
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
 #  include "uniwbrk.h"
 #endif
-#ifdef HAVE_CROARING
-#  include "roaring.h"
-static roaring_bitmap_t *rmark = NULL;
-#endif
 #include "u8idscr.h"
 #undef EXT_SCRIPTS
 #include "unic11.h"
-#include "mark.h"
+#ifdef HAVE_CROARING
+#  include "roaring.h"
+static roaring_bitmap_t *rmark = NULL;
+#  define EXT_SCRIPTS
+#  include "mark.h"
+#endif
 
 // private access
 unsigned u8ident_options(void);
@@ -84,14 +85,6 @@ static inline bool isC11_cont(uint32_t cp) {
   return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
 }
 
-static inline bool isMARK(uint32_t cp) {
-#ifdef HAVE_CROARING
-  return roaring_bitmap_contains(rmark, cp);
-#else
-  return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
-#endif
-}
-
 #ifdef HAVE_SYS_STAT_H
 static int file_exists(const char *path) {
   struct stat st;
@@ -107,7 +100,8 @@ static int file_exists(const char *path) {
 
 static const char *errstr(int errcode) {
   static const char *const _str[] = {
-      "ERR_CONFUS",           // -5
+      "ERR_CONFUS",           // -6
+      "ERR_COMBINE",          // -5
       "ERR_ENCODING",         // -4
       "ERR_SCRIPTS",          //-3
       "ERR_SCRIPT",           //-2
@@ -117,8 +111,8 @@ static const char *errstr(int errcode) {
       "EOK_WARN_CONFUS",      // 2
       "EOK_NORM_WARN_CONFUS", // 3
   };
-  assert(errcode >= -5 && errcode <= 3);
-  return _str[errcode + 5];
+  assert(errcode >= -6 && errcode <= 3);
+  return _str[errcode + 6];
 }
 
 int testdir(const char *dir, const char *fname) {

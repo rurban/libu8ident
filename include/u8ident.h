@@ -137,7 +137,8 @@ enum u8id_errors {
   U8ID_ERR_SCRIPT = -2,
   U8ID_ERR_SCRIPTS = -3,
   U8ID_ERR_ENCODING = -4,
-  U8ID_ERR_CONFUS = -5,
+  U8ID_ERR_COMBINE = -5,
+  U8ID_ERR_CONFUS = -6,
 };
 
 /* Two variants to check if this identifier is valid. u8ident_check_buf avoids

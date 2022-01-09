@@ -47,7 +47,6 @@
 #include "u8idscr.h"
 #undef EXT_SCRIPTS
 #include "unic11.h"
-#include "mark.h"
 
 // private use:
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
@@ -71,15 +70,6 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
     }
   }
   return NULL;
-}
-static inline bool range_bool_search(const uint32_t cp,
-                                     const struct range_bool *list,
-                                     const size_t len) {
-  return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
-}
-
-static inline bool isMARK(uint32_t cp) {
-  return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
 }
 
 static inline bool isSkipIdtype(uint32_t cp) {
@@ -234,7 +224,7 @@ static void gen_c23_safe(void) {
     struct range_bool r = xid_start_list[i];
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
-      if (s < FIRST_EXCLUDED_SCRIPT && !isMARK(cp)) {
+      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -293,7 +283,8 @@ static void gen_c23_safe(void) {
       if (BITGET(u, cp))
         continue;
       uint8_t s = u8ident_get_script(cp);
-      if (s < FIRST_EXCLUDED_SCRIPT && !isMARK(cp) && !isSkipIdtype(cp)) {
+      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) &&
+          !isSkipIdtype(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -329,7 +320,7 @@ static void gen_c23_safe(void) {
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          !isMARK(cp) && !isSkipIdtype(cp)) {
+          !u8ident_is_MARK(cp) && !isSkipIdtype(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -362,7 +353,7 @@ static void gen_c23_safe(void) {
         continue;
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          !isMARK(cp) && !isSkipIdtype(cp)) {
+          !u8ident_is_MARK(cp) && !isSkipIdtype(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));

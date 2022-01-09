@@ -188,7 +188,7 @@ extern const char *const all_scripts[161];
 #endif
 
 enum u8id_sc {
-  // clang-format off
+// clang-format off
 #define FIRST_RECOMMENDED_SCRIPT 0
   SC_Common     = 0,
   SC_Inherited  = 1,
@@ -388,7 +388,7 @@ struct sc {
 struct scx {
   uint32_t from;
   uint32_t to;
-  uint8_t gc; // enum u8id_gc is too large
+  uint8_t gc;      // enum u8id_gc is too large
   const char *scx; // indices into sc
 };
 
@@ -6609,8 +6609,8 @@ enum u8id_idtypes {
 
    The possible values are:
    Not_Character, Deprecated, Default_Ignorable, Not_NFKC, Not_XID,
-   Exclusion, Obsolete, Technical, Uncommon_Use, Limited_Use, Inclusion, Recommended
-   See enum u8id_idtypes
+   Exclusion, Obsolete, Technical, Uncommon_Use, Limited_Use, Inclusion,
+   Recommended See enum u8id_idtypes
 
    Restricted: Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC,
                Default_Ignorable, Deprecated, Not_Character

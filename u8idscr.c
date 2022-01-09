@@ -1,5 +1,5 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021 Reini Urban
+   Copyright 2021, 2022 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 
   Classify and search for the script property
@@ -31,6 +31,7 @@
 #else
 #  include "u8idroar.h"
 #endif
+#include "mark.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
@@ -202,6 +203,10 @@ uint8_t u8ident_get_script(const uint32_t cp) {
 const struct scx *u8ident_get_scx(const uint32_t cp) {
   return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
+}
+
+bool u8ident_is_MARK(uint32_t cp) {
+  return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
 }
 
 bool u8ident_is_bidi(const uint32_t cp) {

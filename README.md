@@ -359,7 +359,8 @@ Return values (`enum u8id_errors`):
 * -2  - invalid script
 * -3  - invalid mixed scripts
 * -4  - invalid UTF-8 encoding
-* -5  - invalid because confusable
+* -5  - invalid combining mark run
+* -6  - invalid because confusable
 
 Note that we explicitly allow the Latin confusables: 0 1 I ` |
 i.e. U+30, U+31, U+49, U+60, U+7C

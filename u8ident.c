@@ -1,5 +1,5 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021 Reini Urban
+   Copyright 2021, 2022 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 */
 #include <string.h>
@@ -98,6 +98,17 @@ EXTERN void u8ident_set_maxlength(unsigned maxlen) {
 
 unsigned u8ident_maxlength(void) { return s_maxlen; }
 
+/* check if the script sc is in the SCX list */
+bool in_SCX(const enum u8id_sc scr, const char *scx) {
+  unsigned char *x = (unsigned char *)scx;
+  while (*x) {
+    if (*x == (unsigned char)scr)
+      return true;
+    x++;
+  }
+  return false;
+}
+
 /* Two variants to check if this identifier is valid. The second avoids
    allocating a fresh string from the parsed input.
 */
@@ -108,6 +119,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   const char *e = (char *)&buf[len];
   bool need_normalize = false;
   struct ctx_t *ctx = u8ident_ctx();
+  enum u8id_sc basesc = SC_Unknown;
   // char *scx = NULL;
   // char scx[32]; // combination of all scx
   // scx[0] = '\0';
@@ -192,34 +204,50 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       goto ok;
 #endif
     bool is_new = false;
-    // check scx on Common or Inherited. Keep list of possible scripts and
-    // reduce them.
+    // check scx on Common or Inherited.
+    // TODO Keep list of possible scripts and reduce them.
     if (scr == SC_Common || scr == SC_Inherited) {
-      // everybody may mix with latin
+      // Almost everybody may mix with latin
       const bool has_latin = u8ident_has_script_ctx(SC_Latin, ctx);
       const struct scx *this_scx = u8ident_get_scx(cp);
       if (this_scx) {
         char *x = (char *)this_scx->scx;
-        // enum u8id_gc gc = (enum u8id_gc)this_scx->gc;
+        const enum u8id_gc gc = (const enum u8id_gc)this_scx->gc;
         int n = 0;
         if (ctx->count && (s_u8id_profile < 5 || s_u8id_profile == C23_4)) {
           // Special-case for runs: only after japanese
+          // This is the only context dependent Lm case.
+          // All others are Combining Marks. TODO
           if (!ctx->is_japanese &&
               ((cp >= 0x30FC && cp <= 0x30FE) || cp == 0xFF70)) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           }
-          if (!has_latin) {
+          if (!has_latin) { // 6 cases for Hira Kana
             if (strEQc(x, "\x11\x12") && !ctx->is_japanese) {
               ctx->last_cp = cp;
               return U8ID_ERR_SCRIPTS;
             }
-            // any cfk
+            // any cfk, also 6 cases for Bopo Hang Hani Hira Kana
             if (strEQc(x, "\x06\x0e\x0f\x11\x12") && !ctx->is_japanese &&
                 !ctx->has_han && !ctx->is_korean) {
               ctx->last_cp = cp;
               return U8ID_ERR_SCRIPTS;
             }
+          }
+          // we have 2 Mc cases, and 30 Mn in SCX. No Me. More of them are in SC
+          // though
+        } else if (gc == GC_Mn || gc == GC_Mc) {
+          if (!ctx->count || basesc == SC_Unknown) {
+            // Disallow combiners without any base char (which does have a
+            // script) This catches only a mark as very first char. We check the
+            // base char for runs at ok:
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
+          } else if (!in_SCX(basesc, this_scx->scx)) {
+            // Check combiners against basesc
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
           }
         }
         while (*x) {
@@ -323,6 +351,17 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
       }
     ok:
+      // check illegal runs
+      if (scr == SC_Common || scr == SC_Inherited) {
+        if (basesc == SC_Unknown && u8ident_is_MARK(cp)) {
+          // Only for Mark, not Lm
+          // Disallow combiners without any base char (which do have a script)
+          ctx->last_cp = cp;
+          return U8ID_ERR_COMBINE;
+        } // SCX already checked above
+      } else {
+        basesc = scr;
+      }
       u8ident_add_script_ctx(scr, ctx);
     }
   }

@@ -30,7 +30,8 @@ char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 static const char *errstr(int errcode) {
   static const char *const _str[] = {
-      "ERR_CONFUS",           // -5
+      "ERR_CONFUS",           // -6
+      "ERR_COMBINE",          // -5
       "ERR_ENCODING",         // -4
       "ERR_SCRIPTS",          //-3
       "ERR_SCRIPT",           //-2
@@ -40,8 +41,8 @@ static const char *errstr(int errcode) {
       "EOK_WARN_CONFUS",      // 2
       "EOK_NORM_WARN_CONFUS", // 3
   };
-  assert(errcode >= -5 && errcode <= 3);
-  return _str[errcode + 5];
+  assert(errcode >= -6 && errcode <= 3);
+  return _str[errcode + 6];
 }
 
 // check if the library can be used without init: script lookups, default checks
@@ -546,10 +547,10 @@ void test_mixed_scripts_with_ctx(void) {
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
-  // But allow Latin plus other Japanese Lm (but this is not in TR31_ALLOWED,
-  // just XID)
+  // Allow Latin plus other Japanese Lm VERTICAL KANA REPEAT MARK
   ret = u8ident_check((const uint8_t *)"a\u3031", NULL);
 #if defined ENABLE_CHECK_XID
+  // 3031 Lm is not in TR31_ALLOWED, just XID
   CHECK_RET(ret, U8ID_ERR_XID, 0);
 #elif defined U8ID_PROFILE && U8ID_PROFILE < 3
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
@@ -560,12 +561,52 @@ void test_mixed_scripts_with_ctx(void) {
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   ret = u8ident_check((const uint8_t *)"أحرارًا", NULL);
-  // huh?
+  // huh? 6 norms, but 5 not?
 #if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6)
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0);
 #endif
+  u8ident_free();
+}
+
+// Test invalid encodings (Combining marks)
+void test_combine() {
+  int ret;
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
+
+  // Disallow Latin plus Japanese Mn
+  ret = u8ident_check((const uint8_t *)"a\u3099", NULL);
+#if defined ENABLE_CHECK_XID
+  CHECK_RET(ret, U8ID_ERR_XID, 0);
+#else
+  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+#endif
+
+  // Disallow Latin plus Mn (in SCX)
+  ret = u8ident_check((const uint8_t *)"a\u1cd0", NULL);
+#if defined ENABLE_CHECK_XID
+  CHECK_RET(ret, U8ID_ERR_XID, 0);
+#else
+  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+#endif
+
+  // Disallow Latin plus Deva Mn. ex-SCX, moved to SC. FIXME
+  ret = u8ident_check((const uint8_t *)"a\u1cd1", NULL);
+#if defined ENABLE_CHECK_XID
+  CHECK_RET(ret, U8ID_ERR_XID, 0);
+#else
+  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+#endif
+
+  // Disallow Latin plus Cyrillic Mn (not in SCX)
+  ret = u8ident_check((const uint8_t *)"a\u2dfa", NULL);
+#if defined ENABLE_CHECK_XID
+  CHECK_RET(ret, U8ID_ERR_XID, 0);
+#else
+  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+#endif
+
   u8ident_free();
 }
 
@@ -684,11 +725,16 @@ int main(int argc, char **argv) {
   const int xid = (argc > i && strEQc(argv[i], "xid") && i++);
 #endif
   const int scx = (argc > i && strEQc(argv[i], "scx") && i++);
+  const int combine = (argc > i && strEQc(argv[i], "combine") && i++);
 
   if (argc == 1) {
     test_scripts_no_init();
     test_init();
     test_script();
+  }
+  if (combine) {
+    test_combine();
+    return 0;
   }
   if (norm || argc == 1) {
 #if !defined U8ID_NORM || U8ID_NORM == NFKC
@@ -727,6 +773,8 @@ int main(int argc, char **argv) {
 #endif
 
   test_mixed_scripts_with_ctx();
+  test_combine();
+
   if (scx || argc == 1) {
     test_scx_singles();
     test_add_scripts();

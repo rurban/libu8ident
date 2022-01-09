@@ -21,6 +21,7 @@ bool u8ident_is_ID_Start(const uint32_t cp);
 bool u8ident_is_ID_Cont(const uint32_t cp);
 bool u8ident_is_XID_Start(const uint32_t cp);
 bool u8ident_is_XID_Cont(const uint32_t cp);
+bool u8ident_is_MARK(const uint32_t cp);
 // memmber or bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.
 bool u8ident_is_bidi(const uint32_t cp);
