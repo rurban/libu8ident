@@ -230,6 +230,16 @@ bool u8ident_is_XID_Start(const uint32_t cp) {
 bool u8ident_is_XID_Cont(const uint32_t cp) {
   return range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
 }
+const enum u8id_gc u8ident_get_gc(const uint32_t cp) {
+    binary_search(cp, (char *)list, len, sizeof(*list));
+}
+const char *u8ident_gc_name(const enum u8id_gc gc) {
+  if (gc > GC_Zs)
+    return NULL;
+  assert(gc <= GC_Zs);
+  return u8id_gc_names[gc];
+}
+
 //#endif
 
 // bitmask of u8id_idtypes
@@ -365,16 +375,6 @@ const char *u8ident_existing_scripts(const u8id_ctx_t i) {
     strcat(res, str);
   }
   return res;
-}
-
-#if 0
-// TODO. Generate either if-trees, or sorted lists of those.
-static bool _is_MARK(const uint32_t cp) {
-  (void)cp;
-  return true;
-}
-static bool _is_DECOMPOSED_REST(const uint32_t cp) {
-  return cp < 128 || (cp >> 11) > 2 ? false : true;
 }
 
 /*

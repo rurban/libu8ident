@@ -391,6 +391,38 @@ enum u8id_gc {
   GC_Zs,
 };
 
+#ifdef EXT_SCRIPTS
+extern const char *const u8id_gc_names[25];
+#else
+const char *const u8id_gc_names[] = {
+  "Cc",
+  "Cf",
+  "Lamp",
+  "Lm",
+  "Lo",
+  "Mc",
+  "Me",
+  "Mn",
+  "Nd",
+  "Nl",
+  "No",
+  "Pc",
+  "Pd",
+  "Pe",
+  "Pf",
+  "Pi",
+  "Po",
+  "Ps",
+  "Sc",
+  "Sk",
+  "Sm",
+  "So",
+  "Zl",
+  "Zp",
+  "Zs",
+};
+#endif
+
 struct sc {
   uint32_t from;
   uint32_t to;

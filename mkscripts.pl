@@ -634,12 +634,26 @@ printf $H <<'EOF';
 */
 enum u8id_gc {
 EOF
-for my $g (sort keys %GC) {
+my @GCs = sort keys %GC;
+for my $g (@GCs) {
   $g =~ s/&/amp/;
   printf $H "  GC_%s,\n", $g;
 }
+printf $H <<'EOF', scalar(@GCs);
+};
+
+#ifdef EXT_SCRIPTS
+extern const char *const u8id_gc_names[%u];
+#else
+const char *const u8id_gc_names[] = {
+EOF
+for my $g (@GCs) {
+  $g =~ s/&/amp/;
+  printf $H "  \"%s\",\n", $g;
+}
 printf $H <<'EOF', $i;
 };
+#endif
 
 EOF
 print $H $structs;

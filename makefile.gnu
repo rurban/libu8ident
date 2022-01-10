@@ -18,7 +18,7 @@ WGET := wget
 
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
-HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h mark.h unic11.h scripts16.h
+HDRS = u8id_private.h scripts.h $(NORMHDRS) hangul.h mark.h gc.h unic11.h scripts16.h
 SRC = u8ident.c u8idscr.c u8idnorm.c
 ifeq (${HAVE_CONFUS}, 1)
 SRC += u8idroar.c
@@ -97,6 +97,8 @@ all: most mkc23 test-texts test perf c23++proposal.html
 
 .c.o:
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c $< -o $@
+.c.i:
+	$(CC) $(CFLAGS) $(DEFINES) -Iinclude -E -c $< -o $@
 u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idnorm.c -o $@
 u8idroar.o: u8idroar.c u8id_private.h $(HEADER) confus_croar.h
@@ -114,6 +116,8 @@ confus_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl -c
 mark.h: mkmark.pl # UnicodeData.txt
 	$(PERL) mkmark.pl
+gc.h: mkgc.pl # UnicodeData.txt
+	$(PERL) mkgc.pl
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 

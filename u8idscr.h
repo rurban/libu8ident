@@ -22,7 +22,7 @@ bool u8ident_is_ID_Cont(const uint32_t cp);
 bool u8ident_is_XID_Start(const uint32_t cp);
 bool u8ident_is_XID_Cont(const uint32_t cp);
 bool u8ident_is_MARK(const uint32_t cp);
-// memmber or bidi formatting characters for reordering attacks.
+// member or bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.
 bool u8ident_is_bidi(const uint32_t cp);
 // bitmask of u8id_idtypes
@@ -30,4 +30,8 @@ uint16_t u8ident_get_idtypes(const uint32_t cp);
 const char *u8ident_script_name(const int scr);
 // bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr);
 bool u8ident_maybe_normalized(const uint32_t cp);
+
+const enum u8id_gc u8ident_get_gc(const uint32_t cp);
+const char *u8ident_gc_name(const enum u8id_gc);
+
 #endif // _U8IDSCR_H

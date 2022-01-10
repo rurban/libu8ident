@@ -120,6 +120,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
           s = u8ident_get_script(from);
           fprintf(f, "    {0x%X, 0x%X", from, i - 1);
           if (with_sc) {
+	    // TODO u8ident_get_gc(cp), u8ident_gc_name(gc)
             fprintf(f, ", SC_%s, GC_%s, NULL", u8ident_script_name(s), "Lu");
 	    fprintf(f, "}, // %s %s",
 		    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"

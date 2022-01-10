@@ -42,7 +42,8 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/arabic-1.c          texts/math-1.c         texts/bidi-sec-1.c     texts/bidi-sec-2.c \
 	texts/bidi-sec-3.c        texts/homo-1.c         texts/nfc-1.c          texts/nfkc-1.c \
 	texts/bidi-sec-1.tst      texts/bidi-sec-2.tst   texts/homo-1-p4.tst
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl makefile.gnu $(HDRS) $(doc_DATA) \
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl makefile.gnu \
+	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4
 
 .c.i:
