@@ -466,7 +466,7 @@ const struct sc_c23 safec23_start_list[432];
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, Skipped Ids, NFC and !MARK
 #ifndef EXT_SCRIPTS
-const struct sc safec23_cont_list[] = {
+const struct sc_c23 safec23_cont_list[] = {
     {0x30, 0x39, SC_Common, GC_Lu, NULL}, //  0..9
     {0x5F, 0x5F, SC_Common, GC_Lu, NULL}, //  _
     {0xB7, 0xB7, SC_Common, GC_Lu, NULL}, //  ·
@@ -708,6 +708,7 @@ const struct sc_c23 safec23_excl_start_list[191];
 // 158 ranges, 33 singles, 14926 codepoints
 
 // Only excluded scripts, XID_Continue,!XID_Start, Skipped Ids, NFC and !MARK
+#ifndef EXT_SCRIPTS
 const struct sc_c23 safec23_excl_cont_list[] = {
     {0x1810, 0x1819, SC_Mongolian, GC_Lu, NULL}, //  (Excluded) ᠐..᠙
     {0x104A0, 0x104A9, SC_Osmanya, GC_Lu, NULL}, //  (Excluded) 𐒠..𐒩

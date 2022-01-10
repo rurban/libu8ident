@@ -323,7 +323,7 @@ static void gen_c23_safe(void) {
         "NFC and !MARK\n",
         f);
   fputs("#ifndef EXT_SCRIPTS\n", f);
-  fputs("const struct sc safec23_cont_list[] = {\n", f);
+  fputs("const struct sc_c23 safec23_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
   fputs("#else\n", f);
@@ -395,6 +395,7 @@ static void gen_c23_safe(void) {
       }
     }
   }
+  fputs("#ifndef EXT_SCRIPTS\n", f);
   fputs("const struct sc_c23 safec23_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);

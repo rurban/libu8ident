@@ -625,37 +625,7 @@ EOF
 $defines .= "  // clang-format on\n";
 $defines .= "};\n";
 print $H $defines;
-printf $H <<'EOF';
 
-/* UCD General_Category
-   For scripts.h we are only interested for the Identifier parts in scx_list[]
-   to detect illegal runs.
-   But u8idlint.c/unic23.h needs the full list.
-*/
-enum u8id_gc {
-EOF
-my @GCs = sort keys %GC;
-for my $g (@GCs) {
-  $g =~ s/&/amp/;
-  printf $H "  GC_%s,\n", $g;
-}
-printf $H <<'EOF', scalar(@GCs);
-};
-
-#ifdef EXT_SCRIPTS
-extern const char *const u8id_gc_names[%u];
-#else
-const char *const u8id_gc_names[] = {
-EOF
-for my $g (@GCs) {
-  $g =~ s/&/amp/;
-  printf $H "  \"%s\",\n", $g;
-}
-printf $H <<'EOF', $i;
-};
-#endif
-
-EOF
 print $H $structs;
 
 printf $H <<"EOF", scalar @SCR;

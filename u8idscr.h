@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "u8id_private.h"
 #define EXT_SCRIPTS
+#include "gc.h"
 #include "scripts.h"
 
 uint32_t dec_utf8(char **strp);
@@ -31,7 +32,7 @@ const char *u8ident_script_name(const int scr);
 // bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr);
 bool u8ident_maybe_normalized(const uint32_t cp);
 
-const enum u8id_gc u8ident_get_gc(const uint32_t cp);
+enum u8id_gc u8ident_get_gc(const uint32_t cp);
 const char *u8ident_gc_name(const enum u8id_gc);
 
 #endif // _U8IDSCR_H

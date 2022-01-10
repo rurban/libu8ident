@@ -22,6 +22,7 @@
 #include "u8id_private.h"
 #include <u8ident.h>
 
+#include "gc.h"
 #include "scripts.h"
 #ifndef HAVE_CROARING
 // optional. default: disabled
@@ -230,13 +231,18 @@ bool u8ident_is_XID_Start(const uint32_t cp) {
 bool u8ident_is_XID_Cont(const uint32_t cp) {
   return range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
 }
-const enum u8id_gc u8ident_get_gc(const uint32_t cp) {
-    binary_search(cp, (char *)list, len, sizeof(*list));
+enum u8id_gc u8ident_get_gc(const uint32_t cp) {
+  const struct gc *gc = (const struct gc *)binary_search(
+      cp, (char *)gc_list, ARRAY_SIZE(gc_list), sizeof(*gc_list));
+  if (gc)
+    return gc->gc;
+  else
+    return GC_INVALID;
 }
 const char *u8ident_gc_name(const enum u8id_gc gc) {
-  if (gc > GC_Zs)
+  if (gc >= GC_INVALID)
     return NULL;
-  assert(gc <= GC_Zs);
+  assert(gc < GC_INVALID);
   return u8id_gc_names[gc];
 }
 
@@ -377,6 +383,7 @@ const char *u8ident_existing_scripts(const u8id_ctx_t i) {
   return res;
 }
 
+#if 0
 /*
   Check for the right-hand-side of the Decomposition_Mapping property,
   which means the codepoint can be normalized, if the sequence is
@@ -386,9 +393,7 @@ const char *u8ident_existing_scripts(const u8id_ctx_t i) {
 */
 
 bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr) {
-  if (scr == SC_Hangul || _is_MARK(cp))
-    return true;
-  return _is_DECOMPOSED_REST(cp);
+  return (scr == SC_Hangul || u8ident_is_MARK(cp)) : true : false;
 }
 #endif
 

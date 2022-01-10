@@ -41,18 +41,21 @@ c11_6
 C11STD. Sets xid c11.
 .TP
 c23_4
-SAFEC23 (i.e. 4 with Greek). Sets xid allowed.
+SAFEC23 (i.e. 4 with Greek). Sets xid safec23.
 .TP
-\fB\-x\fR|\-\-xid=ascii,allowed,id,xid,c11,allutf8
+\fB\-x\fR|\-\-xid=ascii,allowed,safec23,id,xid,c11,allutf8
 default: allowed
 .IP
-allowed set of identifiers:
+TR31 set of identifiers:
 .TP
 ascii
 only ASCII letters, punctuations. plus numbers
 .TP
 allowed
 tr31 with only recommended scripts, IdentifierStatus
+.TP
+safec23
+allowed but different Identifer_Type and NFC
 .TP
 id
 all letters. plus numbers, punctuations and combining marks
