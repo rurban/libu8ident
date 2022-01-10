@@ -3,7 +3,7 @@
 # Copyright 2022 Reini Urban
 # SPDX-License-Identifier: Apache-2.0
 #
-# Create gc.h General_Category API
+# Create u8id_gc.h General_Category API
 
 use strict;
 use Config;
@@ -14,7 +14,7 @@ if (!-e $ucd) {
   system("wget -N https://www.unicode.org/Public/UNIDATA/$ucd");
 }
 
-my $gc_h = "gc.h";
+my $gc_h = "u8id_gc.h";
 my (@GC, %GC);
 open my $UCD, "<", $ucd or die "$ucd $!";
 my ($from, $to, $oldto, $oldgc) = (0,0);
@@ -121,5 +121,5 @@ EOF
 
 close $H;
 chmod 0444, $gc_h;
-print "Created gc.h\n";
+print "Created $gc_h\n";
 

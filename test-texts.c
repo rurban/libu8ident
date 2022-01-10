@@ -37,12 +37,6 @@
 #include "u8idscr.h"
 #undef EXT_SCRIPTS
 #include "unic11.h"
-#ifdef HAVE_CROARING
-#  include "roaring.h"
-static roaring_bitmap_t *rmark = NULL;
-#  define EXT_SCRIPTS
-#  include "mark.h"
-#endif
 
 // private access
 unsigned u8ident_options(void);
@@ -234,10 +228,6 @@ int cmp_str(const void *a, const void *b) {
 int main(int argc, char **argv) {
   char *dirname = "texts";
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
-#ifdef HAVE_CROARING
-  rmark = roaring_bitmap_portable_deserialize_safe((char *)mark_croar_bin,
-                                                   mark_croar_bin_len);
-#endif
 
   if (getenv("U8IDTEST_TEXTS"))
     dirname = getenv("U8IDTEST_TEXTS");
@@ -248,9 +238,6 @@ int main(int argc, char **argv) {
   if (argc > 1 && file_exists(argv[1])) {
     testdir(NULL, argv[1]);
     u8ident_free();
-#  ifdef HAVE_CROARING
-    roaring_bitmap_free(rmark);
-#  endif
     return 0;
   }
 #endif
@@ -329,8 +316,5 @@ int main(int argc, char **argv) {
 #endif
 
   u8ident_free();
-#ifdef HAVE_CROARING
-  roaring_bitmap_free(rmark);
-#endif
   return 0;
 }

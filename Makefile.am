@@ -26,7 +26,7 @@ dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.html
-HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
+HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h mark.h unic11.h scripts16.h unic23.h c11-all.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
@@ -60,6 +60,8 @@ $(srcdir)/confus.h: $(srcdir)/mkconfus.pl
 	cd $(srcdir) && $(PERL) mkconfus.pl
 $(srcdir)/mark.h: $(srcdir)/mkmark.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkmark.pl
+$(srcdir)/u8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
+	cd $(srcdir) && $(PERL) mkgc.pl
 # emacs flymake-mode
 check-syntax:
 	test -n "$(CHK_SOURCES)" && \

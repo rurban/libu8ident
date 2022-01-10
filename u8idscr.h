@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "u8id_private.h"
 #define EXT_SCRIPTS
-#include "gc.h"
+#include "u8id_gc.h"
 #include "scripts.h"
 
 uint32_t dec_utf8(char **strp);

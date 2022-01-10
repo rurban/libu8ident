@@ -22,7 +22,7 @@
 #include "u8id_private.h"
 #include <u8ident.h>
 
-#include "gc.h"
+#include "u8id_gc.h"
 #include "scripts.h"
 #ifndef HAVE_CROARING
 // optional. default: disabled
