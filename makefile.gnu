@@ -117,7 +117,7 @@ mark.h: mkmark.pl # UnicodeData.txt
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
-u8idlint: u8idlint.c $(LIB) c23-safe.h unic11.h
+u8idlint: u8idlint.c $(LIB) unic23.h unic11.h
 	$(CC) $(CFLAGS_REL) $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB)
 
 .PHONY: check check-asan check-norms check-profiles check-xid \
@@ -151,7 +151,7 @@ test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
-c11-all.h c23-safe.h: mkc23 scripts.h mark.h
+c11-all.h unic23.h: mkc23 scripts.h mark.h
 	./mkc23
 mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude mkc23.c $(SRC) -o $@

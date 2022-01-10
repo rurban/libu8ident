@@ -28,7 +28,7 @@ docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.html
 HDRS =  scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h unic11.h scripts16.h c23-safe.h c11-all.h
+	confus_croar.h mark.h unic11.h scripts16.h unic23.h c11-all.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
 	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
 	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -137,9 +137,9 @@ perf: perf.c
 endif
 
 if !HAVE_WINDOWS
-c11-all.h c23-safe.h: mkc23$(EXEEXT) scripts.h mark.h
+c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h
 #	./mkc23$(EXEXT)
-#	-mv c11-all.h c23-safe.h $(srcdir)/
+#	-mv c11-all.h unic23.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
@@ -235,7 +235,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html
-MAINTAINERCLEANFILES  = *~ Makefile.in Makefile c11-all.h c23-safe.h
+MAINTAINERCLEANFILES  = *~ Makefile.in Makefile c11-all.h unic23.h
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
 	compile \

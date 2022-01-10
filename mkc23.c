@@ -212,7 +212,7 @@ static void gen_c11_all(void) {
 
 // XID, only recommended scripts and IdTypes, mandate NFC (no MARK)
 static void gen_c23_safe(void) {
-  const char *header = "c23-safe.h";
+  const char *header = "unic23.h";
   FILE *f = fopen(header, "w");
   int nfc = 0;
   static uint8_t u[0x10ffff >> 3];
