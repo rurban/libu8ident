@@ -236,17 +236,20 @@ my @limited = qw(
 
 open my $SC, "<", $scn or die "$scn $!";
 $started = 0; $oldsc = '';
+my $gc;
 while (<$SC>) {
   if (!$started && /^# Scripts-(\d+)\.(\d+)\.(\d+)\.txt/) {
     @ucd_version = ($1, $2, $3);
   }
   if (/^0000/) { $started++; }
   next unless $started;
-  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; (\w+) #/) {
-    ($from, $to, $sc) = (hex($1), hex($2), $3);
+  if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; (\w+) # (\w.) /) {
+    ($from, $to, $sc, $gc) = (hex($1), hex($2), $3, $4);
+    $GC{$gc}++;
   }
-  elsif (/^([0-9A-F]{4,5})\s+; (\w+) #/) {
-    ($from, $to, $sc) = (hex($1), hex($1), $2);
+  elsif (/^([0-9A-F]{4,5})\s+; (\w+) # (\w.) /) {
+    ($from, $to, $sc, $gc) = (hex($1), hex($1), $2, $3);
+    $GC{$gc}++;
   } else {
     #warn $_;
     next;
@@ -280,7 +283,7 @@ close $PVA;
 $started = 0;
 $oldto = 0; $oldsc = "";
 open my $SCX, "<", $scxn or die "$scxn $!";
-my ($scl, $gc);
+my $scl;
 while (<$SCX>) {
   if (/^# Script_Extensions=/) { $started++; }
   next unless $started;
@@ -624,12 +627,15 @@ $defines .= "};\n";
 print $H $defines;
 printf $H <<'EOF';
 
-/* Partial list of UCD General_Category
-   We are only interested for the Identifier parts in scx_list[]
-   to detect illegal runs. */
+/* UCD General_Category
+   For scripts.h we are only interested for the Identifier parts in scx_list[]
+   to detect illegal runs.
+   But u8idlint.c/unic23.h needs the full list.
+*/
 enum u8id_gc {
 EOF
 for my $g (sort keys %GC) {
+  $g =~ s/&/amp/;
   printf $H "  GC_%s,\n", $g;
 }
 printf $H <<'EOF', $i;
@@ -1216,3 +1222,5 @@ sub patch_ucd_major {
   rename $inc, "$inc.bak";
   rename "$inc.new", $inc;
 }
+
+# perl-indent-level: 4

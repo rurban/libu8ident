@@ -358,24 +358,36 @@ enum u8id_sc {
   // clang-format on
 };
 
-/* Partial list of UCD General_Category
-   We are only interested for the Identifier parts in scx_list[]
-   to detect illegal runs. */
+/* UCD General_Category
+   For scripts.h we are only interested for the Identifier parts in scx_list[]
+   to detect illegal runs.
+   But u8idlint.c/unic23.h needs the full list.
+*/
 enum u8id_gc {
+  GC_Cc,
   GC_Cf,
+  GC_Lamp,
   GC_Lm,
   GC_Lo,
   GC_Mc,
+  GC_Me,
   GC_Mn,
   GC_Nd,
+  GC_Nl,
   GC_No,
+  GC_Pc,
   GC_Pd,
   GC_Pe,
+  GC_Pf,
+  GC_Pi,
   GC_Po,
   GC_Ps,
   GC_Sc,
   GC_Sk,
+  GC_Sm,
   GC_So,
+  GC_Zl,
+  GC_Zp,
   GC_Zs,
 };
 

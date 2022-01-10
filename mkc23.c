@@ -119,13 +119,20 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
           enc_utf8(tmp, &len, from);
           s = u8ident_get_script(from);
           fprintf(f, "    {0x%X, 0x%X", from, i - 1);
-          if (with_sc)
-            fprintf(f, ", %u", s);
-          fprintf(f, "}, // %s%s %s", u8ident_script_name(s),
-                  s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
-                  : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
-                                                : "",
-                  tmp);
+          if (with_sc) {
+            fprintf(f, ", SC_%s, GC_%s, NULL", u8ident_script_name(s), "Lu");
+	    fprintf(f, "}, // %s %s",
+		    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
+		    : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
+		    : "",
+		    tmp);
+	  } else {
+	    fprintf(f, "}, // %s%s %s", u8ident_script_name(s),
+		    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
+		    : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
+		    : "",
+		    tmp);
+	  }
           if (from == i - 1) {
             stats.singles++;
             fprintf(f, "\n");
@@ -161,6 +168,9 @@ static void gen_c11_all(void) {
       BITSET(u, cp);
     }
   }
+#ifdef HAVE_SYS_STAT_H
+  chmod(header, 0644);
+#endif
   FILE *f = fopen(header, "w");
   fputs("/* ex: set ro ft=c: -*- mode: c; buffer-read-only: t -*- */\n"
         "/* libu8ident - Check unicode security guidelines for identifiers.\n"
@@ -206,6 +216,9 @@ static void gen_c11_all(void) {
   fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fclose(f);
+#ifdef HAVE_SYS_STAT_H
+  chmod(header, 0444);
+#endif
   memset(&stats, 0, sizeof(stats));
   printf("%s created\n", header);
 }
@@ -213,6 +226,9 @@ static void gen_c11_all(void) {
 // XID, only recommended scripts and IdTypes, mandate NFC (no MARK)
 static void gen_c23_safe(void) {
   const char *header = "unic23.h";
+#ifdef HAVE_SYS_STAT_H
+  chmod(header, 0644);
+#endif
   FILE *f = fopen(header, "w");
   int nfc = 0;
   static uint8_t u[0x10ffff >> 3];
@@ -255,12 +271,14 @@ static void gen_c23_safe(void) {
       "    uint32_t to;\n"
       "    enum u8id_sc sc;\n"
       "    enum u8id_gc gc;\n"
-      "    const char *scx; // maxsize Beng Deva Dogr Gong Gonm Gran Gujr Guru "
-      "Knda Limb Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh\n"
+      "    // maxsize: Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Limb\n"
+      "    //          Mahj Mlym Nand Orya Sind Sinh Sylo Takr Taml Telu Tirh\n"
+      "    const char *scx;\n"
       "};\n"
       "\n",
       f);
   fputs("// Filtering allowed scripts, XID_Start, Skipped Ids and NFC\n", f);
+  fputs("#ifndef EXT_SCRIPTS\n", f);
   fputs("const struct sc_c23 safec23_start_list[] = {\n"
         "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
         "    {'A', 'Z', SC_Latin, GC_Lu, NULL},\n"  // 41-5a
@@ -269,6 +287,9 @@ static void gen_c23_safe(void) {
         f);
   emit_ranges(f, 0x7a, u, true);
   fputs("};\n", f);
+  fputs("#else\n", f);
+  fprintf(f, "const struct sc_c23 safec23_start_list[%u];\n", stats.ranges + stats.singles);
+  fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec23_start_list",
          stats.ranges, stats.singles, stats.codepoints);
   fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
@@ -300,9 +321,13 @@ static void gen_c23_safe(void) {
   fputs("\n// Filtering allowed scripts, XID_Continue,!XID_Start, Skipped Ids, "
         "NFC and !MARK\n",
         f);
+  fputs("#ifndef EXT_SCRIPTS\n", f);
   fputs("const struct sc safec23_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
+  fputs("#else\n", f);
+  fprintf(f, "const struct sc_c23 safec23_cont_list[%u];\n", stats.ranges + stats.singles);
+  fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec23_cont_list",
          stats.ranges, stats.singles, stats.codepoints);
   fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
@@ -332,9 +357,13 @@ static void gen_c23_safe(void) {
       }
     }
   }
-  fputs("const struct sc safec23_excl_start_list[] = {\n", f);
+  fputs("#ifndef EXT_SCRIPTS\n", f);
+  fputs("const struct sc_c23 safec23_excl_start_list[] = {\n", f);
   emit_ranges(f, 0x7a, u, true);
   fputs("};\n", f);
+  fputs("#else\n", f);
+  fprintf(f, "const struct sc_c23 safec23_excl_start_list[%u];\n", stats.ranges + stats.singles);
+  fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
          "safec23_excl_start_list", stats.ranges, stats.singles,
          stats.codepoints);
@@ -365,15 +394,21 @@ static void gen_c23_safe(void) {
       }
     }
   }
-  fputs("const struct range_bool safec23_excl_cont_list[] = {\n", f);
+  fputs("const struct sc_c23 safec23_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
+  fputs("#else\n", f);
+  fprintf(f, "const struct sc_c23 safec23_excl_cont_list[%u];\n", stats.ranges + stats.singles);
+  fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
          "safec23_excl_cont_list", stats.ranges, stats.singles,
          stats.codepoints);
   fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fclose(f);
+#ifdef HAVE_SYS_STAT_H
+  chmod(header, 0444);
+#endif
   memset(&stats, 0, sizeof(stats));
   fprintf(stderr, "%d codepoints not NFC safe\n", nfc);
   printf("%s created\n", header);
