@@ -124,7 +124,7 @@ allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkco
 u8idlint: u8idlint.c $(LIB) unic23.h unic11.h
 	$(CC) $(CFLAGS_REL) $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB)
 
-.PHONY: check check-asan check-norms check-profiles check-xid \
+.PHONY: check check-asan check-norms check-profiles check-tr31 \
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
@@ -149,7 +149,7 @@ check: test test-texts u8idlint
 endif
 endif
 
-check-all: check check-norms check-profiles check-xid check-asan
+check-all: check check-norms check-profiles check-tr31 check-asan
 
 test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
@@ -175,7 +175,7 @@ perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
 	       perf mkroar u8idlint \
-	       test test-texts test-asan test-xid-{EN,DIS}ABLE \
+	       test test-texts test-asan test-tr31 \
 	       test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
@@ -187,25 +187,42 @@ check-norms: $(SRC) $(HEADER) $(HDRS)
             $(CC) $(CFLAGS_REL) -DU8ID_NORM=$$n -Wfatal-errors -Iinclude -c u8idnorm.c -o u8idnorm.o && \
 	      ls -gGh u8idnorm.o; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_NORM=$$n -I. -Iinclude test.c $(SRC) \
-	      -o test-norm-$$n && ./test-norm-$$n norm && rm test-norm-$$n; \
+	      -o test-norm-$$n && \
+	    if ./test-norm-$$n norm; then rm test-norm-$$n; else exit; fi; \
         done
 check-profiles: $(SRC) $(HEADER) $(HDRS)
 	for n in 2 3 4 5 6 C11_6 C23_4; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
-	      -o test-prof$$n && ./test-prof$$n profile && rm test-prof$$n; \
+	      -o test-prof$$n && \
+	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
 	for n in SAFEC23 C11STD; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE_$${n} -I. -Iinclude test.c $(SRC) \
-	      -o test-prof$$n && ./test-prof$$n profile && rm test-prof$$n; \
+	      -o test-prof$$n && \
+	    ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
-check-xid: $(SRC) $(HEADER) $(HDRS)
-	for n in DISABLE ENABLE; do \
-            echo $${n}_CHECK_XID; \
-	    $(CC) $(CFLAGS_DBG) $(DEFINES) -D$${n}_CHECK_XID -I. -Iinclude test.c $(SRC) \
-	      -o test-xid-$$n && ./test-xid-$$n xid && rm test-xid-$$n; \
+check-tr31: $(SRC) $(HEADER) $(HDRS)
+	for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+            echo U8ID_TR31_$$x; \
+	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_TR31=$$x -I. -Iinclude test.c $(SRC) \
+	      -o test-xid-$$x && \
+	    if ./test-xid-$$x xid; then rm test-xid-$$x; else exit; fi; \
         done
+check-all-combinations: $(SRC) $(HEADER) $(HDRS)
+	for n in NFKC NFC NFKD NFD FCD FCC; do \
+	  for p in 2 3 4 5 6 C11_6 C23_4; do \
+	    for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
+	      $(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
+		-Wfatal-errors test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c \
+	        -o test-profiles && \
+	      ./test-profiles || exit; \
+	    done; \
+	  done; \
+	done; \
+	rm test-profiles
 
 # Create the normalization headers via a current perl
 Unicode-Normalize: un8ifcan.h

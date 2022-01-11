@@ -146,16 +146,16 @@ c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h
 endif
 
 if !HAVE_WINDOWS
-check-all: check check-asan check-norms check-profiles check-xid
+check-all: check check-asan check-norms check-profiles check-tr31
 else
-check-all: check check-norms check-profiles check-xid
+check-all: check check-norms check-profiles check-tr31
 endif
 
 check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
 	  $(srcdir)/test.c $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c \
 	  -o test-asan$(EXEEXT)
-	./test-asan$(EXEEXT)
+	if ./test-asan$(EXEEXT); then rm test-asan$(EXEEXT); else exit; fi
 
 # Check coverage and sizes for all --with-norm configure combinations
 # e.g. amd64-gcc:   NFKC 217K, NFC+FCC 182K, NFD 113K, NFD 78K, FCD 52K
@@ -170,7 +170,8 @@ check-norms:
 	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-norm$(EXEEXT) && \
 	  ./test-norm$(EXEEXT) norm || exit; \
-	done
+	done; \
+	rm test-norm$(EXEEXT)
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6 C11_6 C23_4; do \
 	    echo PROFILE_$${n}; \
@@ -183,33 +184,30 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
-	done
-check-xid: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in DISABLE ENABLE; do \
-	    echo $${n}_CHECK_XID; \
-	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -D$${n}_CHECK_XID -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-xid$(EXEEXT) && \
-	    ./test-xid$(EXEEXT) xid || exit; \
-	done
+	done; \
+	rm test-profiles$(EXEEXT)
+check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
+	for n in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+	    echo U8ID_TR31=$${n}; \
+	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_TR31=$${n} -Wfatal-errors $(srcdir)/test.c \
+	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-tr31$(EXEEXT) && \
+	    ./test-tr31$(EXEEXT) xid || exit; \
+	done; \
+	rm test-tr31$(EXEEXT)
 check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
 	  for p in 2 3 4 5 6 C11_6 C23_4; do \
-	    for x in DDISABLE_CHECK_XID DENABLE_CHECK_XID UIGNORE; do \
-	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -$${x}"; \
-	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -$${x} \
+	    for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
+	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
 		-Wfatal-errors $(srcdir)/test.c \
 		$(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
 		$(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
 	      ./test-profiles$(EXEEXT) || exit; \
-	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -$${x} \
-		-O2 -fsanitize=address \
-		$(srcdir)/test.c $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
-		$(srcdir)/u8idroar.c -o test-asan$(EXEEXT) && \
-	      ./test-asan$(EXEEXT) || exit; \
 	    done; \
 	  done; \
 	done; \
-	rm ./test-asan$(EXEEXT) ./test-profiles$(EXEEXT);
+	rm ./test-profiles$(EXEEXT)
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
 SCAN_BUILD = scan-build
@@ -233,8 +231,7 @@ endif
 	rm -rf inst
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
-	     test-xid$(EXEEXT) test-xid-{EN,DIS}ABLE$(EXEEXT) \
-	     test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
+	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html
