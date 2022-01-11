@@ -10,6 +10,9 @@
    Currently only used for PERF_TEST.
 */
 
+#define U8ID_UNICODE_MAJOR 14
+#define U8ID_UNICODE_MINOR 0
+
 struct sc16 {
   uint16_t from;
   uint16_t to;

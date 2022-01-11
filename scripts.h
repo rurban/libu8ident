@@ -7,6 +7,9 @@
    UNICODE version 14.0
 */
 
+#define U8ID_UNICODE_MAJOR 14
+#define U8ID_UNICODE_MINOR 0
+
 /* Provide a mapping of the 161 Script properties to an index byte.
    Sorted into usages.
  */

@@ -503,6 +503,9 @@ print $H <<"EOF";
    UNICODE version $ucd_version[0].$ucd_version[1]
 */
 
+#define U8ID_UNICODE_MAJOR $ucd_version[0]
+#define U8ID_UNICODE_MINOR $ucd_version[1]
+
 EOF
 my $structs = <<'EOF';
 struct sc {
@@ -555,6 +558,9 @@ print $H16 <<"EOF";
    more general data into cache lines, with one more branch upfront.
    Currently only used for PERF_TEST.
 */
+
+#define U8ID_UNICODE_MAJOR $ucd_version[0]
+#define U8ID_UNICODE_MINOR $ucd_version[1]
 
 struct sc16 {
   uint16_t from;
