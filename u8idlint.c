@@ -37,7 +37,7 @@
 #  include "uniwbrk.h"
 #endif
 #include "u8idscr.h"
-#undef EXT_SCRIPTS
+#define EXT_SCRIPTS
 #include "unic11.h"
 #include "unic23.h"
 //#include "mark.h"
@@ -50,90 +50,7 @@ enum u8id_norm norm = U8ID_NFC;
 enum u8id_profile profile = U8ID_PROFILE_C23_4;
 unsigned u8idopts = 0;
 
-// private access
-char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
-
-static inline struct sc *binary_search(const uint32_t cp, const char *list,
-                                       const size_t len, const size_t size) {
-  int n = (int)len;
-  const char *p = list;
-  struct sc *pos;
-  while (n > 0) {
-    pos = (struct sc *)(p + size * (n / 2));
-    // hack: with unsigned wrapping max-cp is always higher, so false
-    // was: (cp >= pos->from && cp <= pos->to)
-    if ((cp - pos->from) <= (pos->to - pos->from))
-      return pos;
-    else if (cp < pos->from)
-      n /= 2;
-    else {
-      p = (char *)pos + size;
-      n -= (n / 2) + 1;
-    }
-  }
-  return NULL;
-}
-
-static inline bool range_bool_search(const uint32_t cp,
-                                     const struct range_bool *list,
-                                     const size_t len) {
-  return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
-}
-
-const struct range_bool ascii_start_list[] = {
-    {'$', '$'}, {'A', 'Z'}, {'_', '_'}, {'a', 'z'}};
-const struct range_bool ascii_cont_list[] = {
-    {'$', '$'},
-    {'0', '9'},
-};
-
-typedef bool func_xid(uint32_t cp);
-
-static bool isASCII_start(uint32_t cp) {
-  return range_bool_search(cp, ascii_start_list, ARRAY_SIZE(ascii_start_list));
-}
-static bool isASCII_cont(uint32_t cp) {
-  return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
-}
-// Note: This includes 0..9 already
-static bool isALLOWED_start(uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
-}
-static bool isALLOWED_cont(uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
-}
-static bool isSAFEC23_start(uint32_t cp) {
-  return binary_search(cp, (char *)safec23_start_list,
-                       ARRAY_SIZE(safec23_start_list),
-                       sizeof(*safec23_start_list))
-      ? true : false;
-}
-static bool isSAFEC23_cont(uint32_t cp) {
-  return binary_search(cp, (char *)safec23_cont_list,
-                       ARRAY_SIZE(safec23_cont_list),
-                       sizeof(*safec23_cont_list))
-      ? true : false;
-}
-static bool isID_start(uint32_t cp) { return u8ident_is_ID_Start(cp); }
-static bool isID_cont(uint32_t cp) { return u8ident_is_ID_Cont(cp); }
-static bool isXID_start(uint32_t cp) { return u8ident_is_XID_Start(cp); }
-static bool isXID_cont(uint32_t cp) { return u8ident_is_XID_Cont(cp); }
-static bool isC11_start(uint32_t cp) {
-  return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
-}
-static bool isC11_cont(uint32_t cp) {
-  return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
-}
-static bool isALLUTF8_start(uint32_t cp) {
-  return isASCII_start(cp) || cp > 127;
-}
-static bool isALLUTF8_cont(uint32_t cp) { return isASCII_cont(cp) || cp > 127; }
-struct func_xid_s {
-  func_xid *start;
-  func_xid *cont;
-};
-
-/* tokenizers:
+/* tr31 options:
   ASCII,   // only ASCII letters
   ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
   SAFEC23, // see c23++proposal
@@ -142,7 +59,7 @@ struct func_xid_s {
   C11, // the AltId ranges from the C11 standard
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal
 */
-static struct func_xid_s id_funcs[] = {
+static struct func_tr31_s tr31_funcs[] = {
     // clang-format disable
     {isASCII_start, isASCII_cont},
     {isALLOWED_start, isALLOWED_cont},
@@ -153,23 +70,6 @@ static struct func_xid_s id_funcs[] = {
     {isALLUTF8_start, isALLUTF8_cont},
     // clang-format enable
 };
-
-static const char *errstr(int errcode) {
-  static const char *const _str[] = {
-      "ERR_CONFUS",           // -6
-      "ERR_COMBINE",          // -5
-      "ERR_ENCODING",         // -4
-      "ERR_SCRIPTS",          //-3
-      "ERR_SCRIPT",           //-2
-      "ERR_XID",              // -1
-      "EOK",                  // 0
-      "EOK_NORM",             // 1
-      "EOK_WARN_CONFUS",      // 2
-      "EOK_NORM_WARN_CONFUS", // 3
-  };
-  assert(errcode >= -6 && errcode <= 3);
-  return _str[errcode + 6];
-}
 
 #ifdef HAVE_SYS_STAT_H
 static int file_exists(const char *path) {
@@ -284,10 +184,10 @@ int testfile(const char *dir, const char *fname) {
   }
   assert(xid <= ALLUTF8);
 #if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
-  _Static_assert(ARRAY_SIZE(id_funcs) == ALLUTF8 + 1, "Invalid id_funcs size");
+  _Static_assert(ARRAY_SIZE(tr31_funcs) == ALLUTF8 + 1, "Invalid tr31_funcs[] size");
 #endif
-  func_xid *id_start = id_funcs[xid].start;
-  func_xid *id_cont = id_funcs[xid].cont;
+  func_tr31 *id_start = tr31_funcs[xid].start;
+  func_tr31 *id_cont = tr31_funcs[xid].cont;
   if (!dir) {
     strncpy(path, fname, sizeof(path) - 1);
   } else {
@@ -400,7 +300,7 @@ int testfile(const char *dir, const char *fname) {
         if (ret < 0) {
           if (quiet)
             printfile(dir, fname);
-          printf("  %s: %s (%s", word, errstr(ret), scripts);
+          printf("  %s: %s (%s", word, u8ident_errstr(ret), scripts);
           const uint32_t cp = u8ident_failed_char(c);
           const uint8_t scr = u8ident_get_script(cp);
           if (scr != SC_Unknown)
@@ -408,7 +308,7 @@ int testfile(const char *dir, const char *fname) {
           else
             printf(" + U+%X)!\n", cp);
         } else if (verbose && !quiet) {
-          printf("  %s: %s (%s)\n", word, errstr(ret), scripts);
+          printf("  %s: %s (%s)\n", word, u8ident_errstr(ret), scripts);
         }
         // maybe also warn on skip. overly long words
         free((char *)scripts);

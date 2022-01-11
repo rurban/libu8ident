@@ -28,23 +28,6 @@ unsigned u8ident_options(void);
 unsigned u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
-static const char *errstr(int errcode) {
-  static const char *const _str[] = {
-      "ERR_CONFUS",           // -6
-      "ERR_COMBINE",          // -5
-      "ERR_ENCODING",         // -4
-      "ERR_SCRIPTS",          //-3
-      "ERR_SCRIPT",           //-2
-      "ERR_XID",              // -1
-      "EOK",                  // 0
-      "EOK_NORM",             // 1
-      "EOK_WARN_CONFUS",      // 2
-      "EOK_NORM_WARN_CONFUS", // 3
-  };
-  assert(errcode >= -6 && errcode <= 3);
-  return _str[errcode + 6];
-}
-
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
 #ifdef HAVE_CROARING
@@ -149,17 +132,17 @@ static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
   if (ret != wanted) {
     if (ret == U8ID_EOK_NORM) {
       printf("ERROR %s in profile %u, expected %s.\n", // print hexstr diff?
-             errstr(ret), u8ident_profile(), errstr(wanted));
+             u8ident_errstr(ret), u8ident_profile(), u8ident_errstr(wanted));
       return;
     }
     const char *scripts = u8ident_existing_scripts(ctx);
     if (ret)
       printf("ERROR %s U+%X %s in profile %u, expected %s. Have scripts: %s\n",
              u8ident_failed_script_name(ctx), u8ident_failed_char(ctx),
-             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
+             u8ident_errstr(ret), u8ident_profile(), u8ident_errstr(wanted), scripts);
     else
       printf("ERROR %s in profile %u, expected %s. Have scripts: %s\n",
-             errstr(ret), u8ident_profile(), errstr(wanted), scripts);
+             u8ident_errstr(ret), u8ident_profile(), u8ident_errstr(wanted), scripts);
     free((void *)scripts);
   }
 }
@@ -743,7 +726,7 @@ void test_confus(void) {
       ret = u8ident_check((const uint8_t *)enc_utf8(buf, &len, cp), NULL);
       if (ret == U8ID_EOK || ret == U8ID_EOK_NORM) {
         printf("ERROR U+%X not detected as confusable, but %s\n", cp,
-               errstr(ret));
+               u8ident_errstr(ret));
       }
       assert(ret == U8ID_EOK_WARN_CONFUS || ret < 0 ||
              ret == U8ID_EOK_NORM_WARN_CONFUS);

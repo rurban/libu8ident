@@ -92,23 +92,6 @@ static int file_exists(const char *path) {
 }
 #endif
 
-static const char *errstr(int errcode) {
-  static const char *const _str[] = {
-      "ERR_CONFUS",           // -6
-      "ERR_COMBINE",          // -5
-      "ERR_ENCODING",         // -4
-      "ERR_SCRIPTS",          //-3
-      "ERR_SCRIPT",           //-2
-      "ERR_XID",              // -1
-      "EOK",                  // 0
-      "EOK_NORM",             // 1
-      "EOK_WARN_CONFUS",      // 2
-      "EOK_NORM_WARN_CONFUS", // 3
-  };
-  assert(errcode >= -6 && errcode <= 3);
-  return _str[errcode + 6];
-}
-
 int testdir(const char *dir, const char *fname) {
   char path[256];
   static char line[1024] = {0};
@@ -199,7 +182,7 @@ int testdir(const char *dir, const char *fname) {
       if (!*wp && *word && force_break) { // non-empty word-end
         int ret = u8ident_check((uint8_t *)word, NULL);
         const char *scripts = u8ident_existing_scripts(ctx);
-        printf("%s: %s (%s", word, errstr(ret), scripts);
+        printf("%s: %s (%s", word, u8ident_errstr(ret), scripts);
         if (ret < 0) {
           const uint32_t cp = u8ident_failed_char(ctx);
           const uint8_t scr = u8ident_get_script(cp);

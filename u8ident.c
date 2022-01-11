@@ -19,6 +19,44 @@ enum u8id_norm s_u8id_norm = U8ID_NORM_DEFAULT;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
+const char *u8ident_errstr(int errcode) {
+  static const char *const _str[] = {
+      "ERR_CONFUS",           // -6
+      "ERR_COMBINE",          // -5
+      "ERR_ENCODING",         // -4
+      "ERR_SCRIPTS",          //-3
+      "ERR_SCRIPT",           //-2
+      "ERR_XID",              // -1
+      "EOK",                  // 0
+      "EOK_NORM",             // 1
+      "EOK_WARN_CONFUS",      // 2
+      "EOK_NORM_WARN_CONFUS", // 3
+  };
+  assert(errcode >= -6 && errcode <= 3);
+  return _str[errcode + 6];
+}
+
+/* tr31 options:
+  ASCII,   // only ASCII letters
+  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
+  SAFEC23, // see c23++proposal
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  XID, // ID plus NFKC quirks.
+  C11, // the AltId ranges from the C11 standard
+  ALLUTF8, // all > 128, e.g. D, php, nim, crystal
+*/
+static struct func_tr31_s tr31_funcs[] = {
+    // clang-format disable
+    {isASCII_start, isASCII_cont},
+    {isALLOWED_start, isALLOWED_cont},
+    {isSAFEC23_start, isSAFEC23_cont},
+    {isID_start, isID_cont},
+    {isXID_start, isXID_cont},
+    {isC11_start, isC11_cont},
+    {isALLUTF8_start, isALLUTF8_cont},
+    // clang-format enable
+};
+
 /* Initialize the library with a profile, normalization and a bitmask of
    enum u8id_options, which define the performed checks. Recommended is
    `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
@@ -71,8 +109,11 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
 
   s_u8id_options = options;
 #ifdef ENABLE_CHECK_XID
-  s_u8id_options |= U8ID_TR31_ALLOWED;
+  s_u8id_options = (options & ~U8ID_TR31_MASK) | U8ID_TR31_DEFAULT;
 #endif
+  if (s_u8id_profile == U8ID_PROFILE_1)
+    s_u8id_options = (options & ~U8ID_TR31_MASK) | U8ID_TR31_ASCII;
+
 #ifdef HAVE_CROARING
   if (u8ident_roar_init())
     return -1;
@@ -121,34 +162,40 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   struct ctx_t *ctx = u8ident_ctx();
   enum u8id_sc scr;
   enum u8id_sc basesc = SC_Unknown;
+  const enum xid_e xid = (s_u8id_options & U8ID_TR31_MASK) - U8ID_TR31_ASCII;
   char *scx = NULL;
+  func_tr31 *id_start = tr31_funcs[xid].start;
+  func_tr31 *id_cont = tr31_funcs[xid].cont;
 
-  while (s < e) {
-    const uint32_t cp = dec_utf8(&s);
-    if (unlikely(!cp)) {
-      ctx->last_cp = cp;
-      return U8ID_ERR_ENCODING; // not well-formed UTF-8
-    }
+  uint32_t cp = dec_utf8(&s);
 #ifndef DISABLE_CHECK_XID
-    // check for the Allowed IdentifierStatus (tr39)
-    // FIXME implement all the TR31 XID checks. also allow hardcoded TR31 profiles.
-    if
-#  ifdef ENABLE_CHECK_XID
-        (1)
-#  else
-        (s_u8id_options & U8ID_TR31_ALLOWED)
-#  endif
-    {
-      if (unlikely(!u8ident_is_allowed(cp))) {
-        ctx->last_cp = cp;
-        return U8ID_ERR_XID;
-      }
-    }
+  // hardcoded TR31 funcs via static functions (inlinable)
+  if
+#if U8ID_TR31 == ALLOWED
+    (unlikely(!isALLOWED_start(cp)))
+#elif U8ID_TR31 == ASCII
+    (unlikely(!isASCII_start(cp)))
+#elif U8ID_TR31 == SAFEC23
+    (unlikely(!isSAFEC23_start(cp)))
+#elif U8ID_TR31 == C11
+    (unlikely(!isC11_start(cp)))
+#elif U8ID_TR31 == XID
+    (unlikely(!isXID_start(cp)))
+#elif U8ID_TR31 == ID
+    (unlikely(!isID_start(cp)))
+#elif U8ID_TR31 == ALLUTF8
+    (unlikely(!isALLUTF8_start(cp)))
+#else
+    (unlikely(!(*id_start)(cp)))
 #endif
-    if (unlikely(s_u8id_profile == U8ID_PROFILE_1 && cp > 127)) {
-      ctx->last_cp = cp;
-      return U8ID_ERR_XID;
-    }
+  {
+    ctx->last_cp = cp;
+    return U8ID_ERR_XID;
+  }
+#endif
+
+  do {
+
 #ifdef HAVE_CONFUS
     /* allow some latin confusables: 0 1 I ` | U+30, U+31, U+49, U+60, U+7C */
     /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6 */
@@ -178,7 +225,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     if (s_u8id_profile == U8ID_PROFILE_6 ||
         s_u8id_profile == U8ID_PROFILE_C11_6) {
       need_normalize = true;
-      if (!(s_u8id_options & U8ID_TR31_ALLOWED))
+      if (!((s_u8id_options & U8ID_TR31_MASK) == U8ID_TR31_ALLOWED))
         goto norm;
       else {
         scr = (enum u8id_sc)u8ident_get_script(cp);
@@ -281,7 +328,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       if (!u8ident_has_script_ctx(scr, ctx))
         u8ident_add_script_ctx(scr, ctx);
       basesc = scr;
-      continue;
+      goto next;
     }
 
     // if not already have it, add it. EXCLUDED_SCRIPT must already exist
@@ -386,7 +433,17 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     } else if (scr != SC_Common && scr != SC_Inherited) {
       basesc = scr;
     }
-  }
+
+  next:
+    cp = dec_utf8(&s);
+#ifndef DISABLE_CHECK_XID
+    // hardcode cont also? not yet
+    if (unlikely(!(*id_cont)(cp) && !(*id_start)(cp))) {
+      ctx->last_cp = cp;
+      return U8ID_ERR_XID;
+    }
+#endif
+  } while (s < e);
 
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6
 norm:

@@ -45,6 +45,7 @@
 #define FCC 5
 #define C11_6 7
 #define C23_4 8
+#define NONE 8
 
 // allowed set of identifiers (TR31 --xid tokenizer options)
 enum xid_e {
@@ -116,6 +117,10 @@ enum xid_e {
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
 #endif
 
+#ifdef DISABLE_U8ID_TR31
+#  define DISABLE_CHECK_XID
+#  define U8ID_TR31_DEFAULT 0
+#endif
 #ifdef U8ID_TR31
 #  if U8ID_TR31 == NONE
 #    define DISABLE_CHECK_XID
@@ -175,5 +180,9 @@ enum u8id_profile u8ident_profile(void);
 enum u8id_options u8ident_tr31(void);
 unsigned u8ident_options(void);
 unsigned u8ident_maxlength(void);
+const char *u8ident_errstr(int errcode);
+// from u8idnorm.c
+uint32_t dec_utf8(char **strp);
+char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 #endif // _U8ID_PRIVATE_H

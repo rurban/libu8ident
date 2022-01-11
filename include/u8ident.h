@@ -33,20 +33,21 @@ enum u8id_profile {
 enum u8id_options {
   //  Note: The parser/tokenizer should do that. Without, the checker can be
   //  faster.
-  //  Can be disallowed with --disable-check-xid
-  //  hardcoded with --enable-check-xid.
-  U8ID_TR31_ALLOWED = 64, // The UCD IdentifierStatus.txt (default)
-  U8ID_TR31_SAFEC23 = 65, // XID without Limited_Use and Excluded Scripts
-  U8ID_TR31_ID = 66,      // The usual tr31 variants
-  U8ID_TR31_XID = 67,     // without NFKC quirks, labelled stable
-  U8ID_TR31_C11 = 68,     // See C11 Annex D for the ranges
-  U8ID_TR31_ALLUTF8 = 69,
+  //  Can be disallowed with --u8id-tr31=NONE, hardcoded with --u8id-tr31=.
+  U8ID_TR31_ASCII = 64,
+  U8ID_TR31_ALLOWED = 65, // The UCD IdentifierStatus.txt (default)
+  U8ID_TR31_SAFEC23 = 66, // XID without Limited_Use and Excluded Scripts
+  U8ID_TR31_ID = 67,      // The usual tr31 variants
+  U8ID_TR31_XID = 68,     // without NFKC quirks, labelled stable
+  U8ID_TR31_C11 = 69,     // See C11 Annex D for the ranges
+  U8ID_TR31_ALLUTF8 = 70,
   // room for more tr31 profiles
 
   U8ID_FOLDCASE = 128,
   U8ID_WARN_CONFUSABLE = 256,  // requires -DHAVE_CONFUS
   U8ID_ERROR_CONFUSABLE = 512, // requires -DHAVE_CONFUS
 };
+#define U8ID_TR31_MASK 127
 typedef unsigned u8id_ctx_t;
 
 #ifndef U8ID_NORM_DEFAULT

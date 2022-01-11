@@ -45,7 +45,7 @@
 
 #include "u8ident.h"
 #include "u8idscr.h"
-#undef EXT_SCRIPTS
+#define EXT_SCRIPTS
 #include "unic11.h"
 
 // private use:

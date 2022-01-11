@@ -4,10 +4,10 @@
 
   Classify and search for the script property
   https://www.unicode.org/reports/tr24/tr24-32.html Implement
+  http://www.unicode.org/reports/tr31/ charsets
   http://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 
-  TODO: seperate is_allowed into start, and cont. special case some TR31
-  characters. U+B7 MIDDLE DOT is allowed, but should only be in median. U+200D
+  TODO: U+B7 MIDDLE DOT is allowed, but should only be in median. U+200D
   ZERO WIDTH JOINER* is allowed, but should only be in cont and TR31 2.3
   special-cases. U+200C ZERO WIDTH NON-JOINER* is allowed, but should only be in
   median and TR31 special-cases. They are currently in Inherited. HEBREW U+5F3
@@ -33,6 +33,9 @@
 #  include "u8idroar.h"
 #endif
 #include "mark.h"
+#undef EXT_SCRIPTS
+#include "unic11.h"
+#include "unic23.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
@@ -215,22 +218,60 @@ bool u8ident_is_bidi(const uint32_t cp) {
 }
 
 #ifndef DISABLE_CHECK_XID
-//#ifndef HAVE_CROARING
-bool u8ident_is_allowed(const uint32_t cp) {
+
+const struct range_bool ascii_start_list[] = {
+    {'$', '$'}, {'A', 'Z'}, {'_', '_'}, {'a', 'z'}};
+const struct range_bool ascii_cont_list[] = {
+    {'$', '$'},
+    {'0', '9'},
+};
+bool isASCII_start(const uint32_t cp) {
+  return range_bool_search(cp, ascii_start_list, ARRAY_SIZE(ascii_start_list));
+}
+bool isASCII_cont(const uint32_t cp) {
+  return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
+}
+// Note: This includes 0..9 already
+bool isALLOWED_start(const uint32_t cp) {
+  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)) &&
+         !(cp >= '0' && cp <= '9');
+}
+bool isALLOWED_cont(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
-bool u8ident_is_ID_Start(const uint32_t cp) {
+bool isSAFEC23_start(const uint32_t cp) {
+  return binary_search(cp, (char *)safec23_start_list,
+                       ARRAY_SIZE(safec23_start_list),
+                       sizeof(*safec23_start_list))
+      ? true : false;
+}
+bool isSAFEC23_cont(const uint32_t cp) {
+  return binary_search(cp, (char *)safec23_cont_list,
+                       ARRAY_SIZE(safec23_cont_list),
+                       sizeof(*safec23_cont_list))
+      ? true : false;
+}
+bool isID_start(const uint32_t cp) {
   return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
 }
-bool u8ident_is_ID_Cont(const uint32_t cp) {
+bool isID_cont(const uint32_t cp) {
   return range_bool_search(cp, id_cont_list, ARRAY_SIZE(id_cont_list));
 }
-bool u8ident_is_XID_Start(const uint32_t cp) {
+bool isXID_start(const uint32_t cp) {
   return range_bool_search(cp, xid_start_list, ARRAY_SIZE(xid_start_list));
 }
-bool u8ident_is_XID_Cont(const uint32_t cp) {
+bool isXID_cont(const uint32_t cp) {
   return range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
 }
+bool isC11_start(const uint32_t cp) {
+  return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
+}
+bool isC11_cont(const uint32_t cp) {
+  return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
+}
+bool isALLUTF8_start(const uint32_t cp) { return isASCII_start(cp) || cp > 127; }
+bool isALLUTF8_cont(const uint32_t cp) { return isASCII_cont(cp) || cp > 127; }
+
 enum u8id_gc u8ident_get_gc(const uint32_t cp) {
   const struct gc *gc = (const struct gc *)binary_search(
       cp, (char *)gc_list, ARRAY_SIZE(gc_list), sizeof(*gc_list));
@@ -246,15 +287,13 @@ const char *u8ident_gc_name(const enum u8id_gc gc) {
   return u8id_gc_names[gc];
 }
 
-//#endif
-
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp) {
   const struct range_short *id = (struct range_short *)binary_search(
       cp, (char *)idtype_list, ARRAY_SIZE(idtype_list), sizeof(*idtype_list));
   return id ? id->types : 0;
 }
-#endif
+#endif // DISABLE_CHECK_XID
 
 #ifdef HAVE_CONFUS
 #  ifndef HAVE_CROARING
