@@ -45,7 +45,7 @@
 int verbose = 0;
 int quiet = 0;
 int recursive = 0;
-enum xid_e xid = ALLOWED;
+enum xid_e xid = SAFEC23;
 enum u8id_norm norm = U8ID_NFC;
 enum u8id_profile profile = U8ID_PROFILE_C23_4;
 unsigned u8idopts = 0;
