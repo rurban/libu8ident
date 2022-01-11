@@ -132,6 +132,8 @@ enum xid_e {
 #ifdef DISABLE_U8ID_TR31
 #  define DISABLE_CHECK_XID
 #  define U8ID_TR31_DEFAULT 0
+#  undef U8ID_TR31
+#  undef ENABLE_CHECK_XID
 #endif
 #ifdef U8ID_TR31
 #  if U8ID_TR31 == NONE

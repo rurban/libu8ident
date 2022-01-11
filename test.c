@@ -63,10 +63,24 @@ void test_scripts_no_init(void) {
   assert(scx->scx[0] == 0x03);   // Arab
   assert(scx->scx[1] == '\x99'); // Syrc, signed!
 #ifndef DISABLE_CHECK_XID
+  assert(!isID_start('0'));
+  assert(!isXID_start('0'));
   assert(!isALLOWED_start('0'));
-  assert(isALLOWED_cont(0x27));
-  assert(!isALLOWED_cont(0x26));
-  assert(isALLOWED_cont(0x40e));
+  assert(!isC11_start('0'));
+  assert(!isSAFEC23_start('0'));
+  assert(!isALLUTF8_start('0'));
+  assert(!isASCII_start('0'));
+  assert(isID_cont('0'));
+  assert(isXID_cont('0'));
+  assert(isALLOWED_cont('0'));
+  assert(isC11_cont('0'));
+  assert(isSAFEC23_cont('0'));
+  assert(isALLUTF8_cont('0'));
+  assert(isASCII_cont('0'));
+
+  assert(isALLOWED_cont(0x27));  // '
+  assert(!isALLOWED_cont(0x26)); // &
+  assert(isALLOWED_cont(0x40e)); // Ў
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
 #endif
   // check that no list elements can be merged
@@ -125,9 +139,11 @@ static char *xstr(const char *s) {
   // buf[i] = 0;
   return buf;
 }
-#define CHECK_RET(ret, wanted, ctx)                                            \
-  check_ret(ret, wanted, ctx);                                                 \
-  assert(ret == wanted)
+#define CHECK_RET(ret, wanted, ctx)		\
+    do {					\
+      check_ret(ret, wanted, ctx);		\
+      assert(ret == wanted);			\
+    } while (0)
 
 static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
   if (ret != wanted) {
@@ -425,13 +441,27 @@ void test_mixed_scripts(int xid_check) {
 #endif
 
   ret = u8ident_check((const uint8_t *)"\xc3\xb7", NULL);
-  if (u8ident_options() & U8ID_TR31_ALLOWED) {
+  if (u8ident_tr31() != U8ID_TR31_ALLUTF8) {
     CHECK_RET(ret, U8ID_ERR_XID, 0); // division sign U+F7 Sm forbidden as XID
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
-    CHECK_RET(ret, U8ID_ERR_XID,
-              0); // small letter b with stroke U+180 is not allowed
-    ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
-    CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
+    // small letter b with stroke U+180 is in xid, but not allowed
+    if (u8ident_tr31() == U8ID_TR31_ALLOWED) {
+	CHECK_RET(ret, U8ID_ERR_XID, 0);
+	ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
+	CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
+    } else {
+	CHECK_RET(ret, U8ID_EOK, 0);
+	ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
+	// Balinese U+1B05 is limited. so SAFEC23 should fail earlier
+	if (u8ident_tr31() == U8ID_TR31_SAFEC23)
+	    CHECK_RET(ret, U8ID_ERR_XID, 0);
+	else
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C23_4
+	    CHECK_RET(ret, U8ID_ERR_SCRIPT, 0);
+#else
+	    CHECK_RET(ret, U8ID_EOK, 0);
+#endif
+    }
   } else {
     // division sign U+F7 Math_Symbol allowed without XID check.
     CHECK_RET(ret, U8ID_EOK, 0);

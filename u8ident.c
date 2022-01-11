@@ -173,7 +173,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #ifndef DISABLE_CHECK_XID
   // hardcoded TR31 funcs via static functions (inlinable)
   if
-#  if U8ID_TR31 == ALLOWED
+#  if !defined U8ID_TR31
+      (unlikely(!(*id_start)(cp)))
+#  elif U8ID_TR31 == ALLOWED
       (unlikely(!isALLOWED_start(cp)))
 #  elif U8ID_TR31 == ASCII
       (unlikely(!isASCII_start(cp)))
@@ -440,13 +442,15 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   next:
     cp = dec_utf8(&s);
 #ifndef DISABLE_CHECK_XID
-    // hardcode cont also? not yet
-    if (unlikely(!(*id_cont)(cp) && !(*id_start)(cp))) {
-      ctx->last_cp = cp;
-      return U8ID_ERR_XID;
+    if (likely(s <= e && cp != 0)) {
+	// hardcode cont also? not yet
+	if (unlikely(!(*id_cont)(cp) && !(*id_start)(cp))) {
+	    ctx->last_cp = cp;
+	    return U8ID_ERR_XID;
+	}
     }
 #endif
-  } while (s < e);
+  } while (s <= e);
 
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6
 norm:
