@@ -7,12 +7,12 @@
 
 #include <stdio.h>
 #include "roaring.c"
+#include "u8id_private.h"
 #include "u8id_gc.h"
 #include "scripts.h"
 #include "confus.h"
 #include "mark.h"
 
-#define ARR_SIZE(x) sizeof(x) / sizeof(*x)
 enum what_list {
   ALLOWED_ID_LIST,
   CONFUSABLES,
@@ -105,24 +105,24 @@ int serialize(size_t size, const uint32_t *list, enum what_list what) {
 
 int main(int argc, char **argv) {
   if (argc < 2 || strcmp(argv[1], "confus") == 0)
-    serialize(ARR_SIZE(confusables), confusables, CONFUSABLES);
+    serialize(ARRAY_SIZE(confusables), confusables, CONFUSABLES);
   if (argc > 1 && strcmp(argv[1], "confus") == 0)
     exit(0);
 
   if (argc < 2 || strcmp(argv[1], "mark") == 0)
-    serialize(ARR_SIZE(mark_list), (const uint32_t *)mark_list, MARK);
+    serialize(ARRAY_SIZE(mark_list), (const uint32_t *)mark_list, MARK);
   if (argc > 1 && strcmp(argv[1], "mark") == 0)
     exit(0);
 
-  serialize(ARR_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list,
+  serialize(ARRAY_SIZE(allowed_id_list), (const uint32_t *)allowed_id_list,
             ALLOWED_ID_LIST);
   /* NFD_N, NFC_N, NFC_M, NFKD_N, NFKC_N, NFKC_M */
-  serialize(ARR_SIZE(NFD_N_list), (const uint32_t *)NFD_N_list, NFD_N);
-  serialize(ARR_SIZE(NFC_N_list), (const uint32_t *)NFC_N_list, NFC_N);
-  serialize(ARR_SIZE(NFC_M_list), (const uint32_t *)NFC_M_list, NFC_M);
-  serialize(ARR_SIZE(NFKD_N_list), (const uint32_t *)NFKD_N_list, NFKD_N);
-  serialize(ARR_SIZE(NFKC_N_list), (const uint32_t *)NFKC_N_list, NFKC_N);
-  serialize(ARR_SIZE(NFKC_M_list), (const uint32_t *)NFKC_M_list, NFKC_M);
+  serialize(ARRAY_SIZE(NFD_N_list), (const uint32_t *)NFD_N_list, NFD_N);
+  serialize(ARRAY_SIZE(NFC_N_list), (const uint32_t *)NFC_N_list, NFC_N);
+  serialize(ARRAY_SIZE(NFC_M_list), (const uint32_t *)NFC_M_list, NFC_M);
+  serialize(ARRAY_SIZE(NFKD_N_list), (const uint32_t *)NFKD_N_list, NFKD_N);
+  serialize(ARRAY_SIZE(NFKC_N_list), (const uint32_t *)NFKC_N_list, NFKC_N);
+  serialize(ARRAY_SIZE(NFKC_M_list), (const uint32_t *)NFKC_M_list, NFKC_M);
 
   return 0;
 }
