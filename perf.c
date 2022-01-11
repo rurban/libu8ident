@@ -37,10 +37,10 @@ nfc:  bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
 #include "u8id_private.h"
 #include "scripts.h"
 #include "u8idroar.h"
-#undef EXT_SCRIPTS
+#undef EXTERN_SCRIPTS
 #include "scripts16.h"
 #include "confus.h"
-#define EXT_SCRIPTS
+#define EXTERN_SCRIPTS
 #include "mark.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)

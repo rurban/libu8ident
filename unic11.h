@@ -25,7 +25,7 @@
    0300–036F, 1DC0–1DFF, 20D0–20FF, FE20–FE2F
 */
 
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const struct range_bool c11_start_list[53];
 extern const struct range_bool c11_cont_list[6];
 #else

@@ -33,7 +33,8 @@
 #  include "u8idroar.h"
 #endif
 #include "mark.h"
-#undef EXT_SCRIPTS
+// we are the owner of these lists
+#undef EXTERN_SCRIPTS
 #include "unic11.h"
 #include "unic23.h"
 
@@ -72,12 +73,12 @@ EXTERN int u8ident_set_ctx(u8id_ctx_t i) {
 }
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
-struct ctx_t *u8ident_ctx(void) {
+LOCAL struct ctx_t *u8ident_ctx(void) {
   return (i_ctx < U8ID_CTX_TRESH) ? &ctx[i_ctx] : &ctxp[i_ctx];
 }
 
 // search in linear vector of scripts per ctx
-bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
+LOCAL bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
   if (!c->count)
     return false;
   const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
@@ -88,11 +89,11 @@ bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
   return false;
 }
 
-bool u8ident_has_script(const uint8_t scr) {
+LOCAL bool u8ident_has_script(const uint8_t scr) {
   return u8ident_has_script_ctx(scr, u8ident_ctx());
 }
 
-int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
+LOCAL int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
   if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
     return -1;
   int i = c->count;
@@ -191,7 +192,7 @@ static inline bool range_bool_search(const uint32_t cp,
   return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
 }
 
-uint8_t u8ident_get_script(const uint32_t cp) {
+EXTERN uint8_t u8ident_get_script(const uint32_t cp) {
 #if defined DISABLE_CHECK_XID || defined ENABLE_CHECK_XID
   // faster check, as we have no NON-xid's
   return sc_search(cp, nonxid_script_list, ARRAY_SIZE(nonxid_script_list));
@@ -204,75 +205,87 @@ uint8_t u8ident_get_script(const uint32_t cp) {
 }
 
 /* Search for list of script indices */
-const struct scx *u8ident_get_scx(const uint32_t cp) {
+LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
   return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
 }
+/* Search for safec23 entry */
+LOCAL const struct sc_c23 *u8ident_get_safec23(const uint32_t cp) {
+  const struct sc_c23 *sc = (const struct sc_c23 *)binary_search(
+      cp, (char *)safec23_start_list, ARRAY_SIZE(safec23_start_list),
+      sizeof(*safec23_start_list));
+  if (sc)
+    return sc;
+  else
+    return (const struct sc_c23 *)binary_search(cp, (char *)safec23_cont_list,
+                                                ARRAY_SIZE(safec23_cont_list),
+                                                sizeof(*safec23_cont_list));
+}
 
-bool u8ident_is_MARK(uint32_t cp) {
+LOCAL bool u8ident_is_MARK(uint32_t cp) {
   return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
 }
 
-bool u8ident_is_bidi(const uint32_t cp) {
+LOCAL bool u8ident_is_bidi(const uint32_t cp) {
   return linear_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
 }
 
 #ifndef DISABLE_CHECK_XID
 
-const struct range_bool ascii_start_list[] = {
+static const struct range_bool ascii_start_list[] = {
     {'$', '$'}, {'A', 'Z'}, {'_', '_'}, {'a', 'z'}};
-const struct range_bool ascii_cont_list[] = {
+static const struct range_bool ascii_cont_list[] = {
     {'$', '$'},
     {'0', '9'},
 };
-bool isASCII_start(const uint32_t cp) {
+LOCAL bool isASCII_start(const uint32_t cp) {
   return range_bool_search(cp, ascii_start_list, ARRAY_SIZE(ascii_start_list));
 }
-bool isASCII_cont(const uint32_t cp) {
+LOCAL bool isASCII_cont(const uint32_t cp) {
   return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
 }
 // Note: This includes 0..9 already
-bool isALLOWED_start(const uint32_t cp) {
+LOCAL bool isALLOWED_start(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)) &&
          !(cp >= '0' && cp <= '9');
 }
-bool isALLOWED_cont(const uint32_t cp) {
+LOCAL bool isALLOWED_cont(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
-bool isSAFEC23_start(const uint32_t cp) {
+LOCAL bool isSAFEC23_start(const uint32_t cp) {
   return binary_search(cp, (char *)safec23_start_list,
                        ARRAY_SIZE(safec23_start_list),
                        sizeof(*safec23_start_list))
       ? true : false;
 }
-bool isSAFEC23_cont(const uint32_t cp) {
+LOCAL bool isSAFEC23_cont(const uint32_t cp) {
   return binary_search(cp, (char *)safec23_cont_list,
                        ARRAY_SIZE(safec23_cont_list),
                        sizeof(*safec23_cont_list))
       ? true : false;
 }
-bool isID_start(const uint32_t cp) {
+LOCAL bool isID_start(const uint32_t cp) {
   return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
 }
-bool isID_cont(const uint32_t cp) {
+LOCAL bool isID_cont(const uint32_t cp) {
   return range_bool_search(cp, id_cont_list, ARRAY_SIZE(id_cont_list));
 }
-bool isXID_start(const uint32_t cp) {
+LOCAL bool isXID_start(const uint32_t cp) {
   return range_bool_search(cp, xid_start_list, ARRAY_SIZE(xid_start_list));
 }
-bool isXID_cont(const uint32_t cp) {
+LOCAL bool isXID_cont(const uint32_t cp) {
   return range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
 }
-bool isC11_start(const uint32_t cp) {
+LOCAL bool isC11_start(const uint32_t cp) {
   return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
 }
-bool isC11_cont(const uint32_t cp) {
+LOCAL bool isC11_cont(const uint32_t cp) {
   return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
 }
-bool isALLUTF8_start(const uint32_t cp) { return isASCII_start(cp) || cp > 127; }
-bool isALLUTF8_cont(const uint32_t cp) { return isASCII_cont(cp) || cp > 127; }
+LOCAL bool isALLUTF8_start(const uint32_t cp) { return isASCII_start(cp) || cp > 127; }
+LOCAL bool isALLUTF8_cont(const uint32_t cp) { return isASCII_cont(cp) || cp > 127; }
 
-enum u8id_gc u8ident_get_gc(const uint32_t cp) {
+LOCAL enum u8id_gc u8ident_get_gc(const uint32_t cp) {
   const struct gc *gc = (const struct gc *)binary_search(
       cp, (char *)gc_list, ARRAY_SIZE(gc_list), sizeof(*gc_list));
   if (gc)
@@ -280,7 +293,7 @@ enum u8id_gc u8ident_get_gc(const uint32_t cp) {
   else
     return GC_INVALID;
 }
-const char *u8ident_gc_name(const enum u8id_gc gc) {
+LOCAL const char *u8ident_gc_name(const enum u8id_gc gc) {
   if (gc >= GC_INVALID)
     return NULL;
   assert(gc < GC_INVALID);
@@ -288,7 +301,7 @@ const char *u8ident_gc_name(const enum u8id_gc gc) {
 }
 
 // bitmask of u8id_idtypes
-uint16_t u8ident_get_idtypes(const uint32_t cp) {
+LOCAL uint16_t u8ident_get_idtypes(const uint32_t cp) {
   const struct range_short *id = (struct range_short *)binary_search(
       cp, (char *)idtype_list, ARRAY_SIZE(idtype_list), sizeof(*idtype_list));
   return id ? id->types : 0;
@@ -297,7 +310,7 @@ uint16_t u8ident_get_idtypes(const uint32_t cp) {
 
 #ifdef HAVE_CONFUS
 #  ifndef HAVE_CROARING
-static int compar32(const void *a, const void *b) {
+static inline int compar32(const void *a, const void *b) {
   const uint32_t ai = *(const uint32_t *)a;
   const uint32_t bi = *(const uint32_t *)b;
   return ai < bi ? -1 : ai == bi ? 0 : 1;
@@ -311,7 +324,7 @@ EXTERN bool u8ident_is_confusable(const uint32_t cp) {
 #  endif
 #endif
 
-const char *u8ident_script_name(const int scr) {
+EXTERN const char *u8ident_script_name(const int scr) {
   if (scr < 0 || scr > LAST_SCRIPT)
     return NULL;
   assert(scr >= 0 && scr <= LAST_SCRIPT);
@@ -319,7 +332,7 @@ const char *u8ident_script_name(const int scr) {
 }
 
 /* returns the failing codepoint, which failed in the last check. */
-uint32_t u8ident_failed_char(const u8id_ctx_t i) {
+EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t i) {
   if (i <= i_ctx) {
     const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
     return c->last_cp;
@@ -328,7 +341,7 @@ uint32_t u8ident_failed_char(const u8id_ctx_t i) {
   }
 }
 /* returns the constant script name, which failed in the last check. */
-const char *u8ident_failed_script_name(const u8id_ctx_t i) {
+EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t i) {
   if (i <= i_ctx) {
     const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
     const uint32_t cp = c->last_cp;
@@ -392,7 +405,7 @@ EXTERN void u8ident_free(void) {
      free(errstr);
    }
 */
-const char *u8ident_existing_scripts(const u8id_ctx_t i) {
+EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t i) {
   if (unlikely(i > i_ctx))
     return NULL;
   const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
@@ -422,20 +435,6 @@ const char *u8ident_existing_scripts(const u8id_ctx_t i) {
   return res;
 }
 
-#if 0
-/*
-  Check for the right-hand-side of the Decomposition_Mapping property,
-  which means the codepoint can be normalized, if the sequence is
-  decomposed (NFD or NFKD).
-  This is equivalent to all 1963 C<\p{IsM}> Mark characters,
-  plus the remaining 869 non-mark and non-hangul normalizables.
-*/
-
-bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr) {
-  return (scr == SC_Hangul || u8ident_is_MARK(cp)) : true : false;
-}
-#endif
-
 /* quickcheck these lists
   NFD_QC_N
   NFC_QC_N
@@ -444,7 +443,7 @@ bool u8ident_is_decomposed(const uint32_t cp, const uint8_t scr) {
   NFKC_QC_N
   NFKC_QC_M
  */
-bool u8ident_maybe_normalized(const uint32_t cp) {
+LOCAL bool u8ident_maybe_normalized(const uint32_t cp) {
 
 #if U8ID_NORM == FCC || U8ID_NORM == FCD
   (void)cp;

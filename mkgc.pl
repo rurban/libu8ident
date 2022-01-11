@@ -72,10 +72,10 @@ printf $H "  GC_INVALID,\n";
 printf $H <<'EOF', scalar(@GCs);
 };
 
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const char *const u8id_gc_names[%u];
 #else
-const char *const u8id_gc_names[] = {
+LOCAL const char *const u8id_gc_names[] = {
 EOF
 for my $g (@GCs) {
   $g =~ s/&/amp/;
@@ -94,7 +94,7 @@ struct gc {
 EOF
 
 printf $H <<'EOF', scalar @GC;
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const struct gc gc_list[%u];
 #else
 const struct gc gc_list[] = {

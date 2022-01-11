@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include "roaring.c"
+#include "u8id_gc.h"
 #include "scripts.h"
 #include "confus.h"
 #include "mark.h"

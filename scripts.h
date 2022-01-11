@@ -13,8 +13,8 @@
 /* Provide a mapping of the 161 Script properties to an index byte.
    Sorted into usages.
  */
-#ifndef EXT_SCRIPTS
-const char *const all_scripts[] = {
+#ifndef EXTERN_SCRIPTS
+LOCAL const char *const all_scripts[] = {
     // clang-format off
     // Recommended Scripts (not need to add them)
     // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
@@ -388,10 +388,10 @@ struct range_short {
 // The slow variant without U8ID_CHECK_XID. Add all holes for non-identifiers or
 // non-codepoints. Not needed with U8ID_CHECK_XID or when the parser checks
 // all XID's properly.
-#  ifdef EXT_SCRIPTS
+#  ifdef EXTERN_SCRIPTS
 extern const struct sc xid_script_list[942];
 #  else
-const struct sc xid_script_list[] = {
+LOCAL const struct sc xid_script_list[] = {
     // clang-format off
     {0x0000, 0x0040, 0},	// Common
     {0x0041, 0x005A, 2},	// Latin
@@ -1343,10 +1343,10 @@ const struct sc xid_script_list[] = {
 // The fast variant with U8ID_CHECK_XID. No holes for non-identifiers or
 // non-codepoints needed, as the parser or our XID check already disallowed such
 // codepoints.
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const struct sc nonxid_script_list[421];
 #else
-const struct sc nonxid_script_list[] = {
+LOCAL const struct sc nonxid_script_list[] = {
     // clang-format off
     {0x0000, 0x0040, 0},	// Common
     {0x0041, 0x005A, 2},	// Latin
@@ -1775,8 +1775,8 @@ const struct sc nonxid_script_list[] = {
 
 // Maybe remove all Limited Use SC's from the list on hardcoded profiles 3-5.
 // But 120 entries is small enough.
-#ifndef EXT_SCRIPTS
-const struct scx scx_list[] = {
+#ifndef EXTERN_SCRIPTS
+LOCAL const struct scx scx_list[] = {
     // clang-format off
     {0x0342, 0x0345, GC_Mn, "\x0b"},	// Greek
     {0x0363, 0x036F, GC_Mn, "\x02"},	// Latin
@@ -1907,8 +1907,8 @@ extern const struct scx scx_list[120];
 #ifndef DISABLE_CHECK_XID
 // Allowed scripts from IdentifierStatus.txt. TR 39
 // Note that this includes 0..9 already
-#  ifndef EXT_SCRIPTS
-const struct range_bool allowed_id_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool allowed_id_list[] = {
     // clang-format off
     {0x0027, 0x0027},
     {0x002D, 0x002E},
@@ -2305,8 +2305,8 @@ extern const struct range_bool allowed_id_list[388];
 #  endif
 
 // TR31 ID_Start
-#  ifndef EXT_SCRIPTS
-const struct range_bool id_start_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool id_start_list[] = {
     // clang-format off
     {0x0041, 0x005A},
     {0x0061, 0x007A},
@@ -3038,7 +3038,7 @@ const struct range_bool id_start_list[] = {
     // clang-format on
 }; // 555 ranges, 172 single codepoints
 
-const struct range_bool id_cont_list[] = {
+LOCAL const struct range_bool id_cont_list[] = {
     // clang-format off
     {0x0030, 0x0039},
     {0x005F, 0x005F},
@@ -3633,8 +3633,8 @@ extern const struct range_bool id_cont_list[584];
 
 // If you use NFKC you'd need the xid lists instead
 // NFKC has many special cases, and does not roundtrip.
-#  ifndef EXT_SCRIPTS
-const struct range_bool xid_start_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool xid_start_list[] = {
     // clang-format off
     {0x0041, 0x005A},
     {0x0061, 0x007A},
@@ -4369,7 +4369,7 @@ const struct range_bool xid_start_list[] = {
     // clang-format on
 }; // 551 ranges, 179 single codepoints
 
-const struct range_bool xid_cont_list[] = {
+LOCAL const struct range_bool xid_cont_list[] = {
     // clang-format off
     {0x0030, 0x0039},
     {0x005F, 0x005F},
@@ -4969,11 +4969,11 @@ extern const struct range_bool xid_cont_list[585];
 #  if 0
 // All (X)ID_Continue with gc=Lm. For SCX checks, invalid runs.
 // https://www.unicode.org/reports/tr31/#Modifier_Letters
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool id_lm_list[92];
 extern const struct range_bool xid_lm_list[31];
 #    else
-const struct range_bool id_lm_list[] = {
+LOCAL const struct range_bool id_lm_list[] = {
     // clang-format off
     {0x02B0, 0x02C1},
     {0x02C6, 0x02D1},
@@ -5070,7 +5070,7 @@ const struct range_bool id_lm_list[] = {
     // clang-format on
 }; // 92 ranges, 0 single codepoints
 
-const struct range_bool xid_lm_list[] = {
+LOCAL const struct range_bool xid_lm_list[] = {
     // clang-format off
     {0x02B0, 0x02C1},
     {0x02C6, 0x02D1},
@@ -5142,8 +5142,8 @@ enum u8id_idtypes {
 
    Not_XID, Not_NFKC, Not_Character are not in XID already.
 */
-#  ifndef EXT_SCRIPTS
-const struct range_short idtype_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_short idtype_list[] = {
     // clang-format off
     {0x0009, 0x000D, U8ID_Not_XID},
     {0x0020, 0x0026, U8ID_Not_XID},
@@ -6787,10 +6787,10 @@ extern const struct range_short idtype_list[1629];
 
 // NFD_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFD
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool NFD_N_list[243];
 #    else
-const struct range_bool NFD_N_list[] = {
+LOCAL const struct range_bool NFD_N_list[] = {
     // clang-format off
     {0x00C0, 0x00C5},
     {0x00C7, 0x00CF},
@@ -7042,10 +7042,10 @@ const struct range_bool NFD_N_list[] = {
 
 // NFC_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFC
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool NFC_N_list[74];
 #    else
-const struct range_bool NFC_N_list[] = {
+LOCAL const struct range_bool NFC_N_list[] = {
     // clang-format off
     {0x0340, 0x0341},
     {0x0343, 0x0344},
@@ -7128,10 +7128,10 @@ const struct range_bool NFC_N_list[] = {
 
 // NFC_Quick_Check=Maybe
 #  if !defined U8ID_NORM || U8ID_NORM == NFC
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool NFC_M_list[43];
 #    else
-const struct range_bool NFC_M_list[] = {
+LOCAL const struct range_bool NFC_M_list[] = {
     // clang-format off
     {0x0300, 0x0304},
     {0x0306, 0x030C},
@@ -7183,10 +7183,10 @@ const struct range_bool NFC_M_list[] = {
 
 // NFKD_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFKD
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool NFKD_N_list[547];
 #    else
-const struct range_bool NFKD_N_list[] = {
+LOCAL const struct range_bool NFKD_N_list[] = {
     // clang-format off
     {0x00A0, 0x00A0},
     {0x00A8, 0x00A8},
@@ -7742,10 +7742,10 @@ const struct range_bool NFKD_N_list[] = {
 
 // NFKC_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFKC
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool NFKC_N_list[392];
 #    else
-const struct range_bool NFKC_N_list[] = {
+LOCAL const struct range_bool NFKC_N_list[] = {
     // clang-format off
     {0x00A0, 0x00A0},
     {0x00A8, 0x00A8},
@@ -8146,10 +8146,10 @@ const struct range_bool NFKC_N_list[] = {
 
 // NFKC_Quick_Check=Maybe
 #  if !defined U8ID_NORM || U8ID_NORM == NFKC
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool NFKC_M_list[43];
 #    else
-const struct range_bool NFKC_M_list[] = {
+LOCAL const struct range_bool NFKC_M_list[] = {
     // clang-format off
     {0x0300, 0x0304},
     {0x0306, 0x030C},
@@ -8202,10 +8202,10 @@ const struct range_bool NFKC_M_list[] = {
 
 // Bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const struct range_bool bidi_list[2];
 #else
-const struct range_bool bidi_list[] = {
+LOCAL const struct range_bool bidi_list[] = {
     // clang-format off
     { 0x202A, 0x202E }, // LRE, RLE, PDF, LRO, RLO
     { 0x2066, 0x2069 }, // LRI, RLI, FSI, PDI

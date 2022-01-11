@@ -11,7 +11,7 @@
 /* Sorted set of all confusables,
    from https://www.unicode.org/Public/security/latest/confusables.txt
  */
-#ifndef EXT_SCRIPTS
+#ifndef EXTERN_SCRIPTS
 const uint32_t confusables[] = {
     // clang-format off
     0x0030,	// 0

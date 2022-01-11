@@ -45,11 +45,11 @@
 
 #include "u8ident.h"
 #include "u8idscr.h"
-#define EXT_SCRIPTS
+#define EXTERN_SCRIPTS
 #include "unic11.h"
 
 // private use:
-char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+// char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
@@ -184,7 +184,7 @@ static void gen_c11_all(void) {
           "*/\n",
           U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
   fputs(
-      "const struct range_bool c11_start_list[] = {\n"
+      "static const struct range_bool c11_start_list[] = {\n"
       "    {'$', '$'}, {'A', 'Z'}, {'_', '_'}, {'a', 'z'},\n"
       "    {0x00A8, 0x00A8},   {0x00AA, 0x00AA},\n"
       "    {0x00AD, 0x00AD},   {0x00AF, 0x00AF},   {0x00B2, 0x00B5},\n"
@@ -207,7 +207,7 @@ static void gen_c11_all(void) {
       BITSET(u, cp);
     }
   }
-  fputs("const struct range_bool c11_cont_list[] = {\n"
+  fputs("static const struct range_bool c11_cont_list[] = {\n"
         "    {'$', '$'},\n"
         "    {'0', '9'},\n",
         f);
@@ -280,8 +280,8 @@ static void gen_c23_safe(void) {
       "\n",
       U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
   fputs("// Filtering allowed scripts, XID_Start, Skipped Ids and NFC\n", f);
-  fputs("#ifndef EXT_SCRIPTS\n", f);
-  fputs("const struct sc_c23 safec23_start_list[] = {\n"
+  fputs("#ifndef EXTERN_SCRIPTS\n", f);
+  fputs("static const struct sc_c23 safec23_start_list[] = {\n"
         "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
         "    {'A', 'Z', SC_Latin, GC_Lu, NULL},\n"  // 41-5a
         "    {'_', '_', SC_Latin, GC_Pc, NULL},\n"  // 5f
@@ -323,8 +323,8 @@ static void gen_c23_safe(void) {
   fputs("\n// Filtering allowed scripts, XID_Continue,!XID_Start, Skipped Ids, "
         "NFC and !MARK\n",
         f);
-  fputs("#ifndef EXT_SCRIPTS\n", f);
-  fputs("const struct sc_c23 safec23_cont_list[] = {\n", f);
+  fputs("#ifndef EXTERN_SCRIPTS\n", f);
+  fputs("static const struct sc_c23 safec23_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
   fputs("#else\n", f);
@@ -359,8 +359,8 @@ static void gen_c23_safe(void) {
       }
     }
   }
-  fputs("#ifndef EXT_SCRIPTS\n", f);
-  fputs("const struct sc_c23 safec23_excl_start_list[] = {\n", f);
+  fputs("#ifndef EXTERN_SCRIPTS\n", f);
+  fputs("static const struct sc_c23 safec23_excl_start_list[] = {\n", f);
   emit_ranges(f, 0x7a, u, true);
   fputs("};\n", f);
   fputs("#else\n", f);
@@ -396,8 +396,8 @@ static void gen_c23_safe(void) {
       }
     }
   }
-  fputs("#ifndef EXT_SCRIPTS\n", f);
-  fputs("const struct sc_c23 safec23_excl_cont_list[] = {\n", f);
+  fputs("#ifndef EXTERN_SCRIPTS\n", f);
+  fputs("static const struct sc_c23 safec23_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
   fputs("#else\n", f);

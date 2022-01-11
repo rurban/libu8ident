@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "u8id_private.h"
-#define EXT_SCRIPTS
+#define EXTERN_SCRIPTS
 #include "u8id_gc.h"
 #include "scripts.h"
 
@@ -15,8 +15,8 @@ struct ctx_t *u8ident_ctx(void);
 uint8_t u8ident_get_script(const uint32_t cp);
 /* list of script indices */
 const struct scx *u8ident_get_scx(const uint32_t cp);
-// member of the Allowed IdentifierStatus list
-//bool u8ident_is_allowed(const uint32_t cp);
+/* search for safec23 entry */
+const struct sc_c23 *u8ident_get_safec23(const uint32_t cp);
 bool u8ident_is_MARK(const uint32_t cp);
 // member or bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.

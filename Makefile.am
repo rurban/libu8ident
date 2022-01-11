@@ -17,8 +17,8 @@ libu8ident_la_LDFLAGS = \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
 bin_PROGRAMS = u8idlint
-u8idlint_SOURCES = u8idlint.c
-u8idlint_LDADD   = $(lib_LTLIBRARIES)
+u8idlint_SOURCES = u8idlint.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
+u8idlint_CFLAGS = $(AM_CFLAGS)
 
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc
@@ -114,17 +114,17 @@ if !HAVE_WINDOWS
 EXTRA_PROGRAMS += test-texts mkc23
 TESTS += test-texts.test u8idlint.test
 endif
-test_SOURCES = test.c
-test_LDADD = $(lib_LTLIBRARIES)
-test_texts_SOURCES = test-texts.c
+test_SOURCES = test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
+test_CFLAGS = $(AM_CFLAGS)
+test_texts_SOURCES = test-texts.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
 test_texts_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS)
-test_texts_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
-mkc23_SOURCES = mkc23.c
+test_texts_LDADD = $(test_texts_LIBS)
+mkc23_SOURCES = mkc23.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
 mkc23_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS) -DU8ID_PROFILE_SAFEC23
-mkc23_LDADD = $(lib_LTLIBRARIES) $(test_texts_LIBS)
+mkc23_LDADD = $(test_texts_LIBS)
 
 if HAVE_CROARING
-test_LDADD += u8idroar.lo
+test_LDADD = u8idroar.lo
 EXTRA_PROGRAMS += perf
 perf_CFLAGS = $(AM_CFLAGS) -DPERF_TEST
 perf_SOURCES = perf.c u8idroar.c

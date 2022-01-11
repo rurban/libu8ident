@@ -19,8 +19,8 @@ struct sc_c23 {
 };
 
 // Filtering allowed scripts, XID_Start, Skipped Ids and NFC
-#ifndef EXT_SCRIPTS
-const struct sc_c23 safec23_start_list[] = {
+#ifndef EXTERN_SCRIPTS
+static const struct sc_c23 safec23_start_list[] = {
     {'$', '$', SC_Latin, GC_Sc, NULL},
     {'A', 'Z', SC_Latin, GC_Lu, NULL},
     {'_', '_', SC_Latin, GC_Pc, NULL},
@@ -464,8 +464,8 @@ const struct sc_c23 safec23_start_list[432];
 // 315 ranges, 117 singles, 99629 codepoints
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, Skipped Ids, NFC and !MARK
-#ifndef EXT_SCRIPTS
-const struct sc_c23 safec23_cont_list[] = {
+#ifndef EXTERN_SCRIPTS
+static const struct sc_c23 safec23_cont_list[] = {
     {0x30, 0x39, SC_Common, GC_Lu, NULL}, //  0..9
     {0x5F, 0x5F, SC_Common, GC_Lu, NULL}, //  _
     {0xB7, 0xB7, SC_Common, GC_Lu, NULL}, //  ·
@@ -506,8 +506,8 @@ const struct sc_c23 safec23_cont_list[30];
 //---------------------------------------------------
 
 // Only excluded scripts, XID_Start,!Obsolete,!Uncommon_Use, NFC and !MARK
-#ifndef EXT_SCRIPTS
-const struct sc_c23 safec23_excl_start_list[] = {
+#ifndef EXTERN_SCRIPTS
+static const struct sc_c23 safec23_excl_start_list[] = {
     {0x3E2, 0x3EF, SC_Coptic, GC_Lu, NULL}, //  (Excluded) Ϣ..ϯ
     {0x800, 0x815, SC_Samaritan, GC_Lu, NULL}, //  (Excluded) ࠀ..ࠕ
     {0x81A, 0x81A, SC_Samaritan, GC_Lu, NULL}, //  (Excluded) ࠚ
@@ -706,8 +706,8 @@ const struct sc_c23 safec23_excl_start_list[191];
 // 158 ranges, 33 singles, 14926 codepoints
 
 // Only excluded scripts, XID_Continue,!XID_Start, Skipped Ids, NFC and !MARK
-#ifndef EXT_SCRIPTS
-const struct sc_c23 safec23_excl_cont_list[] = {
+#ifndef EXTERN_SCRIPTS
+static const struct sc_c23 safec23_excl_cont_list[] = {
     {0x1810, 0x1819, SC_Mongolian, GC_Lu, NULL}, //  (Excluded) ᠐..᠙
     {0x104A0, 0x104A9, SC_Osmanya, GC_Lu, NULL}, //  (Excluded) 𐒠..𐒩
     {0x11066, 0x1106F, SC_Brahmi, GC_Lu, NULL}, //  (Excluded) 𑁦..𑁯

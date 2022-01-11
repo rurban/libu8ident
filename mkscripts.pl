@@ -538,8 +538,8 @@ print $H <<"EOF";
 /* Provide a mapping of the $num_scripts Script properties to an index byte.
    Sorted into usages.
  */
-#ifndef EXT_SCRIPTS
-const char *const all_scripts[] = {
+#ifndef EXTERN_SCRIPTS
+LOCAL const char *const all_scripts[] = {
     // clang-format off
     // Recommended Scripts (not need to add them)
     // https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
@@ -639,10 +639,10 @@ printf $H <<"EOF", scalar @SCR;
 // The slow variant without U8ID_CHECK_XID. Add all holes for non-identifiers or
 // non-codepoints. Not needed with U8ID_CHECK_XID or when the parser checks
 // all XID's properly.
-#  ifdef EXT_SCRIPTS
+#  ifdef EXTERN_SCRIPTS
 extern const struct sc xid_script_list[%u];
 #  else
-const struct sc xid_script_list[] = {
+LOCAL const struct sc xid_script_list[] = {
     // clang-format off
 EOF
 my ($b, $s);
@@ -669,8 +669,8 @@ EOF
 printf $H16 <<'EOF', $b, $s;
 
 #if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
-#  ifndef EXT_SCRIPTS
-const struct sc16 xid_script_list16[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct sc16 xid_script_list16[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -695,8 +695,8 @@ printf $H16 <<'EOF', $b, $s, $b + $s;
 extern const struct sc16 xid_script_list16[%u];
 #  endif
 
-#  ifndef EXT_SCRIPTS
-const struct sc xid_script_list32[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct sc xid_script_list32[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -729,10 +729,10 @@ printf $H <<"EOF", scalar(@SCRF);
 // The fast variant with U8ID_CHECK_XID. No holes for non-identifiers or
 // non-codepoints needed, as the parser or our XID check already disallowed such
 // codepoints.
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const struct sc nonxid_script_list[%u];
 #else
-const struct sc nonxid_script_list[] = {
+LOCAL const struct sc nonxid_script_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -756,8 +756,8 @@ printf $H <<"EOF", $b, $s;
 
 // Maybe remove all Limited Use SC's from the list on hardcoded profiles 3-5.
 // But 120 entries is small enough.
-#ifndef EXT_SCRIPTS
-const struct scx scx_list[] = {
+#ifndef EXTERN_SCRIPTS
+LOCAL const struct scx scx_list[] = {
     // clang-format off
 EOF
 my $size;
@@ -799,8 +799,8 @@ extern const struct scx scx_list[%u];
 #ifndef DISABLE_CHECK_XID
 // Allowed scripts from IdentifierStatus.txt. TR 39
 // Note that this includes 0..9 already
-#  ifndef EXT_SCRIPTS
-const struct range_bool allowed_id_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool allowed_id_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -824,8 +824,8 @@ EOF
 printf $H16 <<'EOF';
 
 #ifndef DISABLE_CHECK_XID
-#  ifndef EXT_SCRIPTS
-const struct range_bool16 allowed_id_list16[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool16 allowed_id_list16[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -845,8 +845,8 @@ printf $H16 <<'EOF', $b, $s, $b +$s;
 extern const struct range_bool16 allowed_id_list16[%u];
 #  endif
 
-#  ifndef EXT_SCRIPTS
-const struct range_bool allowed_id_list32[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool allowed_id_list32[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -872,8 +872,8 @@ EOF
 printf $H <<'EOF';
 
 // TR31 ID_Start
-#  ifndef EXT_SCRIPTS
-const struct range_bool id_start_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool id_start_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -889,7 +889,7 @@ printf $H <<"EOF", $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 
-const struct range_bool id_cont_list[] = {
+LOCAL const struct range_bool id_cont_list[] = {
     // clang-format off
 EOF
 sub inRange {
@@ -928,8 +928,8 @@ extern const struct range_bool id_cont_list[%u];
 
 // If you use NFKC you'd need the xid lists instead
 // NFKC has many special cases, and does not roundtrip.
-#  ifndef EXT_SCRIPTS
-const struct range_bool xid_start_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool xid_start_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -945,7 +945,7 @@ printf $H <<"EOF", $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 
-const struct range_bool xid_cont_list[] = {
+LOCAL const struct range_bool xid_cont_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -989,11 +989,11 @@ extern const struct range_bool xid_cont_list[%u];
 #  if 0
 // All (X)ID_Continue with gc=Lm. For SCX checks, invalid runs.
 // https://www.unicode.org/reports/tr31/#Modifier_Letters
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool id_lm_list[%u];
 extern const struct range_bool xid_lm_list[%u];
 #    else
-const struct range_bool id_lm_list[] = {
+LOCAL const struct range_bool id_lm_list[] = {
     // clang-format off
 EOF
 
@@ -1010,7 +1010,7 @@ printf $H <<'EOF', $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 
-const struct range_bool xid_lm_list[] = {
+LOCAL const struct range_bool xid_lm_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
@@ -1064,8 +1064,8 @@ print $H <<"EOF";
 
    Not_XID, Not_NFKC, Not_Character are not in XID already.
 */
-#  ifndef EXT_SCRIPTS
-const struct range_short idtype_list[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_short idtype_list[] = {
     // clang-format off
 EOF
 sub idtype_bits {
@@ -1120,10 +1120,10 @@ for my $name (@NORM_QC) {
 
 // %s_Quick_Check=%s
 #  if !defined U8ID_NORM || U8ID_NORM == %s
-#    ifdef EXT_SCRIPTS
+#    ifdef EXTERN_SCRIPTS
 extern const struct range_bool %s_list[%u];
 #    else
-const struct range_bool %s_list[] = {
+LOCAL const struct range_bool %s_list[] = {
     // clang-format off
 EOF
   ($b, $s) = (0, 0);
@@ -1146,8 +1146,8 @@ EOF
 
 // %s_Quick_Check=%s
 #  if !defined U8ID_NORM || U8ID_NORM == %s
-#    ifndef EXT_SCRIPTS
-const struct range_bool16 %s_list16[] = {
+#    ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool16 %s_list16[] = {
     // clang-format off
 EOF
   ($b, $s) = (0, 0);
@@ -1167,8 +1167,8 @@ EOF
 extern const struct range_bool16 %s_list16[%u];
 #  endif
 
-#  ifndef EXT_SCRIPTS
-const struct range_bool %s_list32[] = {
+#  ifndef EXTERN_SCRIPTS
+LOCAL const struct range_bool %s_list32[] = {
     // clang-format off
 EOF
   ($b, $s) = (0, 0);
@@ -1200,10 +1200,10 @@ printf $H <<'EOF';
 
 // Bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const struct range_bool bidi_list[2];
 #else
-const struct range_bool bidi_list[] = {
+LOCAL const struct range_bool bidi_list[] = {
     // clang-format off
     { 0x202A, 0x202E }, // LRE, RLE, PDF, LRO, RLO
     { 0x2066, 0x2069 }, // LRI, RLI, FSI, PDI

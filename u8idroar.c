@@ -21,9 +21,9 @@ static roaring_bitmap_t *ra = NULL;
 #  endif
 
 #  ifdef USE_MARK_CROAR
-#    define EXT_SCRIPTS
+#    define EXTERN_SCRIPTS
 #    include "scripts.h"
-#    undef EXT_SCRIPTS
+#    undef EXTERN_SCRIPTS
 #    include "mark.h"
 static roaring_bitmap_t *rm = NULL;
 #  endif

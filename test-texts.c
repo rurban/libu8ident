@@ -35,7 +35,7 @@
 #  include "uniwbrk.h"
 #endif
 #include "u8idscr.h"
-#undef EXT_SCRIPTS
+//#undef EXTERN_SCRIPTS
 #include "unic11.h"
 
 // private access
@@ -43,6 +43,7 @@ unsigned u8ident_options(void);
 unsigned u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
+/*
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
   int n = (int)len;
@@ -78,6 +79,7 @@ static inline bool isC11_start(uint32_t cp) {
 static inline bool isC11_cont(uint32_t cp) {
   return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
 }
+*/
 
 #ifdef HAVE_SYS_STAT_H
 static int file_exists(const char *path) {

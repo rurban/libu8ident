@@ -13,10 +13,10 @@
 #ifdef HAVE_CROARING
 #  include "u8idroar.h"
 #endif
-#undef EXT_SCRIPTS
+#undef EXTERN_SCRIPTS
 #ifdef HAVE_CONFUS
 #  ifndef HAVE_CROARING
-#    define EXT_SCRIPTS
+#    define EXTERN_SCRIPTS
 #  endif
 #  include "confus.h"
 #endif
@@ -63,9 +63,10 @@ void test_scripts_no_init(void) {
   assert(scx->scx[0] == 0x03);   // Arab
   assert(scx->scx[1] == '\x99'); // Syrc, signed!
 #ifndef DISABLE_CHECK_XID
-  assert(u8ident_is_allowed(0x27));
-  assert(!u8ident_is_allowed(0x26));
-  assert(u8ident_is_allowed(0x40e));
+  assert(!isALLOWED_start('0'));
+  assert(isALLOWED_cont(0x27));
+  assert(!isALLOWED_cont(0x26));
+  assert(isALLOWED_cont(0x40e));
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
 #endif
   // check that no list elements can be merged

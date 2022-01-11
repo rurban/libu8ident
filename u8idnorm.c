@@ -117,7 +117,7 @@ static int cp_len(const uint32_t cp) {
 }
 
 /* convert utf8 to unicode codepoint (to_cp) */
-uint32_t dec_utf8(char **strp) {
+LOCAL uint32_t dec_utf8(char **strp) {
   const unsigned char *str = (const unsigned char *)*strp;
   int bytes = utf8_len(*str);
   int shift;
@@ -140,7 +140,7 @@ uint32_t dec_utf8(char **strp) {
 }
 
 /* convert unicode codepoint to utf8 (to_utf8) */
-char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
+LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
   if (cp > _UNICODE_MAX) {
     errno = EILSEQ;
     *lenp = 0;
@@ -180,7 +180,7 @@ char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
 
 #if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFKD
 
-static int _bsearch_exc(const void *ptr1, const void *ptr2) {
+static inline int _bsearch_exc(const void *ptr1, const void *ptr2) {
   UN8IF_compat_exc_t *e1 = (UN8IF_compat_exc_t *)ptr1;
   UN8IF_compat_exc_t *e2 = (UN8IF_compat_exc_t *)ptr2;
   return e1->cp > e2->cp ? 1 : e1->cp == e2->cp ? 0 : -1;
@@ -188,7 +188,7 @@ static int _bsearch_exc(const void *ptr1, const void *ptr2) {
 #elif !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD ||            \
     U8ID_NORM == FCC || U8ID_NORM == FCD
 
-static int _bsearch_exc(const void *ptr1, const void *ptr2) {
+static inline int _bsearch_exc(const void *ptr1, const void *ptr2) {
   UN8IF_canon_exc_t *e1 = (UN8IF_canon_exc_t *)ptr1;
   UN8IF_canon_exc_t *e2 = (UN8IF_canon_exc_t *)ptr2;
   return e1->cp > e2->cp ? 1 : e1->cp == e2->cp ? 0 : -1;
@@ -390,8 +390,9 @@ static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
  *    remaining 869 non-mark and non-hangul normalizables.  Hangul has some
  *    special normalization logic.
  */
-int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
-                     size_t *restrict lenp, const bool iscompat) {
+static int u8id_decompose_s(char *restrict dest, long dmax,
+                            char *restrict src, size_t *restrict lenp,
+                            const bool iscompat) {
   size_t orig_dmax;
   const char *overlap_bumper;
   uint32_t cp;
@@ -515,7 +516,7 @@ typedef struct {
 } UN8IF_cc;
 
 /* rc = u8id_reorder_s(tmp, len+1, dest); */
-static int _compare_cc(const void *a, const void *b) {
+static inline int _compare_cc(const void *a, const void *b) {
   int ret_cc;
   ret_cc = ((UN8IF_cc *)a)->cc - ((UN8IF_cc *)b)->cc;
   if (ret_cc)
@@ -525,7 +526,7 @@ static int _compare_cc(const void *a, const void *b) {
          (((UN8IF_cc *)a)->pos < ((UN8IF_cc *)b)->pos);
 }
 
-static uint8_t _combin_class(uint32_t cp) {
+static inline uint8_t _combin_class(uint32_t cp) {
   const STDCHAR **plane, *row;
   plane = UN8IF_combin[cp >> 16];
   if (!plane)
@@ -543,8 +544,8 @@ static uint8_t _combin_class(uint32_t cp) {
  *    as defined in the latest Unicode standard. The conversion
  *    stops at the first null or after dmax characters.
  */
-int u8id_reorder_s(unsigned char *restrict dest, long dmax,
-                   const char *restrict src, const size_t len) {
+static int u8id_reorder_s(unsigned char *restrict dest, long dmax,
+                          const char *restrict src, const size_t len) {
   UN8IF_cc seq_ary[CC_SEQ_SIZE];
   UN8IF_cc *seq_ptr = (UN8IF_cc *)seq_ary; /* start with stack */
   UN8IF_cc *seq_ext = NULL;                /* heap when needed */
@@ -686,8 +687,9 @@ static uint32_t _composite_cp(uint32_t cp, uint32_t cp2) {
  *    stops at the first null or after dmax characters. */
 /* combine decomposed sequences to NFC. */
 /* iscontig = false; composeContiguous? FCC if true */
-int u8id_compose_s(char *restrict dest, long dmax, const char *restrict src,
-                   size_t *restrict lenp, const bool iscontig) {
+static int u8id_compose_s(char *restrict dest, long dmax,
+                                const char *restrict src, size_t *restrict lenp,
+                                const bool iscontig) {
   char *p = (char *)src;
   const char *e = p + *lenp;
   uint32_t cpS = 0;       /* starter code point */
@@ -807,12 +809,6 @@ int u8id_compose_s(char *restrict dest, long dmax, const char *restrict src,
   return 0;
 }
 #endif // !(NFD, NFKD, FCD)
-
-int u8ident_may_normalize(const char *buf, int len) {
-  (void)buf;
-  (void)len;
-  return 1;
-}
 
 /* Returns a freshly allocated normalized string, in the option defined at
  * `u8ident_init`. */

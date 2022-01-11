@@ -10,6 +10,7 @@ RANLIB := ranlib
 RONN := ronn
 # Maintainer only
 VERSION = 0.1
+SO_MAJ = 0
 DEFINES += -DPACKAGE_VERSION="\"$(VERSION)\""
 # This should to be a recent perl, matching the target unicode version
 PERL := perl
@@ -47,6 +48,7 @@ endif
 #OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
+SOLIB = libu8ident.so
 DOCS = README.md NOTICE LICENSE c23++proposal.html c23++proposal.md c11.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
@@ -91,7 +93,7 @@ endif
 endif
 endif
 
-most: $(LIB) $(MAN) u8idlint
+most: $(LIB) $(SOLIB) $(MAN) u8idlint
 
 all: most mkc23 test-texts test perf c23++proposal.html
 
@@ -108,6 +110,12 @@ $(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
+$(SOLIB): $(SRC) $(HEADER) $(HDRS)
+	$(CC) $(CFLAGS_REL) $(LTOFLAGS) -shared -fPIC $(DEFINES) -Iinclude \
+	  -Wl,-soname,$(SOLIB).$(SO_MAJ) -o $@.$(SO_MAJ) $(SRC)
+	-rm -f $(SOLIB)
+	ln -s $(SOLIB).$(SO_MAJ) $(SOLIB)
+
 scripts.h scripts16.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt DerivedNormalizationProps.txt
 	$(PERL) mkscripts.pl
 confus.h: mkconfus.pl mkroar.c # confusables.txt
@@ -122,7 +130,7 @@ allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkco
 	$(PERL) mkconfus.pl
 
 u8idlint: u8idlint.c $(LIB) unic23.h unic11.h
-	$(CC) $(CFLAGS_REL) $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB)
+	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB)
 
 .PHONY: check check-asan check-norms check-profiles check-tr31 \
 	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
@@ -173,8 +181,8 @@ perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
 	./perf
 
 clean:
-	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o libu8ident.a \
-	       perf mkroar u8idlint \
+	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o $(LIB) $(SOLIB) \
+	       perf mkroar mkc23 u8idlint \
 	       test test-texts test-asan test-tr31 \
 	       test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}

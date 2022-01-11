@@ -19,7 +19,7 @@ enum u8id_norm s_u8id_norm = U8ID_NORM_DEFAULT;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
 
-const char *u8ident_errstr(int errcode) {
+LOCAL const char *u8ident_errstr(int errcode) {
   static const char *const _str[] = {
       "ERR_CONFUS",           // -6
       "ERR_COMBINE",          // -5
@@ -39,22 +39,18 @@ const char *u8ident_errstr(int errcode) {
 /* tr31 options:
   ASCII,   // only ASCII letters
   ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
-  SAFEC23, // see c23++proposal
+  SAFEC23, // see c23++proposal XID minus exotic scripts, filtered by NFC and
+              IdentifierType.
   ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
-  XID, // ID plus NFKC quirks.
+  XID, // ID minus NFKC quirks.
   C11, // the AltId ranges from the C11 standard
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal
 */
 static struct func_tr31_s tr31_funcs[] = {
-    // clang-format disable
-    {isASCII_start, isASCII_cont},
-    {isALLOWED_start, isALLOWED_cont},
-    {isSAFEC23_start, isSAFEC23_cont},
-    {isID_start, isID_cont},
-    {isXID_start, isXID_cont},
-    {isC11_start, isC11_cont},
+    {isASCII_start, isASCII_cont},     {isALLOWED_start, isALLOWED_cont},
+    {isSAFEC23_start, isSAFEC23_cont}, {isID_start, isID_cont},
+    {isXID_start, isXID_cont},         {isC11_start, isC11_cont},
     {isALLUTF8_start, isALLUTF8_cont},
-    // clang-format enable
 };
 
 /* Initialize the library with a profile, normalization and a bitmask of

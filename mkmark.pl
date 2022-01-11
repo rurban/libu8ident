@@ -55,7 +55,7 @@ EOF
 
 printf $H <<'EOF', scalar @MARK;
 /* All Combining Marks, sorted */
-#ifdef EXT_SCRIPTS
+#ifdef EXTERN_SCRIPTS
 extern const struct range_bool mark_list[%u];
 #else
 const struct range_bool mark_list[] = {
@@ -87,7 +87,7 @@ if (-e "roaring.h" && -e "roaring.c") {
 
 // This was just an experiment. It's slower than binary search in ranges.
 #ifdef HAVE_CROARING
-#  ifndef EXT_SCRIPTS
+#  ifndef EXTERN_SCRIPTS
 /* generated via mkroar.c */
 EOF
     close $H;
@@ -98,7 +98,7 @@ EOF
 #  else
 extern const unsigned int mark_croar_bin_len;
 extern const unsigned char mark_croar_bin[1219]; // checkme on updates
-#  endif // EXT_SCRIPTS
+#  endif // EXTERN_SCRIPTS
 #endif // HAVE_CROARING
 EOF
 }

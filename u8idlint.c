@@ -37,7 +37,7 @@
 #  include "uniwbrk.h"
 #endif
 #include "u8idscr.h"
-#define EXT_SCRIPTS
+#define EXTERN_SCRIPTS
 #include "unic11.h"
 #include "unic23.h"
 //#include "mark.h"

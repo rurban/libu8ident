@@ -8,7 +8,16 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#define EXTERN extern
+#if defined _WIN32 || defined __CYGWIN__
+#  define EXTERN __declspec(dllexport)
+#  define LOCAL
+#elif __GNUC__ >= 4
+#  define EXTERN __attribute__((visibility("default")))
+#  define LOCAL   __attribute__((visibility("hidden")))
+#else
+#  define EXTERN
+#  define LOCAL
+#endif
 
 #ifndef PERF_TEST
 // they are all too slow
@@ -175,14 +184,14 @@ struct ctx_t {
 #  define GCC_DIAG_IGNORE(w)
 #endif
 
-enum u8id_norm u8ident_norm(void);
-enum u8id_profile u8ident_profile(void);
-enum u8id_options u8ident_tr31(void);
-unsigned u8ident_options(void);
-unsigned u8ident_maxlength(void);
-const char *u8ident_errstr(int errcode);
+LOCAL enum u8id_norm u8ident_norm(void);
+LOCAL enum u8id_profile u8ident_profile(void);
+LOCAL enum u8id_options u8ident_tr31(void);
+LOCAL unsigned u8ident_options(void);
+LOCAL unsigned u8ident_maxlength(void);
+LOCAL const char *u8ident_errstr(int errcode);
 // from u8idnorm.c
-uint32_t dec_utf8(char **strp);
-char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+LOCAL uint32_t dec_utf8(char **strp);
+LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 #endif // _U8ID_PRIVATE_H
