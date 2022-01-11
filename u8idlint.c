@@ -142,7 +142,7 @@ struct func_xid_s {
   C11, // the AltId ranges from the C11 standard
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal
 */
-static struct func_start_s id_funcs[] = {
+static struct func_xid_s id_funcs[] = {
     // clang-format disable
     {isASCII_start, isASCII_cont},
     {isALLOWED_start, isALLOWED_cont},
@@ -286,8 +286,8 @@ int testfile(const char *dir, const char *fname) {
 #if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
   _Static_assert(ARRAY_SIZE(id_funcs) == ALLUTF8 + 1, "Invalid id_funcs size");
 #endif
-  func_start *id_start = id_funcs[xid].start;
-  func_start *id_cont = id_funcs[xid].cont;
+  func_xid *id_start = id_funcs[xid].start;
+  func_xid *id_cont = id_funcs[xid].cont;
   if (!dir) {
     strncpy(path, fname, sizeof(path) - 1);
   } else {

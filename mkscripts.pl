@@ -792,6 +792,7 @@ extern const struct scx scx_list[%u];
 
 #ifndef DISABLE_CHECK_XID
 // Allowed scripts from IdentifierStatus.txt. TR 39
+// Note that this includes 0..9 already
 #  ifndef EXT_SCRIPTS
 const struct range_bool allowed_id_list[] = {
     // clang-format off
@@ -882,12 +883,25 @@ printf $H <<"EOF", $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 
-// FIXME: This includes the id_start still
 const struct range_bool id_cont_list[] = {
     // clang-format off
 EOF
+sub inRange {
+  my ($cp, $range) = @_;
+  for my $r (@$range) {
+    return 1 if $cp >= $r->[0] and $cp <= $r->[1];
+  }
+  return 0;
+}
+
 ($b, $s) = (0, 0);
+my $cont_size = scalar(@IDCONT);
 for my $r (@IDCONT) {
+  # skip if in IDSTART
+  if (inRange($r->[0], \@IDSTART)) {
+    $cont_size--;
+    next;
+  }
   if ($r->[0] == $r->[1]) {
     $s++;
   } else {
@@ -895,7 +909,7 @@ for my $r (@IDCONT) {
   }
   printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
 };
-printf $H <<"EOF", $b, $s, scalar(@IDSTART), scalar(@IDCONT);
+printf $H <<"EOF", $b, $s, scalar(@IDSTART), $cont_size;
     // clang-format on
 }; // %u ranges, %u single codepoints
 #  else
@@ -922,13 +936,17 @@ printf $H <<"EOF", $b, $s;
     // clang-format on
 }; // %u ranges, %u single codepoints
 
-// FIXME: This includes the xid_start still
 const struct range_bool xid_cont_list[] = {
     // clang-format off
 EOF
 ($b, $s) = (0, 0);
-# FIXME only the chars not in XIDSTART
+$cont_size = scalar(@XIDCONT);
 for my $r (@XIDCONT) {
+  # skip if in XIDSTART
+  if (inRange($r->[0], \@XIDSTART)) {
+    $cont_size--;
+    next;
+  }
   if ($r->[0] == $r->[1]) {
     $s++;
   } else {
@@ -936,7 +954,7 @@ for my $r (@XIDCONT) {
   }
   printf $H "    {0x%04X, 0x%04X},\n", $r->[0], $r->[1];
 };
-printf $H <<'EOF', $b, $s, scalar(@XIDSTART), scalar(@XIDCONT), scalar(@LM), scalar(@LMX);
+printf $H <<'EOF', $b, $s, scalar(@XIDSTART), $cont_size, scalar(@LM), scalar(@LMX);
     // clang-format on
 }; // %u ranges, %u single codepoints
 #  else
