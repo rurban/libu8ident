@@ -168,7 +168,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     // profile 6 shortcuts: skip all script checks.
     // when we need TR31 checks.
     // advance to normalize checks
-#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6) && DISABLE_CHECK_XID
+#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6) && defined(DISABLE_CHECK_XID)
     need_normalize = true;
     // if (scr != SC_Common && scr != SC_Inherited)
     //   basesc = scr;

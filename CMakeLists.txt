@@ -2,10 +2,9 @@ project(libu8ident C)
 cmake_minimum_required(VERSION 2.9)
 # Supported options:
 #  -DBUILD_SHARED_LIBS=ON,OFF
-#  -DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD
-#  -DLIBU8IDENT_PROFILE=2,3,4,5,6,C23_4,C11_6
-#  -DENABLE_CHECK_XID=On
-#  -DDISABLE_CHECK_XID=On
+#  -DU8ID_NORM=NFC,NFKC,NFD,NFKD
+#  -DU8ID_PROFILE=2,3,4,5,6,C23_4,C11_6
+#  -DU8ID_TR31=ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE
 #  -DHAVE_CONFUS=ON
 #  -DHAVE_CROARING=ON
 # for smaller builds and lib.
@@ -70,10 +69,9 @@ if(MINGW) # WINDOWS AND CMAKE_COMPILER_IS_GNUCC
 endif()
 
 option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
-option(LIBU8IDENT_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
-option(LIBU8IDENT_PROFILE "force a single profile: 2-6,C23_4,C11_6" OFF)
-option(ENABLE_CHECK_XID "en- or disabled check_xid" OFF)
-option(DISABLE_CHECK_XID "en- or disabled check_xid" OFF)
+option(U8ID_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
+option(U8ID_PROFILE "force a single profile: 2-6,C23_4,C11_6" OFF)
+option(U8ID_TR31 "force TR31 charset: ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE" OFF)
 option(HAVE_CONFUS "add confus.h set" OFF)
 option(HAVE_CROARING "use CRoaring bitsets" ON)
 
@@ -136,16 +134,16 @@ set(private_HEADERS
   un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
   mark.h unic11.h confus.h ${roaring_HEADERS})
 
+add_library(u8ident_static STATIC
+  ${libu8ident_HEADERS}
+  ${libu8ident_SOURCES}
+  ${private_HEADERS})
+add_library(u8ident SHARED
+  ${libu8ident_HEADERS}
+  ${libu8ident_SOURCES}
+  ${private_HEADERS})
 if(MSVC)
   if (BUILD_SHARED_LIBS)
-    add_library(u8ident_static STATIC
-      ${libu8ident_HEADERS}
-      ${libu8ident_SOURCES}
-      ${private_HEADERS})
-    add_library(u8ident SHARED
-      ${libu8ident_HEADERS}
-      ${libu8ident_SOURCES}
-      ${private_HEADERS})
     # FIXME cmake bug:
     # need full path. u8idlint only gets Release\u8ident.lib, but is in a seperate path.
     # This is ignored because the target is built, not imported.
@@ -163,20 +161,35 @@ if(MSVC)
       #set_target_properties(u8ident PROPERTIES
       #  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release")
     #endif()
-  else(BUILD_SHARED_LIBS)
-    add_library(u8ident
-      ${libu8ident_HEADERS}
-      ${libu8ident_SOURCES}
-      ${private_HEADERS})
   endif(BUILD_SHARED_LIBS)
-else(MSVC)
-  add_library(u8ident
-    ${libu8ident_HEADERS}
-    ${libu8ident_SOURCES}
-    ${private_HEADERS})
 endif(MSVC)
 #set_target_properties(${libu8ident_HEADERS} PROPERTIES PUBLIC_HEADER)
 set_target_properties(u8ident PROPERTIES PUBLIC_HEADER include/u8ident.h)
+if (U8ID_NORM)
+  set_target_properties(u8ident u8ident_static PROPERTIES
+    COMPILE_DEFINITIONS U8ID_NORM=${U8ID_NORM})
+endif()
+if (U8ID_PROFILE)
+  get_target_property(DEF u8ident COMPILE_DEFINITIONS)
+  if (DEF)
+    set_target_properties(u8ident u8ident_static PROPERTIES
+      COMPILE_DEFINITIONS "${DEF};U8ID_PROFILE=${U8ID_PROFILE}")
+  else()
+    set_target_properties(u8ident u8ident_static PROPERTIES
+      COMPILE_DEFINITIONS U8ID_PROFILE=${U8ID_PROFILE})
+  endif()
+endif()
+if (U8ID_TR31)
+  get_target_property(DEF u8ident COMPILE_DEFINITIONS)
+  if (DEF)
+    set_target_properties(u8ident u8ident_static PROPERTIES
+      COMPILE_DEFINITIONS "${DEF};U8ID_TR31=${U8ID_TR31}")
+  else()
+    set_target_properties(u8ident u8ident_static PROPERTIES
+      COMPILE_DEFINITIONS U8ID_TR31=${U8ID_TR31})
+  endif()
+endif()
+
 target_include_directories(u8ident PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR})
@@ -189,15 +202,12 @@ if (CRoaring_FOUND)
       PROPERTIES COMPILE_FLAGS "-DPERF_TEST")
 endif()
 
-# cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
-if (NOT MSVC)
-  link_libraries(u8ident)
-endif()
-add_executable(u8idlint u8idlint.c)
-if (MSVC)
+add_executable(u8idlint u8idlint.c ${libu8ident_SOURCES})
+#if (MSVC)
+  # cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
   #target_link_directories(u8idlint PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-  target_link_libraries(u8idlint ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
-endif()
+# target_link_libraries(u8idlint ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
+#endif()
 include_directories(BEFORE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -205,15 +215,15 @@ include_directories(BEFORE
 
 if(NOT CMAKE_CROSSCOMPILING)
   enable_testing()
-  add_executable(u8idtest test.c)
+  add_executable(u8idtest test.c ${libu8ident_SOURCES})
   add_test(test ./u8idtest)
   if (NOT MSVC)
     add_test(u8idlint.test "${CMAKE_CURRENT_SOURCE_DIR}/u8idlint.test")
     set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
     # still broken for MSVC
-    add_executable(test-texts test-texts.c)
+    add_executable(test-texts test-texts.c ${libu8ident_SOURCES})
     add_test(test-texts ./test-texts)
-    add_executable(mkc23 mkc23.c)
+    add_executable(mkc23 mkc23.c ${libu8ident_SOURCES})
     set_source_files_properties(mkc23
       PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_SAFEC23)
     add_test(mkc23 ./mkc23)
