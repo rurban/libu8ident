@@ -210,7 +210,7 @@ static int dir_exists(const char *dir, const char *fname) {
 #endif
 
 static void version(void) { puts("u8idlint " PACKAGE_VERSION); }
-static void usage(void) {
+static void usage(int exitcode) {
   version();
 #ifndef HAVE_GETOPT_H
   puts("Usage: u8idlint [dirs or files]...");
@@ -259,7 +259,7 @@ static void usage(void) {
   puts("  u8ident.3");
   puts("\nAUTHOR:");
   puts("  Reini Urban <rurban@cpan.org>");
-  exit(0);
+  exit(exitcode);
 }
 
 void printfile(const char *dir, const char *fname) {
@@ -522,7 +522,7 @@ int main(int argc, char **argv) {
 #endif
 
   if (argc > 1 && strEQc(argv[1], "--help"))
-    usage();
+    usage(0);
   if (argc > 1 && strEQc(argv[1], "--version")) {
     version();
     exit(0);
@@ -551,7 +551,7 @@ int main(int argc, char **argv) {
         norm = U8ID_NFD;
       else {
         fprintf(stderr, "Invalid --normalize %s\n", optarg);
-        exit(1);
+        usage(1);
       }
       break;
     case 'p':
@@ -582,7 +582,7 @@ int main(int argc, char **argv) {
           xid = C11;
       } else {
         fprintf(stderr, "Invalid --profile %s\n", optarg);
-        exit(1);
+	usage(1);
       }
       break;
     case 'x': // ascii,allowed,id,xid,c11,allutf8
@@ -615,7 +615,7 @@ int main(int argc, char **argv) {
       }
       else {
         fprintf(stderr, "Invalid --xid %s\n", optarg);
-        exit(1);
+        usage(1);
       }
       break;
     case 'e':
@@ -633,7 +633,7 @@ int main(int argc, char **argv) {
       recursive++;
       break;
     case 'h':
-      usage();
+      usage(0);
       break;
 #  ifdef HAVE_GETOPT_LONG
     case 0:
@@ -645,7 +645,7 @@ int main(int argc, char **argv) {
       else if (strEQc(long_options[option_index].name, "recursive"))
         recursive++;
       else if (strEQc(long_options[option_index].name, "help"))
-        usage();
+        usage(0);
       else if (strEQc(long_options[option_index].name, "version")) {
         version();
         exit(0);
@@ -679,6 +679,7 @@ int main(int argc, char **argv) {
       dirname = argv[i];
     } else {
       fprintf(stderr, "Invalid arg %s\n", argv[i]);
+      usage(1);
     }
     i++;
   }
