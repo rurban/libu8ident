@@ -186,7 +186,7 @@ static void usage(int exitcode) {
   puts("  set to nfkd by default for python");
   puts(" -p|--profile=1,2,3,4,5,6,c23_4,c11_6        default: c23_4");
   puts("  TR39 unicode mixed-script security profile for identifiers:");
-  puts("    1      ASCII. sets xid ascii.");
+  puts("    1      ASCII. Sets xid ascii.");
   puts("    2      Single script");
   puts("    3      Highly Restrictive");
   puts("    4      Moderately Restrictive");
@@ -198,13 +198,13 @@ static void usage(int exitcode) {
   puts("  TR31 set of identifiers:"); // sorted from most secure to least secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
   puts("    allowed   tr31 with only recommended scripts, IdentifierStatus");
-  puts("    safec23   allowed but different Identifer_Type and NFC");
+  puts("    safec23   allowed but different Identifier_Type and NFC");
   puts("    id        all letters. plus numbers, punctuations and combining "
        "marks");
   puts("    xid       stable id subset, no NFKC quirks");
   puts("    c11       some AltId unicode ranges from C11");
   puts("    allutf8   allow all >128. e.g. php, nim, crystal");
-  // see below for recognized extensions
+  // see above for recognized extensions
   puts(" -e|--ext=.c                        only this file extension");
   puts(" -r|--recursive");
   puts(" -v|--verbose");
@@ -214,9 +214,9 @@ static void usage(int exitcode) {
   puts("u8idlint checks all words in UTF-8 source files for");
   puts("violations against various unicode security guidelines for "
        "identifiers.");
-  // puts("For special known file extensions it applies rules to parse
-  // identifiers,"); puts("macro names and #include names, and handles them
-  // stricter than comments or strings.");
+  puts("For special known file extensions it uses its default xid to parse identifiers.");
+  puts("(i.e. *.c uses C11)");
+  // puts("macro names and #include names, and handles them stricter than comments or strings.");
   puts("It adds a special BIDI warning on bidi formatting chars and when the "
        "document");
   puts("is not in Hebrew nor Arabic.");
@@ -436,6 +436,7 @@ static int process_dir(const char *dirname, const char *ext) {
   do {
     const size_t l = strlen(CUR_FILE);
     if (ext) {
+      // TODO support comma-seperated list of exts
       size_t le = strlen(ext);
       if (l > le && strEQ(&CUR_FILE[l - le], ext)) {
         ret |= testfile(dirname, CUR_FILE);
@@ -471,19 +472,19 @@ done:
 }
 
 static void option_xid(const char *optarg) {
-  if (strEQc(optarg, "ascii"))
+  if (strEQc(optarg, "ascii") || strEQc(optarg, "ASCII"))
     xid = ASCII;
-  else if (strEQc(optarg, "allowed"))
+  else if (strEQc(optarg, "allowed") || strEQc(optarg, "ALLOWED"))
     xid = ALLOWED;
-  else if (strEQc(optarg, "safec23"))
+  else if (strEQc(optarg, "safec23") || strEQc(optarg, "SAFEC23"))
     xid = SAFEC23;
-  else if (strEQc(optarg, "id"))
+  else if (strEQc(optarg, "id") || strEQc(optarg, "ID"))
     xid = ID;
-  else if (strEQc(optarg, "xid"))
+  else if (strEQc(optarg, "xid") || strEQc(optarg, "XID"))
     xid = XID;
-  else if (strEQc(optarg, "c11"))
+  else if (strEQc(optarg, "c11") || strEQc(optarg, "C11"))
     xid = C11;
-  else if (strEQc(optarg, "allutf8"))
+  else if (strEQc(optarg, "allutf8") || strEQc(optarg, "ALLUTF8"))
     xid = ALLUTF8;
   else {
     fprintf(stderr, "Invalid --xid %s\n", optarg);
@@ -509,9 +510,9 @@ static void option_profile(const char *optarg) {
     profile = U8ID_PROFILE_5;
   else if (strEQc(optarg, "6"))
     profile = U8ID_PROFILE_6;
-  else if (strEQc(optarg, "c23_4")) {
+  else if (strEQc(optarg, "c23_4") || strEQc(optarg, "C23_4") || strEQc(optarg, "SAFEC23")) {
     profile = U8ID_PROFILE_C23_4;
-  } else if (strEQc(optarg, "c11_6")) {
+  } else if (strEQc(optarg, "c11_6") || strEQc(optarg, "C11_6") || strEQc(optarg, "C11")) {
     profile = U8ID_PROFILE_C11_6;
   } else {
     fprintf(stderr, "Invalid --profile %s\n", optarg);
@@ -521,19 +522,19 @@ static void option_profile(const char *optarg) {
 
 // norm is global, but... 
 static enum u8id_norm option_norm(const char *optarg) {
-  if (strEQc(optarg, "nfkc"))
-    norm = U8ID_NFKC;
-  else if (strEQc(optarg, "nfc"))
-    norm = U8ID_NFC;
-  else if (strEQc(optarg, "nfkd"))
-    norm = U8ID_NFKD;
-  else if (strEQc(optarg, "nfd"))
-    norm = U8ID_NFD;
+  if (strEQc(optarg, "nfkc") || strEQc(optarg, "NFKC"))
+    return U8ID_NFKC;
+  else if (strEQc(optarg, "nfc") || strEQc(optarg, "NFC"))
+    return U8ID_NFC;
+  else if (strEQc(optarg, "nfkd") || strEQc(optarg, "NFKD"))
+    return U8ID_NFKD;
+  else if (strEQc(optarg, "nfd") || strEQc(optarg, "NFD"))
+    return U8ID_NFD;
   else {
     fprintf(stderr, "Invalid --normalize %s\n", optarg);
     usage(1);
   }
-  return norm;
+  return 0;
 }
  
 int main(int argc, char **argv) {
@@ -584,7 +585,7 @@ int main(int argc, char **argv) {
       opt_profile = true;
       option_profile(optarg);
       if (profile == U8ID_PROFILE_1 && !opt_xid)
-          opt_xid = ASCII;
+	opt_xid = ASCII;
       if (profile == U8ID_PROFILE_C23_4 && !opt_xid) {
 	xid = SAFEC23;
 	u8idopts |= U8ID_TR31_SAFEC23;
@@ -653,6 +654,7 @@ int main(int argc, char **argv) {
       i++;
     }
     if (argc > i + 1 && (strEQc(argv[i], "--ext") || strEQc(argv[i], "-e"))) {
+      // TODO support comma-seperated list of exts
       ext = argv[i + 1];
       i += 2;
     }

@@ -20,7 +20,7 @@ default: c23_4
 TR39 unicode mixed\-script security profile for identifiers:
 .TP
 1
-ASCII. sets xid ascii.
+ASCII. Sets xid ascii.
 .TP
 2
 Single script
@@ -55,7 +55,7 @@ allowed
 tr31 with only recommended scripts, IdentifierStatus
 .TP
 safec23
-allowed but different Identifer_Type and NFC
+allowed but different Identifier_Type and NFC
 .TP
 id
 all letters. plus numbers, punctuations and combining marks
@@ -82,6 +82,8 @@ only this file extension
 .PP
 u8idlint checks all words in UTF\-8 source files for
 violations against various unicode security guidelines for identifiers.
+For special known file extensions it uses its default xid to parse identifiers.
+(i.e. *.c uses C11)
 It adds a special BIDI warning on bidi formatting chars and when the document
 is not in Hebrew nor Arabic.
 .SS "SEE ALSO:"
