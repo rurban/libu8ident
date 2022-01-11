@@ -105,13 +105,12 @@ static const struct ext_xid {
 
 /* tr31 options:
   XID      - ID minus NFKC quirks.
-  ID       - all letters, plus numbers, punctuation and marks. With exotic scripts.
-  ALLOWED  - TR31 ID with only recommended scripts. Allowed IdentifierStatus.
-  SAFEC23  - see c23++proposal XID minus exotic scripts, filtered by NFC and
-             IdentifierType.
-  C11      - the AltId ranges from the C11 standard
-  ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
-  ASCII    - only ASCII letters
+  ID       - all letters, plus numbers, punctuation and marks. With exotic
+  scripts. ALLOWED  - TR31 ID with only recommended scripts. Allowed
+  IdentifierStatus. SAFEC23  - see c23++proposal XID minus exotic scripts,
+  filtered by NFC and IdentifierType. C11      - the AltId ranges from the C11
+  standard ALLUTF8  - all > 128, e.g. D, php, nim, crystal. ASCII    - only
+  ASCII letters
 */
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
@@ -194,7 +193,8 @@ static void usage(int exitcode) {
   puts("    6      Unrestricted");
   puts("    c11_6  C11STD. Sets xid c11.");
   puts("    c23_4  SAFEC23 (i.e. 4 with Greek). Sets xid safec23.");
-  puts(" -x|--xid=ascii,allowed,safec23,id,xid,c11,allutf8     default: allowed");
+  puts(" -x|--xid=ascii,allowed,safec23,id,xid,c11,allutf8     default: "
+       "allowed");
   puts("  TR31 set of identifiers:"); // sorted from most secure to least secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
   puts("    allowed   tr31 with only recommended scripts, IdentifierStatus");
@@ -214,9 +214,11 @@ static void usage(int exitcode) {
   puts("u8idlint checks all words in UTF-8 source files for");
   puts("violations against various unicode security guidelines for "
        "identifiers.");
-  puts("For special known file extensions it uses its default xid to parse identifiers.");
+  puts("For special known file extensions it uses its default xid to parse "
+       "identifiers.");
   puts("(i.e. *.c uses C11)");
-  // puts("macro names and #include names, and handles them stricter than comments or strings.");
+  // puts("macro names and #include names, and handles them stricter than
+  // comments or strings.");
   puts("It adds a special BIDI warning on bidi formatting chars and when the "
        "document");
   puts("is not in Hebrew nor Arabic.");
@@ -245,7 +247,7 @@ int testfile(const char *dir, const char *fname) {
   char *word;
   unsigned maxlen = u8ident_maxlength();
   bool need_free = false;
- 
+
   if (maxlen > 1024) {
     word = calloc(maxlen, 1);
   } else {
@@ -256,14 +258,17 @@ int testfile(const char *dir, const char *fname) {
     enum xid_e _xid = extension_xid(fname);
     if (_xid) {
       xid = _xid;
-      // do wordchecks according to the tr31. the profile is 4 by default for all
-      u8ident_init(u8ident_profile(), u8ident_norm(), xid_opts(xid) | (rest_opts & ~127));
+      // do wordchecks according to the tr31. the profile is 4 by default for
+      // all
+      u8ident_init(u8ident_profile(), u8ident_norm(),
+                   xid_opts(xid) | (rest_opts & ~127));
       need_free = true;
     }
   }
   assert(xid <= LAST_XID_E);
 #if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
-  _Static_assert(ARRAY_SIZE(tr31_funcs) == LAST_XID_E + 1, "Invalid tr31_funcs[] size");
+  _Static_assert(ARRAY_SIZE(tr31_funcs) == LAST_XID_E + 1,
+                 "Invalid tr31_funcs[] size");
 #endif
   // do wordbreaks according to the tr31
   func_tr31 *id_start = tr31_funcs[xid].start;
@@ -510,9 +515,11 @@ static void option_profile(const char *optarg) {
     profile = U8ID_PROFILE_5;
   else if (strEQc(optarg, "6"))
     profile = U8ID_PROFILE_6;
-  else if (strEQc(optarg, "c23_4") || strEQc(optarg, "C23_4") || strEQc(optarg, "SAFEC23")) {
+  else if (strEQc(optarg, "c23_4") || strEQc(optarg, "C23_4") ||
+           strEQc(optarg, "SAFEC23")) {
     profile = U8ID_PROFILE_C23_4;
-  } else if (strEQc(optarg, "c11_6") || strEQc(optarg, "C11_6") || strEQc(optarg, "C11")) {
+  } else if (strEQc(optarg, "c11_6") || strEQc(optarg, "C11_6") ||
+             strEQc(optarg, "C11")) {
     profile = U8ID_PROFILE_C11_6;
   } else {
     fprintf(stderr, "Invalid --profile %s\n", optarg);
@@ -520,7 +527,7 @@ static void option_profile(const char *optarg) {
   }
 }
 
-// norm is global, but... 
+// norm is global, but...
 static enum u8id_norm option_norm(const char *optarg) {
   if (strEQc(optarg, "nfkc") || strEQc(optarg, "NFKC"))
     return U8ID_NFKC;
@@ -536,7 +543,7 @@ static enum u8id_norm option_norm(const char *optarg) {
   }
   return 0;
 }
- 
+
 int main(int argc, char **argv) {
   int i = 1;
   int ret = 0;
@@ -549,7 +556,7 @@ int main(int argc, char **argv) {
   static struct option long_options[] = {
       {"normalization", 1, 0, 'n'}, // *nfc*,nfd,nfkc,nfkd
       {"profile", 1, 0, 'p'},       // 1,2,3,*4*,5,6,c23_4,c11_6
-      {"xid", 1, 0, 'x'},           // ascii,allowed,id,*xid*,safec23,c11,allutf8
+      {"xid", 1, 0, 'x'}, // ascii,allowed,id,*xid*,safec23,c11,allutf8
       {"ext", 1, 0, 'e'},
       {"recursive", 0, 0, 'r'},
       {"help", 0, 0, 0},
@@ -585,21 +592,21 @@ int main(int argc, char **argv) {
       opt_profile = true;
       option_profile(optarg);
       if (profile == U8ID_PROFILE_1 && !opt_xid)
-	opt_xid = ASCII;
+        opt_xid = ASCII;
       if (profile == U8ID_PROFILE_C23_4 && !opt_xid) {
-	xid = SAFEC23;
-	u8idopts |= U8ID_TR31_SAFEC23;
+        xid = SAFEC23;
+        u8idopts |= U8ID_TR31_SAFEC23;
       }
       if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
-	xid = C11;
-	u8idopts |= U8ID_TR31_C11;
+        xid = C11;
+        u8idopts |= U8ID_TR31_C11;
       }
       break;
     case 'x': // ascii,allowed,id,xid,safec23,c11,allutf8
       opt_xid = true;
       option_xid(optarg);
       if (xid == ASCII && !opt_profile)
-          profile = U8ID_PROFILE_1;
+        profile = U8ID_PROFILE_1;
       break;
     case 'e':
       ext = optarg;
@@ -665,18 +672,19 @@ int main(int argc, char **argv) {
         profile = U8ID_PROFILE_1;
       i += 2;
     }
-    if (argc > i + 1 && (strEQc(argv[i], "--profile") || strEQc(argv[i], "-p"))) {
+    if (argc > i + 1 &&
+        (strEQc(argv[i], "--profile") || strEQc(argv[i], "-p"))) {
       opt_profile = true;
       option_profile(optarg);
       if (profile == U8ID_PROFILE_1 && !opt_xid)
-	opt_xid = ASCII;
+        opt_xid = ASCII;
       if (profile == U8ID_PROFILE_C23_4 && !opt_xid) {
-	xid = SAFEC23;
-	u8idopts |= U8ID_TR31_SAFEC23;
+        xid = SAFEC23;
+        u8idopts |= U8ID_TR31_SAFEC23;
       }
       if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
-	xid = C11;
-	u8idopts |= U8ID_TR31_C11;
+        xid = C11;
+        u8idopts |= U8ID_TR31_C11;
       }
       i += 2;
     }
@@ -702,4 +710,3 @@ int main(int argc, char **argv) {
 }
 
 // c-basic-offset: 2
-

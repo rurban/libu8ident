@@ -34,13 +34,17 @@ enum u8id_options {
   //  Note: The parser/tokenizer should do that. Without, the checker can be
   //  faster.
   //  Can be disallowed with --u8id-tr31=NONE, hardcoded with --u8id-tr31=.
-  U8ID_TR31_XID = 64,     // ID without NFKC quirks, labelled stable, the default
-  U8ID_TR31_ID = 65,      // all letters, plus numbers, punctuation and marks. With exotic scripts.
-  U8ID_TR31_ALLOWED = 66, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
-  U8ID_TR31_SAFEC23 = 67, // practical XID with TR39 security measures. see c23++proposal
-  U8ID_TR31_C11 = 68,     // the stable insecure AltId ranges from the C11 standard, Annex D
+  U8ID_TR31_XID = 64, // ID without NFKC quirks, labelled stable, the default
+  U8ID_TR31_ID = 65,  // all letters, plus numbers, punctuation and marks. With
+                      // exotic scripts.
+  U8ID_TR31_ALLOWED =
+      66, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
+  U8ID_TR31_SAFEC23 =
+      67, // practical XID with TR39 security measures. see c23++proposal
+  U8ID_TR31_C11 =
+      68, // the stable insecure AltId ranges from the C11 standard, Annex D
   U8ID_TR31_ALLUTF8 = 69, // allow all > 128, e.g. D, php, nim, crystal
-  U8ID_TR31_ASCII = 70,   // only ASCII letters (as e.g. zig, j. older compilers)
+  U8ID_TR31_ASCII = 70, // only ASCII letters (as e.g. zig, j. older compilers)
   // room for more tr31 profiles
 
   U8ID_FOLDCASE = 128,
@@ -69,10 +73,10 @@ typedef unsigned u8id_ctx_t;
 // inside the dll
 #  if defined _WIN32 || defined __CYGWIN__
 #    define EXTERN __declspec(dllexport)
-#    define LOCAL  __attribute__((visibility("hidden")))
+#    define LOCAL __attribute__((visibility("hidden")))
 #  elif __GNUC__ >= 4
 #    define EXTERN __attribute__((visibility("default")))
-#    define LOCAL  __attribute__((visibility("hidden")))
+#    define LOCAL __attribute__((visibility("hidden")))
 #  else
 #    define EXTERN
 #    define LOCAL
@@ -184,7 +188,8 @@ enum u8id_errors {
   i.e. U+30, U+31, U+49, U+60
 */
 EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
-EXTERN enum u8id_errors u8ident_check_buf(const char *buf, int len, char **outnorm);
+EXTERN enum u8id_errors u8ident_check_buf(const char *buf, int len,
+                                          char **outnorm);
 
 /* returns the failing codepoint, which failed in the last check. */
 EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t ctx);

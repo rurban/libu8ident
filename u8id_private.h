@@ -13,7 +13,7 @@
 #  define LOCAL
 #elif __GNUC__ >= 4
 #  define EXTERN __attribute__((visibility("default")))
-#  define LOCAL   __attribute__((visibility("hidden")))
+#  define LOCAL __attribute__((visibility("hidden")))
 #else
 #  define EXTERN
 #  define LOCAL
@@ -59,8 +59,8 @@
 // allowed set of identifiers. TR31 --xid tokenizer options
 // we need XID, the default, as first for uninitialized options.
 enum xid_e {
-  XID,     // ID plus NFKC quirks, labelled stable, the default
-  ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  XID, // ID plus NFKC quirks, labelled stable, the default
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
   ALLOWED, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
   SAFEC23, // practical XID with TR39 security measures, see c23++proposal
   C11,     // the stable insecure AltId ranges from the C11 standard, Annex D

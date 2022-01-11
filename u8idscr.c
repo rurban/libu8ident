@@ -256,13 +256,15 @@ LOCAL bool isSAFEC23_start(const uint32_t cp) {
   return binary_search(cp, (char *)safec23_start_list,
                        ARRAY_SIZE(safec23_start_list),
                        sizeof(*safec23_start_list))
-      ? true : false;
+             ? true
+             : false;
 }
 LOCAL bool isSAFEC23_cont(const uint32_t cp) {
   return binary_search(cp, (char *)safec23_cont_list,
                        ARRAY_SIZE(safec23_cont_list),
                        sizeof(*safec23_cont_list))
-      ? true : false;
+             ? true
+             : false;
 }
 LOCAL bool isID_start(const uint32_t cp) {
   return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
@@ -282,8 +284,12 @@ LOCAL bool isC11_start(const uint32_t cp) {
 LOCAL bool isC11_cont(const uint32_t cp) {
   return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
 }
-LOCAL bool isALLUTF8_start(const uint32_t cp) { return isASCII_start(cp) || cp > 127; }
-LOCAL bool isALLUTF8_cont(const uint32_t cp) { return isASCII_cont(cp) || cp > 127; }
+LOCAL bool isALLUTF8_start(const uint32_t cp) {
+  return isASCII_start(cp) || cp > 127;
+}
+LOCAL bool isALLUTF8_cont(const uint32_t cp) {
+  return isASCII_cont(cp) || cp > 127;
+}
 
 LOCAL enum u8id_gc u8ident_get_gc(const uint32_t cp) {
   const struct gc *gc = (const struct gc *)binary_search(

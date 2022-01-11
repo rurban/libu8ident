@@ -140,10 +140,12 @@ static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
     if (ret)
       printf("ERROR %s U+%X %s in profile %u, expected %s. Have scripts: %s\n",
              u8ident_failed_script_name(ctx), u8ident_failed_char(ctx),
-             u8ident_errstr(ret), u8ident_profile(), u8ident_errstr(wanted), scripts);
+             u8ident_errstr(ret), u8ident_profile(), u8ident_errstr(wanted),
+             scripts);
     else
       printf("ERROR %s in profile %u, expected %s. Have scripts: %s\n",
-             u8ident_errstr(ret), u8ident_profile(), u8ident_errstr(wanted), scripts);
+             u8ident_errstr(ret), u8ident_profile(), u8ident_errstr(wanted),
+             scripts);
     free((void *)scripts);
   }
 }
@@ -574,7 +576,7 @@ void test_combine() {
   // Disallow Latin plus Japanese Mn
   ret = u8ident_check((const uint8_t *)"a\u3099", NULL);
   //#if defined ENABLE_CHECK_XID
-  //CHECK_RET(ret, U8ID_ERR_XID, 0);
+  // CHECK_RET(ret, U8ID_ERR_XID, 0);
 #if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
   CHECK_RET(ret, U8ID_EOK, 0);
 #else
@@ -614,7 +616,8 @@ void test_combine() {
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   // Arabic-only combiners
-  // "\xd8\xa3\xd8\xad\xd8\xb1\xd8\xa7\xd8\xb1\xd9\x8b\xd8\xa7" from texts/arabic-1.txt
+  // "\xd8\xa3\xd8\xad\xd8\xb1\xd8\xa7\xd8\xb1\xd9\x8b\xd8\xa7" from
+  // texts/arabic-1.txt
   ret = u8ident_check((const uint8_t *)"أحرارًا", NULL);
   // FIXME
 #if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4

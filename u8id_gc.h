@@ -50,35 +50,9 @@ enum u8id_gc {
 extern const char *const u8id_gc_names[29];
 #else
 LOCAL const char *const u8id_gc_names[] = {
-  "Cc",
-  "Cf",
-  "Co",
-  "Cs",
-  "Ll",
-  "Lm",
-  "Lo",
-  "Lt",
-  "Lu",
-  "Mc",
-  "Me",
-  "Mn",
-  "Nd",
-  "Nl",
-  "No",
-  "Pc",
-  "Pd",
-  "Pe",
-  "Pf",
-  "Pi",
-  "Po",
-  "Ps",
-  "Sc",
-  "Sk",
-  "Sm",
-  "So",
-  "Zl",
-  "Zp",
-  "Zs",
+    "Cc", "Cf", "Co", "Cs", "Ll", "Lm", "Lo", "Lt", "Lu", "Mc",
+    "Me", "Mn", "Nd", "Nl", "No", "Pc", "Pd", "Pe", "Pf", "Pi",
+    "Po", "Ps", "Sc", "Sk", "Sm", "So", "Zl", "Zp", "Zs",
 };
 #endif
 
@@ -3379,7 +3353,7 @@ const struct gc gc_list[] = {
     {0xE0100, 0xF0000, GC_Co},	// 󠄀..󰀀
     {0xFFFFD, 0xFFFFD, GC_Co},	// 
     {0x100000, 0x100000, GC_Co},	// 
-    {0x10FFFD, 0x10FFFD, GC_Co},	// 
+    {0x10FFFD, 0x10FFFD, GC_Co},	//
     // clang-format on
 };
 #endif

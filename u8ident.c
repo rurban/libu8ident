@@ -38,13 +38,12 @@ LOCAL const char *u8ident_errstr(int errcode) {
 
 /* tr31 options:
   XID      - ID minus NFKC quirks.
-  ID       - all letters, plus numbers, punctuation and marks. With exotic scripts.
-  ALLOWED  - TR31 ID with only recommended scripts. Allowed IdentifierStatus.
-  SAFEC23  - see c23++proposal XID minus exotic scripts, filtered by NFC and
-             IdentifierType.
-  C11      - the AltId ranges from the C11 standard
-  ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
-  ASCII    - only ASCII letters
+  ID       - all letters, plus numbers, punctuation and marks. With exotic
+  scripts. ALLOWED  - TR31 ID with only recommended scripts. Allowed
+  IdentifierStatus. SAFEC23  - see c23++proposal XID minus exotic scripts,
+  filtered by NFC and IdentifierType. C11      - the AltId ranges from the C11
+  standard ALLUTF8  - all > 128, e.g. D, php, nim, crystal. ASCII    - only
+  ASCII letters
 */
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
@@ -164,7 +163,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   char *scx = NULL;
   assert(xid >= 0 && xid <= LAST_XID_E);
 #if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
-  _Static_assert(ARRAY_SIZE(tr31_funcs) == LAST_XID_E + 1, "Invalid tr31_funcs[] size");
+  _Static_assert(ARRAY_SIZE(tr31_funcs) == LAST_XID_E + 1,
+                 "Invalid tr31_funcs[] size");
 #endif
   func_tr31 *id_start = tr31_funcs[xid].start;
   func_tr31 *id_cont = tr31_funcs[xid].cont;
@@ -173,23 +173,23 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #ifndef DISABLE_CHECK_XID
   // hardcoded TR31 funcs via static functions (inlinable)
   if
-#if U8ID_TR31 == ALLOWED
-    (unlikely(!isALLOWED_start(cp)))
-#elif U8ID_TR31 == ASCII
-    (unlikely(!isASCII_start(cp)))
-#elif U8ID_TR31 == SAFEC23
-    (unlikely(!isSAFEC23_start(cp)))
-#elif U8ID_TR31 == C11
-    (unlikely(!isC11_start(cp)))
-#elif U8ID_TR31 == XID
-    (unlikely(!isXID_start(cp)))
-#elif U8ID_TR31 == ID
-    (unlikely(!isID_start(cp)))
-#elif U8ID_TR31 == ALLUTF8
-    (unlikely(!isALLUTF8_start(cp)))
-#else
-    (unlikely(!(*id_start)(cp)))
-#endif
+#  if U8ID_TR31 == ALLOWED
+      (unlikely(!isALLOWED_start(cp)))
+#  elif U8ID_TR31 == ASCII
+      (unlikely(!isASCII_start(cp)))
+#  elif U8ID_TR31 == SAFEC23
+      (unlikely(!isSAFEC23_start(cp)))
+#  elif U8ID_TR31 == C11
+      (unlikely(!isC11_start(cp)))
+#  elif U8ID_TR31 == XID
+      (unlikely(!isXID_start(cp)))
+#  elif U8ID_TR31 == ID
+      (unlikely(!isID_start(cp)))
+#  elif U8ID_TR31 == ALLUTF8
+      (unlikely(!isALLUTF8_start(cp)))
+#  else
+      (unlikely(!(*id_start)(cp)))
+#  endif
   {
     ctx->last_cp = cp;
     return U8ID_ERR_XID;
@@ -217,7 +217,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     // profile 6 shortcuts: skip all script checks.
     // when we need TR31 checks.
     // advance to normalize checks
-#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6) && defined(DISABLE_CHECK_XID)
+#if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6) &&    \
+    defined(DISABLE_CHECK_XID)
     need_normalize = true;
     // if (scr != SC_Common && scr != SC_Inherited)
     //   basesc = scr;

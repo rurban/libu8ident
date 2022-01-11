@@ -120,20 +120,20 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
           s = u8ident_get_script(from);
           fprintf(f, "    {0x%X, 0x%X", from, i - 1);
           if (with_sc) {
-	    // TODO u8ident_get_gc(cp), u8ident_gc_name(gc)
+            // TODO u8ident_get_gc(cp), u8ident_gc_name(gc)
             fprintf(f, ", SC_%s, GC_%s, NULL", u8ident_script_name(s), "Lu");
-	    fprintf(f, "}, // %s %s",
-		    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
-		    : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
-		    : "",
-		    tmp);
-	  } else {
-	    fprintf(f, "}, // %s%s %s", u8ident_script_name(s),
-		    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
-		    : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
-		    : "",
-		    tmp);
-	  }
+            fprintf(f, "}, // %s %s",
+                    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
+                    : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
+                                                  : "",
+                    tmp);
+          } else {
+            fprintf(f, "}, // %s%s %s", u8ident_script_name(s),
+                    s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
+                    : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
+                                                  : "",
+                    tmp);
+          }
           if (from == i - 1) {
             stats.singles++;
             fprintf(f, "\n");
@@ -290,7 +290,8 @@ static void gen_c23_safe(void) {
   emit_ranges(f, 0x7a, u, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_start_list[%u];\n", stats.ranges + stats.singles);
+  fprintf(f, "const struct sc_c23 safec23_start_list[%u];\n",
+          stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec23_start_list",
          stats.ranges, stats.singles, stats.codepoints);
@@ -328,7 +329,8 @@ static void gen_c23_safe(void) {
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_cont_list[%u];\n", stats.ranges + stats.singles);
+  fprintf(f, "const struct sc_c23 safec23_cont_list[%u];\n",
+          stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec23_cont_list",
          stats.ranges, stats.singles, stats.codepoints);
@@ -364,7 +366,8 @@ static void gen_c23_safe(void) {
   emit_ranges(f, 0x7a, u, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_excl_start_list[%u];\n", stats.ranges + stats.singles);
+  fprintf(f, "const struct sc_c23 safec23_excl_start_list[%u];\n",
+          stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
          "safec23_excl_start_list", stats.ranges, stats.singles,
@@ -401,7 +404,8 @@ static void gen_c23_safe(void) {
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_excl_cont_list[%u];\n", stats.ranges + stats.singles);
+  fprintf(f, "const struct sc_c23 safec23_excl_cont_list[%u];\n",
+          stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
          "safec23_excl_cont_list", stats.ranges, stats.singles,

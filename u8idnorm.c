@@ -390,9 +390,8 @@ static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
  *    remaining 869 non-mark and non-hangul normalizables.  Hangul has some
  *    special normalization logic.
  */
-static int u8id_decompose_s(char *restrict dest, long dmax,
-                            char *restrict src, size_t *restrict lenp,
-                            const bool iscompat) {
+static int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
+                            size_t *restrict lenp, const bool iscompat) {
   size_t orig_dmax;
   const char *overlap_bumper;
   uint32_t cp;
@@ -688,8 +687,8 @@ static uint32_t _composite_cp(uint32_t cp, uint32_t cp2) {
 /* combine decomposed sequences to NFC. */
 /* iscontig = false; composeContiguous? FCC if true */
 static int u8id_compose_s(char *restrict dest, long dmax,
-                                const char *restrict src, size_t *restrict lenp,
-                                const bool iscontig) {
+                          const char *restrict src, size_t *restrict lenp,
+                          const bool iscontig) {
   char *p = (char *)src;
   const char *e = p + *lenp;
   uint32_t cpS = 0;       /* starter code point */
