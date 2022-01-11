@@ -37,20 +37,20 @@ LOCAL const char *u8ident_errstr(int errcode) {
 }
 
 /* tr31 options:
-  ASCII,   // only ASCII letters
-  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
-  SAFEC23, // see c23++proposal XID minus exotic scripts, filtered by NFC and
-              IdentifierType.
-  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
-  XID, // ID minus NFKC quirks.
-  C11, // the AltId ranges from the C11 standard
-  ALLUTF8, // all > 128, e.g. D, php, nim, crystal
+  XID      - ID minus NFKC quirks.
+  ID       - all letters, plus numbers, punctuation and marks. With exotic scripts.
+  ALLOWED  - TR31 ID with only recommended scripts. Allowed IdentifierStatus.
+  SAFEC23  - see c23++proposal XID minus exotic scripts, filtered by NFC and
+             IdentifierType.
+  C11      - the AltId ranges from the C11 standard
+  ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
+  ASCII    - only ASCII letters
 */
 static struct func_tr31_s tr31_funcs[] = {
-    {isASCII_start, isASCII_cont},     {isALLOWED_start, isALLOWED_cont},
-    {isSAFEC23_start, isSAFEC23_cont}, {isID_start, isID_cont},
-    {isXID_start, isXID_cont},         {isC11_start, isC11_cont},
-    {isALLUTF8_start, isALLUTF8_cont},
+    {isXID_start, isXID_cont},         {isID_start, isID_cont},
+    {isALLOWED_start, isALLOWED_cont}, {isSAFEC23_start, isSAFEC23_cont},
+    {isC11_start, isC11_cont},         {isALLUTF8_start, isALLUTF8_cont},
+    {isASCII_start, isASCII_cont},
 };
 
 /* Initialize the library with a profile, normalization and a bitmask of
@@ -158,8 +158,14 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   struct ctx_t *ctx = u8ident_ctx();
   enum u8id_sc scr;
   enum u8id_sc basesc = SC_Unknown;
-  const enum xid_e xid = (s_u8id_options & U8ID_TR31_MASK) - U8ID_TR31_ASCII;
+  const unsigned xid_mask = s_u8id_options & U8ID_TR31_MASK;
+  // default to XID (0)
+  const enum xid_e xid = xid_mask > 64 ? xid_mask - 64 : XID;
   char *scx = NULL;
+  assert(xid >= 0 && xid <= LAST_XID_E);
+#if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
+  _Static_assert(ARRAY_SIZE(tr31_funcs) == LAST_XID_E + 1, "Invalid tr31_funcs[] size");
+#endif
   func_tr31 *id_start = tr31_funcs[xid].start;
   func_tr31 *id_cont = tr31_funcs[xid].cont;
 

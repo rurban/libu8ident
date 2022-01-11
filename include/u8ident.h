@@ -34,13 +34,13 @@ enum u8id_options {
   //  Note: The parser/tokenizer should do that. Without, the checker can be
   //  faster.
   //  Can be disallowed with --u8id-tr31=NONE, hardcoded with --u8id-tr31=.
-  U8ID_TR31_ASCII = 64,
-  U8ID_TR31_ALLOWED = 65, // The UCD IdentifierStatus.txt (default)
-  U8ID_TR31_SAFEC23 = 66, // XID without Limited_Use and Excluded Scripts
-  U8ID_TR31_ID = 67,      // The usual tr31 variants
-  U8ID_TR31_XID = 68,     // without NFKC quirks, labelled stable
-  U8ID_TR31_C11 = 69,     // See C11 Annex D for the ranges
-  U8ID_TR31_ALLUTF8 = 70,
+  U8ID_TR31_XID = 64,     // ID without NFKC quirks, labelled stable, the default
+  U8ID_TR31_ID = 65,      // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  U8ID_TR31_ALLOWED = 66, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
+  U8ID_TR31_SAFEC23 = 67, // practical XID with TR39 security measures. see c23++proposal
+  U8ID_TR31_C11 = 68,     // the stable insecure AltId ranges from the C11 standard, Annex D
+  U8ID_TR31_ALLUTF8 = 69, // allow all > 128, e.g. D, php, nim, crystal
+  U8ID_TR31_ASCII = 70,   // only ASCII letters (as e.g. zig, j. older compilers)
   // room for more tr31 profiles
 
   U8ID_FOLDCASE = 128,
