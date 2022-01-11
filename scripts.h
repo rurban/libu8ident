@@ -4517,10 +4517,12 @@ const struct range_bool xid_cont_list[] = {
     {0x0DE6, 0x0DEF},
     {0x0DF2, 0x0DF3},
     {0x0E31, 0x0E31},
+    {0x0E33, 0x0E33},
     {0x0E34, 0x0E3A},
     {0x0E47, 0x0E4E},
     {0x0E50, 0x0E59},
     {0x0EB1, 0x0EB1},
+    {0x0EB3, 0x0EB3},
     {0x0EB4, 0x0EBC},
     {0x0EC8, 0x0ECD},
     {0x0ED0, 0x0ED9},
@@ -4954,7 +4956,7 @@ const struct range_bool xid_cont_list[] = {
     {0x1FBF0, 0x1FBF9},
     {0xE0100, 0xE01EF},
     // clang-format on
-}; // 396 ranges, 189 single codepoints
+}; // 396 ranges, 191 single codepoints
 #  else
 extern const struct range_bool xid_start_list[730];
 extern const struct range_bool xid_cont_list[585];

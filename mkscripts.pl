@@ -900,6 +900,9 @@ for my $r (@IDCONT) {
   # skip if in IDSTART
   if (inRange($r->[0], \@IDSTART)) {
     $cont_size--;
+    if (!inRange($r->[1], \@IDSTART)) {
+      warn sprintf("%X not in IDSTART, but %X is", $r->[1], $r->[0]);
+    }
     next;
   }
   if ($r->[0] == $r->[1]) {
@@ -945,8 +948,22 @@ for my $r (@XIDCONT) {
   # skip if in XIDSTART
   if (inRange($r->[0], \@XIDSTART)) {
     $cont_size--;
+    if (!inRange($r->[1], \@XIDSTART)) {
+      # special-cases E32 is in start, E33 not
+      if ($r->[1] == 0xE33) {
+	$r->[0] = 0xE33;
+	goto ok_xid;
+      # special-cases EB2 is in start, EB3 not
+      } elsif ($r->[1] == 0xEB3) {
+	$r->[0] = 0xEB3;
+	goto ok_xid;
+      } else {
+	warn sprintf("%X not in XIDSTART, but %X is", $r->[1], $r->[0]);
+      }
+    }
     next;
   }
+ ok_xid:
   if ($r->[0] == $r->[1]) {
     $s++;
   } else {

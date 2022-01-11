@@ -481,7 +481,9 @@ const struct sc_c23 safec23_cont_list[] = {
     {0xC66, 0xC6F, SC_Telugu, GC_Lu, NULL}, //  ౦..౯
     {0xCE6, 0xCEF, SC_Kannada, GC_Lu, NULL}, //  ೦..೯
     {0xD66, 0xD6F, SC_Malayalam, GC_Lu, NULL}, //  ൦..൯
+    {0xE33, 0xE33, SC_Thai, GC_Lu, NULL}, //  ำ
     {0xE50, 0xE59, SC_Thai, GC_Lu, NULL}, //  ๐..๙
+    {0xEB3, 0xEB3, SC_Lao, GC_Lu, NULL}, //  ຳ
     {0xED0, 0xED9, SC_Lao, GC_Lu, NULL}, //  ໐..໙
     {0xF20, 0xF29, SC_Tibetan, GC_Lu, NULL}, //  ༠..༩
     {0x1040, 0x1049, SC_Myanmar, GC_Lu, NULL}, //  ၀..၉
@@ -495,12 +497,11 @@ const struct sc_c23 safec23_cont_list[] = {
     {0xFF3F, 0xFF3F, SC_Common, GC_Lu, NULL}, //  ＿
     {0xFF9E, 0xFF9F, SC_Common, GC_Lu, NULL}, //  ﾞ..ﾟ
     {0x1D7CE, 0x1D7FF, SC_Common, GC_Lu, NULL}, //  𝟎..𝟿
-    {0x1FBF0, 0x1FBF9, SC_Common, GC_Lu, NULL}, //  🯰..🯹
 };
 #else
-const struct sc_c23 safec23_cont_list[29];
+const struct sc_c23 safec23_cont_list[30];
 #endif
-// 26 ranges, 3 singles, 243 codepoints
+// 25 ranges, 5 singles, 234 codepoints
 
 
 //---------------------------------------------------
