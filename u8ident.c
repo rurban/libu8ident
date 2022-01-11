@@ -13,12 +13,8 @@
 #  include "u8idroar.h"
 #endif
 
-// defaults to U8ID_PROFILE_4, U8ID_NFC, U8ID_TR31_ALLOWED
-unsigned s_u8id_options = 0
-#ifndef DISABLE_CHECK_XID
-                          | U8ID_TR31_ALLOWED
-#endif
-    ;
+// defaults to U8ID_PROFILE_4, U8ID_NFC, U8ID_TR31_XID
+unsigned s_u8id_options = U8ID_TR31_DEFAULT;
 enum u8id_norm s_u8id_norm = U8ID_NORM_DEFAULT;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;

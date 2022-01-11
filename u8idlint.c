@@ -45,16 +45,6 @@
 int verbose = 0;
 int quiet = 0;
 int recursive = 0;
-// allowed set of identifiers (--xid tokenizer options)
-enum xid_e {
-  ASCII,   // only ASCII letters
-  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
-  SAFEC23, // see c23++proposal
-  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
-  XID, // ID plus NFKC quirks.
-  C11, // the AltId ranges from the C11 standard
-  ALLUTF8, // all > 128, e.g. D, php, nim, crystal
-};
 enum xid_e xid = ALLOWED;
 enum u8id_norm norm = U8ID_NFC;
 enum u8id_profile profile = U8ID_PROFILE_C23_4;
@@ -97,7 +87,7 @@ const struct range_bool ascii_cont_list[] = {
     {'0', '9'},
 };
 
-typedef bool func_start(uint32_t cp);
+typedef bool func_xid(uint32_t cp);
 
 static bool isASCII_start(uint32_t cp) {
   return range_bool_search(cp, ascii_start_list, ARRAY_SIZE(ascii_start_list));
@@ -105,10 +95,7 @@ static bool isASCII_start(uint32_t cp) {
 static bool isASCII_cont(uint32_t cp) {
   return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
 }
-static bool isID_start(uint32_t cp) { return u8ident_is_ID_Start(cp); }
-static bool isID_cont(uint32_t cp) { return u8ident_is_ID_Start(cp); }
-static bool isXID_start(uint32_t cp) { return u8ident_is_XID_Start(cp); }
-static bool isXID_cont(uint32_t cp) { return u8ident_is_XID_Start(cp); }
+// Note: This includes 0..9 already
 static bool isALLOWED_start(uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
@@ -127,6 +114,10 @@ static bool isSAFEC23_cont(uint32_t cp) {
                        sizeof(*safec23_cont_list))
       ? true : false;
 }
+static bool isID_start(uint32_t cp) { return u8ident_is_ID_Start(cp); }
+static bool isID_cont(uint32_t cp) { return u8ident_is_ID_Cont(cp); }
+static bool isXID_start(uint32_t cp) { return u8ident_is_XID_Start(cp); }
+static bool isXID_cont(uint32_t cp) { return u8ident_is_XID_Cont(cp); }
 static bool isC11_start(uint32_t cp) {
   return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
 }
@@ -137,23 +128,30 @@ static bool isALLUTF8_start(uint32_t cp) {
   return isASCII_start(cp) || cp > 127;
 }
 static bool isALLUTF8_cont(uint32_t cp) { return isASCII_cont(cp) || cp > 127; }
-struct func_start_s {
-  func_start *start;
-  func_start *cont;
+struct func_xid_s {
+  func_xid *start;
+  func_xid *cont;
 };
 
 /* tokenizers:
   ASCII,   // only ASCII letters
-  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus
-  SAFEC23,
-  ID,      // all letters, plus numbers, punctuation and marks. With exotic
-  scripts XID,     // ID plus NFKC quirks C11,     // some AltId ranges from C11
-  ALLUTF8, // all > 128, e.g. php, nim, crystal */
+  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
+  SAFEC23, // see c23++proposal
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  XID, // ID plus NFKC quirks.
+  C11, // the AltId ranges from the C11 standard
+  ALLUTF8, // all > 128, e.g. D, php, nim, crystal
+*/
 static struct func_start_s id_funcs[] = {
-    {isASCII_start, isASCII_cont}, {isALLOWED_start, isALLOWED_cont},
+    // clang-format disable
+    {isASCII_start, isASCII_cont},
+    {isALLOWED_start, isALLOWED_cont},
     {isSAFEC23_start, isSAFEC23_cont},
-    {isID_start, isID_cont},       {isXID_start, isXID_cont},
-    {isC11_start, isC11_cont},     {isALLUTF8_start, isALLUTF8_cont},
+    {isID_start, isID_cont},
+    {isXID_start, isXID_cont},
+    {isC11_start, isC11_cont},
+    {isALLUTF8_start, isALLUTF8_cont},
+    // clang-format enable
 };
 
 static const char *errstr(int errcode) {
@@ -285,6 +283,9 @@ int testfile(const char *dir, const char *fname) {
     word = &_word[0];
   }
   assert(xid <= ALLUTF8);
+#if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
+  _Static_assert(ARRAY_SIZE(id_funcs) == ALLUTF8 + 1, "Invalid id_funcs size");
+#endif
   func_start *id_start = id_funcs[xid].start;
   func_start *id_cont = id_funcs[xid].cont;
   if (!dir) {

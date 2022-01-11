@@ -45,6 +45,18 @@
 #define FCC 5
 #define C11_6 7
 #define C23_4 8
+
+// allowed set of identifiers (TR31 --xid tokenizer options)
+enum xid_e {
+  ASCII,   // only ASCII letters
+  ALLOWED, // TR31 ID with only recommended scripts. Allowed IdentifierStatus.
+  SAFEC23, // see c23++proposal
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  XID, // ID plus NFKC quirks.
+  C11, // the AltId ranges from the C11 standard
+  ALLUTF8, // all > 128, e.g. D, php, nim, crystal
+};
+
 #define _XSTR(s) _STR(s)
 #define _STR(s) #s
 #define CAT(a, b) a##b
@@ -102,6 +114,32 @@
 #else
 // Moderately Restrictive
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_4
+#endif
+
+#ifdef U8ID_TR31
+#  if U8ID_TR31 == NONE
+#    define DISABLE_CHECK_XID
+#    define U8ID_TR31_DEFAULT 0
+#  else
+#    define ENABLE_CHECK_XID
+#    if U8ID_TR31 == ASCII
+#      define U8ID_TR31_DEFAULT U8ID_TR31_ASCII
+#    elif U8ID_TR31 == ALLOWED
+#      define U8ID_TR31_DEFAULT U8ID_TR31_ALLOWED
+#    elif U8ID_TR31 == SAFEC23
+#      define U8ID_TR31_DEFAULT U8ID_TR31_SAFEC23
+#    elif U8ID_TR31 == ID
+#      define U8ID_TR31_DEFAULT U8ID_TR31_ID
+#    elif U8ID_TR31 == XID
+#      define U8ID_TR31_DEFAULT U8ID_TR31_XID
+#    elif U8ID_TR31 == C11
+#      define U8ID_TR31_DEFAULT U8ID_TR31_C11
+#    elif U8ID_TR31 == ALLUTF8
+#      define U8ID_TR31_DEFAULT U8ID_TR31_ALLUTF8
+#    endif
+#  endif
+#else
+#  define U8ID_TR31_DEFAULT U8ID_TR31_XID
 #endif
 
 #define U8ID_CTX_TRESH 5

@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 # cmd in pwd
 # texts in this dir
 ROOT="$(dirname "$0")"
@@ -9,21 +8,53 @@ if [ "$ROOT" != "." ] && [ ! -d texts ]; then
     chmod +w texts || exit 0
 fi
 
+check3() {
+    arg=$1
+    file=texts/$2
+    tst=texts/$3
+    rst=$3.rst
+    # shellcheck disable=SC2086
+    ./u8idlint $arg "$file" > "$rst"
+    if diff "$tst" "$rst"; then
+	rm -- ./"$rst"
+    else
+	echo $arg $3.rst failed
+	exit
+    fi
+}
+
+check3 -xsafec23 homo-sec-1.c homo-sec-1.tst
+check3 -xc11 homo-sec-1.c homo-sec-1.tst
+check3 "-p1 -xc11" homo-sec-1.c homo-sec-1-p1.tst
+check3 "-p2 -xc11" homo-sec-1.c homo-sec-1.tst
+check3 "-p3 -xc11" homo-sec-1.c homo-sec-1.tst
+check3 "-p4 -xc11" homo-sec-1.c homo-sec-1.tst
+
+check3 -xsafec23 homo-1.c homo-1.tst
+check3 -xc11 homo-1.c homo-1.tst
+
+check3 -xallowed bidi-sec-1.c bidi-sec-1.tst
+check3 -xsafec23 bidi-sec-1.c bidi-sec-1.tst
+check3 -xc11 bidi-sec-1.c bidi-sec-1.tst
+
+check3 -xallowed bidi-sec-2.c bidi-sec-2.tst
+check3 -xsafec23 bidi-sec-2.c bidi-sec-2.tst
+check3 -xc11 bidi-sec-2.c bidi-sec-2.tst
+
 #./u8idlint -xallowed texts/homo-1.c > homo-1-allowed.rst &&
-#    diff texts/homo-1-p4st homo-1-allowed.rst && homo-1-allowed.rst
-./u8idlint -xsafec23 texts/homo-1.c > homo-1-c23.rst &&
-    diff texts/homo-1-p4.tst homo-1-c23.rst && rm homo-1-c23.rst
-./u8idlint -p4 -xc11 texts/homo-1.c > homo-1-c11.rst &&
-    diff texts/homo-1-p4.tst homo-1-c11.rst && rm homo-1-c11.rst
+#    diff texts/homo-1-p4.tst homo-1-allowed.rst && homo-1-allowed.rst
+#./u8idlint -xsafec23 texts/homo-1.c > homo-1-c23.rst &&
+#    diff texts/homo-1-p4.tst homo-1-c23.rst && rm homo-1-c23.rst
+#./u8idlint -p4 -xc11 texts/homo-1.c > homo-1-c11.rst &&
+#    diff texts/homo-1-p4.tst homo-1-c11.rst && rm homo-1-c11.rst
 #./u8idlint -xxid texts/homo-1.c > homo-1-xid.rst &&
 #    diff texts/homo-1-p4st homo-1-xid.rst && homo-1-xid.rst
 #./u8idlint -xid texts/homo-1.c > homo-1-id.rst &&
 #    diff texts/homo-1-p4st homo-1-id.rst && rm homo-1-id.rst
-
-./u8idlint -xc11 texts/bidi-sec-1.c > bidi-sec-1.rst &&
-    diff texts/bidi-sec-1.tst bidi-sec-1.rst && rm bidi-sec-1.rst
-./u8idlint -xc11 texts/bidi-sec-2.c > bidi-sec-2.rst &&
-    diff texts/bidi-sec-2.tst bidi-sec-2.rst && rm bidi-sec-2.rst
+#./u8idlint -xc11 texts/bidi-sec-1.c > bidi-sec-1.rst &&
+#    diff texts/bidi-sec-1.tst bidi-sec-1.rst && rm bidi-sec-1.rst
+#./u8idlint -xc11 texts/bidi-sec-2.c > bidi-sec-2.rst &&
+#    diff texts/bidi-sec-2.tst bidi-sec-2.rst && rm bidi-sec-2.rst
 
 #rm -f homo-1-p4.rst bidi-sec-1.rst bidi-sec-2.rst
 if [ -n "$NEWTEXTS" ]; then
