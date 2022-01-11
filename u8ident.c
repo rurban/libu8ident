@@ -443,11 +443,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     cp = dec_utf8(&s);
 #ifndef DISABLE_CHECK_XID
     if (likely(s <= e && cp != 0)) {
-	// hardcode cont also? not yet
-	if (unlikely(!(*id_cont)(cp) && !(*id_start)(cp))) {
-	    ctx->last_cp = cp;
-	    return U8ID_ERR_XID;
-	}
+      // hardcode cont also? not yet
+      if (unlikely(!(*id_cont)(cp) && !(*id_start)(cp))) {
+        ctx->last_cp = cp;
+        return U8ID_ERR_XID;
+      }
     }
 #endif
   } while (s <= e);

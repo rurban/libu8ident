@@ -209,7 +209,7 @@ check-profiles: $(SRC) $(HEADER) $(HDRS)
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE_$${n} -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && \
-	    ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
+	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
 check-tr31: $(SRC) $(HEADER) $(HDRS)
 	for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \

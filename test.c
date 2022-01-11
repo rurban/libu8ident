@@ -139,11 +139,11 @@ static char *xstr(const char *s) {
   // buf[i] = 0;
   return buf;
 }
-#define CHECK_RET(ret, wanted, ctx)		\
-    do {					\
-      check_ret(ret, wanted, ctx);		\
-      assert(ret == wanted);			\
-    } while (0)
+#define CHECK_RET(ret, wanted, ctx)                                            \
+  do {                                                                         \
+    check_ret(ret, wanted, ctx);                                               \
+    assert(ret == wanted);                                                     \
+  } while (0)
 
 static void check_ret(int ret, enum u8id_errors wanted, int ctx) {
   if (ret != wanted) {
@@ -446,20 +446,20 @@ void test_mixed_scripts(int xid_check) {
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     // small letter b with stroke U+180 is in xid, but not allowed
     if (u8ident_tr31() == U8ID_TR31_ALLOWED) {
-	CHECK_RET(ret, U8ID_ERR_XID, 0);
-	ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
-	CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
+      CHECK_RET(ret, U8ID_ERR_XID, 0);
+      ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
+      CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
     } else {
-	CHECK_RET(ret, U8ID_EOK, 0);
-	ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
-	// Balinese U+1B05 is limited. so SAFEC23 should fail earlier
-	if (u8ident_tr31() == U8ID_TR31_SAFEC23)
-	    CHECK_RET(ret, U8ID_ERR_XID, 0);
-	else
+      CHECK_RET(ret, U8ID_EOK, 0);
+      ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
+      // Balinese U+1B05 is limited. so SAFEC23 should fail earlier
+      if (u8ident_tr31() == U8ID_TR31_SAFEC23)
+        CHECK_RET(ret, U8ID_ERR_XID, 0);
+      else
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C23_4
-	    CHECK_RET(ret, U8ID_ERR_SCRIPT, 0);
+        CHECK_RET(ret, U8ID_ERR_SCRIPT, 0);
 #else
-	    CHECK_RET(ret, U8ID_EOK, 0);
+        CHECK_RET(ret, U8ID_EOK, 0);
 #endif
     }
   } else {

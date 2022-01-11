@@ -98,6 +98,9 @@ regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
 	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
 	$(PERL) mkscripts.pl
+	$(PERL) mkgc.pl
+	$(PERL) mkmark.pl
+	-$(MAKE) unic23.h
 # Download some UCD files and create confus.h
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
@@ -141,8 +144,8 @@ endif
 
 if !HAVE_WINDOWS
 c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h
-#	./mkc23$(EXEXT)
-#	-mv c11-all.h unic23.h $(srcdir)/
+	./mkc23$(EXEXT)
+	-mv c11-all.h unic23.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
