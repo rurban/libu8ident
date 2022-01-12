@@ -407,13 +407,18 @@ void test_norm_fcd(void) {
 // Bengali 2nd/ https://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 void test_mixed_scripts(int xid_check) {
   int ret;
+  //printf("test_mixed_scripts(%d)\n", xid_check);
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
+  int xid = u8ident_tr31();
   ret = u8ident_check((const uint8_t *)"abcd", NULL);
   CHECK_RET(ret, U8ID_EOK, 0); // Latin only
 
   ret = u8ident_check((const uint8_t *)"aঅ", NULL); // Latin + Bengali U+985
 #if !defined U8ID_PROFILE || U8ID_PROFILE > 3
-  CHECK_RET(ret, U8ID_EOK, 0);
+  if (xid == U8ID_TR31_ASCII)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else
+    CHECK_RET(ret, U8ID_EOK, 0);
 #else
   // 2 single script, 3 +CFK.
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
@@ -435,17 +440,20 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
 #if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||             \
     U8ID_NORM == FCC
-  CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
+  if (xid == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else
+    CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // U+301
 #endif
 
   ret = u8ident_check((const uint8_t *)"\xc3\xb7", NULL);
-  if (u8ident_tr31() != U8ID_TR31_ALLUTF8) {
+  if (xid != U8ID_TR31_ALLUTF8) {
     CHECK_RET(ret, U8ID_ERR_XID, 0); // division sign U+F7 Sm forbidden as XID
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     // small letter b with stroke U+180 is in xid, but not allowed
-    if (u8ident_tr31() == U8ID_TR31_ALLOWED) {
+    if (xid == U8ID_TR31_ALLOWED) {
       CHECK_RET(ret, U8ID_ERR_XID, 0);
       ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
       CHECK_RET(ret, U8ID_ERR_XID, 0); // Balinese U+1B05 is limited
@@ -517,6 +525,7 @@ void test_mixed_scripts_with_ctx(void) {
   assert(u8ident_free_ctx(ctx) == 0);
 
   assert(!u8ident_init(u8ident_profile(), u8ident_norm(), u8ident_options()));
+  int tr31 = u8ident_tr31();
   ctx = u8ident_new_ctx();
   assert(ctx == 1);
   // U+45D
@@ -543,11 +552,13 @@ void test_mixed_scripts_with_ctx(void) {
 
   ctx = u8ident_new_ctx(); // new ctx
   ret = u8ident_check((const uint8_t *)"\xf0\x91\x8c\x81", NULL);
+  if (tr31 == U8ID_TR31_ALLOWED) {
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C23_4
-  CHECK_RET(ret, U8ID_ERR_SCRIPT, ctx); // U+11301 Grantha is excluded
+    CHECK_RET(ret, U8ID_ERR_SCRIPT, ctx); // U+11301 Grantha is excluded
 #else
-  CHECK_RET(ret, U8ID_EOK, ctx); // 6 allows even these
+    CHECK_RET(ret, U8ID_EOK, ctx); // 6 allows even these
 #endif
+  }
   assert(u8ident_free_ctx(ctx) == 0);
   u8ident_free();
 
@@ -575,14 +586,16 @@ void test_mixed_scripts_with_ctx(void) {
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   // Allow Latin plus other Japanese Lm VERTICAL KANA REPEAT MARK
   ret = u8ident_check((const uint8_t *)"a\u3031", NULL);
-#if defined ENABLE_CHECK_XID
-  // 3031 Lm is not in TR31_ALLOWED, just XID
-  CHECK_RET(ret, U8ID_ERR_XID, 0);
-#elif defined U8ID_PROFILE && U8ID_PROFILE < 3
-  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+  if (tr31 == U8ID_TR31_ALLOWED) {
+    // 3031 Lm is not in TR31_ALLOWED, just XID
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  } else {
+#if defined U8ID_PROFILE && U8ID_PROFILE < 3
+    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
-  CHECK_RET(ret, U8ID_EOK, 0);
+    CHECK_RET(ret, U8ID_EOK, 0);
 #endif
+  }
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
@@ -593,7 +606,10 @@ void test_mixed_scripts_with_ctx(void) {
 #elif U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
-  CHECK_RET(ret, U8ID_EOK, 0);
+  if (tr31 == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else
+    CHECK_RET(ret, U8ID_EOK, 0);
 #endif
   u8ident_free();
 }
@@ -602,6 +618,7 @@ void test_mixed_scripts_with_ctx(void) {
 void test_combine() {
   int ret;
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
+  int tr31 = u8ident_tr31();
 
   // Disallow Latin plus Japanese Mn
   ret = u8ident_check((const uint8_t *)"a\u3099", NULL);
@@ -610,38 +627,47 @@ void test_combine() {
 #if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
   CHECK_RET(ret, U8ID_EOK, 0);
 #else
-  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+  if (tr31 == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
 
   // Disallow Latin plus Vedic Mn (in SCX)
   ret = u8ident_check((const uint8_t *)"a\u1cd0", NULL);
-#if defined ENABLE_CHECK_XID
-  CHECK_RET(ret, U8ID_ERR_XID, 0);
-#elif defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
-  CHECK_RET(ret, U8ID_EOK, 0);
+  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else {
+#if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
+    CHECK_RET(ret, U8ID_EOK, 0);
 #else
-  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
+  }
 
   // Disallow Latin plus Deva Mn (now also in SCX)
   ret = u8ident_check((const uint8_t *)"a\u1cd1", NULL);
-#if defined ENABLE_CHECK_XID
-  CHECK_RET(ret, U8ID_ERR_XID, 0);
-#elif defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
-  CHECK_RET(ret, U8ID_EOK, 0);
+  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else {
+#if defined U8ID_PROFILE && U8ID_PROFILE > 5 && U8ID_PROFILE != C23_4
+    CHECK_RET(ret, U8ID_EOK, 0);
 #else
-  CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 #endif
+  }
 
   // Disallow Latin plus Cyrillic Mn. not in SCX, so ERR_SCRIPTS
   ret = u8ident_check((const uint8_t *)"a\u2dfa", NULL);
-#if defined ENABLE_CHECK_XID
-  CHECK_RET(ret, U8ID_ERR_XID, 0);
-#elif defined U8ID_PROFILE && U8ID_PROFILE > 4 && U8ID_PROFILE != C23_4
-  CHECK_RET(ret, U8ID_EOK, 0);
+  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else {
+#if defined U8ID_PROFILE && U8ID_PROFILE > 4 && U8ID_PROFILE != C23_4
+    CHECK_RET(ret, U8ID_EOK, 0);
 #else
-  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #endif
+  }
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
@@ -655,7 +681,10 @@ void test_combine() {
 #elif U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
-  CHECK_RET(ret, U8ID_EOK, 0);
+  if (tr31 == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else
+    CHECK_RET(ret, U8ID_EOK, 0);
 #endif
 
   u8ident_free();
@@ -731,6 +760,7 @@ static int compar32(const void *a, const void *b) {
 }
 
 void test_confus(void) {
+  int ret;
 #  ifdef HAVE_CROARING
   u8ident_roar_init();
 #  endif
@@ -742,8 +772,10 @@ void test_confus(void) {
   }
   //
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_WARN_CONFUSABLE);
-  int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
-  assert(!(ret & U8ID_EOK_WARN_CONFUS));
+  if (u8ident_tr31() != U8ID_TR31_SAFEC23) {
+    ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
+    assert(!(ret & U8ID_EOK_WARN_CONFUS));
+  }
 
   u8ident_add_script(SC_Coptic);
   ret = u8ident_check((const uint8_t *)"\u01a6", NULL); // Ʀ
@@ -820,11 +852,8 @@ int main(int argc, char **argv) {
 #endif
 #ifndef DISABLE_CHECK_XID
   if (profile || xid || argc == 1) {
-    test_mixed_scripts(U8ID_TR31_ALLOWED);
+    test_mixed_scripts(U8ID_TR31_DEFAULT);
   }
-#endif
-#ifdef ENABLE_CHECK_XID
-  test_mixed_scripts(U8ID_TR31_ALLOWED);
 #endif
 
 #if U8ID_NORM != FCD && U8ID_NORM != FCC

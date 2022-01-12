@@ -139,8 +139,8 @@ u8idlint: u8idlint.c $(LIB) unic23.h unic11.h
 	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB) $(LIBUNISTR)
 
 .PHONY: check check-asan check-norms check-profiles check-tr31 check-extra check-mdl \
-	check-all-combinations clean regen-scripts regen-norm regen-confus install \
-	man dist-src dist-bin clang-format
+	check-all-combinations clean regen-scripts regen-norm regen-confus regen-u8idlint-test \
+	install man dist-src dist-bin clang-format
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
 check: test test-texts u8idlint
@@ -171,7 +171,19 @@ check-extra: check-all check-mdl check-all-combinations
 test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
-	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts $(LIBUNISTR)
+regen-u8idlint-test: u8idlint
+	-./u8idlint -xsafec23 texts/homo-sec-1.c >texts/homo-sec-1.tst
+	-./u8idlint -p1 -xc11 texts/homo-sec-1.c >texts/homo-sec-1-p1.tst
+	-./u8idlint -xc11 texts/homo-1.c >texts/homo-1.tst
+	-./u8idlint -xallowed texts/bidi-sec-1.c >texts/bidi-sec-1.tst
+	-./u8idlint -xc11 texts/bidi-sec-1.c >texts/bidi-sec-1-c11.tst
+	-./u8idlint -xsafec23 texts/bidi-sec-1.c >texts/bidi-sec-1-c23.tst
+	-./u8idlint -xascii texts/bidi-sec-2.c >texts/bidi-sec-2-ascii.tst
+	-./u8idlint -xallowed texts/bidi-sec-2.c >texts/bidi-sec-2-allowed.tst
+	-./u8idlint -xid texts/bidi-sec-2.c >texts/bidi-sec-2.tst
+	-./u8idlint -xc11 texts/bidi-sec-2.c >texts/bidi-sec-2-c11.tst
+
 c11-all.h unic23.h: mkc23 scripts.h mark.h
 	./mkc23
 mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS)

@@ -54,7 +54,6 @@
 #define FCC 5
 #define C11_6 7
 #define C23_4 8
-#define NONE 8
 
 // allowed set of identifiers. TR31 --xid tokenizer options
 // we need XID, the default, as first for uninitialized options.
@@ -67,6 +66,14 @@ enum xid_e {
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal
   ASCII,   // only ASCII letters
 };
+#define XID 0
+#define ID 1
+#define ALLOWED 2
+#define SAFEC23 3
+#define C11 4
+#define ALLUTF8 5
+#define ASCII 6
+#define NONE 7
 #define FIRST_XID_E XID
 #define LAST_XID_E ASCII
 
@@ -136,15 +143,16 @@ enum xid_e {
 #  undef ENABLE_CHECK_XID
 #endif
 #ifdef U8ID_TR31
+//#  pragma message("U8ID_TR31=" _XSTR(U8ID_TR31))
 #  if U8ID_TR31 == NONE
 #    define DISABLE_CHECK_XID
 #    define U8ID_TR31_DEFAULT 0
 #  else
 #    define ENABLE_CHECK_XID
-#    if U8ID_TR31 == ASCII
-#      define U8ID_TR31_DEFAULT U8ID_TR31_ASCII
-#    elif U8ID_TR31 == ALLOWED
+#    if U8ID_TR31 == ALLOWED
 #      define U8ID_TR31_DEFAULT U8ID_TR31_ALLOWED
+#    elif U8ID_TR31 == ASCII
+#      define U8ID_TR31_DEFAULT U8ID_TR31_ASCII
 #    elif U8ID_TR31 == SAFEC23
 #      define U8ID_TR31_DEFAULT U8ID_TR31_SAFEC23
 #    elif U8ID_TR31 == ID

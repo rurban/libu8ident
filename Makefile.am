@@ -42,9 +42,11 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt \
 	texts/arabic-1.c          texts/math-1.c         texts/bidi-sec-1.c     texts/bidi-sec-2.c \
 	texts/bidi-sec-3.c        texts/homo-1.c         texts/homo-sec-1.c     texts/nfc-1.c \
-	texts/nfkc-1.c 		  texts/bidi-sec-1.tst   texts/bidi-sec-2.tst   texts/bidi-sec-1-c11.tst \
-	texts/bidi-sec-2-c11.tst  texts/bidi-sec-2-allowed.tst                  texts/homo-sec-1.tst \
-	texts/homo-sec-1-p1.tst   texts/homo-1.tst
+	texts/nfkc-1.c \
+	texts/bidi-sec-1.tst      texts/bidi-sec-1-c11.tst  \
+	texts/bidi-sec-2.tst      texts/bidi-sec-2-c11.tst  texts/bidi-sec-2-allowed.tst \
+	texts/bidi-sec-2-allowed.tst \
+	texts/homo-sec-1.tst   	  texts/homo-sec-1-p1.tst   texts/homo-1.tst
 EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl makefile.gnu \
 	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4
@@ -245,9 +247,11 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html
-dist-clean-local:
-	-[ $(builddir) != $(srcdir) ] && rm -rf $(builddir)/texts
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html homo-sec-1.tst.rst
+distclean-compile:
+	-rm -f *.tab.c
+	-rm -rf .deps
+	-[ "$(srcdir)" != "." ] && rm -rf $(builddir)/texts
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \

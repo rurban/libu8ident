@@ -33,19 +33,22 @@ check3 "-p4 -xc11" homo-sec-1.c homo-sec-1.tst
 check3 -xsafec23 homo-1.c homo-1.tst
 check3 -xc11 homo-1.c homo-1.tst
 
+# ascii-xid ignore BIDI words here
 check3 -xascii bidi-sec-1.c bidi-sec-1.tst
 check3 -xallowed bidi-sec-1.c bidi-sec-1.tst
 check3 -xsafec23 bidi-sec-1.c bidi-sec-1.tst
 check3 -xid bidi-sec-1.c bidi-sec-1.tst
 check3 -xxid bidi-sec-1.c bidi-sec-1.tst
+check3 "" bidi-sec-1.c bidi-sec-1-c11.tst
 check3 -xc11 bidi-sec-1.c bidi-sec-1-c11.tst
 
-check3 -xascii bidi-sec-2.c bidi-sec-2.tst
+check3 -xascii bidi-sec-2.c bidi-sec-2-ascii.tst
 check3 -xallowed bidi-sec-2.c bidi-sec-2-allowed.tst
 check3 -xsafec23 bidi-sec-2.c bidi-sec-2.tst
 check3 -xid bidi-sec-2.c bidi-sec-2.tst
 check3 -xxid bidi-sec-2.c bidi-sec-2.tst
 check3 -xc11 bidi-sec-2.c bidi-sec-2-c11.tst
+check3 "" bidi-sec-2.c bidi-sec-2-c11.tst
 
 #./u8idlint -xallowed texts/homo-1.c > homo-1-allowed.rst &&
 #    diff texts/homo-1-p4.tst homo-1-allowed.rst && homo-1-allowed.rst
@@ -62,6 +65,7 @@ check3 -xc11 bidi-sec-2.c bidi-sec-2-c11.tst
 #./u8idlint -xc11 texts/bidi-sec-2.c > bidi-sec-2.rst &&
 #    diff texts/bidi-sec-2.tst bidi-sec-2.rst && rm bidi-sec-2.rst
 
+rm homo-sec-1.tst.rst
 #rm -f homo-1-p4.rst bidi-sec-1.rst bidi-sec-2.rst
 if [ -n "$NEWTEXTS" ]; then
     rm -rf texts || true

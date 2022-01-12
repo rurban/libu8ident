@@ -38,48 +38,11 @@
 //#undef EXTERN_SCRIPTS
 #include "unic11.h"
 
+int verbose = 0;
 // private access
 unsigned u8ident_options(void);
 unsigned u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
-
-/*
-static inline struct sc *binary_search(const uint32_t cp, const char *list,
-                                       const size_t len, const size_t size) {
-  int n = (int)len;
-  const char *p = list;
-  struct sc *pos;
-  while (n > 0) {
-    pos = (struct sc *)(p + size * (n / 2));
-    // hack: with unsigned wrapping max-cp is always higher, so false
-    // was: (cp >= pos->from && cp <= pos->to)
-    if ((cp - pos->from) <= (pos->to - pos->from))
-      return pos;
-    else if (cp < pos->from)
-      n /= 2;
-    else {
-      p = (char *)pos + size;
-      n -= (n / 2) + 1;
-    }
-  }
-  return NULL;
-}
-
-static inline bool range_bool_search(const uint32_t cp,
-                                     const struct range_bool *list,
-                                     const size_t len) {
-  const char *r = (char *)binary_search(cp, (char *)list, len, sizeof(*list));
-  return r ? true : false;
-}
-
-static inline bool isC11_start(uint32_t cp) {
-  return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
-}
-
-static inline bool isC11_cont(uint32_t cp) {
-  return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
-}
-*/
 
 #ifdef HAVE_SYS_STAT_H
 static int file_exists(const char *path) {
@@ -97,6 +60,7 @@ static int file_exists(const char *path) {
 int testdir(const char *dir, const char *fname) {
   char path[256];
   static char line[1024] = {0};
+  unsigned ln = 0;
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
   static char brks[1024] = {0};
 #endif
@@ -127,29 +91,33 @@ int testdir(const char *dir, const char *fname) {
     char *s = &line[0];
     bool prev_isword = false;
     char *wp = &word[0];
+    ln++;
     *word = '\0';
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
-    u8_wordbreaks(s, strlen(s), brks);
+    u8_wordbreaks((uint8_t*)s, strlen(s), brks);
 #endif
     while (*s) {
       char *olds = s;
       uint32_t cp = dec_utf8(&s);
       if (!cp) {
-        printf("ERROR %s illegal UTF-8\n", olds);
+        printf("ERROR %s illegal UTF-8 at line %u, col %lu\n", olds, ln, s - olds);
         exit(1);
       }
 
       // unicode #29 word-break, but simplified:
       // must not split at continuations (Combining marks). e.g. for
       // texts/arabic-1.txt
-      const bool iscont = isC11_cont(cp);
-      bool isword = prev_isword ? (isC11_start(cp) || iscont) : isC11_start(cp);
+      const bool iscont = isXID_cont(cp);
+      bool isword = prev_isword ? (isXID_start(cp) || iscont) : isXID_start(cp);
       char force_break = (prev_isword != isword && !iscont);
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
-      if (force_break != brks[s - olds])
-        fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
-                cp);
-      force_break = brks[s - olds];
+      if (force_break != brks[s - olds] && verbose)
+        /* break at: if libunistring found a break, but we not.
+           no break at: if we found a break, but libunistring not. */
+        fprintf(stderr, "WARN: %sbreak at U+%X, line %u, col %lu\n", force_break ? "" : "no ",
+                cp, ln, s - olds);
+      // don't rely in the CI on an optional lib
+      //force_break = brks[s - olds];
 #endif
       // first, or changed from non-word to word, and is no mark (continuation)
       if (olds == &line[0] || force_break) {
@@ -211,19 +179,27 @@ int cmp_str(const void *a, const void *b) {
 }
 
 int main(int argc, char **argv) {
+  int i = 1;
   char *dirname = "texts";
-  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_XID);
 
   if (getenv("U8IDTEST_TEXTS"))
     dirname = getenv("U8IDTEST_TEXTS");
-  else if (argc == 2)
-    dirname = argv[1];
+  else if (argc > 1 && strEQc(argv[1], "-v")) {
+    verbose++;
+    i++;
+  }
 
 #if !defined _MSC_VER && defined HAVE_SYS_STAT_H
-  if (argc > 1 && file_exists(argv[1])) {
-    testdir(NULL, argv[1]);
+  if (argc > i && file_exists(argv[i])) {
+    while (argc > i && file_exists(argv[i])) {
+      testdir(NULL, argv[i++]);
+    }
     u8ident_free();
     return 0;
+  }
+  if (argc > i && !file_exists(argv[i])) {
+    dirname = argv[i];
   }
 #endif
 

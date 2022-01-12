@@ -45,12 +45,14 @@ LOCAL const char *u8ident_errstr(int errcode) {
   standard ALLUTF8  - all > 128, e.g. D, php, nim, crystal. ASCII    - only
   ASCII letters
 */
+#ifndef DISABLE_CHECK_XID
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
     {isALLOWED_start, isALLOWED_cont}, {isSAFEC23_start, isSAFEC23_cont},
     {isC11_start, isC11_cont},         {isALLUTF8_start, isALLUTF8_cont},
     {isASCII_start, isASCII_cont},
 };
+#endif
 
 /* Initialize the library with a profile, normalization and a bitmask of
    enum u8id_options, which define the performed checks. Recommended is
@@ -102,12 +104,14 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
   s_u8id_profile = profile;
 #endif
 
-  s_u8id_options = options;
 #ifdef ENABLE_CHECK_XID
   s_u8id_options = (options & ~U8ID_TR31_MASK) | U8ID_TR31_DEFAULT;
-#endif
-  if (s_u8id_profile == U8ID_PROFILE_1)
+#else
+  if (unlikely(s_u8id_profile == U8ID_PROFILE_1))
     s_u8id_options = (options & ~U8ID_TR31_MASK) | U8ID_TR31_ASCII;
+  else
+    s_u8id_options = options;
+#endif
 
 #ifdef HAVE_CROARING
   if (u8ident_roar_init())
@@ -162,15 +166,17 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
   const enum xid_e xid = xid_mask > 64 ? xid_mask - 64 : XID;
   char *scx = NULL;
   assert(xid >= 0 && xid <= LAST_XID_E);
-#if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
+#ifndef DISABLE_CHECK_XID
+#  if (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 460)
   _Static_assert(ARRAY_SIZE(tr31_funcs) == LAST_XID_E + 1,
                  "Invalid tr31_funcs[] size");
+#  endif
 #endif
+  uint32_t cp = dec_utf8(&s);
+
+#ifndef DISABLE_CHECK_XID
   func_tr31 *id_start = tr31_funcs[xid].start;
   func_tr31 *id_cont = tr31_funcs[xid].cont;
-
-  uint32_t cp = dec_utf8(&s);
-#ifndef DISABLE_CHECK_XID
   // hardcoded TR31 funcs via static functions (inlinable)
   if
 #  if !defined U8ID_TR31

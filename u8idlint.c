@@ -335,7 +335,7 @@ int testfile(const char *dir, const char *fname) {
         skip = true;
       }
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
-      if (verbose && force_break != brks[s - olds])
+      if (verbose > 1 && force_break != brks[s - olds])
         fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
                 cp);
       force_break = brks[s - olds];
