@@ -488,9 +488,9 @@ done:
 static void option_xid(const char *optarg) {
   if (strEQc(optarg, "ascii") || strEQc(optarg, "ASCII"))
     xid = ASCII;
-  else if (strEQc(optarg, "allowed") || strEQc(optarg, "ALLOWED"))
+  else if (strEQc(optarg, "allowed") || strEQc(optarg, "ALLOWED") || strEQc(optarg, "tr39"))
     xid = ALLOWED;
-  else if (strEQc(optarg, "safec23") || strEQc(optarg, "SAFEC23"))
+  else if (strEQc(optarg, "safec23") || strEQc(optarg, "SAFEC23") || strEQc(optarg, "c23"))
     xid = SAFEC23;
   else if (strEQc(optarg, "id") || strEQc(optarg, "ID"))
     xid = ID;

@@ -28,7 +28,7 @@ docdir = $(datadir)/libu8ident
 doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.html
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h unic11.h scripts16.h unic23.h c11-all.h
+	confus_croar.h mark.h unic11.h unic23.h scripts16.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
 	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
 	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -41,7 +41,9 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt \
 	texts/arabic-1.c          texts/math-1.c         texts/bidi-sec-1.c     texts/bidi-sec-2.c \
 	texts/bidi-sec-3.c        texts/homo-1.c         texts/homo-sec-1.c     texts/nfc-1.c \
-	texts/nfkc-1.c 		  texts/bidi-sec-1.tst   texts/bidi-sec-2.tst   texts/homo-1-p4.tst
+	texts/nfkc-1.c 		  texts/bidi-sec-1.tst   texts/bidi-sec-2.tst   texts/bidi-sec-1-c11.tst \
+	texts/bidi-sec-2-c11.tst  texts/bidi-sec-2-allowed.tst                  texts/homo-sec-1.tst \
+	texts/homo-sec-1-p1.tst   texts/homo-1.tst
 EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl makefile.gnu \
 	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4
@@ -145,16 +147,17 @@ endif
 if !HAVE_WINDOWS
 c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h
 	./mkc23$(EXEXT)
-	-mv c11-all.h unic23.h $(srcdir)/
+	-mv -f c11-all.h unic23.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
 check-all: check check-asan check-norms check-profiles check-tr31
-else
-check-all: check check-norms check-profiles check-tr31
-endif
 check-extra: check-all check-mdl check-all-combinations
 	shellcheck *.test *.sh
+else
+check-all: check check-norms check-profiles check-tr31
+check-extra: check-all check-mdl check-all-combinations
+endif
 
 check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
@@ -242,8 +245,10 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html
-MAINTAINERCLEANFILES  = *~ Makefile.in Makefile c11-all.h unic23.h
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html $(srcdir)/c11-all.sh
+dist-clean-local:
+	-[ $(builddir) != $(srcdir) ] && rm -rf $(builddir)/texts
+MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
 	compile \
