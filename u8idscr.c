@@ -421,8 +421,10 @@ EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t i) {
   *res = 0;
   for (int j = 0; j < c->count; j++) {
     const char *str = u8ident_script_name(u8p[j]);
-    if (!str)
+    if (!str) {
+      free(res);
       return NULL;
+    }
     const size_t l = strlen(str);
     if (*res) {
       if (l + 3 > len) {

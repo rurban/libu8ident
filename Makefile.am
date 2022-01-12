@@ -215,7 +215,7 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	rm ./test-profiles$(EXEEXT)
 # gem install mdl
 check-mdl:
-	mdl *.md
+	cd $(srcdir) && mdl *.md
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
 SCAN_BUILD = scan-build
