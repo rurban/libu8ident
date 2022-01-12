@@ -236,6 +236,13 @@ void printfile(const char *dir, const char *fname) {
     printf("%s/%s\n", dir, fname);
 }
 
+ void printfile_line(const char *dir, const char *fname, size_t line) {
+  if (strEQc(dir, "."))
+    printf("%s:%u\n", fname, (unsigned)line);
+  else
+    printf("%s/%s:%u\n", dir, fname, (unsigned)line);
+}
+
 int testfile(const char *dir, const char *fname) {
   int err = 0;
   char path[256];
@@ -247,6 +254,7 @@ int testfile(const char *dir, const char *fname) {
   char *word;
   unsigned maxlen = u8ident_maxlength();
   bool need_free = false;
+  size_t ln = 0;
 
   if (maxlen > 1024) {
     word = calloc(maxlen, 1);
@@ -302,6 +310,7 @@ int testfile(const char *dir, const char *fname) {
     bool prev_isword = false;
     char *wp = &word[0];
     bool skip = false;
+    ln++;
     *word = '\0';
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
     u8_wordbreaks(s, strlen(s), brks);
@@ -362,7 +371,7 @@ int testfile(const char *dir, const char *fname) {
             if (!cx->is_rtl) {
               const char *scripts = u8ident_existing_scripts(c);
               if (quiet)
-                printfile(dir, fname);
+                printfile_line(dir, fname, ln);
               printf(
                   "  %s: %s (%s", olds,
                   (profile == U8ID_PROFILE_6 || profile == U8ID_PROFILE_C11_6)
@@ -384,7 +393,7 @@ int testfile(const char *dir, const char *fname) {
         err |= ret;
         if (ret < 0) {
           if (quiet)
-            printfile(dir, fname);
+            printfile_line(dir, fname, ln);
           printf("  %s: %s (%s", word, u8ident_errstr(ret), scripts);
           const uint32_t cp = u8ident_failed_char(c);
           const uint8_t scr = u8ident_get_script(cp);
