@@ -18,7 +18,8 @@ libu8ident_la_LDFLAGS = \
 	$(LDFLAGS) $(AM_LDFLAGS)
 bin_PROGRAMS = u8idlint
 u8idlint_SOURCES = u8idlint.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
-u8idlint_CFLAGS = $(AM_CFLAGS)
+u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
+u8idlint_LDADD = $(u8idlint_LIBS)
 
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc
@@ -122,11 +123,10 @@ endif
 test_SOURCES = test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
 test_CFLAGS = $(AM_CFLAGS)
 test_texts_SOURCES = test-texts.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
-test_texts_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS)
-test_texts_LDADD = $(test_texts_LIBS)
+test_texts_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
+test_texts_LDADD = $(u8idlint_LIBS)
 mkc23_SOURCES = mkc23.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
-mkc23_CFLAGS = $(AM_CFLAGS) $(TEST_TEXTS_CFLAGS) -DU8ID_PROFILE_SAFEC23
-mkc23_LDADD = $(test_texts_LIBS)
+mkc23_CFLAGS = $(AM_CFLAGS)
 
 if HAVE_CROARING
 test_LDADD = u8idroar.lo
@@ -147,7 +147,7 @@ endif
 if !HAVE_WINDOWS
 c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h
 	./mkc23$(EXEXT)
-	-mv -f c11-all.h unic23.h $(srcdir)/
+	echo mv -f c11-all.h unic23.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
@@ -245,7 +245,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html $(srcdir)/c11-all.sh
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html
 dist-clean-local:
 	-[ $(builddir) != $(srcdir) ] && rm -rf $(builddir)/texts
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile

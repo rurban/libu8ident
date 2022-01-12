@@ -313,7 +313,7 @@ int testfile(const char *dir, const char *fname) {
     ln++;
     *word = '\0';
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
-    u8_wordbreaks(s, strlen(s), brks);
+    u8_wordbreaks((uint8_t*)s, strlen(s), brks);
 #endif
     while (*s) {
       char *olds = s;
@@ -335,7 +335,7 @@ int testfile(const char *dir, const char *fname) {
         skip = true;
       }
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
-      if (force_break != brks[s - olds])
+      if (verbose && force_break != brks[s - olds])
         fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
                 cp);
       force_break = brks[s - olds];

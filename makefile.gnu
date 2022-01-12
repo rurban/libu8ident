@@ -35,6 +35,12 @@ endif
 ifneq (,$(wildcard /usr/include/getopt.h))
 DEFINES += -DHAVE_GETOPT_H
 endif
+ifneq (,$(wildcard /usr/include/uniwbrk.h))
+DEFINES += -DHAVE_UNIWBRK_H -DHAVE_LIBUNISTRING
+LIBUNISTR = -lunistring
+else
+LIBUNISTR =
+endif
 ifneq (,$(wildcard roaring.c))
 DEFINES += -DHAVE_CROARING
 HDRS += confus_croar.h roaring.h
@@ -130,10 +136,11 @@ allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkco
 	$(PERL) mkconfus.pl
 
 u8idlint: u8idlint.c $(LIB) unic23.h unic11.h
-	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB)
+	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB) $(LIBUNISTR)
 
-.PHONY: check check-asan check-norms check-profiles check-tr31 \
-	clean regen-scripts regen-norm regen-confus install man dist-src dist-bin clang-format
+.PHONY: check check-asan check-norms check-profiles check-tr31 check-extra check-mdl \
+	check-all-combinations clean regen-scripts regen-norm regen-confus install \
+	man dist-src dist-bin clang-format
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
 check: test test-texts u8idlint
