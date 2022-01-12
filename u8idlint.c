@@ -698,7 +698,7 @@ int main(int argc, char **argv) {
     if (file_exists(argv[i])) {
       ret |= testfile(".", argv[i]);
     } else if (dir_exists(".", argv[i])) {
-      dirname = argv[i];
+      ret |= process_dir(argv[i], ext);
     } else {
       fprintf(stderr, "Invalid arg %s\n", argv[i]);
       usage(1);
