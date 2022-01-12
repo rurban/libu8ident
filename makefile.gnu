@@ -158,6 +158,8 @@ endif
 endif
 
 check-all: check check-norms check-profiles check-tr31 check-asan
+check-extra: check-all check-mdl check-all-combinations
+	shellcheck *.test *.sh
 
 test: test.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test

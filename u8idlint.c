@@ -134,9 +134,9 @@ static int dir_exists(const char *dir, const char *fname) {
   char path[256];
   strncpy(path, dir, sizeof(path) - 1);
   path[255] = '\0';
-  strncat(path, "/", sizeof(path) - 1);
+  strncat(path, "/", sizeof(path) - strlen(path) - 1);
   path[255] = '\0';
-  strncat(path, fname, sizeof(path) - 1);
+  strncat(path, fname, sizeof(path) - strlen(path) - 1);
   path[255] = '\0';
   return (stat(path, &st) == 0) && (st.st_mode & S_IFDIR) == S_IFDIR;
 }
@@ -150,9 +150,9 @@ static int dir_exists(const char *dir, const char *fname) {
   char path[256];
   strncpy(path, dir, sizeof(path) - 1);
   path[255] = '\0';
-  strncat(path, "/", sizeof(path) - 1);
+  strncat(path, "/", sizeof(path) - strlen(path) - 1);
   path[255] = '\0';
-  strncat(path, fname, sizeof(path) - 1);
+  strncat(path, fname, sizeof(path) - strlen(path) - 1);
   path[255] = '\0';
   const uint16_t dwAttrib = GetFileAttributes(path);
   return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
@@ -278,9 +278,9 @@ int testfile(const char *dir, const char *fname) {
   } else {
     strncpy(path, dir, sizeof(path) - 1);
     path[255] = '\0';
-    strncat(path, "/", sizeof(path) - 1);
+    strncat(path, "/", sizeof(path) - strlen(path) - 1);
     path[255] = '\0';
-    strncat(path, fname, sizeof(path) - 1);
+    strncat(path, fname, sizeof(path) - strlen(path) - 1);
     path[255] = '\0';
   }
 
@@ -460,9 +460,9 @@ static int process_dir(const char *dirname, const char *ext) {
       char path[256];
       strncpy(path, dirname, sizeof(path) - 1);
       path[255] = '\0';
-      strncat(path, "/", sizeof(path) - 1);
+      strncat(path, "/", sizeof(path) - strlen(path) - 1);
       path[255] = '\0';
-      strncat(path, CUR_FILE, sizeof(path) - 1);
+      strncat(path, CUR_FILE, sizeof(path) - strlen(path) - 1);
       path[255] = '\0';
       process_dir(path, ext);
     }

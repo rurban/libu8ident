@@ -1,4 +1,5 @@
 /.gdbinit
+.analysis
 GTAGS
 GPATH
 GRTAGS

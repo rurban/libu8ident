@@ -153,6 +153,8 @@ check-all: check check-asan check-norms check-profiles check-tr31
 else
 check-all: check check-norms check-profiles check-tr31
 endif
+check-extra: check-all check-mdl check-all-combinations
+	shellcheck *.test *.sh
 
 check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
@@ -211,6 +213,9 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	  done; \
 	done; \
 	rm ./test-profiles$(EXEEXT)
+# gem install mdl
+check-mdl:
+	mdl *.md
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
 SCAN_BUILD = scan-build
