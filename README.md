@@ -50,7 +50,7 @@ unrestrictive mixed-script security profiles or insecure xid
 ranges. This library does not do this yet.
 
 **u8idlint** has its own tokenizer, which can be configured with the
-**--xid** options: **ASCII, ALLOWED, ID, XID, C11** and
+**--xid** options: **ASCII, SAFEC23, ALLOWED, ID, XID, C11** and
 **ALLUTF8**. (sorted from most secure to most insecure).  ASCII
 ignores all utf8 word boundaries, ALLOWED, the default option is the
 same as the `U8ID_CHECK_XID` option in the library. ID allows all
@@ -58,6 +58,7 @@ letters, plus numbers, punctuation and marks, including all exotic
 scripts. XID is ID plus some special exceptions to avoid the NFKC
 quirks, because NFKC has a lot of confusable mappings and no
 roundtrips. C11 uses the C11 standard insecure DefId unicode ranges.
+SAFEC23 is the optimized proposal for the C23 charset,
 ALLUTF8 allows all unicode characters as letters > 127, as in php, D,
 nim or crystal.
 
@@ -157,21 +158,21 @@ This is the recommended profile, don't fall into the unicode identifier trap.
 `c23_4`. **SAFEC23**
 
 * We also provide a special profile, called **`U8ID_PROFILE_C11_4`**,
-  defined by `-DU8ID_PROFILE_SAFEC23`. This is an extended Moderate
+  also defined by `-DU8ID_PROFILE_SAFEC23`. This is an extended Moderate
   Profile (4), plus allowing Greek with Latin, plus only allowing Allowed
   IdentifierStatus.
-* `U8ID_PROFILE_C11_4` aka `U8ID_PROFILE_SAFEC23` is the secure
+* `U8ID_PROFILE_C23_4` aka `U8ID_PROFILE_SAFEC23` is the secure
   extension over C11, disallowing the restricted and limited_use
   scripts and identifiers, arbitrary rtl and ltr overrides, and all
   the insecure mixed scripts combinations.  See `unic11.h`,
-  `test-c11.c` and [c11.md](c11.md).
+  [c11.md](c11.md) and the unfinished [c23++proposal.md](c23++proposal.md).
 
 `c11_6`. **C11STD**
 
 * The C11 standard allows a certain range of (mostly insecure)
   codepoints, and did not define combinations of mixed scripts, not a
   security profile.  Thus an insecure Unrestricted profile 6, ignoring
-  the UCD IdentifierStatus.  This is `U8ID_PROFILE_C11_6`, defined by
+  the UCD IdentifierStatus.  This is `U8ID_PROFILE_C11_6`, also defined by
   `-DU8ID_PROFILE_C11STD`
   See [c11.md](c11.md), `unic11.h` and [N2731](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf)
   Annex D (p. 425).
@@ -185,7 +186,7 @@ configure options
 * `--with-norm=NFC,NFD,NFKC,NFKD,FCC,FCD`. Default: none (at run-time,
   NFC is the default)
 
-* `--with-profile=2,3,4,5,6,c11_4,c11_6`. Default: none (at run-time, 4 is the default)
+* `--with-profile=2,3,4,5,6,c23_4,c11_6`. Default: none (at run-time, 4 is the default)
 
 * `--enable-confus`
 
@@ -238,7 +239,7 @@ See the likewise **cmake** options:
 
 * `-DBUILD_SHARED_LIBS=ON,OFF`
 * `-DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD`
-* `-DLIBU8IDENT_PROFILE=2,3,4,5,6,c11_4,c11_6`
+* `-DLIBU8IDENT_PROFILE=2,3,4,5,6,c23_4,c11_6`
 * `-DLIBU8IDENT_ENABLE_CHECK_XID=On`
 * `-DLIBU8IDENT_DISABLE_CHECK_XID=On`
 * `-DHAVE_CONFUS=ON`
@@ -473,10 +474,14 @@ codepoint.
 TODO
 ----
 
-* Lookup optimization:
+* NFC lookup optimization:
   For some common combinations generate a single lookup with all the needed values:
   NFC + PROFILE_4 + CHECK\_XID with the script byte in the first decompose lookup
   `UN8IF_canon_tbl`.
+
+* SAFEC23 lookup optimization:
+  Add the GC, SCX, and checkNFC to the script lookup. Since NFC is required, only
+  a single lookup is needed per character. not 6.
 
 * **SCX variants**: Some codepoints are combinations, valid for a number of
   scripts.  These appear with the Common and Inherited scripts. When
