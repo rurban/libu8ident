@@ -3,10 +3,10 @@ on: [push, pull_request]
 
 #strategy:
 #  matrix:
-#    os: [ubuntu-14.04, ubuntu-18.04, ubuntu-latest]
+#    os: [ubuntu-14.04, ubuntu-18.04, ubuntu-20.04, ubuntu-latest]
 jobs:
   linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 1
-    - run: sudo apt-get install perl groff
+    #- run: sudo apt-get install perl groff
     - run: autoreconf -fi
     - run: ./configure
     - run: make V=1
