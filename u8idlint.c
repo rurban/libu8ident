@@ -59,6 +59,8 @@ static const struct ext_xid {
   const enum xid_e xid;
 } exts[] = {
     // tr31 defaults per extension
+    {".zig", ASCII},
+    {".j", ASCII},
     {".c", C11},
     {".C", C11},
     {".h", C11},
@@ -68,13 +70,12 @@ static const struct ext_xid {
     {".cpp", C11},
     {".cxx", C11},
     {".hpp", C11},
-    {".py", XID},
-    {".pl", XID},
-    {".p6", XID},
+    {".cs", XID}, // -p5
+    {".fs", XID}, // -p5
+    {".py", XID}, // -p5
+    {".pl", XID}, // -p5
+    {".p6", XID}, // -p5
     {".rb", XID},
-    {".php", ALLUTF8},
-    {".js", XID},
-    {".ts", XID},
     {".erl", XID},
     {".f", XID},
     {".for", XID},
@@ -86,9 +87,21 @@ static const struct ext_xid {
     {".f08", XID},
     {".f15", XID},
     {".lhs", XID},
+    {".jl", XID}, // -p5
     {".ml", XID},
-    {".rs", XID},
+    {".rs", XID}, // -p4
     {".tcl", XID},
+    {".ada", ID},
+    {".go", ID},
+    {".js", ID}, // -p5
+    {".ts", ID},
+    {".cr", ALLUTF8}, // Crystal
+    {".d", ALLUTF8},
+    {".factor", ALLUTF8},
+    {".fs", ALLUTF8}, // Forth
+    {".nim", ALLUTF8},
+    {".lua", ALLUTF8},
+    {".php", ALLUTF8},
     /* TODO LISP ids */
     {".lisp", ALLUTF8},
     {".lsp", ALLUTF8},
@@ -103,15 +116,19 @@ static const struct ext_xid {
     {".rkt", ALLUTF8},
 };
 
+// clang-format off
 /* tr31 options:
   XID      - ID minus NFKC quirks.
   ID       - all letters, plus numbers, punctuation and marks. With exotic
-  scripts. ALLOWED  - TR31 ID with only recommended scripts. Allowed
-  IdentifierStatus. SAFEC23  - see c23++proposal XID minus exotic scripts,
-  filtered by NFC and IdentifierType. C11      - the AltId ranges from the C11
-  standard ALLUTF8  - all > 128, e.g. D, php, nim, crystal. ASCII    - only
-  ASCII letters
+             scripts.
+  ALLOWED  - TR31 ID with only recommended scripts. Allowed IdentifierStatus.
+  SAFEC23  - see c23++proposal XID minus exotic scripts, filtered by NFC and
+             IdentifierType.
+  C11      - the AltId ranges from the C11 standard
+  ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
+  ASCII    - only ASCII letters
 */
+// clang-format on
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
     {isALLOWED_start, isALLOWED_cont}, {isSAFEC23_start, isSAFEC23_cont},
@@ -236,7 +253,7 @@ void printfile(const char *dir, const char *fname) {
     printf("%s/%s\n", dir, fname);
 }
 
- void printfile_line(const char *dir, const char *fname, size_t line) {
+void printfile_line(const char *dir, const char *fname, size_t line) {
   if (strEQc(dir, "."))
     printf("%s:%u\n", fname, (unsigned)line);
   else
@@ -313,7 +330,7 @@ int testfile(const char *dir, const char *fname) {
     ln++;
     *word = '\0';
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
-    u8_wordbreaks((uint8_t*)s, strlen(s), brks);
+    u8_wordbreaks((uint8_t *)s, strlen(s), brks);
 #endif
     while (*s) {
       char *olds = s;
@@ -488,9 +505,11 @@ done:
 static void option_xid(const char *optarg) {
   if (strEQc(optarg, "ascii") || strEQc(optarg, "ASCII"))
     xid = ASCII;
-  else if (strEQc(optarg, "allowed") || strEQc(optarg, "ALLOWED") || strEQc(optarg, "tr39"))
+  else if (strEQc(optarg, "allowed") || strEQc(optarg, "ALLOWED") ||
+           strEQc(optarg, "tr39"))
     xid = ALLOWED;
-  else if (strEQc(optarg, "safec23") || strEQc(optarg, "SAFEC23") || strEQc(optarg, "c23"))
+  else if (strEQc(optarg, "safec23") || strEQc(optarg, "SAFEC23") ||
+           strEQc(optarg, "c23"))
     xid = SAFEC23;
   else if (strEQc(optarg, "id") || strEQc(optarg, "ID"))
     xid = ID;

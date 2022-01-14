@@ -407,7 +407,7 @@ void test_norm_fcd(void) {
 // Bengali 2nd/ https://www.unicode.org/reports/tr39/#Mixed_Script_Detection
 void test_mixed_scripts(int xid_check) {
   int ret;
-  //printf("test_mixed_scripts(%d)\n", xid_check);
+  // printf("test_mixed_scripts(%d)\n", xid_check);
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   int xid = u8ident_tr31();
   ret = u8ident_check((const uint8_t *)"abcd", NULL);

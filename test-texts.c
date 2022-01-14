@@ -94,13 +94,14 @@ int testdir(const char *dir, const char *fname) {
     ln++;
     *word = '\0';
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
-    u8_wordbreaks((uint8_t*)s, strlen(s), brks);
+    u8_wordbreaks((uint8_t *)s, strlen(s), brks);
 #endif
     while (*s) {
       char *olds = s;
       uint32_t cp = dec_utf8(&s);
       if (!cp) {
-        printf("ERROR %s illegal UTF-8 at line %u, col %lu\n", olds, ln, s - olds);
+        printf("ERROR %s illegal UTF-8 at line %u, col %lu\n", olds, ln,
+               s - olds);
         exit(1);
       }
 
@@ -114,10 +115,10 @@ int testdir(const char *dir, const char *fname) {
       if (force_break != brks[s - olds] && verbose)
         /* break at: if libunistring found a break, but we not.
            no break at: if we found a break, but libunistring not. */
-        fprintf(stderr, "WARN: %sbreak at U+%X, line %u, col %lu\n", force_break ? "" : "no ",
-                cp, ln, s - olds);
-      // don't rely in the CI on an optional lib
-      //force_break = brks[s - olds];
+        fprintf(stderr, "WARN: %sbreak at U+%X, line %u, col %lu\n",
+                force_break ? "" : "no ", cp, ln, s - olds);
+        // don't rely in the CI on an optional lib
+        // force_break = brks[s - olds];
 #endif
       // first, or changed from non-word to word, and is no mark (continuation)
       if (olds == &line[0] || force_break) {
