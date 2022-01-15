@@ -101,7 +101,7 @@ endif
 
 most: $(LIB) $(SOLIB) $(MAN) u8idlint
 
-all: most mkc23 test-texts test perf c23++proposal.html
+all: mkc23 most test-texts test perf c23++proposal.html
 
 .c.o:
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c $< -o $@
@@ -112,11 +112,11 @@ u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
 u8idroar.o: u8idroar.c u8id_private.h $(HEADER) confus_croar.h
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o $@
 
-$(LIB): $(SRC) $(HEADER) $(HDRS) $(OBJS)
+$(LIB): $(SRC) $(HEADER) unic23.h unic11.h $(HDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
-$(SOLIB): $(SRC) $(HEADER) $(HDRS)
+$(SOLIB): $(SRC) $(HEADER) unic23.h unic11.h $(HDRS)
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) -shared -fPIC $(DEFINES) -Iinclude \
 	  -Wl,-soname,$(SOLIB).$(SO_MAJ) -o $@.$(SO_MAJ) $(SRC)
 	-rm -f $(SOLIB)
@@ -135,7 +135,7 @@ u8id_gc.h: mkgc.pl # UnicodeData.txt
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
-u8idlint: u8idlint.c $(LIB) unic23.h unic11.h
+u8idlint: u8idlint.c unic23.h unic11.h $(LIB)
 	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB) $(LIBUNISTR)
 
 .PHONY: check check-asan check-norms check-profiles check-tr31 check-extra check-mdl \
@@ -165,7 +165,7 @@ endif
 endif
 
 check-all: check check-norms check-profiles check-tr31 check-asan
-check-extra: check-all check-mdl check-all-combinations
+check-extra: check-all check-all-combinations check-mdl
 	shellcheck *.test *.sh
 
 test: test.c $(SRC) $(HEADER) $(HDRS)

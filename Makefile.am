@@ -116,10 +116,9 @@ regen-all: regen-scripts regen-norm regen-confus regen-man c23++proposal.html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg
 
-EXTRA_PROGRAMS = test
+EXTRA_PROGRAMS = mkc23 test test-texts
 TESTS = test
 if !HAVE_WINDOWS
-EXTRA_PROGRAMS += test-texts mkc23
 TESTS += test-texts.test u8idlint.test
 endif
 test_SOURCES = test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
@@ -146,10 +145,12 @@ perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
 endif
 
-if !HAVE_WINDOWS
 c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h
 	./mkc23$(EXEXT)
-	echo mv -f c11-all.h unic23.h $(srcdir)/
+if !HAVE_WINDOWS
+	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unic23.h $(srcdir)/
+else
+	-copy /y c11-all.h unic23.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
