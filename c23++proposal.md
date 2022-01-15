@@ -1,7 +1,7 @@
 C++ Identifier Security using Unicode Standard Annex 39
 =======================================================
 
-    Date:       2022-01-07
+    Date:       2022-01-15
     Project:    Programming Language C++
     Audience:   EWG
                 CWG
@@ -20,20 +20,20 @@ Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++ 23 (and C23)
 * TR39#5.2 Mixed-Scripts Moderately Restrictive profile, but allow
   Greek scripts,
 * Disallow all Limited_Use and Excluded scripts,
-* Only allow TR 39#1 Recommended, Inclusion, Technical Identifier Type
+* Only allow TR39#1 Recommended, Inclusion, Technical Identifier Type
   properties,
-* Demand NFC normalization. Reject all composable sequences as
-  ill-formed. (from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
-* Reject illegal mark sequences (Lm, Sk, Cf, Mn, Me) with mixed-scripts (SCX)
-  as ill-formed.
+* Demand NFC normalization. Reject all composable sequences as ill-formed.
+  (from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
+* Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with
+  mixed-scripts (SCX) as ill-formed. TR39#5.4
 
 Optionally:
 
 * Implementations may allow an optional `#pragma unicode <LongScript>` that
   Excluded scripts can be added to the allowed set of scripts.
 
-Recommend binutils/linker identifier rules: Require UTF-8 and
-NFC. Maybe even unicode security.
+Recommend binutils/linker ABI identifier rules: names are UTF-8,
+add identifier checks. .g. readelf -L -Ue.
 
 In addition adopt this proposal as a Defect Report against C++20 and
 earlier. The author provides the
@@ -86,13 +86,13 @@ Restricting the **Identifier_Type** plus the Allowed Scripts, plus demanding NFC
 will shrink the original XID set from 971267 codepoints to 93036 codepoints.
 The ranges expand from 36 to 315. (when split by scripts already, 25 splits happen).
 
-`ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, + `Other_ID_Start`,
-- `Pattern_Syntax`, - `Pattern_White_Space`
+`ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +`Other_ID_Start`,
+ -`Pattern_Syntax`, -`Pattern_White_Space`
 
 131997 codepoints
 
-`ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc, + `Other_ID_Continue`,
-- `Pattern_Syntax`, - `Pattern_White_Space`.
+`ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc, +`Other_ID_Continue`,
+-`Pattern_Syntax`, -`Pattern_White_Space`.
 
 135072 codepoints (= ID_Start + 3075)
 
@@ -304,16 +304,18 @@ not part of XIDs.
 
 67 matches for "XID_Continue # Lm" in buffer: DerivedCoreProperties.txt
 
-```
+``` txt
 02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..
                                         MODIFIER LETTER REVERSED GLOTTAL STOP
 02C6..02D1    ; XID_Continue # Lm  [12] MODIFIER LETTER CIRCUMFLEX ACCENT..
                                         MODIFIER LETTER HALF TRIANGULAR
 ...
-```
-513 matches for "XID_Continue # M" in buffer: DerivedCoreProperties.txt
 
 ```
+
+513 matches for "XID_Continue # M" in buffer: DerivedCoreProperties.txt
+
+``` txt
 0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..
                                         COMBINING LATIN SMALL LETTER X
 0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..
@@ -326,8 +328,9 @@ only #8 Identifier_Type = Recommended, Inclusion, Technical, plus only #4.2
 Recommended Scripts, plus only codepoints with multiple SCX entries,
 leads to these ranges. (TODO #8, Scripts, NFC)
 
-```
-A9CF          ; Bugi Java # Lm       JAVANESE PANGRANGKEP (Javanese Limited, Buginese Excluded)
+``` txt
+A9CF          ; Bugi Java # Lm       JAVANESE PANGRANGKEP
+                                     (Javanese Limited, Buginese Excl)
 3031..3035    ; Hira Kana # Lm   [5] VERTICAL KANA REPEAT MARK..
                                      VERTICAL KANA REPEAT MARK LOWER HALF
 30FC          ; Hira Kana # Lm       KATAKANA-HIRAGANA PROLONGED SOUND MARK
@@ -392,17 +395,22 @@ Handling Combining Marks](https://www.unicode.org/reports/tr24/#Nonspacing_Marks
 8 TR39 Identifier Type
 ======================
 
-The **Identifier_Type** property [TR 39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type
-Table 1) recommendation should be mandatory, with the addition of the
-`Technical` Identifier\_Type to be allowed.
+The **Identifier_Type** property
+[TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1)
+recommendation should be mandatory, with the addition of the `Technical`
+Identifier\_Type to be allowed.
 
 I.e. `Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,`
 `Deprecated, Not_Character` are not part of identifiers.
 
-Allowed are `Recommended, Inclusion, Technical`.
+Allowed are `Recommended, Inclusion, Technical` TR39 Identifier Types.
 
-There are XXX Technical ids added to the original list of XXX
-Recommended, Inclusion ids.
+There are 80 Technical ranges added to the original list of
+Recommended and Inclusion ID's.
+
+    grep ', U8ID_Technical' scripts.h | egrep -v 'Not_XID|U8ID_Obsolete|U8ID_Exclusion'
+
+See 17 Appendix E - IDType Technical.
 
 9 TR39 Mixed Scripts
 ====================
@@ -464,8 +472,7 @@ script run detection for spoofing" are kept tiny.
 10 Contexts
 ==========
 
-T
-his is not discussed in any of the unicode security guidelines for
+This is not discussed in any of the unicode security guidelines for
 identifiers.  One could argue that a mixed-script profile is valid
 only for a single identifier, or it is valid for whole source file
 document.
@@ -528,11 +535,11 @@ fields for the used charset (e.g. if SHIFT-JIS or UTF-8), nor are
 there any rules for name lookup (normalization). This is not solvable
 here (in C nor C++), only there. Only in the Rust ecosystem there are
 proper unicode identifier rules, but Rust can link against
-C++/C. I haven't seen any exported unicode names in the wild, they are
-only used in local symbols still. UTF-16 compilers such as MSVC do
+C++/C. I haven't detected any exported unicode names in the wild, they
+are only used in local symbols still. UTF-16 compilers such as MSVC do
 export their UNICODE names either in the local character set or as
 UTF-8. If used wildly, object files would not link anymore, as local
-charactersets vary, and there is no characterset standard defined.
+character sets vary, and there is no character set standard defined.
 
 The C++/C working groups should urge the binutils/linker working
 groups to adopt a more precise specification how exported identifiers
@@ -544,17 +551,23 @@ unicode names in the wild this is still easy. There are also many
 object file producers in the wild, with possibly completely insecure
 unicode names in the future.
 
+binutils `readelf -L -Ul` is currently broken displaying unicode identifiers.
+I have patches to display them in the current multi-byte locale, and to add
+ui8id checks with -L. I haven't found violations so far in my used libraries.
+
 Even better would be for the C ABI's to also adopt secure unicode
 identifiers, as linkers and FFI's have the same unicode security
 problems as compilers, interpreters and filesystems.  Otherwise they
-should at least clarifiy that their names are not identifiable, and
-implementation defined.
+should at least clarifiy that their names/"symbols" are not
+identifiable, and implementation defined and their interpretation locale
+specific. (i.e. you cannot copy them across locales).
 
 13 Appendix A - C23XID_Start
 ============================
 
 Created with mkc23 from libu8ident
 
+``` c
 // Filtering allowed scripts, XID_Start, Skipped Ids and NFC
 const struct sc safec23_start_list[] = {
 
@@ -994,12 +1007,14 @@ const struct sc safec23_start_list[] = {
 
 };
 // 315 ranges, 114 singles, 93036 codepoints
+```
 
 14 Appendix A - C23XID_Continue
 ===============================
 
 Created with mkc23 from libu8ident
 
+``` c
 // Filtering allowed scripts, XID_Continue,!XID_Start, Skipped Ids, NFC and !MARK
 const struct sc safec23_cont_list[] = {
 
@@ -1037,11 +1052,13 @@ const struct sc safec23_cont_list[] = {
 
 };
 // 26 ranges, 5 singles, 243 codepoints
+```
 
 15 Appendix C - XID_Continue # Lm
 =================================
 
-Needed for TR39#5.4 and [TR31#2.2](https://www.unicode.org/reports/tr31/#Modifier_Letters)
+Needed for [UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
+and [TR31#2.2](https://www.unicode.org/reports/tr31/#Modifier_Letters)
 
 67 matches for "XID_Continue # Lm" in buffer: DerivedCoreProperties.txt
 
@@ -1116,7 +1133,7 @@ Needed for TR39#5.4 and [TR31#2.2](https://www.unicode.org/reports/tr31/#Modifie
 16 Appendix D - XID_Continue # M
 =================================
 
-Needed for TR39#5.4
+Needed for [UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
 
 513 matches for "XID_Continue # M" in buffer: DerivedCoreProperties.txt
 
@@ -1493,7 +1510,8 @@ Needed for TR39#5.4
     112DF         ; XID_Continue # Mn       KHUDAWADI SIGN ANUSVARA
     112E0..112E2  ; XID_Continue # Mc   [3] KHUDAWADI VOWEL SIGN AA..KHUDAWADI VOWEL SIGN II
     112E3..112EA  ; XID_Continue # Mn   [8] KHUDAWADI VOWEL SIGN U..KHUDAWADI SIGN VIRAMA
-    11300..11301  ; XID_Continue # Mn   [2] GRANTHA SIGN COMBINING ANUSVARA ABOVE..GRANTHA SIGN CANDRABINDU
+    11300..11301  ; XID_Continue # Mn   [2] GRANTHA SIGN COMBINING ANUSVARA ABOVE..
+                                            GRANTHA SIGN CANDRABINDU
     11302..11303  ; XID_Continue # Mc   [2] GRANTHA SIGN ANUSVARA..GRANTHA SIGN VISARGA
     1133B..1133C  ; XID_Continue # Mn   [2] COMBINING BINDU BELOW..GRANTHA SIGN NUKTA
     1133E..1133F  ; XID_Continue # Mc   [2] GRANTHA VOWEL SIGN AA..GRANTHA VOWEL SIGN I
@@ -1526,7 +1544,8 @@ Needed for TR39#5.4
     115BC..115BD  ; XID_Continue # Mn   [2] SIDDHAM SIGN CANDRABINDU..SIDDHAM SIGN ANUSVARA
     115BE         ; XID_Continue # Mc       SIDDHAM SIGN VISARGA
     115BF..115C0  ; XID_Continue # Mn   [2] SIDDHAM SIGN VIRAMA..SIDDHAM SIGN NUKTA
-    115DC..115DD  ; XID_Continue # Mn   [2] SIDDHAM VOWEL SIGN ALTERNATE U..SIDDHAM VOWEL SIGN ALTERNATE UU
+    115DC..115DD  ; XID_Continue # Mn   [2] SIDDHAM VOWEL SIGN ALTERNATE U..
+                                            SIDDHAM VOWEL SIGN ALTERNATE UU
     11630..11632  ; XID_Continue # Mc   [3] MODI VOWEL SIGN AA..MODI VOWEL SIGN II
     11633..1163A  ; XID_Continue # Mn   [8] MODI VOWEL SIGN U..MODI VOWEL SIGN AI
     1163B..1163C  ; XID_Continue # Mc   [2] MODI VOWEL SIGN O..MODI VOWEL SIGN AU
@@ -1540,7 +1559,8 @@ Needed for TR39#5.4
     116B0..116B5  ; XID_Continue # Mn   [6] TAKRI VOWEL SIGN U..TAKRI VOWEL SIGN AU
     116B6         ; XID_Continue # Mc       TAKRI SIGN VIRAMA
     116B7         ; XID_Continue # Mn       TAKRI SIGN NUKTA
-    1171D..1171F  ; XID_Continue # Mn   [3] AHOM CONSONANT SIGN MEDIAL LA..AHOM CONSONANT SIGN MEDIAL LIGATING RA
+    1171D..1171F  ; XID_Continue # Mn   [3] AHOM CONSONANT SIGN MEDIAL LA..
+                                            AHOM CONSONANT SIGN MEDIAL LIGATING RA
     11720..11721  ; XID_Continue # Mc   [2] AHOM VOWEL SIGN A..AHOM VOWEL SIGN AA
     11722..11725  ; XID_Continue # Mn   [4] AHOM VOWEL SIGN I..AHOM VOWEL SIGN UU
     11726         ; XID_Continue # Mc       AHOM VOWEL SIGN E
@@ -1579,21 +1599,29 @@ Needed for TR39#5.4
     11C38..11C3D  ; XID_Continue # Mn   [6] BHAIKSUKI VOWEL SIGN E..BHAIKSUKI SIGN ANUSVARA
     11C3E         ; XID_Continue # Mc       BHAIKSUKI SIGN VISARGA
     11C3F         ; XID_Continue # Mn       BHAIKSUKI SIGN VIRAMA
-    11C92..11CA7  ; XID_Continue # Mn  [22] MARCHEN SUBJOINED LETTER KA..MARCHEN SUBJOINED LETTER ZA
+    11C92..11CA7  ; XID_Continue # Mn  [22] MARCHEN SUBJOINED LETTER KA..
+                                            MARCHEN SUBJOINED LETTER ZA
     11CA9         ; XID_Continue # Mc       MARCHEN SUBJOINED LETTER YA
-    11CAA..11CB0  ; XID_Continue # Mn   [7] MARCHEN SUBJOINED LETTER RA..MARCHEN VOWEL SIGN AA
+    11CAA..11CB0  ; XID_Continue # Mn   [7] MARCHEN SUBJOINED LETTER RA..
+                                            MARCHEN VOWEL SIGN AA
     11CB1         ; XID_Continue # Mc       MARCHEN VOWEL SIGN I
     11CB2..11CB3  ; XID_Continue # Mn   [2] MARCHEN VOWEL SIGN U..MARCHEN VOWEL SIGN E
     11CB4         ; XID_Continue # Mc       MARCHEN VOWEL SIGN O
     11CB5..11CB6  ; XID_Continue # Mn   [2] MARCHEN SIGN ANUSVARA..MARCHEN SIGN CANDRABINDU
-    11D31..11D36  ; XID_Continue # Mn   [6] MASARAM GONDI VOWEL SIGN AA..MASARAM GONDI VOWEL SIGN VOCALIC R
+    11D31..11D36  ; XID_Continue # Mn   [6] MASARAM GONDI VOWEL SIGN AA..
+                                            MASARAM GONDI VOWEL SIGN VOCALIC R
     11D3A         ; XID_Continue # Mn       MASARAM GONDI VOWEL SIGN E
-    11D3C..11D3D  ; XID_Continue # Mn   [2] MASARAM GONDI VOWEL SIGN AI..MASARAM GONDI VOWEL SIGN O
-    11D3F..11D45  ; XID_Continue # Mn   [7] MASARAM GONDI VOWEL SIGN AU..MASARAM GONDI VIRAMA
+    11D3C..11D3D  ; XID_Continue # Mn   [2] MASARAM GONDI VOWEL SIGN AI..
+                                            MASARAM GONDI VOWEL SIGN O
+    11D3F..11D45  ; XID_Continue # Mn   [7] MASARAM GONDI VOWEL SIGN AU..
+                                            MASARAM GONDI VIRAMA
     11D47         ; XID_Continue # Mn       MASARAM GONDI RA-KARA
-    11D8A..11D8E  ; XID_Continue # Mc   [5] GUNJALA GONDI VOWEL SIGN AA..GUNJALA GONDI VOWEL SIGN UU
-    11D90..11D91  ; XID_Continue # Mn   [2] GUNJALA GONDI VOWEL SIGN EE..GUNJALA GONDI VOWEL SIGN AI
-    11D93..11D94  ; XID_Continue # Mc   [2] GUNJALA GONDI VOWEL SIGN OO..GUNJALA GONDI VOWEL SIGN AU
+    11D8A..11D8E  ; XID_Continue # Mc   [5] GUNJALA GONDI VOWEL SIGN AA..
+                                            GUNJALA GONDI VOWEL SIGN UU
+    11D90..11D91  ; XID_Continue # Mn   [2] GUNJALA GONDI VOWEL SIGN EE..
+                                            GUNJALA GONDI VOWEL SIGN AI
+    11D93..11D94  ; XID_Continue # Mc   [2] GUNJALA GONDI VOWEL SIGN OO..
+                                            GUNJALA GONDI VOWEL SIGN AU
     11D95         ; XID_Continue # Mn       GUNJALA GONDI SIGN ANUSVARA
     11D96         ; XID_Continue # Mc       GUNJALA GONDI SIGN VISARGA
     11D97         ; XID_Continue # Mn       GUNJALA GONDI VIRAMA
@@ -1605,32 +1633,224 @@ Needed for TR39#5.4
     16F51..16F87  ; XID_Continue # Mc  [55] MIAO SIGN ASPIRATION..MIAO VOWEL SIGN UI
     16F8F..16F92  ; XID_Continue # Mn   [4] MIAO TONE RIGHT..MIAO TONE BELOW
     16FE4         ; XID_Continue # Mn       KHITAN SMALL SCRIPT FILLER
-    16FF0..16FF1  ; XID_Continue # Mc   [2] VIETNAMESE ALTERNATE READING MARK CA..VIETNAMESE ALTERNATE READING MARK NHAY
-    1BC9D..1BC9E  ; XID_Continue # Mn   [2] DUPLOYAN THICK LETTER SELECTOR..DUPLOYAN DOUBLE MARK
-    1CF00..1CF2D  ; XID_Continue # Mn  [46] ZNAMENNY COMBINING MARK GORAZDO NIZKO S KRYZHEM ON LEFT..ZNAMENNY COMBINING MARK KRYZH ON LEFT
-    1CF30..1CF46  ; XID_Continue # Mn  [23] ZNAMENNY COMBINING TONAL RANGE MARK MRACHNO..ZNAMENNY PRIZNAK MODIFIER ROG
-    1D165..1D166  ; XID_Continue # Mc   [2] MUSICAL SYMBOL COMBINING STEM..MUSICAL SYMBOL COMBINING SPRECHGESANG STEM
-    1D167..1D169  ; XID_Continue # Mn   [3] MUSICAL SYMBOL COMBINING TREMOLO-1..MUSICAL SYMBOL COMBINING TREMOLO-3
-    1D16D..1D172  ; XID_Continue # Mc   [6] MUSICAL SYMBOL COMBINING AUGMENTATION DOT..MUSICAL SYMBOL COMBINING FLAG-5
-    1D17B..1D182  ; XID_Continue # Mn   [8] MUSICAL SYMBOL COMBINING ACCENT..MUSICAL SYMBOL COMBINING LOURE
-    1D185..1D18B  ; XID_Continue # Mn   [7] MUSICAL SYMBOL COMBINING DOIT..MUSICAL SYMBOL COMBINING TRIPLE TONGUE
-    1D1AA..1D1AD  ; XID_Continue # Mn   [4] MUSICAL SYMBOL COMBINING DOWN BOW..MUSICAL SYMBOL COMBINING SNAP PIZZICATO
-    1D242..1D244  ; XID_Continue # Mn   [3] COMBINING GREEK MUSICAL TRISEME..COMBINING GREEK MUSICAL PENTASEME
-    1DA00..1DA36  ; XID_Continue # Mn  [55] SIGNWRITING HEAD RIM..SIGNWRITING AIR SUCKING IN
-    1DA3B..1DA6C  ; XID_Continue # Mn  [50] SIGNWRITING MOUTH CLOSED NEUTRAL..SIGNWRITING EXCITEMENT
+    16FF0..16FF1  ; XID_Continue # Mc   [2] VIETNAMESE ALTERNATE READING MARK CA..
+                                            VIETNAMESE ALTERNATE READING MARK NHAY
+    1BC9D..1BC9E  ; XID_Continue # Mn   [2] DUPLOYAN THICK LETTER SELECTOR..
+                                            DUPLOYAN DOUBLE MARK
+    1CF00..1CF2D  ; XID_Continue # Mn  [46] ZNAMENNY COMBINING MARK GORAZDO NIZKO S KRYZHEM ON LEFT..
+                                            ZNAMENNY COMBINING MARK KRYZH ON LEFT
+    1CF30..1CF46  ; XID_Continue # Mn  [23] ZNAMENNY COMBINING TONAL RANGE MARK MRACHNO..
+                                            ZNAMENNY PRIZNAK MODIFIER ROG
+    1D165..1D166  ; XID_Continue # Mc   [2] MUSICAL SYMBOL COMBINING STEM..
+                                            MUSICAL SYMBOL COMBINING SPRECHGESANG STEM
+    1D167..1D169  ; XID_Continue # Mn   [3] MUSICAL SYMBOL COMBINING TREMOLO-1..
+                                            MUSICAL SYMBOL COMBINING TREMOLO-3
+    1D16D..1D172  ; XID_Continue # Mc   [6] MUSICAL SYMBOL COMBINING AUGMENTATION DOT..
+                                            MUSICAL SYMBOL COMBINING FLAG-5
+    1D17B..1D182  ; XID_Continue # Mn   [8] MUSICAL SYMBOL COMBINING ACCENT..
+                                            MUSICAL SYMBOL COMBINING LOURE
+    1D185..1D18B  ; XID_Continue # Mn   [7] MUSICAL SYMBOL COMBINING DOIT..
+                                            MUSICAL SYMBOL COMBINING TRIPLE TONGUE
+    1D1AA..1D1AD  ; XID_Continue # Mn   [4] MUSICAL SYMBOL COMBINING DOWN BOW..
+                                            MUSICAL SYMBOL COMBINING SNAP PIZZICATO
+    1D242..1D244  ; XID_Continue # Mn   [3] COMBINING GREEK MUSICAL TRISEME..
+                                            COMBINING GREEK MUSICAL PENTASEME
+    1DA00..1DA36  ; XID_Continue # Mn  [55] SIGNWRITING HEAD RIM..
+                                            SIGNWRITING AIR SUCKING IN
+    1DA3B..1DA6C  ; XID_Continue # Mn  [50] SIGNWRITING MOUTH CLOSED NEUTRAL..
+                                            SIGNWRITING EXCITEMENT
     1DA75         ; XID_Continue # Mn       SIGNWRITING UPPER BODY TILTING FROM HIP JOINTS
     1DA84         ; XID_Continue # Mn       SIGNWRITING LOCATION HEAD NECK
-    1DA9B..1DA9F  ; XID_Continue # Mn   [5] SIGNWRITING FILL MODIFIER-2..SIGNWRITING FILL MODIFIER-6
-    1DAA1..1DAAF  ; XID_Continue # Mn  [15] SIGNWRITING ROTATION MODIFIER-2..SIGNWRITING ROTATION MODIFIER-16
-    1E000..1E006  ; XID_Continue # Mn   [7] COMBINING GLAGOLITIC LETTER AZU..COMBINING GLAGOLITIC LETTER ZHIVETE
-    1E008..1E018  ; XID_Continue # Mn  [17] COMBINING GLAGOLITIC LETTER ZEMLJA..COMBINING GLAGOLITIC LETTER HERU
-    1E01B..1E021  ; XID_Continue # Mn   [7] COMBINING GLAGOLITIC LETTER SHTA..COMBINING GLAGOLITIC LETTER YATI
-    1E023..1E024  ; XID_Continue # Mn   [2] COMBINING GLAGOLITIC LETTER YU..COMBINING GLAGOLITIC LETTER SMALL YUS
-    1E026..1E02A  ; XID_Continue # Mn   [5] COMBINING GLAGOLITIC LETTER YO..COMBINING GLAGOLITIC LETTER FITA
-    1E130..1E136  ; XID_Continue # Mn   [7] NYIAKENG PUACHUE HMONG TONE-B..NYIAKENG PUACHUE HMONG TONE-D
+    1DA9B..1DA9F  ; XID_Continue # Mn   [5] SIGNWRITING FILL MODIFIER-2..
+                                            SIGNWRITING FILL MODIFIER-6
+    1DAA1..1DAAF  ; XID_Continue # Mn  [15] SIGNWRITING ROTATION MODIFIER-2..
+                                            SIGNWRITING ROTATION MODIFIER-16
+    1E000..1E006  ; XID_Continue # Mn   [7] COMBINING GLAGOLITIC LETTER AZU..
+                                            COMBINING GLAGOLITIC LETTER ZHIVETE
+    1E008..1E018  ; XID_Continue # Mn  [17] COMBINING GLAGOLITIC LETTER ZEMLJA..
+                                            COMBINING GLAGOLITIC LETTER HERU
+    1E01B..1E021  ; XID_Continue # Mn   [7] COMBINING GLAGOLITIC LETTER SHTA..
+                                            COMBINING GLAGOLITIC LETTER YATI
+    1E023..1E024  ; XID_Continue # Mn   [2] COMBINING GLAGOLITIC LETTER YU..
+                                            COMBINING GLAGOLITIC LETTER SMALL YUS
+    1E026..1E02A  ; XID_Continue # Mn   [5] COMBINING GLAGOLITIC LETTER YO..
+                                            COMBINING GLAGOLITIC LETTER FITA
+    1E130..1E136  ; XID_Continue # Mn   [7] NYIAKENG PUACHUE HMONG TONE-B..
+                                            NYIAKENG PUACHUE HMONG TONE-D
     1E2AE         ; XID_Continue # Mn       TOTO SIGN RISING TONE
     1E2EC..1E2EF  ; XID_Continue # Mn   [4] WANCHO TONE TUP..WANCHO TONE KOINI
-    1E8D0..1E8D6  ; XID_Continue # Mn   [7] MENDE KIKAKUI COMBINING NUMBER TEENS..MENDE KIKAKUI COMBINING NUMBER MILLIONS
+    1E8D0..1E8D6  ; XID_Continue # Mn   [7] MENDE KIKAKUI COMBINING NUMBER TEENS..
+                                            MENDE KIKAKUI COMBINING NUMBER MILLIONS
     1E944..1E94A  ; XID_Continue # Mn   [7] ADLAM ALIF LENGTHENER..ADLAM NUKTA
     E0100..E01EF  ; XID_Continue # Mn [240] VARIATION SELECTOR-17..VARIATION SELECTOR-256
 
+17 Appendix E - IDType Technical
+=================================
+
+Needed for **#8 TR39 Identifier Type**. List of Technical ID characters, added the TR39
+Recommended and Inclusion IDTypes.
+[TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1)
+
+`grep ' Technical ' IdentifierType.txt |
+egrep -v 'Not_XID|Obsolete|Exclusion|Uncommon_Use|Limited_Use'`
+
+``` txt
+0180          ; Technical  # 1.1        LATIN SMALL LETTER B WITH STROKE
+01C0..01C3    ; Technical  # 1.1    [4] LATIN LETTER DENTAL CLICK..
+                                        LATIN LETTER RETROFLEX CLICK
+0234..0236    ; Technical  # 4.0    [3] LATIN SMALL LETTER L WITH CURL..
+                                        LATIN SMALL LETTER T WITH CURL
+0250..0252    ; Technical  # 1.1    [3] LATIN SMALL LETTER TURNED A..
+                                        LATIN SMALL LETTER TURNED ALPHA
+0255          ; Technical  # 1.1        LATIN SMALL LETTER C WITH CURL
+0258          ; Technical  # 1.1        LATIN SMALL LETTER REVERSED E
+025A          ; Technical  # 1.1        LATIN SMALL LETTER SCHWA WITH HOOK
+025C..0262    ; Technical  # 1.1    [7] LATIN SMALL LETTER REVERSED OPEN E..
+                                        LATIN LETTER SMALL CAPITAL G
+0264..0267    ; Technical  # 1.1    [4] LATIN SMALL LETTER RAMS HORN..
+                                        LATIN SMALL LETTER HENG WITH HOOK
+026A..0271    ; Technical  # 1.1    [8] LATIN LETTER SMALL CAPITAL I..
+                                        LATIN SMALL LETTER M WITH HOOK
+0273..0276    ; Technical  # 1.1    [4] LATIN SMALL LETTER N WITH RETROFLEX HOOK..
+                                        LATIN LETTER SMALL CAPITAL OE
+0278..027B    ; Technical  # 1.1    [4] LATIN SMALL LETTER PHI..
+                                        LATIN SMALL LETTER TURNED R WITH HOOK
+027D..0288    ; Technical  # 1.1   [12] LATIN SMALL LETTER R WITH TAIL..
+                                        LATIN SMALL LETTER T WITH RETROFLEX HOOK
+028A..0291    ; Technical  # 1.1    [8] LATIN SMALL LETTER UPSILON..
+                                        LATIN SMALL LETTER Z WITH CURL
+0293..029D    ; Technical  # 1.1   [11] LATIN SMALL LETTER EZH WITH CURL..
+                                        LATIN SMALL LETTER J WITH CROSSED-TAIL
+029F..02A8    ; Technical  # 1.1   [10] LATIN LETTER SMALL CAPITAL L..
+                                        LATIN SMALL LETTER TC DIGRAPH WITH CURL
+02A9..02AD    ; Technical  # 3.0    [5] LATIN SMALL LETTER FENG DIGRAPH..
+                                        LATIN LETTER BIDENTAL PERCUSSIVE
+02AE..02AF    ; Technical  # 4.0    [2] LATIN SMALL LETTER TURNED H WITH FISHHOOK..
+                                        LATIN SMALL LETTER TURNED H WITH FISHHOOK AND TAIL
+02B9..02BA    ; Technical  # 1.1    [2] MODIFIER LETTER PRIME..
+                                        MODIFIER LETTER DOUBLE PRIME
+02BD..02C1    ; Technical  # 1.1    [5] MODIFIER LETTER REVERSED COMMA..
+                                        MODIFIER LETTER REVERSED GLOTTAL STOP
+02C6..02D1    ; Technical  # 1.1   [12] MODIFIER LETTER CIRCUMFLEX ACCENT..
+                                        MODIFIER LETTER HALF TRIANGULAR COLON
+02EE          ; Technical  # 3.0        MODIFIER LETTER DOUBLE APOSTROPHE
+030E          ; Technical  # 1.1        COMBINING DOUBLE VERTICAL LINE ABOVE
+0312          ; Technical  # 1.1        COMBINING TURNED COMMA ABOVE
+0315          ; Technical  # 1.1        COMBINING COMMA ABOVE RIGHT
+0317..031A    ; Technical  # 1.1    [4] COMBINING ACUTE ACCENT BELOW..
+                                        COMBINING LEFT ANGLE ABOVE
+031C..0320    ; Technical  # 1.1    [5] COMBINING LEFT HALF RING BELOW..
+                                        COMBINING MINUS SIGN BELOW
+0329..032C    ; Technical  # 1.1    [4] COMBINING VERTICAL LINE BELOW..
+                                        COMBINING CARON BELOW
+032F          ; Technical  # 1.1        COMBINING INVERTED BREVE BELOW
+0333          ; Technical  # 1.1        COMBINING DOUBLE LOW LINE
+0337          ; Technical  # 1.1        COMBINING SHORT SOLIDUS OVERLAY
+033A..033F    ; Technical  # 1.1    [6] COMBINING INVERTED BRIDGE BELOW..
+                                        COMBINING DOUBLE OVERLINE
+0346..034E    ; Technical  # 3.0    [9] COMBINING BRIDGE ABOVE..
+                                        COMBINING UPWARDS ARROW BELOW
+0350..0357    ; Technical  # 4.0    [8] COMBINING RIGHT ARROWHEAD ABOVE..
+                                        COMBINING RIGHT HALF RING ABOVE
+0359..035C    ; Technical  # 4.1    [4] COMBINING ASTERISK BELOW..
+                                        COMBINING DOUBLE BREVE BELOW
+035D..035F    ; Technical  # 4.0    [3] COMBINING DOUBLE BREVE..
+                                        COMBINING DOUBLE MACRON BELOW
+0360..0361    ; Technical  # 1.1    [2] COMBINING DOUBLE TILDE..
+                                        COMBINING DOUBLE INVERTED BREVE
+0362          ; Technical  # 3.0        COMBINING DOUBLE RIGHTWARDS ARROW BELOW
+03CF          ; Technical  # 5.1        GREEK CAPITAL KAI SYMBOL
+03D7          ; Technical  # 3.0        GREEK KAI SYMBOL
+0560          ; Technical  # 11.0       ARMENIAN SMALL LETTER TURNED AYB
+0588          ; Technical  # 11.0       ARMENIAN SMALL LETTER YI WITH STROKE
+0953..0954    ; Technical  # 1.1    [2] DEVANAGARI GRAVE ACCENT..
+                                        DEVANAGARI ACUTE ACCENT
+0D81          ; Technical  # 13.0       SINHALA SIGN CANDRABINDU
+0F18..0F19    ; Technical  # 2.0    [2] TIBETAN ASTROLOGICAL SIGN -KHYUD PA..
+                                        TIBETAN ASTROLOGICAL SIGN SDONG TSHUGS
+17CE..17CF    ; Technical  # 3.0    [2] KHMER SIGN KAKABAT..
+                                        KHMER SIGN AHSDA
+1ABF..1AC0    ; Technical  # 13.0   [2] COMBINING LATIN SMALL LETTER W BELOW..
+                                        COMBINING LATIN SMALL LETTER TURNED W BELOW
+1D00..1D2B    ; Technical  # 4.0   [44] LATIN LETTER SMALL CAPITAL A..
+                                        CYRILLIC LETTER SMALL CAPITAL EL
+1D2F          ; Technical  # 4.0        MODIFIER LETTER CAPITAL BARRED B
+1D3B          ; Technical  # 4.0        MODIFIER LETTER CAPITAL REVERSED N
+1D4E          ; Technical  # 4.0        MODIFIER LETTER SMALL TURNED I
+1D6B          ; Technical  # 4.0        LATIN SMALL LETTER UE
+1D6C..1D77    ; Technical  # 4.1   [12] LATIN SMALL LETTER B WITH MIDDLE TILDE..
+                                        LATIN SMALL LETTER TURNED G
+1D79..1D9A    ; Technical  # 4.1   [34] LATIN SMALL LETTER INSULAR G..
+                                        LATIN SMALL LETTER EZH WITH RETROFLEX HOOK
+1DC4..1DCA    ; Technical  # 5.0    [7] COMBINING MACRON-ACUTE..
+                                        COMBINING LATIN SMALL LETTER R BELOW
+1DCB..1DCD    ; Technical  # 5.1    [3] COMBINING BREVE-MACRON..
+                                        COMBINING DOUBLE CIRCUMFLEX ABOVE
+1DCF..1DD0    ; Technical  # 5.1    [2] COMBINING ZIGZAG BELOW..
+                                        COMBINING IS BELOW
+1DE7..1DF5    ; Technical  # 7.0   [15] COMBINING LATIN SMALL LETTER ALPHA..
+                                        COMBINING UP TACK ABOVE
+1DF6..1DF9    ; Technical  # 10.0   [4] COMBINING KAVYKA ABOVE RIGHT..
+                                        COMBINING WIDE INVERTED BRIDGE BELOW
+1DFB          ; Technical  # 9.0        COMBINING DELETION MARK
+1DFC          ; Technical  # 6.0        COMBINING DOUBLE INVERTED BREVE BELOW
+1DFD          ; Technical  # 5.2        COMBINING ALMOST EQUAL TO BELOW
+1DFE..1DFF    ; Technical  # 5.0    [2] COMBINING LEFT ARROWHEAD ABOVE..
+                                        COMBINING RIGHT ARROWHEAD AND DOWN ARROWHEAD BELOW
+1E9C..1E9D    ; Technical  # 5.1    [2] LATIN SMALL LETTER LONG S WITH DIAGONAL STROKE..
+                                        LATIN SMALL LETTER LONG S WITH HIGH STROKE
+1E9F          ; Technical  # 5.1        LATIN SMALL LETTER DELTA
+1EFA..1EFF    ; Technical  # 5.1    [6] LATIN CAPITAL LETTER MIDDLE-WELSH LL..
+                                        LATIN SMALL LETTER Y WITH LOOP
+203F..2040    ; Technical  # 1.1    [2] UNDERTIE..
+                                        CHARACTER TIE
+20D0..20DC    ; Technical  # 1.1   [13] COMBINING LEFT HARPOON ABOVE..
+                                        COMBINING FOUR DOTS ABOVE
+20E1          ; Technical  # 1.1        COMBINING LEFT RIGHT ARROW ABOVE
+20E5..20EA    ; Technical  # 3.2    [6] COMBINING REVERSE SOLIDUS OVERLAY..
+                                        COMBINING LEFTWARDS ARROW OVERLAY
+20EB          ; Technical  # 4.1        COMBINING LONG DOUBLE SOLIDUS OVERLAY
+20EC..20EF    ; Technical  # 5.0    [4] COMBINING RIGHTWARDS HARPOON WITH BARB DOWNWARDS..
+                                        COMBINING RIGHT ARROW BELOW
+20F0          ; Technical  # 5.1        COMBINING ASTERISK ABOVE
+2118          ; Technical  # 1.1        SCRIPT CAPITAL P
+212E          ; Technical  # 1.1        ESTIMATED SYMBOL
+2C60..2C67    ; Technical  # 5.0    [8] LATIN CAPITAL LETTER L WITH DOUBLE BAR..
+                                        LATIN CAPITAL LETTER H WITH DESCENDER
+2C77          ; Technical  # 5.0        LATIN SMALL LETTER TAILLESS PHI
+2C78..2C7B    ; Technical  # 5.1    [4] LATIN SMALL LETTER E WITH NOTCH..
+                                        LATIN LETTER SMALL CAPITAL TURNED E
+3021..302D    ; Technical  # 1.1   [13] HANGZHOU NUMERAL ONE..
+                                        IDEOGRAPHIC ENTERING TONE MARK
+3031..3035    ; Technical  # 1.1    [5] VERTICAL KANA REPEAT MARK..
+                                        VERTICAL KANA REPEAT MARK LOWER HALF
+303B..303C    ; Technical  # 3.2    [2] VERTICAL IDEOGRAPHIC ITERATION MARK..
+                                        MASU MARK
+A78E          ; Technical  # 6.0        LATIN SMALL LETTER L WITH RETROFLEX HOOK AND BELT
+A7AF          ; Technical  # 11.0       LATIN LETTER SMALL CAPITAL Q
+A7BA..A7BF    ; Technical  # 12.0   [6] LATIN CAPITAL LETTER GLOTTAL A..
+                                        LATIN SMALL LETTER GLOTTAL U
+A7FA          ; Technical  # 6.0        LATIN LETTER SMALL CAPITAL TURNED M
+AB68          ; Technical  # 13.0       LATIN SMALL LETTER TURNED R WITH MIDDLE TILDE
+FE20..FE23    ; Technical  # 1.1    [4] COMBINING LIGATURE LEFT HALF..
+                                        COMBINING DOUBLE TILDE RIGHT HALF
+FE24..FE26    ; Technical  # 5.1    [3] COMBINING MACRON LEFT HALF..
+                                        COMBINING CONJOINING MACRON
+FE27..FE2D    ; Technical  # 7.0    [7] COMBINING LIGATURE LEFT HALF BELOW..
+                                        COMBINING CONJOINING MACRON BELOW
+FE73          ; Technical  # 3.2        ARABIC TAIL FRAGMENT
+1CF00..1CF2D  ; Technical  # 14.0  [46] ZNAMENNY COMBINING MARK GORAZDO NIZKO S KRYZHEM ON LEFT..
+                                        ZNAMENNY COMBINING MARK KRYZH ON LEFT
+1CF30..1CF46  ; Technical  # 14.0  [23] ZNAMENNY COMBINING TONAL RANGE MARK MRACHNO..
+                                        ZNAMENNY PRIZNAK MODIFIER ROG
+1D165..1D169  ; Technical  # 3.1    [5] MUSICAL SYMBOL COMBINING STEM..
+                                        MUSICAL SYMBOL COMBINING TREMOLO-3
+1D16D..1D172  ; Technical  # 3.1    [6] MUSICAL SYMBOL COMBINING AUGMENTATION DOT..
+                                        MUSICAL SYMBOL COMBINING FLAG-5
+1D17B..1D182  ; Technical  # 3.1    [8] MUSICAL SYMBOL COMBINING ACCENT..
+                                        MUSICAL SYMBOL COMBINING LOURE
+1D185..1D18B  ; Technical  # 3.1    [7] MUSICAL SYMBOL COMBINING DOIT..
+                                        MUSICAL SYMBOL COMBINING TRIPLE TONGUE
+1D1AA..1D1AD  ; Technical  # 3.1    [4] MUSICAL SYMBOL COMBINING DOWN BOW..
+                                        MUSICAL SYMBOL COMBINING SNAP PIZZICATO
+```
