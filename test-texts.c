@@ -210,6 +210,9 @@ int main(int argc, char **argv) {
     perror("opendir");
     exit(1);
   }
+#elif defined _MSC_VER
+  WIN32_FIND_DATA FindFileData;
+  HANDLE hdir;
 #endif
 
   const char *const exts[] = {".txt", ".c"};
@@ -223,12 +226,9 @@ int main(int argc, char **argv) {
 #  define NEXT_FILE (d = readdir(dir))
 #  define CUR_FILE d->d_name
 #elif defined _MSC_VER
-    WIN32_FIND_DATA FindFileData;
-    HANDLE hdir = FindFirstFile(dirname, &FindFileData);
-    if (hdir == INVALID_HANDLE_VALUE) {
-      perror("FindFirstFile");
-      goto done;
-    }
+    hdir = FindFirstFile(dirname, &FindFileData);
+    if (hdir == INVALID_HANDLE_VALUE)
+      continue;
 #  define NEXT_FILE FindNextFile(hdir, &FindFileData)
 #  define CUR_FILE FindFileData.cFileName
 #endif
