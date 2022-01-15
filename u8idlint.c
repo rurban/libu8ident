@@ -703,7 +703,7 @@ int main(int argc, char **argv) {
     if (argc > i + 1 &&
         (strEQc(argv[i], "--profile") || strEQc(argv[i], "-p"))) {
       opt_profile = true;
-      option_profile(optarg);
+      option_profile(argv[i] + 1);
       if (profile == U8ID_PROFILE_1 && !opt_xid)
         opt_xid = ASCII;
       if (profile == U8ID_PROFILE_C23_4 && !opt_xid) {

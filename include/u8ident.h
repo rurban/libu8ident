@@ -72,7 +72,7 @@ typedef unsigned u8id_ctx_t;
 // inside the dll
 #  if defined _WIN32 || defined __CYGWIN__
 #    define EXTERN __declspec(dllexport)
-#    define LOCAL __attribute__((visibility("hidden")))
+#    define LOCAL
 #  elif __GNUC__ >= 4
 #    define EXTERN __attribute__((visibility("default")))
 #    define LOCAL __attribute__((visibility("hidden")))
