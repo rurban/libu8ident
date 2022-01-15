@@ -203,11 +203,9 @@ if (CRoaring_FOUND)
 endif()
 
 add_executable(u8idlint u8idlint.c ${libu8ident_SOURCES})
-#if (MSVC)
-  # cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
-  #target_link_directories(u8idlint PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+# cmake MSVC bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
+# target_link_directories(u8idlint PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 # target_link_libraries(u8idlint ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
-#endif()
 include_directories(BEFORE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -219,23 +217,14 @@ if(NOT CMAKE_CROSSCOMPILING)
   add_test(test ./u8idtest)
   if (NOT MSVC)
     add_test(u8idlint.test "${CMAKE_CURRENT_SOURCE_DIR}/u8idlint.test")
-    set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
-    # still broken for MSVC
-    add_executable(test-texts test-texts.c ${libu8ident_SOURCES})
-    add_test(test-texts ./test-texts)
-    add_executable(mkc23 mkc23.c ${libu8ident_SOURCES})
-    set_source_files_properties(mkc23
-      PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_SAFEC23)
-    add_test(mkc23 ./mkc23)
-  else()
-    # cmake bug: u8idlint only gets Release\u8ident.lib, but is in a subdir
-    #target_link_directories(u8idtest PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-    target_link_libraries(u8idtest ${CMAKE_CURRENT_BINARY_DIR}/u8ident.lib)
-    #target_link_directories(test-texts PRIVATE ${LIBPATH})
-    #target_link_directories(mkc23 PRIVATE ${LIBPATH})
-    #target_link_libraries(test-texts u8ident.lib)
-    #target_link_libraries(mkc23 u8ident.lib)
-  endif(NOT MSVC)
+  endif()
+  set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
+  add_executable(test-texts test-texts.c ${libu8ident_SOURCES})
+  add_test(test-texts ./test-texts)
+  add_executable(mkc23 mkc23.c ${libu8ident_SOURCES})
+  set_source_files_properties(mkc23
+    PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_SAFEC23)
+  add_test(mkc23 ./mkc23)
 endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(

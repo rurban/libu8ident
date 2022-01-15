@@ -134,11 +134,14 @@ jobs:
     #- uses: microsoft/setup-msbuild@v1.1
     - run: cmake .
     - run: cmake --build . --config Release --verbose
-      continue-on-error: true
     - run: cmake --build . --target RUN_TESTS --config Release --verbose
-      continue-on-error: true
     - run: cmake --build . --target package --config Release
-      continue-on-error: true
     # currently -G for "Visual Studio 16 2019"
     #- run: msbuild libu8ident.sln
     #- run: Debug\u8idtest
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          libu8ident-*-win64.exe
