@@ -198,7 +198,7 @@ static void usage(int exitcode) {
 #else
   puts("Usage: u8idlint [OPTIONS] [dirs or files]...");
   puts("OPTIONS:");
-  puts(" -n|--normalize=nfc,nfkc,nfd,nfkc            default: nfc");
+  puts(" -n|--norm=nfc,nfkc,nfd,nfkc            default: nfc");
   puts("  set to nfkd by default for python");
   puts(" -p|--profile=1,2,3,4,5,6,c23_4,c11_6        default: c23_4");
   puts("  TR39 unicode mixed-script security profile for identifiers:");
@@ -566,7 +566,7 @@ static enum u8id_norm option_norm(const char *optarg) {
   else if (strEQc(optarg, "nfd") || strEQc(optarg, "NFD"))
     return U8ID_NFD;
   else {
-    fprintf(stderr, "Invalid --normalize %s\n", optarg);
+    fprintf(stderr, "Invalid --norm %s\n", optarg);
     usage(1);
   }
   return 0;
@@ -582,7 +582,7 @@ int main(int argc, char **argv) {
 #ifdef HAVE_GETOPT_LONG
   int option_index = 0;
   static struct option long_options[] = {
-      {"normalization", 1, 0, 'n'}, // *nfc*,nfd,nfkc,nfkd
+      {"norm", 1, 0, 'n'}, // *nfc*,nfd,nfkc,nfkd
       {"profile", 1, 0, 'p'},       // 1,2,3,*4*,5,6,c23_4,c11_6
       {"xid", 1, 0, 'x'}, // ascii,allowed,id,*xid*,safec23,c11,allutf8
       {"ext", 1, 0, 'e'},
@@ -698,6 +698,10 @@ int main(int argc, char **argv) {
       option_xid(argv[i + 1]);
       if (xid == ASCII && !opt_profile)
         profile = U8ID_PROFILE_1;
+      i += 2;
+    }
+    if (argc > i + 1 && (strEQc(argv[i], "--norm") || strEQc(argv[i], "-n"))) {
+      option_norm(argv[i + 1]);
       i += 2;
     }
     if (argc > i + 1 &&
