@@ -105,7 +105,7 @@ struct stats {
 static char* cquote_new(const char* s) {
   long l = (strlen(s) * 4) + 1;
   char *ret = malloc(l);
-  char *p = (char *)s;
+  uint8_t *p = (uint8_t *)s;
   char *r = ret;
   while (*p) {
     assert(l > 0);
@@ -202,6 +202,10 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
               if (this_scx) {
                 char *scx = cquote_new(this_scx->scx);
                 fprintf(f, ", SC_%s, GC_%s, \"%s\"},\n", u8ident_script_name(s), gcname, scx);
+                fprintf(f, "  //");
+                for (size_t i=0; i<strlen(this_scx->scx); i++) {
+                  fprintf(f, "%s%s", i ? "," : "", u8ident_script_name((uint8_t)this_scx->scx[i]));
+                }
                 free(scx);
               } else {
                 fprintf(f, ", SC_%s, GC_%s, NULL},\n", u8ident_script_name(s), gcname);
@@ -234,6 +238,10 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
             if (this_scx) {
               char *scx = cquote_new(this_scx->scx);
               fprintf(f, ", SC_%s, GC_%s, \"%s\"},", u8ident_script_name(s), mgcname, scx);
+              fprintf(f, "  //");
+              for (size_t i=0; i<strlen(this_scx->scx); i++) {
+                fprintf(f, "%s%s", i ? "," : "", u8ident_script_name((uint8_t)this_scx->scx[i]));
+              }
               free(scx);
             } else
               fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s), mgcname);

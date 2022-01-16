@@ -331,7 +331,7 @@ not part of XIDs.
 From these 67 Lm plus 513 M\[cn\] ranges filtering out the non-C23 XID candidates,
 only #8 Identifier_Type = Recommended, Inclusion, Technical, plus only #4.2
 Recommended Scripts, plus only codepoints with multiple SCX entries,
-leads to these ranges. (TODO #8, NFC)
+leads to these ranges. TODO
 
 ``` txt
 A9CF          ; Bugi Java # Lm       JAVANESE PANGRANGKEP
@@ -570,478 +570,485 @@ specific. (i.e. you cannot copy them across locales).
 13 Appendix A - C23XID_Start
 ============================
 
-Created with mkc23 from libu8ident
+Created with mkc23 from libu8ident.
 
 ``` c
 // Filtering allowed scripts, XID_Start, safe IDTypes and NFC
-const struct sc safec23_start_list[432] = {
-    {'$', '$', SC_Latin},
-    {'A', 'Z', SC_Latin},
-    {'_', '_', SC_Latin},
-    {'a', 'z', SC_Latin},
-    {0x7A, 0x7A, 2}, // Latin z
-    {0xAA, 0xAA, 2}, // Latin ª
-    {0xB5, 0xB5, 0}, // Common µ
-    {0xBA, 0xBA, 2}, // Latin º
-    {0xC0, 0xD6, 2}, // Latin À..Ö
-    {0xD8, 0xF6, 2}, // Latin Ø..ö
-    {0xF8, 0x2B8, 2}, // Latin ø..ʸ
-    {0x2BA, 0x2C1, 0}, // Common ʺ..ˁ
-    {0x2C6, 0x2D1, 0}, // Common ˆ..ˑ
-    {0x2E0, 0x2E4, 2}, // Latin ˠ..ˤ
-    {0x2EC, 0x2EC, 0}, // Common ˬ
-    {0x2EE, 0x2EE, 0}, // Common ˮ
-    {0x370, 0x373, 11}, // Greek Ͱ..ͳ
-    {0x376, 0x377, 11}, // Greek Ͷ..ͷ
-    {0x37B, 0x37D, 11}, // Greek ͻ..ͽ
-    {0x37F, 0x37F, 11}, // Greek Ϳ
-    {0x386, 0x386, 11}, // Greek Ά
-    {0x388, 0x38A, 11}, // Greek Έ..Ί
-    {0x38C, 0x38C, 11}, // Greek Ό
-    {0x38E, 0x3A1, 11}, // Greek Ύ..Ρ
-    {0x3A3, 0x3E1, 11}, // Greek Σ..ϡ
-    {0x3F0, 0x3F5, 11}, // Greek ϰ..ϵ
-    {0x3F7, 0x3FF, 11}, // Greek Ϸ..Ͽ
-    {0x401, 0x481, 7}, // Cyrillic Ё..ҁ
-    {0x48A, 0x52F, 7}, // Cyrillic Ҋ..ԯ
-    {0x531, 0x556, 4}, // Armenian Ա..Ֆ
-    {0x559, 0x559, 4}, // Armenian ՙ
-    {0x560, 0x588, 4}, // Armenian ՠ..ֈ
-    {0x5D0, 0x5EA, 16}, // Hebrew א..ת
-    {0x5EF, 0x5F2, 16}, // Hebrew ׯ..ײ
-    {0x620, 0x63F, 3}, // Arabic ؠ..ؿ
-    {0x641, 0x64A, 3}, // Arabic ف..ي
-    {0x66E, 0x66F, 3}, // Arabic ٮ..ٯ
-    {0x671, 0x6D3, 3}, // Arabic ٱ..ۓ
-    {0x6D5, 0x6D5, 3}, // Arabic ە
-    {0x6E5, 0x6E6, 3}, // Arabic ۥ..ۦ
-    {0x6EE, 0x6EF, 3}, // Arabic ۮ..ۯ
-    {0x6FA, 0x6FC, 3}, // Arabic ۺ..ۼ
-    {0x6FF, 0x6FF, 3}, // Arabic ۿ
-    {0x750, 0x77F, 3}, // Arabic ݐ..ݿ
-    {0x781, 0x7A5, 28}, // Thaana ށ..ޥ
-    {0x7B1, 0x7B1, 28}, // Thaana ޱ
-    {0x870, 0x887, 3}, // Arabic ࡰ..ࢇ
-    {0x889, 0x88E, 3}, // Arabic ࢉ..ࢎ
-    {0x8A0, 0x8C9, 3}, // Arabic ࢠ..ࣉ
-    {0x904, 0x939, 8}, // Devanagari ऄ..ह
-    {0x93D, 0x93D, 8}, // Devanagari ऽ
-    {0x950, 0x950, 8}, // Devanagari ॐ
-    {0x960, 0x961, 8}, // Devanagari ॠ..ॡ
-    {0x971, 0x97F, 8}, // Devanagari ॱ..ॿ
-    {0x985, 0x98C, 5}, // Bengali অ..ঌ
-    {0x98F, 0x990, 5}, // Bengali এ..ঐ
-    {0x993, 0x9A8, 5}, // Bengali ও..ন
-    {0x9AA, 0x9B0, 5}, // Bengali প..র
-    {0x9B2, 0x9B2, 5}, // Bengali ল
-    {0x9B6, 0x9B9, 5}, // Bengali শ..হ
-    {0x9BD, 0x9BD, 5}, // Bengali ঽ
-    {0x9CE, 0x9CE, 5}, // Bengali ৎ
-    {0x9E0, 0x9E1, 5}, // Bengali ৠ..ৡ
-    {0x9F0, 0x9F1, 5}, // Bengali ৰ..ৱ
-    {0x9FC, 0x9FC, 5}, // Bengali ৼ
-    {0xA05, 0xA0A, 13}, // Gurmukhi ਅ..ਊ
-    {0xA0F, 0xA10, 13}, // Gurmukhi ਏ..ਐ
-    {0xA13, 0xA28, 13}, // Gurmukhi ਓ..ਨ
-    {0xA2A, 0xA30, 13}, // Gurmukhi ਪ..ਰ
-    {0xA32, 0xA32, 13}, // Gurmukhi ਲ
-    {0xA35, 0xA35, 13}, // Gurmukhi ਵ
-    {0xA38, 0xA39, 13}, // Gurmukhi ਸ..ਹ
-    {0xA5C, 0xA5C, 13}, // Gurmukhi ੜ
-    {0xA72, 0xA74, 13}, // Gurmukhi ੲ..ੴ
-    {0xA85, 0xA8D, 12}, // Gujarati અ..ઍ
-    {0xA8F, 0xA91, 12}, // Gujarati એ..ઑ
-    {0xA93, 0xAA8, 12}, // Gujarati ઓ..ન
-    {0xAAA, 0xAB0, 12}, // Gujarati પ..ર
-    {0xAB2, 0xAB3, 12}, // Gujarati લ..ળ
-    {0xAB5, 0xAB9, 12}, // Gujarati વ..હ
-    {0xABD, 0xABD, 12}, // Gujarati ઽ
-    {0xAD0, 0xAD0, 12}, // Gujarati ૐ
-    {0xAE0, 0xAE1, 12}, // Gujarati ૠ..ૡ
-    {0xAF9, 0xAF9, 12}, // Gujarati ૹ
-    {0xB05, 0xB0C, 24}, // Oriya ଅ..ଌ
-    {0xB0F, 0xB10, 24}, // Oriya ଏ..ଐ
-    {0xB13, 0xB28, 24}, // Oriya ଓ..ନ
-    {0xB2A, 0xB30, 24}, // Oriya ପ..ର
-    {0xB32, 0xB33, 24}, // Oriya ଲ..ଳ
-    {0xB35, 0xB39, 24}, // Oriya ଵ..ହ
-    {0xB3D, 0xB3D, 24}, // Oriya ଽ
-    {0xB5F, 0xB61, 24}, // Oriya ୟ..ୡ
-    {0xB71, 0xB71, 24}, // Oriya ୱ
-    {0xB83, 0xB83, 26}, // Tamil ஃ
-    {0xB85, 0xB8A, 26}, // Tamil அ..ஊ
-    {0xB8E, 0xB90, 26}, // Tamil எ..ஐ
-    {0xB92, 0xB95, 26}, // Tamil ஒ..க
-    {0xB99, 0xB9A, 26}, // Tamil ங..ச
-    {0xB9C, 0xB9C, 26}, // Tamil ஜ
-    {0xB9E, 0xB9F, 26}, // Tamil ஞ..ட
-    {0xBA3, 0xBA4, 26}, // Tamil ண..த
-    {0xBA8, 0xBAA, 26}, // Tamil ந..ப
-    {0xBAE, 0xBB9, 26}, // Tamil ம..ஹ
-    {0xBD0, 0xBD0, 26}, // Tamil ௐ
-    {0xC05, 0xC0C, 27}, // Telugu అ..ఌ
-    {0xC0E, 0xC10, 27}, // Telugu ఎ..ఐ
-    {0xC12, 0xC28, 27}, // Telugu ఒ..న
-    {0xC2A, 0xC39, 27}, // Telugu ప..హ
-    {0xC3D, 0xC3D, 27}, // Telugu ఽ
-    {0xC58, 0xC5A, 27}, // Telugu ౘ..ౚ
-    {0xC5D, 0xC5D, 27}, // Telugu ౝ
-    {0xC60, 0xC61, 27}, // Telugu ౠ..ౡ
-    {0xC80, 0xC80, 19}, // Kannada ಀ
-    {0xC85, 0xC8C, 19}, // Kannada ಅ..ಌ
-    {0xC8E, 0xC90, 19}, // Kannada ಎ..ಐ
-    {0xC92, 0xCA8, 19}, // Kannada ಒ..ನ
-    {0xCAA, 0xCB3, 19}, // Kannada ಪ..ಳ
-    {0xCB5, 0xCB9, 19}, // Kannada ವ..ಹ
-    {0xCBD, 0xCBD, 19}, // Kannada ಽ
-    {0xCDD, 0xCDE, 19}, // Kannada ೝ..ೞ
-    {0xCE0, 0xCE1, 19}, // Kannada ೠ..ೡ
-    {0xCF1, 0xCF2, 19}, // Kannada ೱ..ೲ
-    {0xD04, 0xD0C, 22}, // Malayalam ഄ..ഌ
-    {0xD0E, 0xD10, 22}, // Malayalam എ..ഐ
-    {0xD12, 0xD3A, 22}, // Malayalam ഒ..ഺ
-    {0xD3D, 0xD3D, 22}, // Malayalam ഽ
-    {0xD4E, 0xD4E, 22}, // Malayalam ൎ
-    {0xD54, 0xD56, 22}, // Malayalam ൔ..ൖ
-    {0xD5F, 0xD61, 22}, // Malayalam ൟ..ൡ
-    {0xD7A, 0xD7F, 22}, // Malayalam ൺ..ൿ
-    {0xD85, 0xD96, 25}, // Sinhala අ..ඖ
-    {0xD9A, 0xDB1, 25}, // Sinhala ක..න
-    {0xDB3, 0xDBB, 25}, // Sinhala ඳ..ර
-    {0xDBD, 0xDBD, 25}, // Sinhala ල
-    {0xDC0, 0xDC6, 25}, // Sinhala ව..ෆ
-    {0xE01, 0xE30, 29}, // Thai ก..ะ
-    {0xE32, 0xE32, 29}, // Thai า
-    {0xE40, 0xE46, 29}, // Thai เ..ๆ
-    {0xE81, 0xE82, 21}, // Lao ກ..ຂ
-    {0xE84, 0xE84, 21}, // Lao ຄ
-    {0xE86, 0xE8A, 21}, // Lao ຆ..ຊ
-    {0xE8C, 0xEA3, 21}, // Lao ຌ..ຣ
-    {0xEA5, 0xEA5, 21}, // Lao ລ
-    {0xEA7, 0xEB0, 21}, // Lao ວ..ະ
-    {0xEB2, 0xEB2, 21}, // Lao າ
-    {0xEBD, 0xEBD, 21}, // Lao ຽ
-    {0xEC0, 0xEC4, 21}, // Lao ເ..ໄ
-    {0xEC6, 0xEC6, 21}, // Lao ໆ
-    {0xEDC, 0xEDF, 21}, // Lao ໜ..ໟ
-    {0xF00, 0xF00, 30}, // Tibetan ༀ
-    {0xF40, 0xF42, 30}, // Tibetan ཀ..ག
-    {0xF44, 0xF47, 30}, // Tibetan ང..ཇ
-    {0xF49, 0xF4C, 30}, // Tibetan ཉ..ཌ
-    {0xF4E, 0xF51, 30}, // Tibetan ཎ..ད
-    {0xF53, 0xF56, 30}, // Tibetan ན..བ
-    {0xF58, 0xF5B, 30}, // Tibetan མ..ཛ
-    {0xF5D, 0xF68, 30}, // Tibetan ཝ..ཨ
-    {0xF6A, 0xF6C, 30}, // Tibetan ཪ..ཬ
-    {0xF88, 0xF8C, 30}, // Tibetan ྈ..ྌ
-    {0x1000, 0x102A, 23}, // Myanmar က..ဪ
-    {0x103F, 0x103F, 23}, // Myanmar ဿ
-    {0x1050, 0x1055, 23}, // Myanmar ၐ..ၕ
-    {0x105A, 0x105D, 23}, // Myanmar ၚ..ၝ
-    {0x1061, 0x1061, 23}, // Myanmar ၡ
-    {0x1065, 0x1066, 23}, // Myanmar ၥ..ၦ
-    {0x106E, 0x1070, 23}, // Myanmar ၮ..ၰ
-    {0x1075, 0x1081, 23}, // Myanmar ၵ..ႁ
-    {0x108E, 0x108E, 23}, // Myanmar ႎ
-    {0x10A0, 0x10C5, 10}, // Georgian Ⴀ..Ⴥ
-    {0x10C7, 0x10C7, 10}, // Georgian Ⴧ
-    {0x10CD, 0x10CD, 10}, // Georgian Ⴭ
-    {0x10D0, 0x10FA, 10}, // Georgian ა..ჺ
-    {0x10FC, 0x10FF, 10}, // Georgian ჼ..ჿ
-    {0x1101, 0x11FF, 14}, // Hangul ᄁ..ᇿ
-    {0x1201, 0x1248, 9}, // Ethiopic ሁ..ቈ
-    {0x124A, 0x124D, 9}, // Ethiopic ቊ..ቍ
-    {0x1250, 0x1256, 9}, // Ethiopic ቐ..ቖ
-    {0x1258, 0x1258, 9}, // Ethiopic ቘ
-    {0x125A, 0x125D, 9}, // Ethiopic ቚ..ቝ
-    {0x1260, 0x1288, 9}, // Ethiopic በ..ኈ
-    {0x128A, 0x128D, 9}, // Ethiopic ኊ..ኍ
-    {0x1290, 0x12B0, 9}, // Ethiopic ነ..ኰ
-    {0x12B2, 0x12B5, 9}, // Ethiopic ኲ..ኵ
-    {0x12B8, 0x12BE, 9}, // Ethiopic ኸ..ኾ
-    {0x12C0, 0x12C0, 9}, // Ethiopic ዀ
-    {0x12C2, 0x12C5, 9}, // Ethiopic ዂ..ዅ
-    {0x12C8, 0x12D6, 9}, // Ethiopic ወ..ዖ
-    {0x12D8, 0x1310, 9}, // Ethiopic ዘ..ጐ
-    {0x1312, 0x1315, 9}, // Ethiopic ጒ..ጕ
-    {0x1318, 0x135A, 9}, // Ethiopic ጘ..ፚ
-    {0x1380, 0x138F, 9}, // Ethiopic ᎀ..ᎏ
-    {0x1780, 0x17B3, 20}, // Khmer ក..ឳ
-    {0x17D7, 0x17D7, 20}, // Khmer ៗ
-    {0x17DC, 0x17DC, 20}, // Khmer ៜ
-    {0x1C80, 0x1C88, 7}, // Cyrillic ᲀ..ᲈ
-    {0x1C90, 0x1CBA, 10}, // Georgian Ა..Ჺ
-    {0x1CBD, 0x1CBF, 10}, // Georgian Ჽ..Ჿ
-    {0x1CEB, 0x1CEC, 8}, // Devanagari ᳫ..ᳬ
-    {0x1CEE, 0x1CF1, 8}, // Devanagari ᳮ..ᳱ
-    {0x1CF5, 0x1CF6, 0}, // Common ᳵ..ᳶ
-    {0x1D00, 0x1D25, 2}, // Latin ᴀ..ᴥ
-    {0x1D27, 0x1D2A, 11}, // Greek ᴧ..ᴪ
-    {0x1D2C, 0x1D5C, 2}, // Latin ᴬ..ᵜ
-    {0x1D5E, 0x1D61, 11}, // Greek ᵞ..ᵡ
-    {0x1D63, 0x1D65, 2}, // Latin ᵣ..ᵥ
-    {0x1D67, 0x1D6A, 11}, // Greek ᵧ..ᵪ
-    {0x1D6C, 0x1D77, 2}, // Latin ᵬ..ᵷ
-    {0x1D79, 0x1DBE, 2}, // Latin ᵹ..ᶾ
-    {0x1E00, 0x1EFF, 2}, // Latin Ḁ..ỿ
-    {0x1F01, 0x1F15, 11}, // Greek ἁ..ἕ
-    {0x1F18, 0x1F1D, 11}, // Greek Ἐ..Ἕ
-    {0x1F20, 0x1F45, 11}, // Greek ἠ..ὅ
-    {0x1F48, 0x1F4D, 11}, // Greek Ὀ..Ὅ
-    {0x1F50, 0x1F57, 11}, // Greek ὐ..ὗ
-    {0x1F59, 0x1F59, 11}, // Greek Ὑ
-    {0x1F5B, 0x1F5B, 11}, // Greek Ὓ
-    {0x1F5D, 0x1F5D, 11}, // Greek Ὕ
-    {0x1F5F, 0x1F70, 11}, // Greek Ὗ..ὰ
-    {0x1F72, 0x1F72, 11}, // Greek ὲ
-    {0x1F74, 0x1F74, 11}, // Greek ὴ
-    {0x1F76, 0x1F76, 11}, // Greek ὶ
-    {0x1F78, 0x1F78, 11}, // Greek ὸ
-    {0x1F7A, 0x1F7A, 11}, // Greek ὺ
-    {0x1F7C, 0x1F7C, 11}, // Greek ὼ
-    {0x1F80, 0x1FB4, 11}, // Greek ᾀ..ᾴ
-    {0x1FB6, 0x1FBA, 11}, // Greek ᾶ..Ὰ
-    {0x1FBC, 0x1FBC, 11}, // Greek ᾼ
-    {0x1FC2, 0x1FC4, 11}, // Greek ῂ..ῄ
-    {0x1FC6, 0x1FC8, 11}, // Greek ῆ..Ὲ
-    {0x1FCA, 0x1FCA, 11}, // Greek Ὴ
-    {0x1FCC, 0x1FCC, 11}, // Greek ῌ
-    {0x1FD0, 0x1FD2, 11}, // Greek ῐ..ῒ
-    {0x1FD6, 0x1FDA, 11}, // Greek ῖ..Ὶ
-    {0x1FE0, 0x1FE2, 11}, // Greek ῠ..ῢ
-    {0x1FE4, 0x1FEA, 11}, // Greek ῤ..Ὺ
-    {0x1FEC, 0x1FEC, 11}, // Greek Ῥ
-    {0x1FF2, 0x1FF4, 11}, // Greek ῲ..ῴ
-    {0x1FF6, 0x1FF8, 11}, // Greek ῶ..Ὸ
-    {0x1FFA, 0x1FFA, 11}, // Greek Ὼ
-    {0x1FFC, 0x1FFC, 11}, // Greek ῼ
-    {0x2071, 0x2071, 2}, // Latin ⁱ
-    {0x207F, 0x207F, 2}, // Latin ⁿ
-    {0x2090, 0x209C, 2}, // Latin ₐ..ₜ
-    {0x2102, 0x2102, 0}, // Common ℂ
-    {0x2107, 0x2107, 0}, // Common ℇ
-    {0x210A, 0x2113, 0}, // Common ℊ..ℓ
-    {0x2115, 0x2115, 0}, // Common ℕ
-    {0x2118, 0x211D, 0}, // Common ℘..ℝ
-    {0x2124, 0x2124, 0}, // Common ℤ
-    {0x2128, 0x2128, 0}, // Common ℨ
-    {0x212C, 0x2131, 0}, // Common ℬ..ℱ
-    {0x2133, 0x2139, 0}, // Common ℳ..ℹ
-    {0x213C, 0x213F, 0}, // Common ℼ..ℿ
-    {0x2145, 0x2149, 0}, // Common ⅅ..ⅉ
-    {0x214E, 0x214E, 2}, // Latin ⅎ
-    {0x2160, 0x2188, 2}, // Latin Ⅰ..ↈ
-    {0x2C60, 0x2C7F, 2}, // Latin Ⱡ..Ɀ
-    {0x2D00, 0x2D25, 10}, // Georgian ⴀ..ⴥ
-    {0x2D27, 0x2D27, 10}, // Georgian ⴧ
-    {0x2D2D, 0x2D2D, 10}, // Georgian ⴭ
-    {0x2D80, 0x2D96, 9}, // Ethiopic ⶀ..ⶖ
-    {0x2DA0, 0x2DA6, 9}, // Ethiopic ⶠ..ⶦ
-    {0x2DA8, 0x2DAE, 9}, // Ethiopic ⶨ..ⶮ
-    {0x2DB0, 0x2DB6, 9}, // Ethiopic ⶰ..ⶶ
-    {0x2DB8, 0x2DBE, 9}, // Ethiopic ⶸ..ⶾ
-    {0x2DC0, 0x2DC6, 9}, // Ethiopic ⷀ..ⷆ
-    {0x2DC8, 0x2DCE, 9}, // Ethiopic ⷈ..ⷎ
-    {0x2DD0, 0x2DD6, 9}, // Ethiopic ⷐ..ⷖ
-    {0x2DD8, 0x2DDE, 9}, // Ethiopic ⷘ..ⷞ
-    {0x3005, 0x3007, 15}, // Han 々..〇
-    {0x3021, 0x3029, 15}, // Han 〡..〩
-    {0x3031, 0x3035, 0}, // Common 〱..〵
-    {0x3038, 0x303B, 15}, // Han 〸..〻
-    {0x3041, 0x3096, 17}, // Hiragana ぁ..ゖ
-    {0x309D, 0x309F, 17}, // Hiragana ゝ..ゟ
-    {0x30A1, 0x30FA, 18}, // Katakana ァ..ヺ
-    {0x30FC, 0x30FC, 0}, // Common ー
-    {0x30FE, 0x30FF, 18}, // Katakana ヾ..ヿ
-    {0x3105, 0x312F, 6}, // Bopomofo ㄅ..ㄯ
-    {0x3131, 0x318E, 14}, // Hangul ㄱ..ㆎ
-    {0x31A0, 0x31BF, 6}, // Bopomofo ㆠ..ㆿ
-    {0x31F0, 0x31FF, 18}, // Katakana ㇰ..ㇿ
-    {0x4E00, 0x9FFF, 15}, // Han 一..鿿
-    {0xA640, 0xA66E, 7}, // Cyrillic Ꙁ..ꙮ
-    {0xA67F, 0xA69D, 7}, // Cyrillic ꙿ..ꚝ
-    {0xA717, 0xA71F, 0}, // Common ꜗ..ꜟ
-    {0xA722, 0xA787, 2}, // Latin Ꜣ..ꞇ
-    {0xA78B, 0xA7CA, 2}, // Latin Ꞌ..ꟊ
-    {0xA7D0, 0xA7D1, 2}, // Latin Ꟑ..ꟑ
-    {0xA7D3, 0xA7D3, 2}, // Latin ꟓ
-    {0xA7D5, 0xA7D9, 2}, // Latin ꟕ..ꟙ
-    {0xA7F2, 0xA7FF, 2}, // Latin ꟲ..ꟿ
-    {0xA8F2, 0xA8F7, 8}, // Devanagari ꣲ..ꣷ
-    {0xA8FB, 0xA8FB, 8}, // Devanagari ꣻ
-    {0xA8FD, 0xA8FE, 8}, // Devanagari ꣽ..ꣾ
-    {0xA960, 0xA97C, 14}, // Hangul ꥠ..ꥼ
-    {0xA9CF, 0xA9CF, 0}, // Common ꧏ
-    {0xA9E0, 0xA9E4, 23}, // Myanmar ꧠ..ꧤ
-    {0xA9E6, 0xA9EF, 23}, // Myanmar ꧦ..ꧯ
-    {0xA9FA, 0xA9FE, 23}, // Myanmar ꧺ..ꧾ
-    {0xAA60, 0xAA76, 23}, // Myanmar ꩠ..ꩶ
-    {0xAA7A, 0xAA7A, 23}, // Myanmar ꩺ
-    {0xAA7E, 0xAA7F, 23}, // Myanmar ꩾ..ꩿ
-    {0xAB01, 0xAB06, 9}, // Ethiopic ꬁ..ꬆ
-    {0xAB09, 0xAB0E, 9}, // Ethiopic ꬉ..ꬎ
-    {0xAB11, 0xAB16, 9}, // Ethiopic ꬑ..ꬖ
-    {0xAB20, 0xAB26, 9}, // Ethiopic ꬠ..ꬦ
-    {0xAB28, 0xAB2E, 9}, // Ethiopic ꬨ..ꬮ
-    {0xAB30, 0xAB5A, 2}, // Latin ꬰ..ꭚ
-    {0xAB5C, 0xAB64, 2}, // Latin ꭜ..ꭤ
-    {0xAB66, 0xAB69, 2}, // Latin ꭦ..ꭩ
-    {0xD7B0, 0xD7C6, 14}, // Hangul ힰ..ퟆ
-    {0xD7CB, 0xD7FB, 14}, // Hangul ퟋ..ퟻ
-    {0xFA0E, 0xFA0F, 15}, // Han 﨎..﨏
-    {0xFA11, 0xFA11, 15}, // Han 﨑
-    {0xFA13, 0xFA14, 15}, // Han 﨓..﨔
-    {0xFA1F, 0xFA1F, 15}, // Han 﨟
-    {0xFA21, 0xFA21, 15}, // Han 﨡
-    {0xFA23, 0xFA24, 15}, // Han 﨣..﨤
-    {0xFA27, 0xFA29, 15}, // Han 﨧..﨩
-    {0xFB00, 0xFB06, 2}, // Latin ﬀ..ﬆ
-    {0xFB13, 0xFB17, 4}, // Armenian ﬓ..ﬗ
-    {0xFB20, 0xFB28, 16}, // Hebrew ﬠ..ﬨ
-    {0xFB4F, 0xFB4F, 16}, // Hebrew ﭏ
-    {0xFB51, 0xFBB1, 3}, // Arabic ﭑ..ﮱ
-    {0xFBD3, 0xFC5D, 3}, // Arabic ﯓ..ﱝ
-    {0xFC64, 0xFD3D, 3}, // Arabic ﱤ..ﴽ
-    {0xFD50, 0xFD8F, 3}, // Arabic ﵐ..ﶏ
-    {0xFD92, 0xFDC7, 3}, // Arabic ﶒ..ﷇ
-    {0xFDF0, 0xFDF9, 3}, // Arabic ﷰ..ﷹ
-    {0xFE71, 0xFE71, 3}, // Arabic ﹱ
-    {0xFE73, 0xFE73, 3}, // Arabic ﹳ
-    {0xFE77, 0xFE77, 3}, // Arabic ﹷ
-    {0xFE79, 0xFE79, 3}, // Arabic ﹹ
-    {0xFE7B, 0xFE7B, 3}, // Arabic ﹻ
-    {0xFE7D, 0xFE7D, 3}, // Arabic ﹽ
-    {0xFE7F, 0xFEFC, 3}, // Arabic ﹿ..ﻼ
-    {0xFF21, 0xFF3A, 2}, // Latin Ａ..Ｚ
-    {0xFF41, 0xFF5A, 2}, // Latin ａ..ｚ
-    {0xFF66, 0xFF6F, 18}, // Katakana ｦ..ｯ
-    {0xFF71, 0xFF9D, 18}, // Katakana ｱ..ﾝ
-    {0xFFA0, 0xFFBE, 14}, // Hangul ﾠ..ﾾ
-    {0xFFC2, 0xFFC7, 14}, // Hangul ￂ..ￇ
-    {0xFFCA, 0xFFCF, 14}, // Hangul ￊ..ￏ
-    {0xFFD2, 0xFFD7, 14}, // Hangul ￒ..ￗ
-    {0xFFDA, 0xFFDC, 14}, // Hangul ￚ..ￜ
-    {0x10140, 0x10174, 11}, // Greek 𐅀..𐅴
-    {0x10780, 0x10785, 2}, // Latin 𐞀..𐞅
-    {0x10787, 0x107B0, 2}, // Latin 𐞇..𐞰
-    {0x107B2, 0x107BA, 2}, // Latin 𐞲..𐞺
-    {0x16FE3, 0x16FE3, 15}, // Han 𖿣
-    {0x1AFF0, 0x1AFF3, 18}, // Katakana 𚿰..𚿳
-    {0x1AFF5, 0x1AFFB, 18}, // Katakana 𚿵..𚿻
-    {0x1AFFD, 0x1AFFE, 18}, // Katakana 𚿽..𚿾
-    {0x1B000, 0x1B000, 18}, // Katakana 𛀀
-    {0x1B002, 0x1B11F, 17}, // Hiragana 𛀂..𛄟
-    {0x1B121, 0x1B122, 18}, // Katakana 𛄡..𛄢
-    {0x1B150, 0x1B152, 17}, // Hiragana 𛅐..𛅒
-    {0x1B164, 0x1B167, 18}, // Katakana 𛅤..𛅧
-    {0x1D400, 0x1D454, 0}, // Common 𝐀..𝑔
-    {0x1D456, 0x1D49C, 0}, // Common 𝑖..𝒜
-    {0x1D49E, 0x1D49F, 0}, // Common 𝒞..𝒟
-    {0x1D4A2, 0x1D4A2, 0}, // Common 𝒢
-    {0x1D4A5, 0x1D4A6, 0}, // Common 𝒥..𝒦
-    {0x1D4A9, 0x1D4AC, 0}, // Common 𝒩..𝒬
-    {0x1D4AE, 0x1D4B9, 0}, // Common 𝒮..𝒹
-    {0x1D4BB, 0x1D4BB, 0}, // Common 𝒻
-    {0x1D4BD, 0x1D4C3, 0}, // Common 𝒽..𝓃
-    {0x1D4C5, 0x1D505, 0}, // Common 𝓅..𝔅
-    {0x1D507, 0x1D50A, 0}, // Common 𝔇..𝔊
-    {0x1D50D, 0x1D514, 0}, // Common 𝔍..𝔔
-    {0x1D516, 0x1D51C, 0}, // Common 𝔖..𝔜
-    {0x1D51E, 0x1D539, 0}, // Common 𝔞..𝔹
-    {0x1D53B, 0x1D53E, 0}, // Common 𝔻..𝔾
-    {0x1D540, 0x1D544, 0}, // Common 𝕀..𝕄
-    {0x1D546, 0x1D546, 0}, // Common 𝕆
-    {0x1D54A, 0x1D550, 0}, // Common 𝕊..𝕐
-    {0x1D552, 0x1D6A5, 0}, // Common 𝕒..𝚥
-    {0x1D6A8, 0x1D6C0, 0}, // Common 𝚨..𝛀
-    {0x1D6C2, 0x1D6DA, 0}, // Common 𝛂..𝛚
-    {0x1D6DC, 0x1D6FA, 0}, // Common 𝛜..𝛺
-    {0x1D6FC, 0x1D714, 0}, // Common 𝛼..𝜔
-    {0x1D716, 0x1D734, 0}, // Common 𝜖..𝜴
-    {0x1D736, 0x1D74E, 0}, // Common 𝜶..𝝎
-    {0x1D750, 0x1D76E, 0}, // Common 𝝐..𝝮
-    {0x1D770, 0x1D788, 0}, // Common 𝝰..𝞈
-    {0x1D78A, 0x1D7A8, 0}, // Common 𝞊..𝞨
-    {0x1D7AA, 0x1D7C2, 0}, // Common 𝞪..𝟂
-    {0x1D7C4, 0x1D7CB, 0}, // Common 𝟄..𝟋
-    {0x1DF00, 0x1DF1E, 2}, // Latin 𝼀..𝼞
-    {0x1E7E0, 0x1E7E6, 9}, // Ethiopic 𞟠..𞟦
-    {0x1E7E8, 0x1E7EB, 9}, // Ethiopic 𞟨..𞟫
-    {0x1E7ED, 0x1E7EE, 9}, // Ethiopic 𞟭..𞟮
-    {0x1E7F0, 0x1E7FE, 9}, // Ethiopic 𞟰..𞟾
-    {0x1EE00, 0x1EE03, 3}, // Arabic 𞸀..𞸃
-    {0x1EE05, 0x1EE1F, 3}, // Arabic 𞸅..𞸟
-    {0x1EE21, 0x1EE22, 3}, // Arabic 𞸡..𞸢
-    {0x1EE24, 0x1EE24, 3}, // Arabic 𞸤
-    {0x1EE27, 0x1EE27, 3}, // Arabic 𞸧
-    {0x1EE29, 0x1EE32, 3}, // Arabic 𞸩..𞸲
-    {0x1EE34, 0x1EE37, 3}, // Arabic 𞸴..𞸷
-    {0x1EE39, 0x1EE39, 3}, // Arabic 𞸹
-    {0x1EE3B, 0x1EE3B, 3}, // Arabic 𞸻
-    {0x1EE42, 0x1EE42, 3}, // Arabic 𞹂
-    {0x1EE47, 0x1EE47, 3}, // Arabic 𞹇
-    {0x1EE49, 0x1EE49, 3}, // Arabic 𞹉
-    {0x1EE4B, 0x1EE4B, 3}, // Arabic 𞹋
-    {0x1EE4D, 0x1EE4F, 3}, // Arabic 𞹍..𞹏
-    {0x1EE51, 0x1EE52, 3}, // Arabic 𞹑..𞹒
-    {0x1EE54, 0x1EE54, 3}, // Arabic 𞹔
-    {0x1EE57, 0x1EE57, 3}, // Arabic 𞹗
-    {0x1EE59, 0x1EE59, 3}, // Arabic 𞹙
-    {0x1EE5B, 0x1EE5B, 3}, // Arabic 𞹛
-    {0x1EE5D, 0x1EE5D, 3}, // Arabic 𞹝
-    {0x1EE5F, 0x1EE5F, 3}, // Arabic 𞹟
-    {0x1EE61, 0x1EE62, 3}, // Arabic 𞹡..𞹢
-    {0x1EE64, 0x1EE64, 3}, // Arabic 𞹤
-    {0x1EE67, 0x1EE6A, 3}, // Arabic 𞹧..𞹪
-    {0x1EE6C, 0x1EE72, 3}, // Arabic 𞹬..𞹲
-    {0x1EE74, 0x1EE77, 3}, // Arabic 𞹴..𞹷
-    {0x1EE79, 0x1EE7C, 3}, // Arabic 𞹹..𞹼
-    {0x1EE7E, 0x1EE7E, 3}, // Arabic 𞹾
-    {0x1EE80, 0x1EE89, 3}, // Arabic 𞺀..𞺉
-    {0x1EE8B, 0x1EE9B, 3}, // Arabic 𞺋..𞺛
-    {0x1EEA1, 0x1EEA3, 3}, // Arabic 𞺡..𞺣
-    {0x1EEA5, 0x1EEA9, 3}, // Arabic 𞺥..𞺩
-    {0x1EEAB, 0x1EEBB, 3}, // Arabic 𞺫..𞺻
-    {0x20000, 0x2A6DF, 15}, // Han 𠀀..𪛟
-    {0x2A700, 0x2B738, 15}, // Han 𪜀..𫜸
-    {0x2B740, 0x2B81D, 15}, // Han 𫝀..𫠝
-    {0x2B820, 0x2CEA1, 15}, // Han 𫠠..𬺡
-    {0x2CEB0, 0x2EBE0, 15}, // Han 𬺰..𮯠
-    {0x30000, 0x3134A, 15}, // Han 𰀀..𱍊
+const struct sc safec23_start_list[431] = {
+    {'$', '$', SC_Latin, GC_Sc, NULL},
+    {'A', 'Z', SC_Latin, GC_Lu, NULL},
+    {'_', '_', SC_Latin, GC_Pc, NULL},
+    {'a', 'z', SC_Latin, GC_Ll, NULL},
+    {0xAA, 0xAA, SC_Latin, GC_Lo, NULL}, //  ª
+    {0xB5, 0xB5, SC_Common, GC_Ll, NULL}, //  µ
+    {0xBA, 0xBA, SC_Latin, GC_Lo, NULL}, //  º
+    {0xC0, 0xD6, SC_Latin, GC_Lu, NULL}, //  À..Ö
+    {0xD8, 0xF6, SC_Latin, GC_L, NULL}, //  Ø..ö
+    {0xF8, 0x2B8, SC_Latin, GC_L, NULL}, //  ø..ʸ
+    {0x2BA, 0x2C1, SC_Common, GC_Lm, NULL}, //  ʺ..ˁ
+    {0x2C6, 0x2D1, SC_Common, GC_Lm, NULL}, //  ˆ..ˑ
+    {0x2E0, 0x2E4, SC_Latin, GC_Lm, NULL}, //  ˠ..ˤ
+    {0x2EC, 0x2EC, SC_Common, GC_Lm, NULL}, //  ˬ
+    {0x2EE, 0x2EE, SC_Common, GC_Lm, NULL}, //  ˮ
+    {0x370, 0x373, SC_Greek, GC_L, NULL}, //  Ͱ..ͳ
+    {0x376, 0x377, SC_Greek, GC_L, NULL}, //  Ͷ..ͷ
+    {0x37B, 0x37D, SC_Greek, GC_Ll, NULL}, //  ͻ..ͽ
+    {0x37F, 0x37F, SC_Greek, GC_Lu, NULL}, //  Ϳ
+    {0x386, 0x386, SC_Greek, GC_Lu, NULL}, //  Ά
+    {0x388, 0x38A, SC_Greek, GC_Lu, NULL}, //  Έ..Ί
+    {0x38C, 0x38C, SC_Greek, GC_Lu, NULL}, //  Ό
+    {0x38E, 0x3A1, SC_Greek, GC_L, NULL}, //  Ύ..Ρ
+    {0x3A3, 0x3E1, SC_Greek, GC_L, NULL}, //  Σ..ϡ
+    {0x3F0, 0x3F5, SC_Greek, GC_L, NULL}, //  ϰ..ϵ
+    {0x3F7, 0x3FF, SC_Greek, GC_L, NULL}, //  Ϸ..Ͽ
+    {0x401, 0x481, SC_Cyrillic, GC_L, NULL}, //  Ё..ҁ
+    {0x48A, 0x52F, SC_Cyrillic, GC_L, NULL}, //  Ҋ..ԯ
+    {0x531, 0x556, SC_Armenian, GC_Lu, NULL}, //  Ա..Ֆ
+    {0x559, 0x559, SC_Armenian, GC_Lm, NULL}, //  ՙ
+    {0x560, 0x588, SC_Armenian, GC_Ll, NULL}, //  ՠ..ֈ
+    {0x5D0, 0x5EA, SC_Hebrew, GC_Lo, NULL}, //  א..ת
+    {0x5EF, 0x5F2, SC_Hebrew, GC_Lo, NULL}, //  ׯ..ײ
+    {0x620, 0x63F, SC_Arabic, GC_Lo, NULL}, //  ؠ..ؿ
+    {0x641, 0x64A, SC_Arabic, GC_Lo, NULL}, //  ف..ي
+    {0x66E, 0x66F, SC_Arabic, GC_Lo, NULL}, //  ٮ..ٯ
+    {0x671, 0x6D3, SC_Arabic, GC_Lo, NULL}, //  ٱ..ۓ
+    {0x6D5, 0x6D5, SC_Arabic, GC_Lo, NULL}, //  ە
+    {0x6E5, 0x6E6, SC_Arabic, GC_Lm, NULL}, //  ۥ..ۦ
+    {0x6EE, 0x6EF, SC_Arabic, GC_Lo, NULL}, //  ۮ..ۯ
+    {0x6FA, 0x6FC, SC_Arabic, GC_Lo, NULL}, //  ۺ..ۼ
+    {0x6FF, 0x6FF, SC_Arabic, GC_Lo, NULL}, //  ۿ
+    {0x750, 0x77F, SC_Arabic, GC_Lo, NULL}, //  ݐ..ݿ
+    {0x781, 0x7A5, SC_Thaana, GC_Lo, NULL}, //  ށ..ޥ
+    {0x7B1, 0x7B1, SC_Thaana, GC_Lo, NULL}, //  ޱ
+    {0x870, 0x887, SC_Arabic, GC_Lo, NULL}, //  ࡰ..ࢇ
+    {0x889, 0x88E, SC_Arabic, GC_Lo, NULL}, //  ࢉ..ࢎ
+    {0x8A0, 0x8C9, SC_Arabic, GC_L, NULL}, //  ࢠ..ࣉ
+    {0x904, 0x939, SC_Devanagari, GC_Lo, NULL}, //  ऄ..ह
+    {0x93D, 0x93D, SC_Devanagari, GC_Lo, NULL}, //  ऽ
+    {0x950, 0x950, SC_Devanagari, GC_Lo, NULL}, //  ॐ
+    {0x960, 0x961, SC_Devanagari, GC_Lo, NULL}, //  ॠ..ॡ
+    {0x971, 0x97F, SC_Devanagari, GC_L, NULL}, //  ॱ..ॿ
+    {0x985, 0x98C, SC_Bengali, GC_Lo, NULL}, //  অ..ঌ
+    {0x98F, 0x990, SC_Bengali, GC_Lo, NULL}, //  এ..ঐ
+    {0x993, 0x9A8, SC_Bengali, GC_Lo, NULL}, //  ও..ন
+    {0x9AA, 0x9B0, SC_Bengali, GC_Lo, NULL}, //  প..র
+    {0x9B2, 0x9B2, SC_Bengali, GC_Lo, NULL}, //  ল
+    {0x9B6, 0x9B9, SC_Bengali, GC_Lo, NULL}, //  শ..হ
+    {0x9BD, 0x9BD, SC_Bengali, GC_Lo, NULL}, //  ঽ
+    {0x9CE, 0x9CE, SC_Bengali, GC_Lo, NULL}, //  ৎ
+    {0x9E0, 0x9E1, SC_Bengali, GC_Lo, NULL}, //  ৠ..ৡ
+    {0x9F0, 0x9F1, SC_Bengali, GC_Lo, NULL}, //  ৰ..ৱ
+    {0x9FC, 0x9FC, SC_Bengali, GC_Lo, NULL}, //  ৼ
+    {0xA05, 0xA0A, SC_Gurmukhi, GC_Lo, NULL}, //  ਅ..ਊ
+    {0xA0F, 0xA10, SC_Gurmukhi, GC_Lo, NULL}, //  ਏ..ਐ
+    {0xA13, 0xA28, SC_Gurmukhi, GC_Lo, NULL}, //  ਓ..ਨ
+    {0xA2A, 0xA30, SC_Gurmukhi, GC_Lo, NULL}, //  ਪ..ਰ
+    {0xA32, 0xA32, SC_Gurmukhi, GC_Lo, NULL}, //  ਲ
+    {0xA35, 0xA35, SC_Gurmukhi, GC_Lo, NULL}, //  ਵ
+    {0xA38, 0xA39, SC_Gurmukhi, GC_Lo, NULL}, //  ਸ..ਹ
+    {0xA5C, 0xA5C, SC_Gurmukhi, GC_Lo, NULL}, //  ੜ
+    {0xA72, 0xA74, SC_Gurmukhi, GC_Lo, NULL}, //  ੲ..ੴ
+    {0xA85, 0xA8D, SC_Gujarati, GC_Lo, NULL}, //  અ..ઍ
+    {0xA8F, 0xA91, SC_Gujarati, GC_Lo, NULL}, //  એ..ઑ
+    {0xA93, 0xAA8, SC_Gujarati, GC_Lo, NULL}, //  ઓ..ન
+    {0xAAA, 0xAB0, SC_Gujarati, GC_Lo, NULL}, //  પ..ર
+    {0xAB2, 0xAB3, SC_Gujarati, GC_Lo, NULL}, //  લ..ળ
+    {0xAB5, 0xAB9, SC_Gujarati, GC_Lo, NULL}, //  વ..હ
+    {0xABD, 0xABD, SC_Gujarati, GC_Lo, NULL}, //  ઽ
+    {0xAD0, 0xAD0, SC_Gujarati, GC_Lo, NULL}, //  ૐ
+    {0xAE0, 0xAE1, SC_Gujarati, GC_Lo, NULL}, //  ૠ..ૡ
+    {0xAF9, 0xAF9, SC_Gujarati, GC_Lo, NULL}, //  ૹ
+    {0xB05, 0xB0C, SC_Oriya, GC_Lo, NULL}, //  ଅ..ଌ
+    {0xB0F, 0xB10, SC_Oriya, GC_Lo, NULL}, //  ଏ..ଐ
+    {0xB13, 0xB28, SC_Oriya, GC_Lo, NULL}, //  ଓ..ନ
+    {0xB2A, 0xB30, SC_Oriya, GC_Lo, NULL}, //  ପ..ର
+    {0xB32, 0xB33, SC_Oriya, GC_Lo, NULL}, //  ଲ..ଳ
+    {0xB35, 0xB39, SC_Oriya, GC_Lo, NULL}, //  ଵ..ହ
+    {0xB3D, 0xB3D, SC_Oriya, GC_Lo, NULL}, //  ଽ
+    {0xB5F, 0xB61, SC_Oriya, GC_Lo, NULL}, //  ୟ..ୡ
+    {0xB71, 0xB71, SC_Oriya, GC_Lo, NULL}, //  ୱ
+    {0xB83, 0xB83, SC_Tamil, GC_Lo, NULL}, //  ஃ
+    {0xB85, 0xB8A, SC_Tamil, GC_Lo, NULL}, //  அ..ஊ
+    {0xB8E, 0xB90, SC_Tamil, GC_Lo, NULL}, //  எ..ஐ
+    {0xB92, 0xB95, SC_Tamil, GC_Lo, NULL}, //  ஒ..க
+    {0xB99, 0xB9A, SC_Tamil, GC_Lo, NULL}, //  ங..ச
+    {0xB9C, 0xB9C, SC_Tamil, GC_Lo, NULL}, //  ஜ
+    {0xB9E, 0xB9F, SC_Tamil, GC_Lo, NULL}, //  ஞ..ட
+    {0xBA3, 0xBA4, SC_Tamil, GC_Lo, NULL}, //  ண..த
+    {0xBA8, 0xBAA, SC_Tamil, GC_Lo, NULL}, //  ந..ப
+    {0xBAE, 0xBB9, SC_Tamil, GC_Lo, NULL}, //  ம..ஹ
+    {0xBD0, 0xBD0, SC_Tamil, GC_Lo, NULL}, //  ௐ
+    {0xC05, 0xC0C, SC_Telugu, GC_Lo, NULL}, //  అ..ఌ
+    {0xC0E, 0xC10, SC_Telugu, GC_Lo, NULL}, //  ఎ..ఐ
+    {0xC12, 0xC28, SC_Telugu, GC_Lo, NULL}, //  ఒ..న
+    {0xC2A, 0xC39, SC_Telugu, GC_Lo, NULL}, //  ప..హ
+    {0xC3D, 0xC3D, SC_Telugu, GC_Lo, NULL}, //  ఽ
+    {0xC58, 0xC5A, SC_Telugu, GC_Lo, NULL}, //  ౘ..ౚ
+    {0xC5D, 0xC5D, SC_Telugu, GC_Lo, NULL}, //  ౝ
+    {0xC60, 0xC61, SC_Telugu, GC_Lo, NULL}, //  ౠ..ౡ
+    {0xC80, 0xC80, SC_Kannada, GC_Lo, NULL}, //  ಀ
+    {0xC85, 0xC8C, SC_Kannada, GC_Lo, NULL}, //  ಅ..ಌ
+    {0xC8E, 0xC90, SC_Kannada, GC_Lo, NULL}, //  ಎ..ಐ
+    {0xC92, 0xCA8, SC_Kannada, GC_Lo, NULL}, //  ಒ..ನ
+    {0xCAA, 0xCB3, SC_Kannada, GC_Lo, NULL}, //  ಪ..ಳ
+    {0xCB5, 0xCB9, SC_Kannada, GC_Lo, NULL}, //  ವ..ಹ
+    {0xCBD, 0xCBD, SC_Kannada, GC_Lo, NULL}, //  ಽ
+    {0xCDD, 0xCDE, SC_Kannada, GC_Lo, NULL}, //  ೝ..ೞ
+    {0xCE0, 0xCE1, SC_Kannada, GC_Lo, NULL}, //  ೠ..ೡ
+    {0xCF1, 0xCF2, SC_Kannada, GC_Lo, NULL}, //  ೱ..ೲ
+    {0xD04, 0xD0C, SC_Malayalam, GC_Lo, NULL}, //  ഄ..ഌ
+    {0xD0E, 0xD10, SC_Malayalam, GC_Lo, NULL}, //  എ..ഐ
+    {0xD12, 0xD3A, SC_Malayalam, GC_Lo, NULL}, //  ഒ..ഺ
+    {0xD3D, 0xD3D, SC_Malayalam, GC_Lo, NULL}, //  ഽ
+    {0xD4E, 0xD4E, SC_Malayalam, GC_Lo, NULL}, //  ൎ
+    {0xD54, 0xD56, SC_Malayalam, GC_Lo, NULL}, //  ൔ..ൖ
+    {0xD5F, 0xD61, SC_Malayalam, GC_Lo, NULL}, //  ൟ..ൡ
+    {0xD7A, 0xD7F, SC_Malayalam, GC_Lo, NULL}, //  ൺ..ൿ
+    {0xD85, 0xD96, SC_Sinhala, GC_Lo, NULL}, //  අ..ඖ
+    {0xD9A, 0xDB1, SC_Sinhala, GC_Lo, NULL}, //  ක..න
+    {0xDB3, 0xDBB, SC_Sinhala, GC_Lo, NULL}, //  ඳ..ර
+    {0xDBD, 0xDBD, SC_Sinhala, GC_Lo, NULL}, //  ල
+    {0xDC0, 0xDC6, SC_Sinhala, GC_Lo, NULL}, //  ව..ෆ
+    {0xE01, 0xE30, SC_Thai, GC_Lo, NULL}, //  ก..ะ
+    {0xE32, 0xE32, SC_Thai, GC_Lo, NULL}, //  า
+    {0xE40, 0xE46, SC_Thai, GC_L, NULL}, //  เ..ๆ
+    {0xE81, 0xE82, SC_Lao, GC_Lo, NULL}, //  ກ..ຂ
+    {0xE84, 0xE84, SC_Lao, GC_Lo, NULL}, //  ຄ
+    {0xE86, 0xE8A, SC_Lao, GC_Lo, NULL}, //  ຆ..ຊ
+    {0xE8C, 0xEA3, SC_Lao, GC_Lo, NULL}, //  ຌ..ຣ
+    {0xEA5, 0xEA5, SC_Lao, GC_Lo, NULL}, //  ລ
+    {0xEA7, 0xEB0, SC_Lao, GC_Lo, NULL}, //  ວ..ະ
+    {0xEB2, 0xEB2, SC_Lao, GC_Lo, NULL}, //  າ
+    {0xEBD, 0xEBD, SC_Lao, GC_Lo, NULL}, //  ຽ
+    {0xEC0, 0xEC4, SC_Lao, GC_Lo, NULL}, //  ເ..ໄ
+    {0xEC6, 0xEC6, SC_Lao, GC_Lm, NULL}, //  ໆ
+    {0xEDC, 0xEDF, SC_Lao, GC_Lo, NULL}, //  ໜ..ໟ
+    {0xF00, 0xF00, SC_Tibetan, GC_Lo, NULL}, //  ༀ
+    {0xF40, 0xF42, SC_Tibetan, GC_Lo, NULL}, //  ཀ..ག
+    {0xF44, 0xF47, SC_Tibetan, GC_Lo, NULL}, //  ང..ཇ
+    {0xF49, 0xF4C, SC_Tibetan, GC_Lo, NULL}, //  ཉ..ཌ
+    {0xF4E, 0xF51, SC_Tibetan, GC_Lo, NULL}, //  ཎ..ད
+    {0xF53, 0xF56, SC_Tibetan, GC_Lo, NULL}, //  ན..བ
+    {0xF58, 0xF5B, SC_Tibetan, GC_Lo, NULL}, //  མ..ཛ
+    {0xF5D, 0xF68, SC_Tibetan, GC_Lo, NULL}, //  ཝ..ཨ
+    {0xF6A, 0xF6C, SC_Tibetan, GC_Lo, NULL}, //  ཪ..ཬ
+    {0xF88, 0xF8C, SC_Tibetan, GC_Lo, NULL}, //  ྈ..ྌ
+    {0x1000, 0x102A, SC_Myanmar, GC_Lo, NULL}, //  က..ဪ
+    {0x103F, 0x103F, SC_Myanmar, GC_Lo, NULL}, //  ဿ
+    {0x1050, 0x1055, SC_Myanmar, GC_Lo, NULL}, //  ၐ..ၕ
+    {0x105A, 0x105D, SC_Myanmar, GC_Lo, NULL}, //  ၚ..ၝ
+    {0x1061, 0x1061, SC_Myanmar, GC_Lo, NULL}, //  ၡ
+    {0x1065, 0x1066, SC_Myanmar, GC_Lo, NULL}, //  ၥ..ၦ
+    {0x106E, 0x1070, SC_Myanmar, GC_Lo, NULL}, //  ၮ..ၰ
+    {0x1075, 0x1081, SC_Myanmar, GC_Lo, NULL}, //  ၵ..ႁ
+    {0x108E, 0x108E, SC_Myanmar, GC_Lo, NULL}, //  ႎ
+    {0x10A0, 0x10C5, SC_Georgian, GC_Lu, NULL}, //  Ⴀ..Ⴥ
+    {0x10C7, 0x10C7, SC_Georgian, GC_Lu, NULL}, //  Ⴧ
+    {0x10CD, 0x10CD, SC_Georgian, GC_Lu, NULL}, //  Ⴭ
+    {0x10D0, 0x10FA, SC_Georgian, GC_Ll, NULL}, //  ა..ჺ
+    {0x10FC, 0x10FF, SC_Georgian, GC_L, NULL}, //  ჼ..ჿ
+    {0x1101, 0x11FF, SC_Hangul, GC_Lo, NULL}, //  ᄁ..ᇿ
+    {0x1201, 0x1248, SC_Ethiopic, GC_Lo, NULL}, //  ሁ..ቈ
+    {0x124A, 0x124D, SC_Ethiopic, GC_Lo, NULL}, //  ቊ..ቍ
+    {0x1250, 0x1256, SC_Ethiopic, GC_Lo, NULL}, //  ቐ..ቖ
+    {0x1258, 0x1258, SC_Ethiopic, GC_Lo, NULL}, //  ቘ
+    {0x125A, 0x125D, SC_Ethiopic, GC_Lo, NULL}, //  ቚ..ቝ
+    {0x1260, 0x1288, SC_Ethiopic, GC_Lo, NULL}, //  በ..ኈ
+    {0x128A, 0x128D, SC_Ethiopic, GC_Lo, NULL}, //  ኊ..ኍ
+    {0x1290, 0x12B0, SC_Ethiopic, GC_Lo, NULL}, //  ነ..ኰ
+    {0x12B2, 0x12B5, SC_Ethiopic, GC_Lo, NULL}, //  ኲ..ኵ
+    {0x12B8, 0x12BE, SC_Ethiopic, GC_Lo, NULL}, //  ኸ..ኾ
+    {0x12C0, 0x12C0, SC_Ethiopic, GC_Lo, NULL}, //  ዀ
+    {0x12C2, 0x12C5, SC_Ethiopic, GC_Lo, NULL}, //  ዂ..ዅ
+    {0x12C8, 0x12D6, SC_Ethiopic, GC_Lo, NULL}, //  ወ..ዖ
+    {0x12D8, 0x1310, SC_Ethiopic, GC_Lo, NULL}, //  ዘ..ጐ
+    {0x1312, 0x1315, SC_Ethiopic, GC_Lo, NULL}, //  ጒ..ጕ
+    {0x1318, 0x135A, SC_Ethiopic, GC_Lo, NULL}, //  ጘ..ፚ
+    {0x1380, 0x138F, SC_Ethiopic, GC_Lo, NULL}, //  ᎀ..ᎏ
+    {0x1780, 0x17B3, SC_Khmer, GC_Lo, NULL}, //  ក..ឳ
+    {0x17D7, 0x17D7, SC_Khmer, GC_Lm, NULL}, //  ៗ
+    {0x17DC, 0x17DC, SC_Khmer, GC_Lo, NULL}, //  ៜ
+    {0x1C80, 0x1C88, SC_Cyrillic, GC_Ll, NULL}, //  ᲀ..ᲈ
+    {0x1C90, 0x1CBA, SC_Georgian, GC_Lu, NULL}, //  Ა..Ჺ
+    {0x1CBD, 0x1CBF, SC_Georgian, GC_Lu, NULL}, //  Ჽ..Ჿ
+    // TODO SPLIT on SCX
+    {0x1CE9, 0x1CEC, SC_Common, GC_Lo, {SC_Devanagari,SC_Nandinagari,0}}, //  ᳩ..ᳬ
+    // TODO SPLIT on SCX
+    {0x1CEE, 0x1CF3, SC_Common, GC_Lo, {SC_Devanagari,0}}, //  ᳮ..ᳳ
+    {0x1CF5, 0x1CF6, SC_Common, GC_Lo, {SC_Bengali,SC_Devanagari,0}, //  ᳵ..ᳶ
+    {0x1CFA, 0x1CFA, SC_Common, GC_Lo, {SC_Nandinagari,0}}, //  ᳺ
+    {0x1D00, 0x1D25, SC_Latin, GC_Ll, NULL}, //  ᴀ..ᴥ
+    {0x1D27, 0x1D2A, SC_Greek, GC_Ll, NULL}, //  ᴧ..ᴪ
+    {0x1D2C, 0x1D5C, SC_Latin, GC_Lm, NULL}, //  ᴬ..ᵜ
+    {0x1D5E, 0x1D61, SC_Greek, GC_Lm, NULL}, //  ᵞ..ᵡ
+    {0x1D63, 0x1D65, SC_Latin, GC_Lm, NULL}, //  ᵣ..ᵥ
+    {0x1D67, 0x1D6A, SC_Greek, GC_Lm, NULL}, //  ᵧ..ᵪ
+    {0x1D6C, 0x1D77, SC_Latin, GC_Ll, NULL}, //  ᵬ..ᵷ
+    {0x1D79, 0x1DBE, SC_Latin, GC_L, NULL}, //  ᵹ..ᶾ
+    {0x1E00, 0x1EFF, SC_Latin, GC_L, NULL}, //  Ḁ..ỿ
+    {0x1F01, 0x1F15, SC_Greek, GC_L, NULL}, //  ἁ..ἕ
+    {0x1F18, 0x1F1D, SC_Greek, GC_Lu, NULL}, //  Ἐ..Ἕ
+    {0x1F20, 0x1F45, SC_Greek, GC_L, NULL}, //  ἠ..ὅ
+    {0x1F48, 0x1F4D, SC_Greek, GC_Lu, NULL}, //  Ὀ..Ὅ
+    {0x1F50, 0x1F57, SC_Greek, GC_Ll, NULL}, //  ὐ..ὗ
+    {0x1F59, 0x1F59, SC_Greek, GC_Lu, NULL}, //  Ὑ
+    {0x1F5B, 0x1F5B, SC_Greek, GC_Lu, NULL}, //  Ὓ
+    {0x1F5D, 0x1F5D, SC_Greek, GC_Lu, NULL}, //  Ὕ
+    {0x1F5F, 0x1F70, SC_Greek, GC_L, NULL}, //  Ὗ..ὰ
+    {0x1F72, 0x1F72, SC_Greek, GC_Ll, NULL}, //  ὲ
+    {0x1F74, 0x1F74, SC_Greek, GC_Ll, NULL}, //  ὴ
+    {0x1F76, 0x1F76, SC_Greek, GC_Ll, NULL}, //  ὶ
+    {0x1F78, 0x1F78, SC_Greek, GC_Ll, NULL}, //  ὸ
+    {0x1F7A, 0x1F7A, SC_Greek, GC_Ll, NULL}, //  ὺ
+    {0x1F7C, 0x1F7C, SC_Greek, GC_Ll, NULL}, //  ὼ
+    {0x1F80, 0x1FB4, SC_Greek, GC_L, NULL}, //  ᾀ..ᾴ
+    {0x1FB6, 0x1FBA, SC_Greek, GC_L, NULL}, //  ᾶ..Ὰ
+    {0x1FBC, 0x1FBC, SC_Greek, GC_Lt, NULL}, //  ᾼ
+    {0x1FC2, 0x1FC4, SC_Greek, GC_Ll, NULL}, //  ῂ..ῄ
+    {0x1FC6, 0x1FC8, SC_Greek, GC_L, NULL}, //  ῆ..Ὲ
+    {0x1FCA, 0x1FCA, SC_Greek, GC_Lu, NULL}, //  Ὴ
+    {0x1FCC, 0x1FCC, SC_Greek, GC_Lt, NULL}, //  ῌ
+    {0x1FD0, 0x1FD2, SC_Greek, GC_Ll, NULL}, //  ῐ..ῒ
+    {0x1FD6, 0x1FDA, SC_Greek, GC_L, NULL}, //  ῖ..Ὶ
+    {0x1FE0, 0x1FE2, SC_Greek, GC_Ll, NULL}, //  ῠ..ῢ
+    {0x1FE4, 0x1FEA, SC_Greek, GC_L, NULL}, //  ῤ..Ὺ
+    {0x1FEC, 0x1FEC, SC_Greek, GC_Lu, NULL}, //  Ῥ
+    {0x1FF2, 0x1FF4, SC_Greek, GC_Ll, NULL}, //  ῲ..ῴ
+    {0x1FF6, 0x1FF8, SC_Greek, GC_L, NULL}, //  ῶ..Ὸ
+    {0x1FFA, 0x1FFA, SC_Greek, GC_Lu, NULL}, //  Ὼ
+    {0x1FFC, 0x1FFC, SC_Greek, GC_Lt, NULL}, //  ῼ
+    {0x2071, 0x2071, SC_Latin, GC_Lm, NULL}, //  ⁱ
+    {0x207F, 0x207F, SC_Latin, GC_Lm, NULL}, //  ⁿ
+    {0x2090, 0x209C, SC_Latin, GC_Lm, NULL}, //  ₐ..ₜ
+    {0x2102, 0x2102, SC_Common, GC_Lu, NULL}, //  ℂ
+    {0x2107, 0x2107, SC_Common, GC_Lu, NULL}, //  ℇ
+    {0x210A, 0x2113, SC_Common, GC_L, NULL}, //  ℊ..ℓ
+    {0x2115, 0x2115, SC_Common, GC_Lu, NULL}, //  ℕ
+    {0x2118, 0x211D, SC_Common, GC_V, NULL}, //  ℘..ℝ
+    {0x2124, 0x2124, SC_Common, GC_Lu, NULL}, //  ℤ
+    {0x2128, 0x2128, SC_Common, GC_Lu, NULL}, //  ℨ
+    {0x212C, 0x2131, SC_Common, GC_L, NULL}, //  ℬ..ℱ
+    {0x2133, 0x2139, SC_Common, GC_L, NULL}, //  ℳ..ℹ
+    {0x213C, 0x213F, SC_Common, GC_L, NULL}, //  ℼ..ℿ
+    {0x2145, 0x2149, SC_Common, GC_L, NULL}, //  ⅅ..ⅉ
+    {0x214E, 0x214E, SC_Latin, GC_Ll, NULL}, //  ⅎ
+    {0x2160, 0x2188, SC_Latin, GC_V, NULL}, //  Ⅰ..ↈ
+    {0x2C60, 0x2C7F, SC_Latin, GC_L, NULL}, //  Ⱡ..Ɀ
+    {0x2D00, 0x2D25, SC_Georgian, GC_Ll, NULL}, //  ⴀ..ⴥ
+    {0x2D27, 0x2D27, SC_Georgian, GC_Ll, NULL}, //  ⴧ
+    {0x2D2D, 0x2D2D, SC_Georgian, GC_Ll, NULL}, //  ⴭ
+    {0x2D80, 0x2D96, SC_Ethiopic, GC_Lo, NULL}, //  ⶀ..ⶖ
+    {0x2DA0, 0x2DA6, SC_Ethiopic, GC_Lo, NULL}, //  ⶠ..ⶦ
+    {0x2DA8, 0x2DAE, SC_Ethiopic, GC_Lo, NULL}, //  ⶨ..ⶮ
+    {0x2DB0, 0x2DB6, SC_Ethiopic, GC_Lo, NULL}, //  ⶰ..ⶶ
+    {0x2DB8, 0x2DBE, SC_Ethiopic, GC_Lo, NULL}, //  ⶸ..ⶾ
+    {0x2DC0, 0x2DC6, SC_Ethiopic, GC_Lo, NULL}, //  ⷀ..ⷆ
+    {0x2DC8, 0x2DCE, SC_Ethiopic, GC_Lo, NULL}, //  ⷈ..ⷎ
+    {0x2DD0, 0x2DD6, SC_Ethiopic, GC_Lo, NULL}, //  ⷐ..ⷖ
+    {0x2DD8, 0x2DDE, SC_Ethiopic, GC_Lo, NULL}, //  ⷘ..ⷞ
+    {0x3005, 0x3005, SC_Han, GC_Lm, NULL}, //  々
+    {0x3007, 0x3007, SC_Han, GC_Nl, NULL}, //  〇
+    {0x3021, 0x3029, SC_Han, GC_Nl, NULL}, //  〡..〩
+    {0x3031, 0x3035, SC_Common, GC_Lm, {SC_Hiragana,SC_Katakana,0}}, //  〱..〵
+    {0x3038, 0x303B, SC_Han, GC_V, NULL}, //  〸..〻
+    {0x3041, 0x3096, SC_Hiragana, GC_Lo, NULL}, //  ぁ..ゖ
+    {0x309D, 0x309F, SC_Hiragana, GC_L, NULL}, //  ゝ..ゟ
+    {0x30A1, 0x30FA, SC_Katakana, GC_Lo, NULL}, //  ァ..ヺ
+    {0x30FC, 0x30FC, SC_Common, GC_Lm, {SC_Hiragana,SC_Katakana,0}}, //  ー
+    {0x30FE, 0x30FF, SC_Katakana, GC_L, NULL}, //  ヾ..ヿ
+    {0x3105, 0x312F, SC_Bopomofo, GC_Lo, NULL}, //  ㄅ..ㄯ
+    {0x3131, 0x318E, SC_Hangul, GC_Lo, NULL}, //  ㄱ..ㆎ
+    {0x31A0, 0x31BF, SC_Bopomofo, GC_Lo, NULL}, //  ㆠ..ㆿ
+    {0x31F0, 0x31FF, SC_Katakana, GC_Lo, NULL}, //  ㇰ..ㇿ
+    {0x3400, 0x4DBF, SC_Han, GC_Lo, NULL}, //  㐀..䶿
+    {0x4E00, 0x9FFF, SC_Han, GC_Lo, NULL}, //  一..鿿
+    {0xA640, 0xA66E, SC_Cyrillic, GC_L, NULL}, //  Ꙁ..ꙮ
+    {0xA67F, 0xA69D, SC_Cyrillic, GC_L, NULL}, //  ꙿ..ꚝ
+    {0xA717, 0xA71F, SC_Common, GC_Lm, NULL}, //  ꜗ..ꜟ
+    {0xA722, 0xA787, SC_Latin, GC_L, NULL}, //  Ꜣ..ꞇ
+    {0xA78B, 0xA7CA, SC_Latin, GC_L, NULL}, //  Ꞌ..ꟊ
+    {0xA7D0, 0xA7D1, SC_Latin, GC_L, NULL}, //  Ꟑ..ꟑ
+    {0xA7D3, 0xA7D3, SC_Latin, GC_Ll, NULL}, //  ꟓ
+    {0xA7D5, 0xA7D9, SC_Latin, GC_L, NULL}, //  ꟕ..ꟙ
+    {0xA7F2, 0xA7FF, SC_Latin, GC_L, NULL}, //  ꟲ..ꟿ
+    // TODO SPLIT on SCX
+    {0xA8F2, 0xA8F7, SC_Devanagari, GC_Lo, NULL}, //  ꣲ..ꣷ
+    {0xA8FB, 0xA8FB, SC_Devanagari, GC_Lo, NULL}, //  ꣻ
+    {0xA8FD, 0xA8FE, SC_Devanagari, GC_Lo, NULL}, //  ꣽ..ꣾ
+    {0xA960, 0xA97C, SC_Hangul, GC_Lo, NULL}, //  ꥠ..ꥼ
+    {0xA9CF, 0xA9CF, SC_Common, GC_Lm, {SC_Buginese,SC_Javanese,0}}, //  ꧏ
+    {0xA9E0, 0xA9E4, SC_Myanmar, GC_Lo, NULL}, //  ꧠ..ꧤ
+    {0xA9E6, 0xA9EF, SC_Myanmar, GC_L, NULL}, //  ꧦ..ꧯ
+    {0xA9FA, 0xA9FE, SC_Myanmar, GC_Lo, NULL}, //  ꧺ..ꧾ
+    {0xAA60, 0xAA76, SC_Myanmar, GC_L, NULL}, //  ꩠ..ꩶ
+    {0xAA7A, 0xAA7A, SC_Myanmar, GC_Lo, NULL}, //  ꩺ
+    {0xAA7E, 0xAA7F, SC_Myanmar, GC_Lo, NULL}, //  ꩾ..ꩿ
+    {0xAB01, 0xAB06, SC_Ethiopic, GC_Lo, NULL}, //  ꬁ..ꬆ
+    {0xAB09, 0xAB0E, SC_Ethiopic, GC_Lo, NULL}, //  ꬉ..ꬎ
+    {0xAB11, 0xAB16, SC_Ethiopic, GC_Lo, NULL}, //  ꬑ..ꬖ
+    {0xAB20, 0xAB26, SC_Ethiopic, GC_Lo, NULL}, //  ꬠ..ꬦ
+    {0xAB28, 0xAB2E, SC_Ethiopic, GC_Lo, NULL}, //  ꬨ..ꬮ
+    {0xAB30, 0xAB5A, SC_Latin, GC_Ll, NULL}, //  ꬰ..ꭚ
+    {0xAB5C, 0xAB64, SC_Latin, GC_L, NULL}, //  ꭜ..ꭤ
+    {0xAB66, 0xAB69, SC_Latin, GC_L, NULL}, //  ꭦ..ꭩ
+    {0xD7B0, 0xD7C6, SC_Hangul, GC_Lo, NULL}, //  ힰ..ퟆ
+    {0xD7CB, 0xD7FB, SC_Hangul, GC_Lo, NULL}, //  ퟋ..ퟻ
+    {0xFA0E, 0xFA0F, SC_Han, GC_Lo, NULL}, //  﨎..﨏
+    {0xFA11, 0xFA11, SC_Han, GC_Lo, NULL}, //  﨑
+    {0xFA13, 0xFA14, SC_Han, GC_Lo, NULL}, //  﨓..﨔
+    {0xFA1F, 0xFA1F, SC_Han, GC_Lo, NULL}, //  﨟
+    {0xFA21, 0xFA21, SC_Han, GC_Lo, NULL}, //  﨡
+    {0xFA23, 0xFA24, SC_Han, GC_Lo, NULL}, //  﨣..﨤
+    {0xFA27, 0xFA29, SC_Han, GC_Lo, NULL}, //  﨧..﨩
+    {0xFB00, 0xFB06, SC_Latin, GC_Ll, NULL}, //  ﬀ..ﬆ
+    {0xFB13, 0xFB17, SC_Armenian, GC_Ll, NULL}, //  ﬓ..ﬗ
+    {0xFB20, 0xFB28, SC_Hebrew, GC_Lo, NULL}, //  ﬠ..ﬨ
+    {0xFB4F, 0xFB4F, SC_Hebrew, GC_Lo, NULL}, //  ﭏ
+    {0xFB51, 0xFBB1, SC_Arabic, GC_Lo, NULL}, //  ﭑ..ﮱ
+    {0xFBD3, 0xFC5D, SC_Arabic, GC_Lo, NULL}, //  ﯓ..ﱝ
+    {0xFC64, 0xFD3D, SC_Arabic, GC_Lo, NULL}, //  ﱤ..ﴽ
+    {0xFD50, 0xFD8F, SC_Arabic, GC_Lo, NULL}, //  ﵐ..ﶏ
+    {0xFD92, 0xFDC7, SC_Arabic, GC_Lo, NULL}, //  ﶒ..ﷇ
+    // TODO SPLIT on SCX
+    {0xFDF0, 0xFDF9, SC_Arabic, GC_Lo, NULL}, //  ﷰ..ﷹ
+    {0xFE71, 0xFE71, SC_Arabic, GC_Lo, NULL}, //  ﹱ
+    {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ
+    {0xFE77, 0xFE77, SC_Arabic, GC_Lo, NULL}, //  ﹷ
+    {0xFE79, 0xFE79, SC_Arabic, GC_Lo, NULL}, //  ﹹ
+    {0xFE7B, 0xFE7B, SC_Arabic, GC_Lo, NULL}, //  ﹻ
+    {0xFE7D, 0xFE7D, SC_Arabic, GC_Lo, NULL}, //  ﹽ
+    {0xFE7F, 0xFEFC, SC_Arabic, GC_Lo, NULL}, //  ﹿ..ﻼ
+    {0xFF21, 0xFF3A, SC_Latin, GC_Lu, NULL}, //  Ａ..Ｚ
+    {0xFF41, 0xFF5A, SC_Latin, GC_Ll, NULL}, //  ａ..ｚ
+    {0xFF66, 0xFF6F, SC_Katakana, GC_Lo, NULL}, //  ｦ..ｯ
+    {0xFF71, 0xFF9D, SC_Katakana, GC_Lo, NULL}, //  ｱ..ﾝ
+    {0xFFA0, 0xFFBE, SC_Hangul, GC_Lo, NULL}, //  ﾠ..ﾾ
+    {0xFFC2, 0xFFC7, SC_Hangul, GC_Lo, NULL}, //  ￂ..ￇ
+    {0xFFCA, 0xFFCF, SC_Hangul, GC_Lo, NULL}, //  ￊ..ￏ
+    {0xFFD2, 0xFFD7, SC_Hangul, GC_Lo, NULL}, //  ￒ..ￗ
+    {0xFFDA, 0xFFDC, SC_Hangul, GC_Lo, NULL}, //  ￚ..ￜ
+    {0x10140, 0x10174, SC_Greek, GC_Nl, NULL}, //  𐅀..𐅴
+    {0x10780, 0x10785, SC_Latin, GC_Lm, NULL}, //  𐞀..𐞅
+    {0x10787, 0x107B0, SC_Latin, GC_Lm, NULL}, //  𐞇..𐞰
+    {0x107B2, 0x107BA, SC_Latin, GC_Lm, NULL}, //  𐞲..𐞺
+    {0x16FE3, 0x16FE3, SC_Han, GC_Lm, NULL}, //  𖿣
+    {0x1AFF0, 0x1AFF3, SC_Katakana, GC_Lm, NULL}, //  𚿰..𚿳
+    {0x1AFF5, 0x1AFFB, SC_Katakana, GC_Lm, NULL}, //  𚿵..𚿻
+    {0x1AFFD, 0x1AFFE, SC_Katakana, GC_Lm, NULL}, //  𚿽..𚿾
+    {0x1B000, 0x1B000, SC_Katakana, GC_Lo, NULL}, //  𛀀
+    {0x1B002, 0x1B11F, SC_Hiragana, GC_Lo, NULL}, //  𛀂..𛄟
+    {0x1B121, 0x1B122, SC_Katakana, GC_Lo, NULL}, //  𛄡..𛄢
+    {0x1B150, 0x1B152, SC_Hiragana, GC_Lo, NULL}, //  𛅐..𛅒
+    {0x1B164, 0x1B167, SC_Katakana, GC_Lo, NULL}, //  𛅤..𛅧
+    {0x1D400, 0x1D454, SC_Common, GC_L, NULL}, //  𝐀..𝑔
+    {0x1D456, 0x1D49C, SC_Common, GC_L, NULL}, //  𝑖..𝒜
+    {0x1D49E, 0x1D49F, SC_Common, GC_Lu, NULL}, //  𝒞..𝒟
+    {0x1D4A2, 0x1D4A2, SC_Common, GC_Lu, NULL}, //  𝒢
+    {0x1D4A5, 0x1D4A6, SC_Common, GC_Lu, NULL}, //  𝒥..𝒦
+    {0x1D4A9, 0x1D4AC, SC_Common, GC_Lu, NULL}, //  𝒩..𝒬
+    {0x1D4AE, 0x1D4B9, SC_Common, GC_L, NULL}, //  𝒮..𝒹
+    {0x1D4BB, 0x1D4BB, SC_Common, GC_Ll, NULL}, //  𝒻
+    {0x1D4BD, 0x1D4C3, SC_Common, GC_Ll, NULL}, //  𝒽..𝓃
+    {0x1D4C5, 0x1D505, SC_Common, GC_L, NULL}, //  𝓅..𝔅
+    {0x1D507, 0x1D50A, SC_Common, GC_Lu, NULL}, //  𝔇..𝔊
+    {0x1D50D, 0x1D514, SC_Common, GC_Lu, NULL}, //  𝔍..𝔔
+    {0x1D516, 0x1D51C, SC_Common, GC_Lu, NULL}, //  𝔖..𝔜
+    {0x1D51E, 0x1D539, SC_Common, GC_L, NULL}, //  𝔞..𝔹
+    {0x1D53B, 0x1D53E, SC_Common, GC_Lu, NULL}, //  𝔻..𝔾
+    {0x1D540, 0x1D544, SC_Common, GC_Lu, NULL}, //  𝕀..𝕄
+    {0x1D546, 0x1D546, SC_Common, GC_Lu, NULL}, //  𝕆
+    {0x1D54A, 0x1D550, SC_Common, GC_Lu, NULL}, //  𝕊..𝕐
+    {0x1D552, 0x1D6A5, SC_Common, GC_L, NULL}, //  𝕒..𝚥
+    {0x1D6A8, 0x1D6C0, SC_Common, GC_Lu, NULL}, //  𝚨..𝛀
+    {0x1D6C2, 0x1D6DA, SC_Common, GC_Ll, NULL}, //  𝛂..𝛚
+    {0x1D6DC, 0x1D6FA, SC_Common, GC_L, NULL}, //  𝛜..𝛺
+    {0x1D6FC, 0x1D714, SC_Common, GC_Ll, NULL}, //  𝛼..𝜔
+    {0x1D716, 0x1D734, SC_Common, GC_L, NULL}, //  𝜖..𝜴
+    {0x1D736, 0x1D74E, SC_Common, GC_Ll, NULL}, //  𝜶..𝝎
+    {0x1D750, 0x1D76E, SC_Common, GC_L, NULL}, //  𝝐..𝝮
+    {0x1D770, 0x1D788, SC_Common, GC_Ll, NULL}, //  𝝰..𝞈
+    {0x1D78A, 0x1D7A8, SC_Common, GC_L, NULL}, //  𝞊..𝞨
+    {0x1D7AA, 0x1D7C2, SC_Common, GC_Ll, NULL}, //  𝞪..𝟂
+    {0x1D7C4, 0x1D7CB, SC_Common, GC_L, NULL}, //  𝟄..𝟋
+    {0x1DF00, 0x1DF1E, SC_Latin, GC_L, NULL}, //  𝼀..𝼞
+    {0x1E7E0, 0x1E7E6, SC_Ethiopic, GC_Lo, NULL}, //  𞟠..𞟦
+    {0x1E7E8, 0x1E7EB, SC_Ethiopic, GC_Lo, NULL}, //  𞟨..𞟫
+    {0x1E7ED, 0x1E7EE, SC_Ethiopic, GC_Lo, NULL}, //  𞟭..𞟮
+    {0x1E7F0, 0x1E7FE, SC_Ethiopic, GC_Lo, NULL}, //  𞟰..𞟾
+    {0x1EE00, 0x1EE03, SC_Arabic, GC_Lo, NULL}, //  𞸀..𞸃
+    {0x1EE05, 0x1EE1F, SC_Arabic, GC_Lo, NULL}, //  𞸅..𞸟
+    {0x1EE21, 0x1EE22, SC_Arabic, GC_Lo, NULL}, //  𞸡..𞸢
+    {0x1EE24, 0x1EE24, SC_Arabic, GC_Lo, NULL}, //  𞸤
+    {0x1EE27, 0x1EE27, SC_Arabic, GC_Lo, NULL}, //  𞸧
+    {0x1EE29, 0x1EE32, SC_Arabic, GC_Lo, NULL}, //  𞸩..𞸲
+    {0x1EE34, 0x1EE37, SC_Arabic, GC_Lo, NULL}, //  𞸴..𞸷
+    {0x1EE39, 0x1EE39, SC_Arabic, GC_Lo, NULL}, //  𞸹
+    {0x1EE3B, 0x1EE3B, SC_Arabic, GC_Lo, NULL}, //  𞸻
+    {0x1EE42, 0x1EE42, SC_Arabic, GC_Lo, NULL}, //  𞹂
+    {0x1EE47, 0x1EE47, SC_Arabic, GC_Lo, NULL}, //  𞹇
+    {0x1EE49, 0x1EE49, SC_Arabic, GC_Lo, NULL}, //  𞹉
+    {0x1EE4B, 0x1EE4B, SC_Arabic, GC_Lo, NULL}, //  𞹋
+    {0x1EE4D, 0x1EE4F, SC_Arabic, GC_Lo, NULL}, //  𞹍..𞹏
+    {0x1EE51, 0x1EE52, SC_Arabic, GC_Lo, NULL}, //  𞹑..𞹒
+    {0x1EE54, 0x1EE54, SC_Arabic, GC_Lo, NULL}, //  𞹔
+    {0x1EE57, 0x1EE57, SC_Arabic, GC_Lo, NULL}, //  𞹗
+    {0x1EE59, 0x1EE59, SC_Arabic, GC_Lo, NULL}, //  𞹙
+    {0x1EE5B, 0x1EE5B, SC_Arabic, GC_Lo, NULL}, //  𞹛
+    {0x1EE5D, 0x1EE5D, SC_Arabic, GC_Lo, NULL}, //  𞹝
+    {0x1EE5F, 0x1EE5F, SC_Arabic, GC_Lo, NULL}, //  𞹟
+    {0x1EE61, 0x1EE62, SC_Arabic, GC_Lo, NULL}, //  𞹡..𞹢
+    {0x1EE64, 0x1EE64, SC_Arabic, GC_Lo, NULL}, //  𞹤
+    {0x1EE67, 0x1EE6A, SC_Arabic, GC_Lo, NULL}, //  𞹧..𞹪
+    {0x1EE6C, 0x1EE72, SC_Arabic, GC_Lo, NULL}, //  𞹬..𞹲
+    {0x1EE74, 0x1EE77, SC_Arabic, GC_Lo, NULL}, //  𞹴..𞹷
+    {0x1EE79, 0x1EE7C, SC_Arabic, GC_Lo, NULL}, //  𞹹..𞹼
+    {0x1EE7E, 0x1EE7E, SC_Arabic, GC_Lo, NULL}, //  𞹾
+    {0x1EE80, 0x1EE89, SC_Arabic, GC_Lo, NULL}, //  𞺀..𞺉
+    {0x1EE8B, 0x1EE9B, SC_Arabic, GC_Lo, NULL}, //  𞺋..𞺛
+    {0x1EEA1, 0x1EEA3, SC_Arabic, GC_Lo, NULL}, //  𞺡..𞺣
+    {0x1EEA5, 0x1EEA9, SC_Arabic, GC_Lo, NULL}, //  𞺥..𞺩
+    {0x1EEAB, 0x1EEBB, SC_Arabic, GC_Lo, NULL}, //  𞺫..𞺻
+    {0x20000, 0x2A6DF, SC_Han, GC_Lo, NULL}, //  𠀀..𪛟
+    {0x2A700, 0x2B738, SC_Han, GC_Lo, NULL}, //  𪜀..𫜸
+    {0x2B740, 0x2B81D, SC_Han, GC_Lo, NULL}, //  𫝀..𫠝
+    {0x2B820, 0x2CEA1, SC_Han, GC_Lo, NULL}, //  𫠠..𬺡
+    {0x2CEB0, 0x2EBE0, SC_Han, GC_Lo, NULL}, //  𬺰..𮯠
+    {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
-// 315 ranges, 117 singles, 99629 codepoints
+// 315 ranges, 116 singles, 99629 codepoints
 ```
 
 14 Appendix A - C23XID_Continue
 ===============================
 
-Created with mkc23 from libu8ident
+Created with mkc23 from libu8ident.
+_The SCX is modelled as if your CC would allow static initialization of strings as {char,...,0}._
 
 ``` c
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC and !MARK
 const struct sc safec23_cont_list[22] = {
-    {0x30, 0x39, 0}, // Common 0..9
-    {0x5F, 0x5F, 0}, // Common _
-    {0xB7, 0xB7, 0}, // Common ·
-    {0x660, 0x669, 3}, // Arabic ٠..٩
-    {0x6F0, 0x6F9, 3}, // Arabic ۰..۹
-    {0x966, 0x96F, 8}, // Devanagari ०..९
-    {0x9E6, 0x9EF, 5}, // Bengali ০..৯
-    {0xA66, 0xA6F, 13}, // Gurmukhi ੦..੯
-    {0xAE6, 0xAEF, 12}, // Gujarati ૦..૯
-    {0xB66, 0xB6F, 24}, // Oriya ୦..୯
-    {0xBE6, 0xBEF, 26}, // Tamil ௦..௯
-    {0xC66, 0xC6F, 27}, // Telugu ౦..౯
-    {0xCE6, 0xCEF, 19}, // Kannada ೦..೯
-    {0xD66, 0xD6F, 22}, // Malayalam ൦..൯
-    {0xE50, 0xE59, 29}, // Thai ๐..๙
-    {0xED0, 0xED9, 21}, // Lao ໐..໙
-    {0xF20, 0xF29, 30}, // Tibetan ༠..༩
-    {0x1040, 0x1049, 23}, // Myanmar ၀..၉
-    {0x1090, 0x1099, 23}, // Myanmar ႐..႙
-    {0x17E0, 0x17E9, 20}, // Khmer ០..៩
-    {0x203F, 0x2040, 0}, // Common ‿..⁀
-    {0xA9F0, 0xA9F9, 23}, // Myanmar ꧰..꧹
+    {0x30, 0x39, SC_Common, GC_Nd, NULL}, //  0..9
+    {0x5F, 0x5F, SC_Common, GC_Pc, NULL}, //  _
+    {0xB7, 0xB7, SC_Common, GC_Po, NULL}, //  ·
+    {0x660, 0x669, SC_Arabic, GC_Nd, {SC_Arabic,SC_Thaana,SC_Yezidi,0}}, //  ٠..٩
+    {0x6F0, 0x6F9, SC_Arabic, GC_Nd, NULL}, //  ۰..۹
+    {0x966, 0x96F, SC_Devanagari, GC_Nd, {SC_Devanagari,SC_Dogra,SC_Kaithi,SC_Mahajani,0}}, //  ०..९
+    {0x9E6, 0x9EF, SC_Bengali, GC_Nd, {SC_Bengali,SC_Chakma,SC_Syloti_Nagri,0}}, //  ০..৯
+    {0xA66, 0xA6F, SC_Gurmukhi, GC_Nd, {SC_Gurmukhi,SC_Multani,0}}, //  ੦..੯
+    {0xAE6, 0xAEF, SC_Gujarati, GC_Nd, {SC_Gujarati,SC_Khojki,0}, //  ૦..૯
+    {0xB66, 0xB6F, SC_Oriya, GC_Nd, NULL}, //  ୦..୯
+    {0xBE6, 0xBEF, SC_Tamil, GC_Nd, {SC_Grantha,SC_Tamil,0}}, //  ௦..௯
+    {0xC66, 0xC6F, SC_Telugu, GC_Nd, NULL}, //  ౦..౯
+    {0xCE6, 0xCEF, SC_Kannada, GC_Nd, {SC_Kannada,SC_Nandinagari,0}}, //  ೦..೯
+    {0xD66, 0xD6F, SC_Malayalam, GC_Nd, NULL}, //  ൦..൯
+    {0xE50, 0xE59, SC_Thai, GC_Nd, NULL}, //  ๐..๙
+    {0xED0, 0xED9, SC_Lao, GC_Nd, NULL}, //  ໐..໙
+    {0xF20, 0xF29, SC_Tibetan, GC_Nd, NULL}, //  ༠..༩
+    {0x1040, 0x1049, SC_Myanmar, GC_Nd, {SC_Chakma,SC_Myanmar,SC_Tai_Le,0}}, //  ၀..၉
+    {0x1090, 0x1099, SC_Myanmar, GC_Nd, NULL}, //  ႐..႙
+    {0x17E0, 0x17E9, SC_Khmer, GC_Nd, NULL}, //  ០..៩
+    {0x203F, 0x2040, SC_Common, GC_Pc, NULL}, //  ‿..⁀
+    {0xA9F0, 0xA9F9, SC_Myanmar, GC_Nd, NULL}, //  ꧰..꧹
 };
 // 20 ranges, 2 singles, 172 codepoints
 ```

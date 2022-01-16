@@ -218,11 +218,11 @@ const struct sc_c23 safec23_start_list[] = {
     {0x1C90, 0x1CBA, SC_Georgian, GC_Lu, NULL}, //  Ა..Ჺ
     {0x1CBD, 0x1CBF, SC_Georgian, GC_Lu, NULL}, //  Ჽ..Ჿ
     // TODO SPLIT on SCX
-    {0x1CE9, 0x1CEC, SC_Common, GC_Lo, "\x08\x56"}, //  ᳩ..ᳬ
+    {0x1CE9, 0x1CEC, SC_Common, GC_Lo, "\x08\x56"},  //Devanagari,Nandinagari //  ᳩ..ᳬ
     // TODO SPLIT on SCX
-    {0x1CEE, 0x1CF3, SC_Common, GC_Lo, "\x08"}, //  ᳮ..ᳳ
-    {0x1CF5, 0x1CF6, SC_Common, GC_Lo, "\x05\x08"}, //  ᳵ..ᳶ
-    {0x1CFA, 0x1CFA, SC_Common, GC_Lo, "\x56"}, //  ᳺ
+    {0x1CEE, 0x1CF3, SC_Common, GC_Lo, "\x08"},  //Devanagari //  ᳮ..ᳳ
+    {0x1CF5, 0x1CF6, SC_Common, GC_Lo, "\x05\x08"},  //Bengali,Devanagari //  ᳵ..ᳶ
+    {0x1CFA, 0x1CFA, SC_Common, GC_Lo, "\x56"},  //Nandinagari //  ᳺ
     {0x1D00, 0x1D25, SC_Latin, GC_Ll, NULL}, //  ᴀ..ᴥ
     {0x1D27, 0x1D2A, SC_Greek, GC_Ll, NULL}, //  ᴧ..ᴪ
     {0x1D2C, 0x1D5C, SC_Latin, GC_Lm, NULL}, //  ᴬ..ᵜ
@@ -295,12 +295,12 @@ const struct sc_c23 safec23_start_list[] = {
     {0x3005, 0x3005, SC_Han, GC_Lm, NULL}, //  々
     {0x3007, 0x3007, SC_Han, GC_Nl, NULL}, //  〇
     {0x3021, 0x3029, SC_Han, GC_Nl, NULL}, //  〡..〩
-    {0x3031, 0x3035, SC_Common, GC_Lm, "\x11\x12"}, //  〱..〵
+    {0x3031, 0x3035, SC_Common, GC_Lm, "\x11\x12"},  //Hiragana,Katakana //  〱..〵
     {0x3038, 0x303B, SC_Han, GC_V, NULL}, //  〸..〻
     {0x3041, 0x3096, SC_Hiragana, GC_Lo, NULL}, //  ぁ..ゖ
     {0x309D, 0x309F, SC_Hiragana, GC_L, NULL}, //  ゝ..ゟ
     {0x30A1, 0x30FA, SC_Katakana, GC_Lo, NULL}, //  ァ..ヺ
-    {0x30FC, 0x30FC, SC_Common, GC_Lm, "\x11\x12"}, //  ー
+    {0x30FC, 0x30FC, SC_Common, GC_Lm, "\x11\x12"},  //Hiragana,Katakana //  ー
     {0x30FE, 0x30FF, SC_Katakana, GC_L, NULL}, //  ヾ..ヿ
     {0x3105, 0x312F, SC_Bopomofo, GC_Lo, NULL}, //  ㄅ..ㄯ
     {0x3131, 0x318E, SC_Hangul, GC_Lo, NULL}, //  ㄱ..ㆎ
@@ -322,7 +322,7 @@ const struct sc_c23 safec23_start_list[] = {
     {0xA8FB, 0xA8FB, SC_Devanagari, GC_Lo, NULL}, //  ꣻ
     {0xA8FD, 0xA8FE, SC_Devanagari, GC_Lo, NULL}, //  ꣽ..ꣾ
     {0xA960, 0xA97C, SC_Hangul, GC_Lo, NULL}, //  ꥠ..ꥼ
-    {0xA9CF, 0xA9CF, SC_Common, GC_Lm, "\x26\xff"}, //  ꧏ
+    {0xA9CF, 0xA9CF, SC_Common, GC_Lm, "\x26\x88"},  //Buginese,Javanese //  ꧏ
     {0xA9E0, 0xA9E4, SC_Myanmar, GC_Lo, NULL}, //  ꧠ..ꧤ
     {0xA9E6, 0xA9EF, SC_Myanmar, GC_L, NULL}, //  ꧦ..ꧯ
     {0xA9FA, 0xA9FE, SC_Myanmar, GC_Lo, NULL}, //  ꧺ..ꧾ
@@ -472,21 +472,21 @@ const struct sc_c23 safec23_cont_list[] = {
     {0x30, 0x39, SC_Common, GC_Nd, NULL}, //  0..9
     {0x5F, 0x5F, SC_Common, GC_Pc, NULL}, //  _
     {0xB7, 0xB7, SC_Common, GC_Po, NULL}, //  ·
-    {0x660, 0x669, SC_Arabic, GC_Nd, "\x03\x1c\x7d"}, //  ٠..٩
+    {0x660, 0x669, SC_Arabic, GC_Nd, "\x03\x1c\x7d"},  //Arabic,Thaana,Yezidi //  ٠..٩
     {0x6F0, 0x6F9, SC_Arabic, GC_Nd, NULL}, //  ۰..۹
-    {0x966, 0x96F, SC_Devanagari, GC_Nd, "\x08\x31\x3f\x48"}, //  ०..९
-    {0x9E6, 0x9EF, SC_Bengali, GC_Nd, "\x05\xff\xff"}, //  ০..৯
-    {0xA66, 0xA6F, SC_Gurmukhi, GC_Nd, "\x0d\x54"}, //  ੦..੯
-    {0xAE6, 0xAEF, SC_Gujarati, GC_Nd, "\x0c\x42"}, //  ૦..૯
+    {0x966, 0x96F, SC_Devanagari, GC_Nd, "\x08\x31\x3f\x48"},  //Devanagari,Dogra,Kaithi,Mahajani //  ०..९
+    {0x9E6, 0x9EF, SC_Bengali, GC_Nd, "\x05\x84\x98"},  //Bengali,Chakma,Syloti_Nagri //  ০..৯
+    {0xA66, 0xA6F, SC_Gurmukhi, GC_Nd, "\x0d\x54"},  //Gurmukhi,Multani //  ੦..੯
+    {0xAE6, 0xAEF, SC_Gujarati, GC_Nd, "\x0c\x42"},  //Gujarati,Khojki //  ૦..૯
     {0xB66, 0xB6F, SC_Oriya, GC_Nd, NULL}, //  ୦..୯
-    {0xBE6, 0xBEF, SC_Tamil, GC_Nd, "\x38\x1a"}, //  ௦..௯
+    {0xBE6, 0xBEF, SC_Tamil, GC_Nd, "\x38\x1a"},  //Grantha,Tamil //  ௦..௯
     {0xC66, 0xC6F, SC_Telugu, GC_Nd, NULL}, //  ౦..౯
-    {0xCE6, 0xCEF, SC_Kannada, GC_Nd, "\x13\x56"}, //  ೦..೯
+    {0xCE6, 0xCEF, SC_Kannada, GC_Nd, "\x13\x56"},  //Kannada,Nandinagari //  ೦..೯
     {0xD66, 0xD6F, SC_Malayalam, GC_Nd, NULL}, //  ൦..൯
     {0xE50, 0xE59, SC_Thai, GC_Nd, NULL}, //  ๐..๙
     {0xED0, 0xED9, SC_Lao, GC_Nd, NULL}, //  ໐..໙
     {0xF20, 0xF29, SC_Tibetan, GC_Nd, NULL}, //  ༠..༩
-    {0x1040, 0x1049, SC_Myanmar, GC_Nd, "\xff\x17\xff"}, //  ၀..၉
+    {0x1040, 0x1049, SC_Myanmar, GC_Nd, "\x84\x17\x9a"},  //Chakma,Myanmar,Tai_Le //  ၀..၉
     {0x1090, 0x1099, SC_Myanmar, GC_Nd, NULL}, //  ႐..႙
     {0x17E0, 0x17E9, SC_Khmer, GC_Nd, NULL}, //  ០..៩
     {0x203F, 0x2040, SC_Common, GC_Pc, NULL}, //  ‿..⁀
