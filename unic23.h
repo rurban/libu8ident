@@ -18,14 +18,13 @@ struct sc_c23 {
     const char *scx;
 };
 
-// Filtering allowed scripts, XID_Start, Skipped Ids and NFC. TODO GC and SCX
+// Filtering allowed scripts, XID_Start, Skipped Ids and NFC. TODO split on SCX
 #ifndef EXTERN_SCRIPTS
-static const struct sc_c23 safec23_start_list[] = {
+const struct sc_c23 safec23_start_list[] = {
     {'$', '$', SC_Latin, GC_Sc, NULL},
     {'A', 'Z', SC_Latin, GC_Lu, NULL},
     {'_', '_', SC_Latin, GC_Pc, NULL},
     {'a', 'z', SC_Latin, GC_Ll, NULL},
-    {0x7A, 0x7A, SC_Latin, GC_Ll, NULL}, //  z
     {0xAA, 0xAA, SC_Latin, GC_Lo, NULL}, //  ª
     {0xB5, 0xB5, SC_Common, GC_Ll, NULL}, //  µ
     {0xBA, 0xBA, SC_Latin, GC_Lo, NULL}, //  º
@@ -463,13 +462,13 @@ static const struct sc_c23 safec23_start_list[] = {
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
 #else
-const struct sc_c23 safec23_start_list[432];
+extern const struct sc_c23 safec23_start_list[431];
 #endif
-// 315 ranges, 117 singles, 99629 codepoints
+// 315 ranges, 116 singles, 99629 codepoints
 
-// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC and !MARK. TODO GC and SCX
+// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC and !MARK. TODO split on SCX
 #ifndef EXTERN_SCRIPTS
-static const struct sc_c23 safec23_cont_list[] = {
+const struct sc_c23 safec23_cont_list[] = {
     {0x30, 0x39, SC_Common, GC_Nd, NULL}, //  0..9
     {0x5F, 0x5F, SC_Common, GC_Pc, NULL}, //  _
     {0xB7, 0xB7, SC_Common, GC_Po, NULL}, //  ·
@@ -494,7 +493,7 @@ static const struct sc_c23 safec23_cont_list[] = {
     {0xA9F0, 0xA9F9, SC_Myanmar, GC_Nd, NULL}, //  ꧰..꧹
 };
 #else
-const struct sc_c23 safec23_cont_list[22];
+extern const struct sc_c23 safec23_cont_list[22];
 #endif
 // 20 ranges, 2 singles, 172 codepoints
 
@@ -503,7 +502,7 @@ const struct sc_c23 safec23_cont_list[22];
 
 // Only excluded scripts, XID_Start, more IDTypes, NFC and !MARK
 #ifndef EXTERN_SCRIPTS
-static const struct sc_c23 safec23_excl_start_list[] = {
+const struct sc_c23 safec23_excl_start_list[] = {
     {0x3E2, 0x3EF, SC_Coptic, GC_L, NULL}, //  (Excluded) Ϣ..ϯ
     {0x800, 0x815, SC_Samaritan, GC_Lo, NULL}, //  (Excluded) ࠀ..ࠕ
     {0x81A, 0x81A, SC_Samaritan, GC_Lm, NULL}, //  (Excluded) ࠚ
@@ -697,13 +696,13 @@ static const struct sc_c23 safec23_excl_start_list[] = {
     {0x1E800, 0x1E8C4, SC_Mende_Kikakui, GC_Lo, NULL}, //  (Excluded) 𞠀..𞣄
 };
 #else
-const struct sc_c23 safec23_excl_start_list[191];
+extern const struct sc_c23 safec23_excl_start_list[191];
 #endif
 // 158 ranges, 33 singles, 14926 codepoints
 
 // Only excluded scripts, XID_Continue,!XID_Start, more IDTypes, NFC and !MARK
 #ifndef EXTERN_SCRIPTS
-static const struct sc_c23 safec23_excl_cont_list[] = {
+const struct sc_c23 safec23_excl_cont_list[] = {
     {0x1810, 0x1819, SC_Mongolian, GC_Nd, NULL}, //  (Excluded) ᠐..᠙
     {0x104A0, 0x104A9, SC_Osmanya, GC_Nd, NULL}, //  (Excluded) 𐒠..𐒩
     {0x11066, 0x1106F, SC_Brahmi, GC_Nd, NULL}, //  (Excluded) 𑁦..𑁯
@@ -722,6 +721,6 @@ static const struct sc_c23 safec23_excl_cont_list[] = {
     {0x16B50, 0x16B59, SC_Pahawh_Hmong, GC_Nd, NULL}, //  (Excluded) 𖭐..𖭙
 };
 #else
-const struct sc_c23 safec23_excl_cont_list[16];
+extern const struct sc_c23 safec23_excl_cont_list[16];
 #endif
 // 16 ranges, 0 singles, 144 codepoints

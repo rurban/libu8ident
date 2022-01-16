@@ -13,6 +13,8 @@
 #ifdef HAVE_CROARING
 #  include "u8idroar.h"
 #endif
+#define EXTERN_SCRIPTS
+#include "unic23.h"
 #undef EXTERN_SCRIPTS
 #ifdef HAVE_CONFUS
 #  ifndef HAVE_CROARING
@@ -732,6 +734,31 @@ void test_gc(void) {
   }
 }
 
+void test_safec23(void) {
+  // check consecutive and alternating scripts and GC ranges
+  //assert(safec23_start_list[0].from == 0);
+  for (size_t i = 1; i < ARRAY_SIZE(safec23_start_list); i++) {
+    if (safec23_start_list[i - 1].to >= safec23_start_list[i].from)
+      printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
+             safec23_start_list[i - 1].to, i, safec23_start_list[i].from);
+    assert(safec23_start_list[i - 1].to < safec23_start_list[i].from);
+    if (safec23_start_list[i - 1].sc == safec23_start_list[i].sc)
+      assert(safec23_start_list[i - 1].to + 1 < safec23_start_list[i].from);
+    if (safec23_start_list[i - 1].gc == safec23_start_list[i].gc)
+      assert(safec23_start_list[i - 1].to + 1 < safec23_start_list[i].from);
+  }
+  for (size_t i = 1; i < ARRAY_SIZE(safec23_cont_list); i++) {
+    if (safec23_cont_list[i - 1].to >= safec23_cont_list[i].from)
+      printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
+             safec23_cont_list[i - 1].to, i, safec23_cont_list[i].from);
+    assert(safec23_cont_list[i - 1].to < safec23_cont_list[i].from);
+    if (safec23_cont_list[i - 1].sc == safec23_cont_list[i].sc)
+      assert(safec23_cont_list[i - 1].to + 1 < safec23_cont_list[i].from);
+    if (safec23_cont_list[i - 1].gc == safec23_cont_list[i].gc)
+      assert(safec23_cont_list[i - 1].to + 1 < safec23_cont_list[i].from);
+  }
+}
+
 void test_add_scripts(void) {
   int c = u8ident_new_ctx();
   struct ctx_t *ctx = u8ident_ctx();
@@ -809,6 +836,7 @@ int main(int argc, char **argv) {
     test_scripts_no_init();
     test_init();
     test_gc();
+    test_safec23();
     test_script();
   }
   if (combine) {

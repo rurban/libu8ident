@@ -8,6 +8,9 @@ autom4te.cache
 config.h
 include/u8ident.h.bak
 libu8ident.a
+libu8ident.so
+libu8ident.so.0
+a.out
 u8idlint
 u8ident.o
 u8idnorm.o

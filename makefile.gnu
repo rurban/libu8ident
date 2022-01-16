@@ -51,6 +51,7 @@ CFLAGS += -I../CRoaring
 HDRS += confus_croar.h roaring.h
 endif
 endif
+ALLHDRS = $(HDRS) unic23.h
 #OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
@@ -112,11 +113,11 @@ u8idnorm.o: u8idnorm.c u8id_private.h hangul.h $(NORMHDRS) $(HEADER)
 u8idroar.o: u8idroar.c u8id_private.h $(HEADER) confus_croar.h
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c u8idroar.c -o $@
 
-$(LIB): $(SRC) $(HEADER) unic23.h unic11.h $(HDRS) $(OBJS)
+$(LIB): $(SRC) $(HEADER) $(ALLHDRS) $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
-$(SOLIB): $(SRC) $(HEADER) unic23.h unic11.h $(HDRS)
+$(SOLIB): $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) -shared -fPIC $(DEFINES) -Iinclude \
 	  -Wl,-soname,$(SOLIB).$(SO_MAJ) -o $@.$(SO_MAJ) $(SRC)
 	-rm -f $(SOLIB)
@@ -168,9 +169,9 @@ check-all: check check-norms check-profiles check-tr31 check-asan
 check-extra: check-all check-all-combinations check-mdl
 	shellcheck *.test *.sh
 
-test: test.c $(SRC) $(HEADER) $(HDRS)
+test: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
-test-texts: test-texts.c $(SRC) $(HEADER) $(HDRS) mark.h
+test-texts: test-texts.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts $(LIBUNISTR)
 regen-u8idlint-test: u8idlint
 	-./u8idlint -xsafec23 texts/homo-sec-1.c >texts/homo-sec-1.tst
@@ -188,14 +189,14 @@ c11-all.h unic23.h: mkc23 scripts.h mark.h
 	./mkc23
 mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude mkc23.c $(SRC) -o $@
-check-asan: test.c $(SRC) $(HEADER) $(HDRS)
+check-asan: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
 # gem install mdl
 check-mdl:
 	mdl *.md
 
-perf: perf.c u8idroar.c $(HEADER) $(HDRS) \
+perf: perf.c u8idroar.c $(HEADER) $(ALLHDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h
 	$(CC) $(CFLAGS_PERF) -Wno-unused-function $(DEFINES) -DPERF_TEST -I. -Iinclude \
 	  perf.c u8idroar.c -o perf && \
@@ -210,7 +211,7 @@ clean:
 
 # Maintainer-only
 # Check coverage and sizes for all configure combinations
-check-norms: $(SRC) $(HEADER) $(HDRS)
+check-norms: $(SRC) $(HEADER) $(ALLHDRS)
 	for n in NFKC NFC FCC NFKD NFD FCD; do \
             echo $$n; \
             $(CC) $(CFLAGS_REL) -DU8ID_NORM=$$n -Wfatal-errors -Iinclude -c u8idnorm.c -o u8idnorm.o && \
@@ -219,7 +220,7 @@ check-norms: $(SRC) $(HEADER) $(HDRS)
 	      -o test-norm-$$n && \
 	    if ./test-norm-$$n norm; then rm test-norm-$$n; else exit; fi; \
         done
-check-profiles: $(SRC) $(HEADER) $(HDRS)
+check-profiles: $(SRC) $(HEADER) $(ALLHDRS)
 	for n in 2 3 4 5 6 C11_6 C23_4; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
@@ -232,14 +233,14 @@ check-profiles: $(SRC) $(HEADER) $(HDRS)
 	      -o test-prof$$n && \
 	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
-check-tr31: $(SRC) $(HEADER) $(HDRS)
+check-tr31: $(SRC) $(HEADER) $(ALLHDRS)
 	for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
             echo U8ID_TR31_$$x; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_TR31=$$x -I. -Iinclude test.c $(SRC) \
 	      -o test-xid-$$x && \
 	    if ./test-xid-$$x xid; then rm test-xid-$$x; else exit; fi; \
         done
-check-all-combinations: $(SRC) $(HEADER) $(HDRS)
+check-all-combinations: $(SRC) $(HEADER) $(ALLHDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
 	  for p in 2 3 4 5 6 C11_6 C23_4; do \
 	    for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
@@ -283,8 +284,8 @@ c23++proposal.html: c23++proposal.md
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h
-GTAGS: $(SRC) $(HEADER) $(HDRS)
-	ls $(SRC) $(HEADER) $(HDRS) | gtags -f -
+GTAGS: $(SRC) $(HEADER) $(ALLHDRS)
+	ls $(SRC) $(HEADER) $(ALLHDRS) | gtags -f -
 
 # End Maintainer-only
 

@@ -174,7 +174,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
       // when the script property changed, or when its now off, but was on
       bool sc_changed = with_sc ? s1 != s : false;
       if (sc_changed) {
-        fprintf(stderr, "U+%X: %u -> %u\n", i, s, s1);
+        fprintf(stderr, "U+%X: SC %u -> %u\n", i, s, s1);
         goto changed;
       }
     } else { // now off. emit the range
@@ -221,7 +221,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
             } else {
               if (*minor) {
                 mgcname[0] = *minor;
-                mgcname[1] = '\0'; // we cannot represent L& as enum
+                mgcname[1] = '\0'; // we cannot represent L& as enum, so use just GC_L or GC_V
                 fprintf(stderr, "U+%X: minor GC %s -> %s\n", from, gcname, mgcname);
               }
             }
@@ -394,18 +394,18 @@ static void gen_c23_safe(void) {
       "};\n"
       "\n",
       U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
-  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids and NFC. TODO GC and SCX\n", f);
+  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids and NFC. TODO split on SCX\n", f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("static const struct sc_c23 safec23_start_list[] = {\n"
+  fputs("const struct sc_c23 safec23_start_list[] = {\n"
         "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
         "    {'A', 'Z', SC_Latin, GC_Lu, NULL},\n"  // 41-5a
         "    {'_', '_', SC_Latin, GC_Pc, NULL},\n"  // 5f
         "    {'a', 'z', SC_Latin, GC_Ll, NULL},\n", // 61-7a
         f);
-  emit_ranges(f, 0x7a, u, true);
+  emit_ranges(f, 0x7b, u, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_start_list[%u];\n",
+  fprintf(f, "extern const struct sc_c23 safec23_start_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec23_start_list",
@@ -437,14 +437,14 @@ static void gen_c23_safe(void) {
     }
   }
   fputs("\n// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, "
-        "NFC and !MARK. TODO GC and SCX\n",
+        "NFC and !MARK. TODO split on SCX\n",
         f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("static const struct sc_c23 safec23_cont_list[] = {\n", f);
+  fputs("const struct sc_c23 safec23_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_cont_list[%u];\n",
+  fprintf(f, "extern const struct sc_c23 safec23_cont_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec23_cont_list",
@@ -477,11 +477,11 @@ static void gen_c23_safe(void) {
     }
   }
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("static const struct sc_c23 safec23_excl_start_list[] = {\n", f);
+  fputs("const struct sc_c23 safec23_excl_start_list[] = {\n", f);
   emit_ranges(f, 0x7a, u, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_excl_start_list[%u];\n",
+  fprintf(f, "extern const struct sc_c23 safec23_excl_start_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
@@ -515,11 +515,11 @@ static void gen_c23_safe(void) {
     }
   }
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("static const struct sc_c23 safec23_excl_cont_list[] = {\n", f);
+  fputs("const struct sc_c23 safec23_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fputs("};\n", f);
   fputs("#else\n", f);
-  fprintf(f, "const struct sc_c23 safec23_excl_cont_list[%u];\n",
+  fprintf(f, "extern const struct sc_c23 safec23_excl_cont_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
