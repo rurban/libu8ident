@@ -102,6 +102,61 @@ struct stats {
   unsigned ranges, singles, codepoints;
 } stats;
 
+static char* cquote_new(const char* s) {
+  long l = (strlen(s) * 4) + 1;
+  char *ret = malloc(l);
+  char *p = (char *)s;
+  char *r = ret;
+  while (*p) {
+    assert(l > 0);
+    snprintf(r, l, "\\x%02x", *p);
+    p++;
+    r += 4;
+    l -= 4;
+  }
+  *r = '\0'; // terminate to avoid calloc
+  return ret;
+}
+
+// Only record major changes, like Lm => Mn or Mn => Lu.
+// if only a minor GC changed write it to outgc.
+static unsigned first_major_gc_change(const uint32_t from, const uint32_t to, char *outgc) {
+  if (from == to)
+    return 0U;
+  const enum u8id_gc gc1 = u8ident_get_gc(from);
+  for (uint32_t i = from + 1; i <= to; i++) {
+    const enum u8id_gc gc2 = u8ident_get_gc(i);
+    if (gc1 != gc2) {
+      const char* gcs1 = u8ident_gc_name(gc1);
+      const char* gcs2 = u8ident_gc_name(gc2);
+      if (gcs1 && gcs2 && *gcs1 == *gcs2) {
+        *outgc = *gcs1;
+        continue;
+      // Only if one of the names is M do a major split. S and L are compatible
+      } else if (gcs1 && gcs2 && *gcs1 != 'M' && *gcs2 != 'M') {
+        *outgc = 'V';
+        continue;
+      } else {
+        return i;
+      }
+    }
+  }
+  return 0;
+}
+
+static unsigned first_scx_change(const uint32_t from, const uint32_t to) {
+  if (from == to)
+    return 0U;
+  const struct scx *s1 = u8ident_get_scx(from);
+  for (uint32_t i = from + 1; i <= to; i++) {
+    const struct scx *s2 = u8ident_get_scx(i);
+    // if both are NULL or both are defined and equal, it's equal.
+    if (!((!s1 && !s2) || ((s1 && s2) && strEQ(s1->scx, s2->scx))))
+      return i;
+  }
+  return 0;
+}
+
 void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
   unsigned from = start;
   bool on = BITGET(u, from);
@@ -128,30 +183,79 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
         if (from <= i - 1) {
           char tmp[32];
           size_t len;
+          unsigned to = i - 1;
           enc_utf8(tmp, &len, from);
           s = u8ident_get_script(from);
-          fprintf(f, "    {0x%X, 0x%X", from, i - 1);
           if (with_sc) {
-            // TODO u8ident_get_gc(cp), u8ident_gc_name(gc)
-            fprintf(f, ", SC_%s, GC_%s, NULL", u8ident_script_name(s), "Lu");
-            fprintf(f, "}, // %s %s",
+            // TODO split on SCX also
+            unsigned gc_split, scx_split;
+            enum u8id_gc gc = u8ident_get_gc(from);
+            char *gcname = (char*)u8ident_gc_name(gc);
+            struct scx *this_scx = (struct scx *)u8ident_get_scx(from);
+            char mgcname[3]; // a copy because the original is read-only
+            char minor[1];   // if a change is not major, but only minor
+            *minor = '\0';
+            strcpy(mgcname, gcname);
+            if ((gc_split = first_major_gc_change(from, to, minor))) {
+              fprintf(f, "    // SPLIT on GC\n");
+              fprintf(f, "    {0x%X, 0x%X", from, gc_split - 1);
+              if (this_scx) {
+                char *scx = cquote_new(this_scx->scx);
+                fprintf(f, ", SC_%s, GC_%s, \"%s\"},\n", u8ident_script_name(s), gcname, scx);
+                free(scx);
+              } else {
+                fprintf(f, ", SC_%s, GC_%s, NULL},\n", u8ident_script_name(s), gcname);
+              }
+              fprintf(stderr, "U+%X: split GC %s -> %s at U+%X\n", from,
+                      gcname, u8ident_gc_name(u8ident_get_gc(gc_split)),
+                      gc_split);
+              if (from == gc_split - 1) {
+                stats.singles++;
+              } else {
+                stats.ranges++;
+              }
+              from = gc_split;
+              gc = u8ident_get_gc(from);
+              gcname = (char*)u8ident_gc_name(gc);
+              this_scx = (struct scx *)u8ident_get_scx(from);
+            } else {
+              if (*minor) {
+                mgcname[0] = *minor;
+                mgcname[1] = '\0'; // we cannot represent L& as enum
+                fprintf(stderr, "U+%X: minor GC %s -> %s\n", from, gcname, mgcname);
+              }
+            }
+            if ((scx_split = first_scx_change(from, to))) {
+              fprintf(stderr, "U+%X: TODO split SCX changed at U+%X\n", from,
+                      scx_split);
+              fprintf(f, "    // TODO SPLIT on SCX\n");
+            }
+            fprintf(f, "    {0x%X, 0x%X", from, to);
+            if (this_scx) {
+              char *scx = cquote_new(this_scx->scx);
+              fprintf(f, ", SC_%s, GC_%s, \"%s\"},", u8ident_script_name(s), mgcname, scx);
+              free(scx);
+            } else
+              fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s), mgcname);
+            fprintf(f, " // %s %s",
                     s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
                     : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
                                                   : "",
                     tmp);
           } else {
+            fprintf(f, "    {0x%X, 0x%X", from, to);
             fprintf(f, "}, // %s%s %s", u8ident_script_name(s),
                     s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
                     : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
                                                   : "",
                     tmp);
           }
-          if (from == i - 1) {
+          if (from == to) {
             stats.singles++;
             fprintf(f, "\n");
           } else {
             stats.ranges++;
-            enc_utf8(tmp, &len, i - 1);
+            enc_utf8(tmp, &len, to);
             fprintf(f, "..%s\n", tmp);
           }
           stats.codepoints += (i - from - 1);
@@ -290,7 +394,7 @@ static void gen_c23_safe(void) {
       "};\n"
       "\n",
       U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
-  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids and NFC\n", f);
+  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids and NFC. TODO GC and SCX\n", f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("static const struct sc_c23 safec23_start_list[] = {\n"
         "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
@@ -333,7 +437,7 @@ static void gen_c23_safe(void) {
     }
   }
   fputs("\n// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, "
-        "NFC and !MARK\n",
+        "NFC and !MARK. TODO GC and SCX\n",
         f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("static const struct sc_c23 safec23_cont_list[] = {\n", f);

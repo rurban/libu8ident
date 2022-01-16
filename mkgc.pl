@@ -17,28 +17,31 @@ if (!-e $ucd) {
 my $gc_h = "u8id_gc.h";
 my (@GC, %GC);
 open my $UCD, "<", $ucd or die "$ucd $!";
-my ($from, $to, $oldto, $oldgc) = (0,0);
+my ($from, $to, $oldto, $oldgc, $gc) = (0,0,0,'Cc','');
 while (<$UCD>) {
   my @l = split ';';
-  my $gc = @l[2];
+  $gc = @l[2];
   if ($gc =~ /^\w.$/) {
     $GC{$gc}++;
     $to = hex($l[0]);
     if ($oldgc ne $gc) {
-      push @GC, [$from, $to, $gc];
+      push @GC, [$from, $to-1, $oldgc];
       $from = $to;
-    } else {
-      $oldto = $GC[$#GC]->[1];
-      if ($oldto + 1 != $to) {
-        push @GC, [$to, $to, $gc];
-        $from = $to;
-      } else { # update last
-        $GC[$#GC]->[1] = $to;
-      }
+      $oldgc = $gc;
     }
-    $oldgc = $gc;
+    #else {
+    #  $oldto = $GC[$#GC]->[1];
+    #  # FIXME
+    #  if ($oldto + 1 != $to) {
+    #    push @GC, [$to, $to, $gc];
+    #    $from = $to;
+    #  } else { # update last
+    #    $GC[$#GC]->[1] = $to;
+    #  }
+    #}
   }
 }
+push @GC, [$from, $to, $gc]; # the remainder
 close $UCD;
 
 if (!-w $gc_h) {
@@ -68,8 +71,10 @@ for my $g (@GCs) {
   $g =~ s/&/amp/;
   printf $H "  GC_%s,\n", $g;
 }
+printf $H "  GC_L, // is L&, all letters. (for unic23.h only)\n";
+printf $H "  GC_V, // is varying, eg L or S. (for unic23.h only),\n";
 printf $H "  GC_INVALID,\n";
-printf $H <<'EOF', scalar(@GCs);
+printf $H <<'EOF', scalar(@GCs) + 3;
 };
 
 #ifdef EXTERN_SCRIPTS
@@ -81,6 +86,9 @@ for my $g (@GCs) {
   $g =~ s/&/amp/;
   printf $H "  \"%s\",\n", $g;
 }
+printf $H "  \"L\", // L& really (for unic23.h only)\n";
+printf $H "  \"V\", // varying (for unic23.h only)\n";
+printf $H "  \"Zz\"\n";
 printf $H <<'EOF';
 };
 #endif
@@ -104,12 +112,14 @@ for my $r (@GC) {
   my $u = chr $r->[0];
   $u = '' if $r->[0] >= 0xDB70 && $r->[0] <= 0xDFFF;
   $u = '' if $u !~ /\w/;
+  $u = '' if $r->[2] =~ /^M/;
   if ($r->[0] == $r->[1]) {
     printf $H "    {0x%X, 0x%X, GC_%s},\t// %s\n", $r->[0], $r->[1], $r->[2], $u;
   } else {
     my $u1 = chr $r->[1];
     $u1 = '' if $r->[1] >= 0xD800 && $r->[1] <= 0xDFFF;
     $u1 = '' if $u !~ /\w/;
+    $u1 = '' if $r->[2] =~ /^M/;
     printf $H "    {0x%X, 0x%X, GC_%s},\t// %s..%s\n", $r->[0], $r->[1], $r->[2], $u, $u1;
   }
 }

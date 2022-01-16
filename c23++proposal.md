@@ -331,7 +331,7 @@ not part of XIDs.
 From these 67 Lm plus 513 M\[cn\] ranges filtering out the non-C23 XID candidates,
 only #8 Identifier_Type = Recommended, Inclusion, Technical, plus only #4.2
 Recommended Scripts, plus only codepoints with multiple SCX entries,
-leads to these ranges. (TODO #8, Scripts, NFC)
+leads to these ranges. (TODO #8, NFC)
 
 ``` txt
 A9CF          ; Bugi Java # Lm       JAVANESE PANGRANGKEP

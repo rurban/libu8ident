@@ -723,6 +723,15 @@ void test_scx_singles(void) {
   u8ident_free_ctx(c);
 }
 
+void test_gc(void) {
+  // check consecutive and alternating GC ranges
+  assert(gc_list[0].from == 0);
+  for (size_t i = 1; i < ARRAY_SIZE(gc_list); i++) {
+    assert(gc_list[i-1].to != gc_list[i].from);
+    assert(gc_list[i-1].gc != gc_list[i].gc);
+  }
+}
+
 void test_add_scripts(void) {
   int c = u8ident_new_ctx();
   struct ctx_t *ctx = u8ident_ctx();
@@ -799,6 +808,7 @@ int main(int argc, char **argv) {
   if (argc == 1) {
     test_scripts_no_init();
     test_init();
+    test_gc();
     test_script();
   }
   if (combine) {
