@@ -17,23 +17,24 @@ In response to [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021
 
 Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++ 23 (and C23).
 
-* TR39#5.2 Mixed-Scripts Moderately Restrictive profile, but allow
-  Greek scripts,
-* Disallow all Limited_Use and Excluded scripts,
-* Only allow TR39#1 Recommended, Inclusion, Technical Identifier Type
-  properties,
+* Comply to a variant of [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
+  Mixed-Scripts Moderately Restrictive profile, but allow Greek scripts,
+* Disallow all Limited Use [TR31#Table_7](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
+  and Excluded scripts [TR31#Table_4](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers),
+* Only allow [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1)
+  Recommended, Inclusion, Technical Identifier Type properties,
 * Demand NFC normalization. Reject all composable sequences as ill-formed.
   (from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
 * Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with
-  mixed-scripts (SCX) as ill-formed. TR39#5.4
+  mixed-scripts (SCX) as ill-formed. [TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
 
 Optionally:
 
 * Implementations may allow an optional `#pragma unicode <LongScript>` that
-  Excluded scripts can be added to the allowed set of scripts.
+  Excluded scripts can be added to the allowed set of scripts per source file.
 
 Recommend binutils/linker ABI identifier rules: names are UTF-8,
-add identifier checks. .g. readelf -L -Ue.
+add add identifier checks. E.g. `readelf -L -Ue`.
 
 In addition adopt this proposal as a Defect Report against C++20 and
 earlier. The author provides the
@@ -113,7 +114,7 @@ These scripts will stay allowed:
     Sinhala Tamil Telugu Thaana Thai Tibetan
 
 These Excluded Scripts are initially disallowed
-[TR31#Table_Candidate_Characters_for_Exclusion_from_Identifiers](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers)
+[TR31#Table_4](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers)
 but can be optionally be allowed via a new `#pragma unicode Script`:
 
     Ahom Anatolian_Hieroglyphs Avestan Bassa_Vah Bhaiksuki Brahmi
@@ -134,7 +135,7 @@ but can be optionally be allowed via a new `#pragma unicode Script`:
     Tangsa Tangut Tirhuta Toto Ugaritic Vithkuqi Warang_Citi Yezidi
     Zanabazar_Square
 
-These Limited Use Scripts are now disallowed [TR31#Table_Limited_Use_Scripts](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
+These Limited Use Scripts are now disallowed [TR31#Table_7](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
 
     Adlam Balinese Bamum Batak Canadian_Aboriginal Chakma Cham Cherokee
     Hanifi_Rohingya Javanese Kayah_Li Lepcha Limbu Lisu Mandaic
@@ -292,8 +293,8 @@ Special-cases:
 Using the Script property alone will not detect that the U+30FC ( ー )
 KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana,
 gc=Lm) should not be mixed with Latin. See
-[UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
-and [UTS46](https://www.unicode.org/reports/tr46/).
+[TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
+and [TR46](https://www.unicode.org/reports/tr46/).
 We only have 4 such explicitly japanese-only PROLONGED SOUND MARKs,
 all other Lm modifiers may mix with all SCX.
 
@@ -1044,7 +1045,7 @@ const struct sc safec23_cont_list[22] = {
 15 Appendix C - XID_Continue # Lm
 =================================
 
-Needed for [UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
+Needed for [TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
 and [TR31#2.2](https://www.unicode.org/reports/tr31/#Modifier_Letters)
 
 67 matches for "XID_Continue # Lm" in buffer: DerivedCoreProperties.txt
@@ -1152,7 +1153,7 @@ FF9E..FF9F    ; XID_Continue # Lm   [2] HALFWIDTH KATAKANA VOICED SOUND MARK..
 16 Appendix D - XID_Continue # M
 =================================
 
-Needed for [UTS39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
+Needed for [TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
 
 513 matches for "XID_Continue # M" in buffer: DerivedCoreProperties.txt
 
@@ -1929,3 +1930,74 @@ FE73          ; Technical  # 3.2        ARABIC TAIL FRAGMENT
 1D1AA..1D1AD  ; Technical  # 3.1    [4] MUSICAL SYMBOL COMBINING DOWN BOW..
                                         MUSICAL SYMBOL COMBINING SNAP PIZZICATO
 ```
+
+18 References
+=============
+
+* [AltId] Unicode Standard Annex.
+  <http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax>
+
+* [DefId] Unicode Standard Annex.
+  <http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax>
+
+* [ISO 15924 Codes] TR24 Unicode Script Property Values and ISO 15924 Codes.
+  <https://www.unicode.org/reports/tr24/#Relation_To_ISO15924>
+
+* [libu8ident] Reini Urban. 2020. unicode security guidelines for identifiers
+  <https://github.com/rurban/libu8ident/>
+
+* [N3146] Clark Nelson. 2010. Recommendations for extended identifier
+  characters for C and C++.
+  <https://wg21.link/n3146>
+
+* [P1949] Steve Downey et al. 2021. C++ Identifier Syntax using Unicode
+  Standard Annex 31
+  <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html>
+
+* [TR15] Ken Whistler. Unicode Normalization Forms.
+  <http://www.unicode.org/reports/tr15>
+
+* [TR24] Ken Whistler. Unicode Script Property.
+  <https://www.unicode.org/reports/tr24/#Common>
+
+* [TR24#5.1] Handling Characters with the Common Script Property
+  <https://www.unicode.org/reports/tr24/#Common>
+
+* [TR24#5.2] Handling Combining Marks
+  <https://www.unicode.org/reports/tr24/#Nonspacing_Marks>
+
+* [TR31] Mark Davis. Unicode Identifier and Pattern Syntax.
+  <http://www.unicode.org/reports/tr31>
+
+* [TR31#2.1] Combining Marks
+  <https://www.unicode.org/reports/tr31/#Combining_Marks>
+
+* [TR31#2.2] Modifier Letters
+  <https://www.unicode.org/reports/tr31/#Modifier_Letters>
+
+* [TR31#Table 4] Table Candidate Characters for Exclusion from Identifiers
+  <https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers>
+
+* [TR31#Table 7] Limited Use Scripts
+  <http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts>
+
+* [TR36] Mark Davis and Michel Suignard. Unicode Security Considerations.
+  <http://www.unicode.org/reports/tr36>
+
+* [TR39] Mark Davis and Michel Suignard. Unicode Security Mechanisms.
+  <http://www.unicode.org/reports/tr36>
+
+* [TR39#Table 1] Identifier Status and Type Table
+  <https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1>
+
+* [TR39#5.2] Mixed-Scripts Restriction-Level Detection
+  <https://www.unicode.org/reports/tr39/#Restriction_Level_Detection>
+
+* [TR39#5.4] Optional Detection
+  <https://www.unicode.org/reports/tr39/#Optional_Detection>
+
+* [TR44] Ken Whistler and Laurențiu Iancu. Unicode Character Database.
+  <http://www.unicode.org/reports/tr44>
+
+* [TR46] Mark Davis and Michel Suignard. Unicode IDNA Compatibility Processing.
+  <http://www.unicode.org/reports/tr46>
