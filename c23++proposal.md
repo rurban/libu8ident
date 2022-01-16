@@ -186,14 +186,17 @@ barrier to use of Unicode characters outside the basic source
 character set has dropped considerably. Use of characters via
 universal character names was always possible, but never widely
 used. Examples found in the wild of use of UCNs in identifiers come
-from compiler and related tool test suites. There is no report yet from
-misuse in C ABI's from linkers and binutils.
+from compiler and related tool test suites, but it's trivial to come
+up with such spoofing attacks. There is no report yet from misuse in C
+ABI's from linkers and binutils.
 
 Restricting the profile of characters is much easier if no one is
 depending on them.
 
-The recent <https://trojansource.codes> effort caused gcc to emit a new
-bidi warning, and github to implement similar warnings.
+The recent <https://trojansource.codes> effort caused gcc to emit a
+new bidi warning, and github to implement similar warnings. Note that
+secure identifiers don't help against bidi overrides in strings or
+comments, these issues are orthogonal.
 
 There used to be no linter, but there is now one: **u8idlint** from
 <https://github.com/rurban/libu8ident>, which can be used to check for
@@ -278,10 +281,11 @@ Check for unlikely sequences of **combining marks**:
 
 * Forbid sequences of the same nonspacing mark.
 * Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).
-* Forbid sequences of base character + nonspacing mark that look the
-  same as or confusingly similar to the base character alone (because
-  the nonspacing mark overlays a portion of the base character). An
-  example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE.
+* Optionally forbid sequences of base character + nonspacing mark that
+  look the same as or confusingly similar to the base character alone
+  (because the nonspacing mark overlays a portion of the base
+  character). An example is U+0069 LOWERCASE LETTER I + U+0307
+  COMBINING DOT ABOVE.
 
 Since we disallow already most combining marks (at least the Latin
 ones) with the requirement of NFC
@@ -295,8 +299,8 @@ KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana,
 gc=Lm) should not be mixed with Latin. See
 [TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
 and [TR46](https://www.unicode.org/reports/tr46/).
-We only have 4 such explicitly japanese-only PROLONGED SOUND MARKs,
-all other Lm modifiers may mix with all SCX.
+We only have to check only 4 such explicitly japanese-only PROLONGED
+SOUND MARKs, all other Lm modifiers may mix with all SCX.
 
 The list of allowed combining mark characters (with Common or Inherited
 scripts) in the C23++ TR31 profile is: Lm `Modifier_Letter`,
