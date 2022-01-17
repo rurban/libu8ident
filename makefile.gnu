@@ -56,7 +56,7 @@ ALLHDRS = $(HDRS) unic23.h
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 SOLIB = libu8ident.so
-DOCS = README.md NOTICE LICENSE c23++proposal.html c23++proposal.md c11.md
+DOCS = README.md NOTICE LICENSE c23++proposal.html c23++proposal.pdf c23++proposal.md c11.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
 MAN = $(MAN1) $(MAN3)
@@ -102,7 +102,7 @@ endif
 
 most: $(LIB) $(SOLIB) $(MAN) u8idlint
 
-all: mkc23 most test-texts test perf c23++proposal.html
+all: mkc23 most test-texts test perf docs
 
 .c.o:
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c $< -o $@
@@ -141,7 +141,7 @@ u8idlint: u8idlint.c unic23.h unic11.h $(LIB)
 
 .PHONY: check check-asan check-norms check-profiles check-tr31 check-extra check-mdl \
 	check-all-combinations clean regen-scripts regen-norm regen-confus regen-u8idlint-test \
-	install man dist-src dist-bin clang-format
+	install man dist-src dist-bin clang-format docs
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
 check: test test-texts u8idlint
@@ -279,8 +279,11 @@ regen-scripts:
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
+docs: $(DOCS)
 c23++proposal.html: c23++proposal.md
-	-markdown c23++proposal.md >$@
+	-pandoc -s -o $@ c23++proposal.md
+c23++proposal.pdf: c23++proposal.md
+	-pandoc -s --pdf-engine=xelatex -o $@ c23++proposal.md
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h

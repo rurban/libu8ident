@@ -2,6 +2,7 @@ ACLOCAL_AMFLAGS = -I m4 --install ${ACLOCAL_FLAGS}
 PERL = @PERL@
 WGET = @WGET@
 RONN = @RONN@
+PANDOC = @PANDOC@
 WARN_CFLAGS = @WARN_CFLAGS@
 CROARING_PATH = @CROARING_PATH@
 AM_CFLAGS = -I$(srcdir)/include -I$(builddir) -I$(srcdir) $(WARN_CFLAGS)
@@ -26,7 +27,10 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.html
+doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md
+if HAVE_PANDOC
+doc_DATA += c23++proposal.html c23++proposal.pdf
+endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
 	confus_croar.h mark.h unic11.h unic23.h scripts16.h
@@ -110,11 +114,16 @@ regen-scripts:
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
+docs: $(doc_DATA)
+if HAVE_PANDOC
 c23++proposal.html: $(srcdir)/c23++proposal.md
-	-markdown $(srcdir)/c23++proposal.md >$@
+	$(PANDOC) -s -o $@ $(srcdir)/c23++proposal.md
+c23++proposal.pdf: $(srcdir)/c23++proposal.md
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/c23++proposal.md
+endif
 regen-all: regen-scripts regen-norm regen-confus regen-man c23++proposal.html
 
-.PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg
+.PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
 EXTRA_PROGRAMS = mkc23 test test-texts
 TESTS = test

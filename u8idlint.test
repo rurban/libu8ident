@@ -65,7 +65,7 @@ check3 "" bidi-sec-2.c bidi-sec-2-c11.tst
 #./u8idlint -xc11 texts/bidi-sec-2.c > bidi-sec-2.rst &&
 #    diff texts/bidi-sec-2.tst bidi-sec-2.rst && rm bidi-sec-2.rst
 
-rm homo-sec-1.tst.rst
+rm -f homo-sec-1.tst.rst
 #rm -f homo-1-p4.rst bidi-sec-1.rst bidi-sec-2.rst
 if [ -n "$NEWTEXTS" ]; then
     rm -rf texts || true

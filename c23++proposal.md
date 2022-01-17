@@ -153,8 +153,7 @@ Codes](https://www.unicode.org/reports/tr24/#Relation_To_ISO15924).
 ---------------------------------------------------------------------------------
 
 C++23 (and C23) will follow the TR39 Security Profile 4 **Moderately
-Restrictive**, with an exception for Greek. We call this profile **C23_4** or
-**SAFEC23**.
+Restrictive**, with an exception for Greek.
 
 * All identifiers in a document qualify as Single Script, or
 * All identifiers in a document are covered by any of the following sets of
@@ -164,6 +163,12 @@ Restrictive**, with an exception for Greek. We call this profile **C23_4** or
   + Latin + Han + Hangul (Korean), or
 * All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
+
+This it explicitly allows Greek together with Latin, because the only
+found unicode identifiers examples in the wild are greek for math
+variable names, and Greek is forbidden in the TR39 Moderately
+Restrictive profile.
+libu8ident calls this profile **C23_4** or **SAFEC23**.
 
 5 What will this proposal not change
 ====================================
@@ -259,8 +264,10 @@ to its long script property value. (E.g. Syrc to Syriac)
 
     0640       ; Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc # Lm  ARABIC TATWEEL
 
-Some of the SCX scripts contain only a single script. These are directly added
-to the list of SC scripts for the purpose of identifier security checks.
+Some of the SCX scripts contain only a single script. These could
+directly added to the list of SC scripts for the purpose of identifier
+security checks, but I advise against, for easier Combining Marks
+checks against the base character script. See below 7.3.
 
 E.g.
 
