@@ -283,7 +283,7 @@ docs: $(DOCS)
 c23++proposal.html: c23++proposal.md
 	-pandoc -s -o $@ c23++proposal.md
 c23++proposal.pdf: c23++proposal.md
-	-pandoc -s --pdf-engine=xelatex -o $@ c23++proposal.md
+	-pandoc -s --pdf-engine=xelatex -o $@ c23++proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h
