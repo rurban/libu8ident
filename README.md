@@ -39,28 +39,26 @@ null-terminated identifier.  Optionally we can check for proper
 `XID_Start`/`XID_Continue` properties also. But this may not use the
 optimization `-DDISABLE_CHECK_XID`.
 
-With the optional `U8ID_CHECK_XID` option we check for valid UTF-8
-encoding, valid XID_Start/Continue properties and allowed script of
-each character. We do this by checking for the Allowed
-[IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt).
+With the optional `U8ID_TR31` options we check for valid UTF-8
+encoding, valid ID_Start/Continue properties and allowed script of
+each character.
 
-Some parsers also need to check for allowed **median** characters, which
-are not allowed at the very end of an identifier. Esp. for
+Some parsers also need to check for allowed **median** characters,
+which are not allowed at the very end of an identifier. Esp. for
 unrestrictive mixed-script security profiles or insecure xid
 ranges. This library does not do this yet.
 
 **u8idlint** has its own tokenizer, which can be configured with the
 **--xid** options: **ASCII, SAFEC23, ALLOWED, ID, XID, C11** and
 **ALLUTF8**. (sorted from most secure to most insecure).  ASCII
-ignores all utf8 word boundaries, ALLOWED, the default option is the
-same as the `U8ID_CHECK_XID` option in the library. ID allows all
-letters, plus numbers, punctuation and marks, including all exotic
-scripts. XID is ID plus some special exceptions to avoid the NFKC
-quirks, because NFKC has a lot of confusable mappings and no
-roundtrips. C11 uses the C11 standard insecure DefId unicode ranges.
-SAFEC23 is the optimized proposal for the C23 charset,
-ALLUTF8 allows all unicode characters as letters > 127, as in php, D,
-nim or crystal.
+ignores all utf8 word boundaries, ALLOWED, allows only TR39
+IdentifierStatus Allowed characters. ID allows all letters, plus
+numbers, punctuation and marks, including all exotic scripts. XID is
+ID plus some special exceptions to avoid the NFKC quirks, because NFKC
+has a lot of confusable mappings and no roundtrips. C11 uses the C11
+standard insecure DefId unicode ranges.  SAFEC23 is the optimized
+proposal for the C23 charset, ALLUTF8 allows all unicode characters as
+letters > 127, as in php, D, nim or crystal.
 
 Normalization
 -------------
@@ -264,10 +262,9 @@ With `croaring` the confus API is about twice as fast, and needs half the size.
 See the likewise **cmake** options:
 
 * `-DBUILD_SHARED_LIBS=ON,OFF`
-* `-DLIBU8IDENT_NORM=NFC,NFKC,NFD,NFKD`
-* `-DLIBU8IDENT_PROFILE=2,3,4,5,6,c23_4,c11_6`
-* `-DLIBU8IDENT_ENABLE_CHECK_XID=On`
-* `-DLIBU8IDENT_DISABLE_CHECK_XID=On`
+* `-DU8ID_NORM=NFC,NFKC,NFD,NFKD`
+* `-DU8ID_PROFILE=2,3,4,5,6,C23_4,C11_6`
+* `-DU8ID_TR31=ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE`
 * `-DHAVE_CONFUS=ON`
 * `-DHAVE_CROARING=ON`
 
@@ -300,12 +297,13 @@ enum u8id_profile: [TR39](http://www.unicode.org/reports/tr39/)
 
 enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
 
-    U8ID_TR31_ALLOWED = 64, // The UCD IdentifierStatus.txt (default)
-    U8ID_TR31_SAFEC23 = 65, // XID without Limited_Use and Excluded Scripts
-    U8ID_TR31_ID = 66,      // The usual tr31 variants
-    U8ID_TR31_XID = 67,     // without NFKC quirks, labelled stable
+    U8ID_TR31_XID = 64,     // without NFKC quirks, labelled stable
+    U8ID_TR31_ID = 65,      // The usual tr31 variants
+    U8ID_TR31_ALLOWED = 66, // The UCD IdentifierStatus.txt (default)
+    U8ID_TR31_SAFEC23 = 67, // XID without Limited_Use and Excluded Scripts
     U8ID_TR31_C11 = 68,     // See C11 Annex D for the ranges
-    U8ID_TR31_ALLUTF8 = 69,
+    U8ID_TR31_ALLUTF8 = 69, // allow all > 128, e.g. D, php, nim, crystal
+    U8ID_TR31_ASCII = 70,   // only ASCII letters (as e.g. zig, j. older compilers)
     // room for more tr31 profiles
 
     U8ID_FOLDCASE = 128,         // optional for case-insensitive idents. case-folded
@@ -316,7 +314,7 @@ enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
 `int u8ident_init (enum u8id_profile, enum u8id_norm, unsigned options)`
 
 Initialize the library with a bitmask of options, which define the
-performed checks. Recommended is `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
+performed checks. Recommended is `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_SAFEC23)`.
 
 `int u8ident_set_maxlength (int maxlen)`
 
@@ -383,7 +381,7 @@ Return values (`enum u8id_errors`):
 * 1   - valid with need to normalize.
 * 2   - warn about confusable
 * 3   - warn about confusable and need to normalize
-* -1  - invalid character class (only with `U8ID_CHECK_XID`)
+* -1  - invalid character class (only with `U8ID_TR31` checks)
 * -2  - invalid script
 * -3  - invalid mixed scripts
 * -4  - invalid UTF-8 encoding
