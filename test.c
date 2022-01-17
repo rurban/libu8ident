@@ -742,10 +742,14 @@ void test_safec23(void) {
       printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
              safec23_start_list[i - 1].to, i, safec23_start_list[i].from);
     assert(safec23_start_list[i - 1].to < safec23_start_list[i].from);
-    if (safec23_start_list[i - 1].sc == safec23_start_list[i].sc)
-      assert(safec23_start_list[i - 1].to + 1 < safec23_start_list[i].from);
+    if (safec23_start_list[i - 1].sc == safec23_start_list[i].sc) {
+      if (safec23_start_list[i - 1].to >= safec23_start_list[i].from)
+        printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
+               safec23_start_list[i - 1].to, i, safec23_start_list[i].from);
+      assert(safec23_start_list[i - 1].to < safec23_start_list[i].from);
+    }
     if (safec23_start_list[i - 1].gc == safec23_start_list[i].gc)
-      assert(safec23_start_list[i - 1].to + 1 < safec23_start_list[i].from);
+      assert(safec23_start_list[i - 1].to < safec23_start_list[i].from);
   }
   for (size_t i = 1; i < ARRAY_SIZE(safec23_cont_list); i++) {
     if (safec23_cont_list[i - 1].to >= safec23_cont_list[i].from)

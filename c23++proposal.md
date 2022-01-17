@@ -21,10 +21,10 @@ Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++ 23 (and C23)
   Mixed-Scripts Moderately Restrictive profile, but allow Greek scripts,
 * Disallow all Limited Use [TR31#Table_7](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
   and Excluded scripts [TR31#Table_4](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers),
-* Only allow [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1)
+* Only allow [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)
   Recommended, Inclusion, Technical Identifier Type properties,
 * Demand NFC normalization. Reject all composable sequences as ill-formed.
-  (from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
+  (from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html))
 * Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with
   mixed-scripts (SCX) as ill-formed. [TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection)
 
@@ -168,7 +168,6 @@ This it explicitly allows Greek together with Latin, because the only
 found unicode identifiers examples in the wild are greek for math
 variable names, and Greek is forbidden in the TR39 Moderately
 Restrictive profile.
-libu8ident calls this profile **C23_4** or **SAFEC23**.
 
 5 What will this proposal not change
 ====================================
@@ -407,10 +406,9 @@ Handling Combining Marks](https://www.unicode.org/reports/tr24/#Nonspacing_Marks
 8 TR39 Identifier Type
 ======================
 
-The **Identifier_Type** property TR39#Table 1
-<https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table_1>
+The **Identifier Type** property [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)
 recommendation should be mandatory, with the addition of the `Technical`
-Identifier\_Type to be allowed.
+Identifier Type to be allowed.
 
 I.e. `Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,`
 `Deprecated, Not_Character` are not part of identifiers.
@@ -432,7 +430,7 @@ common identifier insecurities, that identifiers will stay
 identifiable.
 
 We choose a variant of the **Moderately Restrictive** profile, with an
-exception for Greek.  I called this profile **C23_4** or **SAFEC23**
+exception for Greek.  I called this profile C23_4 or SAFEC23
 in libu8ident.
 
 * All identifiers in a document qualify as Single Script, or
@@ -522,7 +520,7 @@ simplier perl5 tokenizer.
 Then when GCC went to full insecure identifiers I implemented the more
 general [libu8ident](https://github.com/rurban/libu8ident) library,
 which can be used with all known TR39 identifier type profiles, the
-mixed-script security profiles, TR31 XID character sets and all TR35
+mixed-script security profiles, TR31 XID character sets and all TR15
 normalizations. There I tested various performance strategies of the
 unicode lookups. Tested was CRoaring, which was only useful for sets
 of single codepoints, the list of confusables. Most of the needed
@@ -563,9 +561,10 @@ unicode names in the wild this is still easy. There are also many
 object file producers in the wild, with possibly completely insecure
 unicode names in the future.
 
-binutils `readelf -L -Ul` is currently broken displaying unicode identifiers.
-I have patches to display them in the current multi-byte locale, and to add
-ui8id checks with -L. I haven't found violations so far in my used libraries.
+binutils `readelf -L -Ul` is currently broken displaying unicode
+identifiers.  I have patches to display them in the current multi-byte
+locale, and to add u8ident checks with -L. I haven't found any
+violations so far in my used libraries.
 
 Even better would be for the C ABI's to also adopt secure unicode
 identifiers, as linkers and FFI's have the same unicode security
@@ -578,10 +577,23 @@ specific. (i.e. you cannot copy them across locales).
 ============================
 
 Created with mkc23 from libu8ident.
+_The SCX is modelled as if your compiler would allow static initialization of
+strings as {char,...,0}._
 
 ``` c
-// Filtering allowed scripts, XID_Start, safe IDTypes and NFC
-const struct sc safec23_start_list[431] = {
+
+struct sc_c23 {
+    uint32_t from;
+    uint32_t to;
+    enum u8id_sc sc; // Scripts
+    enum u8id_gc gc; // General Category. GC_L is L& (all letters)
+                     // GC_V is varying
+    const char *scx; // List of ScriptExtensions, maxsize 8 for U+1CF2
+};
+
+// Filtering allowed scripts, XID_Start, safe IDTypes, NFC and !MARK
+// Ranges split at GC and SCX changes
+const struct sc_c23 safec23_start_list[431] = {
     {'$', '$', SC_Latin, GC_Sc, NULL},
     {'A', 'Z', SC_Latin, GC_Lu, NULL},
     {'_', '_', SC_Latin, GC_Pc, NULL},
@@ -778,10 +790,12 @@ const struct sc safec23_start_list[431] = {
     {0x1C80, 0x1C88, SC_Cyrillic, GC_Ll, NULL}, //  ᲀ..ᲈ
     {0x1C90, 0x1CBA, SC_Georgian, GC_Lu, NULL}, //  Ა..Ჺ
     {0x1CBD, 0x1CBF, SC_Georgian, GC_Lu, NULL}, //  Ჽ..Ჿ
-    // TODO SPLIT on SCX
-    {0x1CE9, 0x1CEC, SC_Common, GC_Lo, {SC_Devanagari,SC_Nandinagari,0}}, //  ᳩ..ᳬ
-    // TODO SPLIT on SCX
-    {0x1CEE, 0x1CF3, SC_Common, GC_Lo, {SC_Devanagari,0}}, //  ᳮ..ᳳ
+    {0x1CE9, 0x1CE9, SC_Common, GC_Lo, {SC_Devanagari,SC_Nandinagari,0}}, //  ᳩ
+    {0x1CEA, 0x1CEC, SC_Common, GC_Lo, {SC_Bengali,SC_Devanagari,0}}, //  ᳪ..ᳬ
+    {0x1CEE, 0x1CF1, SC_Common, GC_Lo, {SC_Devanagari,0}}, //  ᳮ..ᳱ
+    {0x1CF2, 0x1CF3, SC_Common, GC_Lo, {SC_Bengali,SC_Devanagari,SC_Grantha,
+      SC_Kannada,SC_Nandinagari,SC_Oriya,SC_Telugu,SC_Tirhuta,0}},  ᳲ..ᳳ
+    {0x1CF5, 0x1CF6, SC_Common, GC_Lo, {SC_Bengali,SC_Devanagari,0}}, //  ᳵ..ᳶ
     {0x1CF5, 0x1CF6, SC_Common, GC_Lo, {SC_Bengali,SC_Devanagari,0}, //  ᳵ..ᳶ
     {0x1CFA, 0x1CFA, SC_Common, GC_Lo, {SC_Nandinagari,0}}, //  ᳺ
     {0x1D00, 0x1D25, SC_Latin, GC_Ll, NULL}, //  ᴀ..ᴥ
@@ -878,8 +892,8 @@ const struct sc safec23_start_list[431] = {
     {0xA7D3, 0xA7D3, SC_Latin, GC_Ll, NULL}, //  ꟓ
     {0xA7D5, 0xA7D9, SC_Latin, GC_L, NULL}, //  ꟕ..ꟙ
     {0xA7F2, 0xA7FF, SC_Latin, GC_L, NULL}, //  ꟲ..ꟿ
-    // TODO SPLIT on SCX
-    {0xA8F2, 0xA8F7, SC_Devanagari, GC_Lo, NULL}, //  ꣲ..ꣷ
+    {0xA8F2, 0xA8F2, SC_Devanagari, GC_Lo, NULL}, //  ꣲ
+    {0xA8F3, 0xA8F7, SC_Devanagari, GC_Lo, {SC_Devanagari,SC_Tamil,0}}, //  ꣳ..ꣷ
     {0xA8FB, 0xA8FB, SC_Devanagari, GC_Lo, NULL}, //  ꣻ
     {0xA8FD, 0xA8FE, SC_Devanagari, GC_Lo, NULL}, //  ꣽ..ꣾ
     {0xA960, 0xA97C, SC_Hangul, GC_Lo, NULL}, //  ꥠ..ꥼ
@@ -916,8 +930,8 @@ const struct sc safec23_start_list[431] = {
     {0xFC64, 0xFD3D, SC_Arabic, GC_Lo, NULL}, //  ﱤ..ﴽ
     {0xFD50, 0xFD8F, SC_Arabic, GC_Lo, NULL}, //  ﵐ..ﶏ
     {0xFD92, 0xFDC7, SC_Arabic, GC_Lo, NULL}, //  ﶒ..ﷇ
-    // TODO SPLIT on SCX
-    {0xFDF0, 0xFDF9, SC_Arabic, GC_Lo, NULL}, //  ﷰ..ﷹ
+    {0xFDF0, 0xFDF1, SC_Arabic, GC_Lo, NULL}, //  ﷰ..ﷱ
+    {0xFDF2, 0xFDF9, SC_Arabic, GC_Lo, {SC_Arabic,SC_Thaana,0}}, //  ﷲ..ﷹ
     {0xFE71, 0xFE71, SC_Arabic, GC_Lo, NULL}, //  ﹱ
     {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ
     {0xFE77, 0xFE77, SC_Arabic, GC_Lo, NULL}, //  ﹷ
@@ -1022,25 +1036,27 @@ const struct sc safec23_start_list[431] = {
     {0x2CEB0, 0x2EBE0, SC_Han, GC_Lo, NULL}, //  𬺰..𮯠
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
-// 315 ranges, 116 singles, 99629 codepoints
+// 317 ranges, 118 singles, 99629 codepoints
 ```
 
 14 Appendix A - C23XID_Continue
 ===============================
 
 Created with mkc23 from libu8ident.
-_The SCX is modelled as if your CC would allow static initialization of strings as {char,...,0}._
+_The SCX is modelled as if your compiler would allow static initialization of
+strings as {char,...,0}._
 
 ``` c
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC and !MARK
-const struct sc safec23_cont_list[22] = {
+const struct sc_c23 safec23_cont_list[22] = {
     {0x30, 0x39, SC_Common, GC_Nd, NULL}, //  0..9
     {0x5F, 0x5F, SC_Common, GC_Pc, NULL}, //  _
     {0xB7, 0xB7, SC_Common, GC_Po, NULL}, //  ·
     {0x660, 0x669, SC_Arabic, GC_Nd, {SC_Arabic,SC_Thaana,SC_Yezidi,0}}, //  ٠..٩
     {0x6F0, 0x6F9, SC_Arabic, GC_Nd, NULL}, //  ۰..۹
-    {0x966, 0x96F, SC_Devanagari, GC_Nd, {SC_Devanagari,SC_Dogra,SC_Kaithi,SC_Mahajani,0}}, //  ०..९
-    {0x9E6, 0x9EF, SC_Bengali, GC_Nd, {SC_Bengali,SC_Chakma,SC_Syloti_Nagri,0}}, //  ০..৯
+    {0x966, 0x96F, SC_Devanagari, GC_Nd, {SC_Devanagari,SC_Dogra,SC_Kaithi,
+        SC_Mahajani,0}}, //  ०..९
+    {0x9E6, 0x9EF, SC_Bengali, GC_Nd, {SC_Bengali,SC_Chakma,SC_Syloti_Nagri,0}},
     {0xA66, 0xA6F, SC_Gurmukhi, GC_Nd, {SC_Gurmukhi,SC_Multani,0}}, //  ੦..੯
     {0xAE6, 0xAEF, SC_Gujarati, GC_Nd, {SC_Gujarati,SC_Khojki,0}, //  ૦..૯
     {0xB66, 0xB6F, SC_Oriya, GC_Nd, NULL}, //  ୦..୯
@@ -1051,7 +1067,7 @@ const struct sc safec23_cont_list[22] = {
     {0xE50, 0xE59, SC_Thai, GC_Nd, NULL}, //  ๐..๙
     {0xED0, 0xED9, SC_Lao, GC_Nd, NULL}, //  ໐..໙
     {0xF20, 0xF29, SC_Tibetan, GC_Nd, NULL}, //  ༠..༩
-    {0x1040, 0x1049, SC_Myanmar, GC_Nd, {SC_Chakma,SC_Myanmar,SC_Tai_Le,0}}, //  ၀..၉
+    {0x1040, 0x1049, SC_Myanmar, GC_Nd, {SC_Chakma,SC_Myanmar,SC_Tai_Le,0}},
     {0x1090, 0x1099, SC_Myanmar, GC_Nd, NULL}, //  ႐..႙
     {0x17E0, 0x17E9, SC_Khmer, GC_Nd, NULL}, //  ០..៩
     {0x203F, 0x2040, SC_Common, GC_Pc, NULL}, //  ‿..⁀
@@ -1786,10 +1802,10 @@ E0100..E01EF  ; XID_Continue # Mn [240] VARIATION SELECTOR-17..-256
 
 Needed for **#8 TR39 Identifier Type**. List of Technical ID characters, added
 the TR39 Recommended and Inclusion IDTypes. TR39#Table 1
-<https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1>
+<https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type>
 
-`grep ' Technical ' IdentifierType.txt |
-egrep -v 'Not_XID|Obsolete|Exclusion|Uncommon_Use|Limited_Use'`
+    grep ' Technical ' IdentifierType.txt |
+      egrep -v 'Not_XID|Obsolete|Exclusion|Uncommon_Use|Limited_Use'
 
 ``` txt
 0180          ; Technical  # 1.1        LATIN SMALL LETTER B WITH STROKE
@@ -2005,8 +2021,8 @@ FE73          ; Technical  # 3.2        ARABIC TAIL FRAGMENT
 * [TR39] Mark Davis and Michel Suignard. Unicode Security Mechanisms.
   <http://www.unicode.org/reports/tr36>
 
-* [TR39#Table 1] Identifier Status and Type Table
-  <https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type Table 1>
+* [TR39#Table 1] Identifier Status and Type Table 1
+  <https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type>
 
 * [TR39#5.2] Mixed-Scripts Restriction-Level Detection
   <https://www.unicode.org/reports/tr39/#Restriction_Level_Detection>
