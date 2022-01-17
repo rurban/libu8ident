@@ -27,9 +27,9 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md
+doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.pdf
 if HAVE_PANDOC
-doc_DATA += c23++proposal.html c23++proposal.pdf
+doc_DATA += c23++proposal.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
@@ -117,9 +117,9 @@ regen-confus:
 docs: $(doc_DATA)
 if HAVE_PANDOC
 c23++proposal.html: $(srcdir)/c23++proposal.md
-	$(PANDOC) -s -o $@ $(srcdir)/c23++proposal.md
+	$(PANDOC) -s -o $@ $(srcdir)/c23++proposal.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
 c23++proposal.pdf: $(srcdir)/c23++proposal.md
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/c23++proposal.md
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/c23++proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
 endif
 regen-all: regen-scripts regen-norm regen-confus regen-man c23++proposal.html
 

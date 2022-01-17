@@ -1,7 +1,6 @@
-C++ Identifier Security using Unicode Standard Annex 39
-=======================================================
+    C++ Identifier Security using Unicode Standard Annex 39
 
-    Date:       2022-01-15
+    Date:       2022-01-17
     Project:    Programming Language C++
     Audience:   EWG
                 CWG
@@ -80,12 +79,13 @@ mixed with others. Identifiers are still identifiable.
 4 What will this proposal change
 ================================
 
-4.1 The set of TR31 XID ranges will become smaller
-----------------------------------------------
+4.1 The set of TR31 XID characters will become much smaller
+-----------------------------------------------------------
 
-Restricting the **Identifier_Type** plus the Allowed Scripts, plus demanding NFC
-will shrink the original XID set from 971267 codepoints to 93036 codepoints.
-The ranges expand from 36 to 315. (when split by scripts already, 25 splits happen).
+Restricting the **Identifier Type** plus the Recommended Scripts, plus
+demanding NFC will shrink the original XID set from 971267 codepoints
+to 93036 codepoints.  The ranges expand from 36 to 315. (when split by
+scripts already, 25 splits happen).
 
 `ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +`Other_ID_Start`,
  -`Pattern_Syntax`, -`Pattern_White_Space`
@@ -102,6 +102,8 @@ The ranges expand from 36 to 315. (when split by scripts already, 25 splits happ
 
 `XID_Start`: 131974 codepoints,
 `XID_Continue`: 135053 codepoints (= `XID_Start` + 3098)
+
+See 13 "Appendix A - C23XID_Start" and 13 "Appendix B - C23XID_Continue"
 
 4.2 Only Recommended scripts are now allowed, Excluded and Limited_Use not
 --------------------------------------------------------------------------
@@ -150,7 +152,7 @@ which maps somehow to the 4-letter [ISO 15924
 Codes](https://www.unicode.org/reports/tr24/#Relation_To_ISO15924).
 
 4.3 Documents with identifiers in many multiple scripts/languages will become illegal
----------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 C++23 (and C23) will follow the TR39 Security Profile 4 **Moderately
 Restrictive**, with an exception for Greek.
@@ -164,10 +166,22 @@ Restrictive**, with an exception for Greek.
 * All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
 
-This it explicitly allows Greek together with Latin, because the only
-found unicode identifiers examples in the wild are greek for math
+Thus it explicitly allows Greek together with Latin, because the only
+found unicode identifiers examples in the wild are Greek for math
 variable names, and Greek is forbidden in the TR39 Moderately
 Restrictive profile.
+
+4.4 Mixed-script runs with combining marks will become illegal
+--------------------------------------------------------------
+
+C23++ will check for unlikely sequences of **combining marks**, and
+reject some.  Combining Marks have no script property per se, but a
+variable list of allowed SCX scripts, which need to be checked against
+the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND
+MARK modifier letters.
+
+See 7.2 "SCX Extensions" and 7.3 "Combining marks script run detection
+for spoofing" below.
 
 5 What will this proposal not change
 ====================================
@@ -334,67 +348,21 @@ not part of XIDs.
 ...
 ```
 
-From these 67 Lm plus 513 M\[cn\] ranges filtering out the non-C23 XID candidates,
-only #8 Identifier_Type = Recommended, Inclusion, Technical, plus only #4.2
-Recommended Scripts, plus only codepoints with multiple SCX entries,
-leads to these ranges. TODO
+From these 67 Lm plus 513 M\[cn\] ranges filtering out the non-C23 XID
+candidates, only #8 Identifier_Type = Recommended, Inclusion,
+Technical, plus only #4.2 Recommended Scripts, plus only codepoints
+with multiple SCX entries, plus only codepoints which don't decompose
+to NFC, leads only to the Lm characters, which can mix with all
+scripts. Not a single Mn or Mc codepoints is left.
 
-``` txt
-A9CF          ; Bugi Java # Lm       JAVANESE PANGRANGKEP
-                                     (Javanese Limited, Buginese Excl)
-3031..3035    ; Hira Kana # Lm   [5] VERTICAL KANA REPEAT MARK..
-                                     VERTICAL KANA REPEAT MARK LOWER HALF
-30FC          ; Hira Kana # Lm       KATAKANA-HIRAGANA PROLONGED SOUND MARK
-FF70          ; Hira Kana # Lm       HALFWIDTH KATAKANA-HIRAGANA PROLONGED
-                                     SOUND MARK
-FF9E..FF9F    ; Hira Kana # Lm   [2] HALFWIDTH KATAKANA VOICED SOUND MARK..
-                                     SEMI-VOICED SOUND MARK
-0640          ; Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc # Lm ARABIC TATWEEL
-102E0         ; Arab Copt # Mn       COPTIC EPACT THOUSANDS MARK
-064B..0655    ; Arab Syrc # Mn  [11] ARABIC FATHATAN..ARABIC HAMZA BELOW
-0670          ; Arab Syrc # Mn       ARABIC LETTER SUPERSCRIPT ALEF
-1CD5..1CD6    ; Beng Deva # Mn   [2] VEDIC TONE YAJURVEDIC AGGRAVATED INDEPENDENT
-                                     SVARITA..INDEPENDENT SVARITA
-1CD8          ; Beng Deva # Mn       VEDIC TONE CANDRA BELOW
-1CE1          ; Beng Deva # Mc       VEDIC TONE ATHARVAVEDIC INDEPENDENT SVARITA
-1CED          ; Beng Deva # Mn       VEDIC SIGN TIRYAK
-A8F1          ; Beng Deva # Mn       COMBINING DEVANAGARI SIGN AVAGRAHA
-302A..302D    ; Bopo Hani # Mn   [4] IDEOGRAPHIC LEVEL TONE MARK..ENTERING TONE MARK
-0484          ; Cyrl Glag # Mn       COMBINING CYRILLIC PALATALIZATION
-0487          ; Cyrl Glag # Mn       COMBINING CYRILLIC POKRYTIE
-A66F          ; Cyrl Glag # Mn       COMBINING CYRILLIC VZMET
-0485..0486    ; Cyrl Latn # Mn   [2] COMBINING CYRILLIC DASIA PNEUMATA..PSILI PNEUMATA
-0483          ; Cyrl Perm # Mn       COMBINING CYRILLIC TITLO
-1DF8          ; Cyrl Syrc # Mn       COMBINING DOT ABOVE LEFT
-1CF8..1CF9    ; Deva Gran # Mn   [2] VEDIC TONE RING ABOVE..DOUBLE RING ABOVE
-1CD7          ; Deva Shrd # Mn       VEDIC TONE YAJURVEDIC KATHAKA INDEPENDENT SVARITA
-1CD9          ; Deva Shrd # Mn       -"- SCHROEDER
-1CDC..1CDD    ; Deva Shrd # Mn   [2] VEDIC TONE KATHAKA ANUDATTA..DOT BELOW
-1CE0          ; Deva Shrd # Mn       VEDIC TONE RIGVEDIC KASHMIRI INDEPENDENT SVARITA
-11301         ; Gran Taml # Mn       GRANTHA SIGN CANDRABINDU
-11303         ; Gran Taml # Mc       GRANTHA SIGN VISARGA
-1133B..1133C  ; Gran Taml # Mn   [2] COMBINING BINDU BELOW..GRANTHA SIGN NUKTA
-3099..309A    ; Hira Kana # Mn   [2] COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK..
-                                     SEMI-VOICED SOUND MARK
-1CF4          ; Deva Gran Knda # Mn       VEDIC TONE CANDRA ABOVE
-20F0          ; Deva Gran Latn # Mn       COMBINING ASTERISK ABOVE
-1CD0          ; Beng Deva Gran Knda # Mn       VEDIC TONE KARSHANA
-1CD2          ; Beng Deva Gran Knda # Mn       VEDIC TONE PRENKHA
-1CDA          ; Deva Knda Mlym Orya Taml Telu # Mn       VEDIC TONE DOUBLE SVARITA
-0952          ; Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh
-              # Mn DEVANAGARI STRESS SIGN ANUDATTA
-0951          ; Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh
-              # Mn DEVANAGARI STRESS SIGN UDATTA
-```
-
-Thus some of the Common `XID_Continue` marks therefore cannot be
+So some of the Common `XID_Continue` marks therefore cannot be
 detected with the SCX logic. But all of them do not combine with Latin
-and are most likely already filtered by by the Mixed Script profile.
+and are already filtered by the C23 Mixed Script profile.
 And all of the Combining Marks are caught by the NFC requirement.
 
-On the other hand Modifier Letters are freestanding base characters,
-which can be combined with any other letter. We only have the SCX
-logic.
+Most Lm Modifier Letters (besides the 4 Japanese PROLONGED SOUND
+MARKs) are freestanding base characters, which can be combined with
+any other letter.
 
 See [TR31#2.1 Combining\_Marks](https://www.unicode.org/reports/tr31/#Combining_Marks)
 and [TR31#2.2 Modifier\_Letters](https://www.unicode.org/reports/tr31/#Modifier_Letters)

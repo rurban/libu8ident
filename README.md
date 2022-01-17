@@ -455,7 +455,8 @@ Internals
 
 Each context keeps a list of all seen unique scripts, which are represented as a
 byte.  4-8 bytes are kept in a word, so you rarely need to allocate room for the
-scripts.
+scripts. All mixed-script profiles have either a max size of 4 allowed scripts, or
+ignore mixed-scripts.
 
 The normalization tables need to be updated every year with the new Unicode
 database via `make regen-norm` (using my `perl-Unicode-Normalize` variant).
@@ -483,10 +484,6 @@ internally used script indices are arbitrarily created via
 Scripts* (sorted alphabetically) and *Limited Use Scripts* (sorted by
 codepoint).
 
-With `-DDISABLE_CHECK_XID` and `-DENABLE_CHECK_XID` we can use the
-shorter `nonxid_script_list[]`, as we know that only valid XID's are
-checked.
-
 With **CRoaring** some boolean bitset queries can be optimized. So far
 only the confusables codepoints lookups are used. The others,
 `allowed_croar.h` and the `nf*_croar.h` headers are too slow. See
@@ -505,10 +502,6 @@ TODO
   NFC + PROFILE_4 + CHECK\_XID with the script byte in the first decompose lookup
   `UN8IF_canon_tbl`.
 
-* SAFEC23 lookup optimization:
-  Add the GC, SCX, and checkNFC to the script lookup. Since NFC is required, only
-  a single lookup is needed per character. not 6.
-
 * **SCX variants**: Some codepoints are combinations, valid for a number of
   scripts.  These appear with the Common and Inherited scripts. When
   an SCX appears with more than one script, such as e.g. U+60C with
@@ -519,22 +512,19 @@ TODO
   script, and check for mixed-script violations. Currently we only check if
   none of the SCX variants exist yet, and only then we have a new script.
   Which exactly is unknown, but the new script might lead to a mixed-script
-  violation.
+  violation. We also check for invalid mixed-script combinations of a SCX list
+  with the base-char.
 
-* allowed_id: seperate into start and cont lists.
-
-* add special checks for zero-with (non-)joiners, only allowed in special
+* Add special checks for zero-with (non-)joiners, only allowed in special
   median or cont positions. See TR31 2.3 A1,A2 or B.
   Ditto for other tr31 special median positions, e.g. MIDDLE DOT, HEBREW U+5F3,
   KATAKANA U+30A0, U+30FB.
 
 * **[IdentifierType](http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
   The list of idtypes is provided, but not yet integrated into any API.
-  E.g. if someone wants to allow the Technical idtype.
+  E.g. if someone wants to allow the Technical idtype, as SAFEC23.
   Then you have to use `u8ident_get_idtypes ()` by yourself, and it is
   not exported (ie. unusable from the shared library)
-  We only optionally check the IdentifierStatus Allowed with CHECK_XID, from
-  this TR39 Table 1.
 
 * **FCD**: This normalization is broken.
 
