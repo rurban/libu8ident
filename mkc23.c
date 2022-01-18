@@ -70,7 +70,7 @@ static inline struct sc *binary_search(const uint32_t cp, const char *list,
 }
 
 /* TR 39#1 Recommended, Inclusion, Technical Identifier Type properties */
-static inline bool isSkipIdtype(uint32_t cp) {
+static inline bool isSkipIdtype(const uint32_t cp) {
   struct range_short *s = (struct range_short *)binary_search(
       cp, (char *)idtype_list, ARRAY_SIZE(idtype_list), sizeof(*idtype_list));
   if (s)
@@ -82,7 +82,7 @@ static inline bool isSkipIdtype(uint32_t cp) {
 }
 
 // allow U8ID_Exclusion for the _excl_ lists
-static inline bool isExcludedIdtype(uint32_t cp) {
+static inline bool isExcludedIdtype(const uint32_t cp) {
   struct range_short *s = (struct range_short *)binary_search(
       cp, (char *)idtype_list, ARRAY_SIZE(idtype_list), sizeof(*idtype_list));
   if (s)
@@ -91,6 +91,11 @@ static inline bool isExcludedIdtype(uint32_t cp) {
             U8ID_Not_NFKC | U8ID_Not_XID | U8ID_Obsolete | U8ID_Uncommon_Use);
   else
     return false;
+}
+
+// disallow 0xFF00-0xFFEF, homoglyph with LATIN A-Z
+static inline bool isHalfwidthOrFullwidth(const uint32_t cp) {
+  return (cp >= 0xFF00 && cp <= 0xFFEF);
 }
 
 // uint8_t[10FFFF/8]
@@ -393,7 +398,8 @@ static void gen_c23_safe(void) {
     struct range_bool r = xid_start_list[i];
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
-      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp)) {
+      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) &&
+          !isHalfwidthOrFullwidth(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -458,7 +464,7 @@ static void gen_c23_safe(void) {
         continue;
       uint8_t s = u8ident_get_script(cp);
       if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) &&
-          !isSkipIdtype(cp)) {
+          !isSkipIdtype(cp) && !isHalfwidthOrFullwidth(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -499,7 +505,8 @@ static void gen_c23_safe(void) {
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp)) {
+          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
+          !isHalfwidthOrFullwidth(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -537,7 +544,8 @@ static void gen_c23_safe(void) {
         continue;
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp)) {
+          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
+          !isHalfwidthOrFullwidth(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));

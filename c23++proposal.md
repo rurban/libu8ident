@@ -84,8 +84,10 @@ mixed with others. Identifiers are still identifiable.
 
 Restricting the **Identifier Type** plus the Recommended Scripts, plus
 demanding NFC will shrink the original XID set from 971267 codepoints
-to 93036 codepoints.  The ranges expand from 36 to 315. (when split by
+to 99475 codepoints.  The ranges expand from 36 to 426. (when split by
 scripts already, 25 splits happen).
+Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are now
+forbidden.
 
 `ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +`Other_ID_Start`,
  -`Pattern_Syntax`, -`Pattern_White_Space`
@@ -383,7 +385,11 @@ I.e. `Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,`
 
 Allowed are `Recommended, Inclusion, Technical` TR39 Identifier Types.
 
-There are 80 Technical ranges added to the original list of
+Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are
+forbidden, even if allowed in TR39. They are confusable with the Latin
+base alphabet A-Z.
+
+And there are 80 Technical ranges added to the original list of
 Recommended and Inclusion ID's.
 
     grep ', U8ID_Technical' scripts.h | egrep -v 'Not_XID|U8ID_Obsolete|U8ID_Exclusion'
@@ -561,7 +567,7 @@ struct sc_c23 {
 
 // Filtering allowed scripts, XID_Start, safe IDTypes, NFC and !MARK
 // Ranges split at GC and SCX changes
-const struct sc_c23 safec23_start_list[431] = {
+const struct sc_c23 safec23_start_list[426] = {
     {'$', '$', SC_Latin, GC_Sc, NULL},
     {'A', 'Z', SC_Latin, GC_Lu, NULL},
     {'_', '_', SC_Latin, GC_Pc, NULL},
@@ -893,29 +899,20 @@ const struct sc_c23 safec23_start_list[431] = {
     {0xFB13, 0xFB17, SC_Armenian, GC_Ll, NULL}, //  ﬓ..ﬗ
     {0xFB20, 0xFB28, SC_Hebrew, GC_Lo, NULL}, //  ﬠ..ﬨ
     {0xFB4F, 0xFB4F, SC_Hebrew, GC_Lo, NULL}, //  ﭏ
-    {0xFB51, 0xFBB1, SC_Arabic, GC_Lo, NULL}, //  ﭑ..ﮱ
-    {0xFBD3, 0xFC5D, SC_Arabic, GC_Lo, NULL}, //  ﯓ..ﱝ
+    {0xFB51, 0xFBB1, SC_Arabic, GC_Lo, NULL}, //  ﭑ..ﮱ TODO some are MEDIAL
+    {0xFBD3, 0xFC5D, SC_Arabic, GC_Lo, NULL}, //  ﯓ..ﱝ TODO some are MEDIAL
     {0xFC64, 0xFD3D, SC_Arabic, GC_Lo, NULL}, //  ﱤ..ﴽ
     {0xFD50, 0xFD8F, SC_Arabic, GC_Lo, NULL}, //  ﵐ..ﶏ
     {0xFD92, 0xFDC7, SC_Arabic, GC_Lo, NULL}, //  ﶒ..ﷇ
     {0xFDF0, 0xFDF1, SC_Arabic, GC_Lo, NULL}, //  ﷰ..ﷱ
     {0xFDF2, 0xFDF9, SC_Arabic, GC_Lo, {SC_Arabic,SC_Thaana,0}}, //  ﷲ..ﷹ
     {0xFE71, 0xFE71, SC_Arabic, GC_Lo, NULL}, //  ﹱ
-    {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ
-    {0xFE77, 0xFE77, SC_Arabic, GC_Lo, NULL}, //  ﹷ
-    {0xFE79, 0xFE79, SC_Arabic, GC_Lo, NULL}, //  ﹹ
-    {0xFE7B, 0xFE7B, SC_Arabic, GC_Lo, NULL}, //  ﹻ
+    {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ TODO Tail Fragment
+    {0xFE77, 0xFE77, SC_Arabic, GC_Lo, NULL}, //  ﹷ TODO Medial
+    {0xFE79, 0xFE79, SC_Arabic, GC_Lo, NULL}, //  ﹹ TODO Medial
+    {0xFE7B, 0xFE7B, SC_Arabic, GC_Lo, NULL}, //  ﹻ TODO Medial
     {0xFE7D, 0xFE7D, SC_Arabic, GC_Lo, NULL}, //  ﹽ
-    {0xFE7F, 0xFEFC, SC_Arabic, GC_Lo, NULL}, //  ﹿ..ﻼ
-    {0xFF21, 0xFF3A, SC_Latin, GC_Lu, NULL}, //  Ａ..Ｚ
-    {0xFF41, 0xFF5A, SC_Latin, GC_Ll, NULL}, //  ａ..ｚ
-    {0xFF66, 0xFF6F, SC_Katakana, GC_Lo, NULL}, //  ｦ..ｯ
-    {0xFF71, 0xFF9D, SC_Katakana, GC_Lo, NULL}, //  ｱ..ﾝ
-    {0xFFA0, 0xFFBE, SC_Hangul, GC_Lo, NULL}, //  ﾠ..ﾾ
-    {0xFFC2, 0xFFC7, SC_Hangul, GC_Lo, NULL}, //  ￂ..ￇ
-    {0xFFCA, 0xFFCF, SC_Hangul, GC_Lo, NULL}, //  ￊ..ￏ
-    {0xFFD2, 0xFFD7, SC_Hangul, GC_Lo, NULL}, //  ￒ..ￗ
-    {0xFFDA, 0xFFDC, SC_Hangul, GC_Lo, NULL}, //  ￚ..ￜ
+    {0xFE7F, 0xFEFC, SC_Arabic, GC_Lo, NULL}, //  ﹿ..ﻼ  TODO Medial
     {0x10140, 0x10174, SC_Greek, GC_Nl, NULL}, //  𐅀..𐅴
     {0x10780, 0x10785, SC_Latin, GC_Lm, NULL}, //  𐞀..𐞅
     {0x10787, 0x107B0, SC_Latin, GC_Lm, NULL}, //  𐞇..𐞰
@@ -1004,7 +1001,7 @@ const struct sc_c23 safec23_start_list[431] = {
     {0x2CEB0, 0x2EBE0, SC_Han, GC_Lo, NULL}, //  𬺰..𮯠
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
-// 317 ranges, 118 singles, 99629 codepoints
+// 308 ranges, 118 singles, 99475 codepoints
 ```
 
 14 Appendix A - C23XID_Continue

@@ -368,15 +368,6 @@ const struct sc_c23 safec23_start_list[] = {
     {0xFE7B, 0xFE7B, SC_Arabic, GC_Lo, NULL}, //  ﹻ
     {0xFE7D, 0xFE7D, SC_Arabic, GC_Lo, NULL}, //  ﹽ
     {0xFE7F, 0xFEFC, SC_Arabic, GC_Lo, NULL}, //  ﹿ..ﻼ
-    {0xFF21, 0xFF3A, SC_Latin, GC_Lu, NULL}, //  Ａ..Ｚ
-    {0xFF41, 0xFF5A, SC_Latin, GC_Ll, NULL}, //  ａ..ｚ
-    {0xFF66, 0xFF6F, SC_Katakana, GC_Lo, NULL}, //  ｦ..ｯ
-    {0xFF71, 0xFF9D, SC_Katakana, GC_Lo, NULL}, //  ｱ..ﾝ
-    {0xFFA0, 0xFFBE, SC_Hangul, GC_Lo, NULL}, //  ﾠ..ﾾ
-    {0xFFC2, 0xFFC7, SC_Hangul, GC_Lo, NULL}, //  ￂ..ￇ
-    {0xFFCA, 0xFFCF, SC_Hangul, GC_Lo, NULL}, //  ￊ..ￏ
-    {0xFFD2, 0xFFD7, SC_Hangul, GC_Lo, NULL}, //  ￒ..ￗ
-    {0xFFDA, 0xFFDC, SC_Hangul, GC_Lo, NULL}, //  ￚ..ￜ
     {0x10140, 0x10174, SC_Greek, GC_Nl, NULL}, //  𐅀..𐅴
     {0x10780, 0x10785, SC_Latin, GC_Lm, NULL}, //  𐞀..𐞅
     {0x10787, 0x107B0, SC_Latin, GC_Lm, NULL}, //  𐞇..𐞰
@@ -466,9 +457,9 @@ const struct sc_c23 safec23_start_list[] = {
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
 #else
-extern const struct sc_c23 safec23_start_list[435];
+extern const struct sc_c23 safec23_start_list[426];
 #endif
-// 317 ranges, 118 singles, 99625 codepoints
+// 308 ranges, 118 singles, 99475 codepoints
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC and !MARK. Split on GC and SCX
 #ifndef EXTERN_SCRIPTS
