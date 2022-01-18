@@ -1,6 +1,6 @@
     C++ Identifier Security using Unicode Standard Annex 39
 
-    Date:       2022-01-17
+    Date:       2022-01-18
     Project:    Programming Language C++
     Audience:   EWG
                 CWG
@@ -22,6 +22,7 @@ Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++ 23 (and C23)
   and Excluded scripts [TR31#Table_4](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers),
 * Only allow [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)
   Recommended, Inclusion, Technical Identifier Type properties,
+  Honor the Median position in Arabic words (wrong in all xid lists),
 * Demand NFC normalization. Reject all composable sequences as ill-formed.
   (from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html))
 * Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with
@@ -84,26 +85,26 @@ mixed with others. Identifiers are still identifiable.
 
 Restricting the **Identifier Type** plus the Recommended Scripts, plus
 demanding NFC will shrink the original XID set from 971267 codepoints
-to 99475 codepoints.  The ranges expand from 36 to 426. (when split by
+to 99350 codepoints.  The ranges expand from 36 to 426. (when split by
 scripts already, 25 splits happen).
 Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are now
 forbidden.
 
 `ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +`Other_ID_Start`,
- -`Pattern_Syntax`, -`Pattern_White_Space`
+ -`Pattern_Syntax`, -`Pattern_White_Space`,-`Median`
 
-131997 codepoints
+131899 codepoints
 
 `ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc, +`Other_ID_Continue`,
--`Pattern_Syntax`, -`Pattern_White_Space`.
++`Median`, -`Pattern_Syntax`, -`Pattern_White_Space`.
 
-135072 codepoints (= ID_Start + 3075)
+135072 codepoints (= ID_Start + 3173)
 
 `XID_Start` and  `XID_Continue` ensure that `isIdentifer(string)` then
 `isIdentifier(NFKx(string))` (_removing the NFKC quirks_)
 
-`XID_Start`: 131974 codepoints,
-`XID_Continue`: 135053 codepoints (= `XID_Start` + 3098)
+`XID_Start`: 131876 codepoints,
+`XID_Continue`: 135053 codepoints (= `XID_Start` + 3173)
 
 See 13 "Appendix A - C23XID_Start" and 13 "Appendix B - C23XID_Continue"
 
@@ -442,6 +443,11 @@ according to the TR31 and TR39 rules of SAFEC23, so we need to come up
 with our own list of `XID_Start/XID_Continue` codepoints, excluding
 the Limited Use and Excluded scripts. And if an implementation choses
 to allow Excluded scripts with more logic to allow only this script.
+
+Since the TR31 XID list also got the median positions wrong (for 98
+Arabic codepoints), and forgot about the Halfwidth and Fullwidth,
+U+FF00..U+FFEF confusables, we need to fixup and generate the XID
+lists by ourselves.
 
 It is recommended to already exclude Limited Use and Excluded scripts
 from the initial list of identifier ranges, as this is the most common
