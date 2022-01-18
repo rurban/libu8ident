@@ -277,7 +277,7 @@ to its long script property value. (E.g. Syrc to Syriac)
 
     0640       ; Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc # Lm  ARABIC TATWEEL
 
-Some of the SCX scripts contain only a single script. These could
+Some of the SCX scripts contain only a single script. These could be
 directly added to the list of SC scripts for the purpose of identifier
 security checks, but I advise against, for easier Combining Marks
 checks against the base character script. See below 7.3.
@@ -288,7 +288,7 @@ E.g.
 
 U+3006 with the Common script property is assigned to the Hani -> Han script.
 
-Multiple SCX list entries can resolved when the previous scripts in
+Multiple SCX list entries can be resolved when the previous scripts in
 the identifier context are already resolved to one or the other
 possibility. Thus for SCX=(Arab Syrc) we need to check if Arabic or
 Syriac was already seen. If not, the new character with that SCX is
