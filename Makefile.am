@@ -167,7 +167,7 @@ endif
 if !HAVE_WINDOWS
 check-all: check check-asan check-norms check-profiles check-tr31
 check-extra: check-all check-mdl check-all-combinations
-	shellcheck *.test *.sh
+	shellcheck *.test test-all-fast.sh  test-all.sh
 else
 check-all: check check-norms check-profiles check-tr31
 check-extra: check-all check-mdl check-all-combinations
