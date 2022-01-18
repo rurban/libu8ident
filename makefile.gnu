@@ -19,7 +19,8 @@ WGET := wget
 
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
-HDRS = u8id_private.h u8id_gc.h scripts.h $(NORMHDRS) hangul.h mark.h unic11.h scripts16.h
+HDRS = u8id_private.h u8id_gc.h scripts.h $(NORMHDRS) hangul.h \
+       mark.h medial.h unic11.h scripts16.h
 SRC = u8ident.c u8idscr.c u8idnorm.c
 ifeq (${HAVE_CONFUS}, 1)
 SRC += u8idroar.c
@@ -133,6 +134,8 @@ mark.h: mkmark.pl # UnicodeData.txt
 	$(PERL) mkmark.pl
 u8id_gc.h: mkgc.pl # UnicodeData.txt
 	$(PERL) mkgc.pl
+medial.h: mkmedial.pl # UnicodeData.txt
+	$(PERL) mkmedial.pl
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
@@ -185,7 +188,7 @@ regen-u8idlint-test: u8idlint
 	-./u8idlint -xid texts/bidi-sec-2.c >texts/bidi-sec-2.tst
 	-./u8idlint -xc11 texts/bidi-sec-2.c >texts/bidi-sec-2-c11.tst
 
-c11-all.h unic23.h: mkc23 scripts.h mark.h
+c11-all.h unic23.h: mkc23 scripts.h mark.h medial.h
 	./mkc23
 mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS)
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude mkc23.c $(SRC) -o $@

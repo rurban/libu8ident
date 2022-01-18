@@ -37,6 +37,7 @@
 #undef EXTERN_SCRIPTS
 #include "unic11.h"
 #include "unic23.h"
+#include "medial.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
@@ -225,7 +226,9 @@ LOCAL const struct sc_c23 *u8ident_get_safec23(const uint32_t cp) {
 LOCAL bool u8ident_is_MARK(uint32_t cp) {
   return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
 }
-
+LOCAL bool u8ident_is_MEDIAL(uint32_t cp) {
+  return range_bool_search(cp, medial_list, ARRAY_SIZE(medial_list));
+}
 LOCAL bool u8ident_is_bidi(const uint32_t cp) {
   return linear_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
 }

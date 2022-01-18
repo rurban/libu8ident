@@ -399,7 +399,7 @@ static void gen_c23_safe(void) {
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
       if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) &&
-          !isHalfwidthOrFullwidth(cp)) {
+          !isHalfwidthOrFullwidth(cp) && !u8ident_is_MEDIAL(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -435,7 +435,8 @@ static void gen_c23_safe(void) {
       "};\n"
       "\n",
       U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
-  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids and NFC. Split on GC and SCX\n", f);
+  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids, !MEDIAL and NFC.\n", f);
+  fputs("// Split on GC and SCX\n", f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c23 safec23_start_list[] = {\n"
         "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
@@ -477,6 +478,21 @@ static void gen_c23_safe(void) {
       }
     }
   }
+  // plus we move the medial positions here, which were originally in start.
+  // A TR31 XID oversight
+  for (size_t i = 0; i < ARRAY_SIZE(xid_start_list); i++) {
+    struct range_bool r = xid_start_list[i];
+    for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      if (BITGET(c, cp))
+        continue;
+      uint8_t s = u8ident_get_script(cp);
+      if (s < FIRST_EXCLUDED_SCRIPT && u8ident_is_MEDIAL(cp) &&
+          !u8ident_is_MARK(cp) && !isHalfwidthOrFullwidth(cp)) {
+        BITSET(c, cp);
+      }
+    }
+  }
+
   fputs("\n// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, "
         "NFC and !MARK. Split on GC and SCX\n",
         f);
@@ -496,7 +512,7 @@ static void gen_c23_safe(void) {
 
   // now more scripts
   fputs("\n\n//---------------------------------------------------\n", f);
-  fputs("\n// Only excluded scripts, XID_Start, more IDTypes, NFC "
+  fputs("\n// Only excluded scripts, XID_Start, more IDTypes, NFC, !MEDIAL "
         "and !MARK\n",
         f);
   memset(u, 0, sizeof(u));
@@ -506,7 +522,7 @@ static void gen_c23_safe(void) {
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
           !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
-          !isHalfwidthOrFullwidth(cp)) {
+          !isHalfwidthOrFullwidth(cp) && !u8ident_is_MEDIAL(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -557,6 +573,23 @@ static void gen_c23_safe(void) {
       }
     }
   }
+  // plus we move the medial positions here, which were originally in start.
+  // A TR31 XID oversight
+  for (size_t i = 0; i < ARRAY_SIZE(xid_start_list); i++) {
+    struct range_bool r = xid_start_list[i];
+    for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      if (BITGET(c, cp))
+        continue;
+      uint8_t s = u8ident_get_script(cp);
+      if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
+          u8ident_is_MEDIAL(cp) &&
+          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
+          !isHalfwidthOrFullwidth(cp)) {
+        BITSET(c, cp);
+      }
+    }
+  }
+
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c23 safec23_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);

@@ -33,7 +33,7 @@ doc_DATA += c23++proposal.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h unic11.h unic23.h scripts16.h
+	confus_croar.h mark.h medial.h unic11.h unic23.h scripts16.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
 	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
 	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -51,7 +51,7 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/bidi-sec-2.tst      texts/bidi-sec-2-c11.tst  texts/bidi-sec-2-allowed.tst \
 	texts/bidi-sec-2-allowed.tst \
 	texts/homo-sec-1.tst   	  texts/homo-sec-1-p1.tst   texts/homo-1.tst
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl makefile.gnu \
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.pl makefile.gnu \
 	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4
 
@@ -69,6 +69,8 @@ $(srcdir)/confus.h: $(srcdir)/mkconfus.pl
 	cd $(srcdir) && $(PERL) mkconfus.pl
 $(srcdir)/mark.h: $(srcdir)/mkmark.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkmark.pl
+$(srcdir)/medial.h: $(srcdir)/mkmedial.pl # UnicodeData.txt
+	cd $(srcdir) && $(PERL) mkmedial.pl
 $(srcdir)/u8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkgc.pl
 # emacs flymake-mode
@@ -154,7 +156,7 @@ perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
 endif
 
-c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h
+c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h medial.h
 	./mkc23$(EXEXT)
 if !HAVE_WINDOWS
 	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unic23.h $(srcdir)/

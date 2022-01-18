@@ -18,6 +18,7 @@ const struct scx *u8ident_get_scx(const uint32_t cp);
 /* search for safec23 entry */
 const struct sc_c23 *u8ident_get_safec23(const uint32_t cp);
 bool u8ident_is_MARK(const uint32_t cp);
+bool u8ident_is_MEDIAL(const uint32_t cp);
 // member or bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.
 bool u8ident_is_bidi(const uint32_t cp);
