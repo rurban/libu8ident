@@ -27,7 +27,7 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.pdf
+doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.pdf tr31-bugs.md
 if HAVE_PANDOC
 doc_DATA += c23++proposal.html
 endif
