@@ -1,6 +1,7 @@
     C++ Identifier Security using Unicode Standard Annex 39
 
-    Date:       2022-01-18
+    Date:       2022-01-19
+    Document:   D0xxxR0
     Project:    Programming Language C++
     Audience:   EWG
                 CWG
@@ -41,10 +42,19 @@ earlier. The author provides the
 [libu8ident](https://github.com/rurban/libu8ident/) library (Apache 2
 licensed) and its generated tables to all implementors.
 
+TR39 checks could be weakened to warnings, TR31 violations not. But note that
+even TR31 has bugs still, to be fixed in the next Unicode version.
+
 2 Changes
 =========
 
-none
+From 2022-01-18:
+
+* Added Context variants for before/after-cpp or private.
+* Mention the variant of TR39 violations as warnings only, not defects.
+  Add a Summary paragraph.
+* Discuss the discriminatory aspect of excluded scripts.
+* Cite a TR31 paragraph for TR31 exclusions.
 
 3 Summary
 =========
@@ -76,6 +86,17 @@ Source file) forbids insecure mixes of Greek with Cyrillic, dangerous
 Arabic RTL bidi attacks and most confusables. You can still write in
 your language, but then only in commonly written languages, and not
 mixed with others. Identifiers are still identifiable.
+
+The question remains if TR39 security violations should be ill-formed
+(throw an compilation error), or if TR31 violations should throw an
+error or just a warning. Since we do have the `-std=c23++` option, and
+the issues are security relevant, an error seems to be best.
+Implementations might choose to go for warnings on not-valid scripts,
+mixed scripts, or invalid sequences of combining marks though for fear
+of political backlash, even if the Unicode Standard recommended for
+decades that identifiers should stay identifiable. If the standard
+committee opts for the insecure option, they should rather rename
+identifiers to symbols then. This would be the political solution.
 
 4 What will this proposal change
 ================================
@@ -244,10 +265,31 @@ rest is split up into 127-31 **Excluded** scripts, which are not in common
 use, and 161-127 **Limited_Use** scripts, which are not to be used in
 identifiers at all.
 
-New scripts are added on a yearly basis, but nothing was added to the
-stable set of recommended scripts. For a while there was a list of
-**Aspirational** scripts to be added eventually, but this list was abandoned.
-Probably also because nobody but Java, cperl and Rust implemented its
+Regarding the discriminatory aspect of Excluded Scripts from
+[TR31#Table_4](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers).
+_"Some scripts are not in customary modern use, and thus implementations
+may want to exclude them from identifiers. These include historic and
+obsolete scripts, scripts used mostly liturgically, and regional
+scripts used only in very small communities or with very limited
+current usage. Some scripts also have unresolved architectural issues
+that make them currently unsuitable for identifiers. The scripts in
+Table 4, Excluded Scripts are recommended for exclusion from
+identifiers."_
+Nevertheless an implementation might choose to allow some optionally
+via a new `#pragma unicode Script`.
+
+Regarding Limited Use scripts:
+TR31#2.4: _"Modern scripts that are in more limited use are listed in
+Table 7, Limited Use Scripts. To avoid security issues, some
+implementations may wish to disallow the limited-use scripts in
+identifiers. For more information on usage, see the Unicode Locale
+project [CLDR](http://cldr.unicode.org/)."
+
+Regarding stability: New scripts are added on a yearly basis, but
+nothing was added to the stable set of recommended scripts. For a
+while there was a list of **Aspirational** scripts to be added
+eventually, but this list was abandoned with Unicode 10.0. Probably
+also because nobody but Java, cperl and Rust implemented its
 identifier profile by scripts, rather went with insecure identifiers.
 
 For error messages and an optional pragma to allow certain Exluded
@@ -377,6 +419,17 @@ Handling Combining Marks](https://www.unicode.org/reports/tr24/#Nonspacing_Marks
 8 TR39 Identifier Type
 ======================
 
+TR31 even recommends to disable some characters from recommended scripts:
+_"Some characters used with recommended scripts may still be problematic
+for identifiers, for example because they are part of extensions that
+are not in modern customary use, and thus implementations may want to
+exclude them from identifiers. These include characters for historic
+and obsolete orthographies, characters used mostly liturgically, and
+in orthographies for languages used only in very small communities or
+with very limited current or declining usage. Some characters also
+have architectural issues that may make them unsuitable for
+identifiers."_
+
 The **Identifier Type** property [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)
 recommendation should be mandatory, with the addition of the `Technical`
 Identifier Type to be allowed.
@@ -387,7 +440,7 @@ I.e. `Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,`
 Allowed are `Recommended, Inclusion, Technical` TR39 Identifier Types.
 
 Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are
-forbidden, even if allowed in TR39. They are confusable with the Latin
+forbidden, even if allowed in TR31. They are confusable with the Latin
 base alphabet A-Z.
 
 And there are 80 Technical ranges added to the original list of
@@ -460,12 +513,14 @@ spoofing attacks, but the additional rules from 7.3 "Combining marks
 script run detection for spoofing" are kept tiny.
 
 10 Contexts
-==========
+===========
 
 This is not discussed in any of the unicode security guidelines for
 identifiers.  One could argue that a mixed-script profile is valid
-only for a single identifier, or it is valid for whole source file
-document.
+only for a single identifier, or it is valid for the whole source file
+document. And there needs to be a definition if before or after the
+preprocessor, and if to treat names in private structs and classes as
+seperate contexts.
 
 If valid for only a single identifier you could arbitralily mix up
 Cyrillic with Greek identifiers in a C++ namespace, and thus these
@@ -485,8 +540,46 @@ already seen scripts and how many.  The maximal number of scripts is
 `Han + Latin`), thus we can save that list in a single 4-byte word, and
 the lookup and memory management is trivial.
 
+Since the compiler sees the identifiers after the preprocessor
+included all headers, the context definition is a bit blurry. Is the
+context for mixed scripts an original source file (before cpp) or the
+resulting file after inclusion of all files (after cpp). This is
+similar to the problem with lexical variables a coupe of decades
+ago.
+
+- **before-cpp**: One could argue that the scope of a variable should
+  be contained in a lexical block, which can be statically determined
+  and safely enclosed.  With identifiers that would mean that the
+  preprocessor already should perform the TR31 lexer checks and TR39
+  security checks, and one could define Arabic headers using private
+  arabic fields, and include another header with Cyrillic only
+  names. This would allow confusables in the resulting object
+  file, and source files would be easy to check with external tools.
+  See also the binutils section 12 below.
+
+- **private**: Another argument would be that all exported names end
+  up in the object files and library flat, which would support the
+  seperation of private and public name contexts, where to perform the
+  mixed-script checks. Private contexts (e.g. static structs or
+  private class fields) should be seperated from the rest.  This would
+  prevent from confusuables in struct/class fields/methods, and the
+  rest is seperated by the checks for the public names.
+
+- **after-cpp**: The third, strictest variant would define the context in
+  the file after cpp. You would not be able to include a Cyrillic-only
+  header, and you would not be able to use Cyrillic private
+  fields. This would be the least surprising and most secure
+  option. As long as the security risk lies ahead of us, one should go
+  for the strictest option. Cyrillic header projects should be
+  isolated and not used at all outside of non-cyrillic projects. I'm
+  pointing the fingers at Cyrillic because it has the biggest number
+  of confusables with Latin. Arabic headers e.g. are not all
+  confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic
+  speaker can identify and see differences in its names without long
+  training. Same for CFK and the other major scripts.
+
 11 Implementations and Strategies
-================================
+=================================
 
 I implemented for [cperl](https://github.com/perl11/cperl), a fork of
 perl5, the General Security profile "Moderately restrictive" (4) for
