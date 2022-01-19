@@ -593,7 +593,7 @@ aʙȼ2: EOK (Latin)
 वागले: EOK (Devanagari)
 पाहिजे: EOK (Devanagari)
 -- texts/myanmar-1.txt
-မြန်မာစာပဲဗျ: EOK (Myanmar)
+မြန်မာစာပဲဗျ: ERR_XID (Myanmar + U+103B Myanmar)!
 လူသားတိုင်းသည်: EOK (Myanmar)
 ဂုဏ်သိက္ခာနှင့်: EOK (Myanmar)
 အခွင့်အရေးများဖြင့်: EOK (Myanmar)

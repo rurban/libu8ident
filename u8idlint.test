@@ -35,7 +35,7 @@ check3 -xc11 homo-1.c homo-1.tst
 
 # ascii-xid ignore BIDI words here
 check3 -xascii bidi-sec-1.c bidi-sec-1.tst
-check3 -xallowed bidi-sec-1.c bidi-sec-1.tst
+check3 -xallowed bidi-sec-1.c bidi-sec-1-allowed.tst
 check3 -xsafec23 bidi-sec-1.c bidi-sec-1.tst
 check3 -xid bidi-sec-1.c bidi-sec-1.tst
 check3 -xxid bidi-sec-1.c bidi-sec-1.tst

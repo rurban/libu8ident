@@ -15,6 +15,7 @@
 #endif
 #define EXTERN_SCRIPTS
 #include "unic23.h"
+#include "medial.h"
 #undef EXTERN_SCRIPTS
 #ifdef HAVE_CONFUS
 #  ifndef HAVE_CROARING
@@ -734,8 +735,39 @@ void test_gc(void) {
   }
 }
 
+void test_medial(void) {
+  // check consecutive medial ranges
+  for (size_t i = 1; i < ARRAY_SIZE(medial_list); i++) {
+    assert(medial_list[i-1].to != medial_list[i].from);
+  }
+
+#ifndef DISABLE_CHECK_XID
+  if (u8ident_tr31() == U8ID_TR31_ALLOWED)
+    return; // FB8A FB91 are all disallowed
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ID);
+  // medial at end
+  int ret = u8ident_check((const uint8_t *)"\uFB8A\uFB91", NULL);
+  if (!is_profile_6())
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else
+    CHECK_RET(ret, U8ID_EOK, 0);
+  // medial at medial
+  ret = u8ident_check((const uint8_t *)"\uFB8A\uFB91\uFB51", NULL);
+  CHECK_RET(ret, U8ID_EOK, 0);
+  // medial at start
+  ret = u8ident_check((const uint8_t *)"\uFB91\uFB51", NULL);
+  //which tr31 is not broken and detects medial at start? Only SAFEC23 so far
+  //unicode bug filed for UCD versions 1-14. v15 might have it fixed.
+  if (!is_profile_6() && u8ident_tr31() == U8ID_TR31_SAFEC23)
+    CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else
+    CHECK_RET(ret, U8ID_EOK, 0);
+  u8ident_free();
+#endif
+}
+
 void test_safec23(void) {
-  // check consecutive and alternating scripts and GC ranges
+  // check consecutive and alternating scripts and safec23 ranges
   //assert(safec23_start_list[0].from == 0);
   for (size_t i = 1; i < ARRAY_SIZE(safec23_start_list); i++) {
     if (safec23_start_list[i - 1].to >= safec23_start_list[i].from)
@@ -840,6 +872,7 @@ int main(int argc, char **argv) {
     test_scripts_no_init();
     test_init();
     test_gc();
+    test_medial();
     test_safec23();
     test_script();
   }
@@ -877,6 +910,7 @@ int main(int argc, char **argv) {
 #ifndef DISABLE_CHECK_XID
   if (profile || xid || argc == 1) {
     test_mixed_scripts(U8ID_TR31_DEFAULT);
+    test_medial();
   }
 #endif
 

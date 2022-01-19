@@ -454,6 +454,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         ctx->last_cp = cp;
         return U8ID_ERR_XID;
       }
+      if (s == e && u8ident_is_MEDIAL(cp)) {
+        ctx->last_cp = cp;
+        return U8ID_ERR_XID;
+      }
     }
 #endif
   } while (s <= e);
