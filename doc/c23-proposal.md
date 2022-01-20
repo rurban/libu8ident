@@ -1,12 +1,9 @@
-    C++ Identifier Security using Unicode Standard Annex 39
+    C Identifier Security using Unicode Standard Annex 39
 
     Date:       2022-01-19
     Document:   D0xxxR0
-    Project:    Programming Language C++
-    Audience:   EWG
-                CWG
-                WG14
-                WG21
+    Project:    Programming Language C
+    Audience:   WG14
                 SG-16
     Reply-to:   Reini Urban <reini.urban@gmail.com>
 
@@ -15,7 +12,7 @@
 
 In response to [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
 
-Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++ 23 (and C23).
+Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C23.
 
 * Comply to a variant of [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
   Mixed-Scripts Moderately Restrictive profile, but allow Greek scripts,
@@ -37,7 +34,7 @@ Optionally:
 Recommend binutils/linker ABI identifier rules: names are UTF-8,
 add add identifier checks. E.g. `readelf -L -Ue`.
 
-In addition adopt this proposal as a Defect Report against C++20 and
+In addition adopt this proposal as a Defect Report against C11 and
 earlier. The author provides the
 [libu8ident](https://github.com/rurban/libu8ident/) library (Apache 2
 licensed) and its generated tables to all implementors.
@@ -48,13 +45,7 @@ even TR31 has bugs still, to be fixed in the next Unicode version.
 2 Changes
 =========
 
-From 2022-01-18:
-
-* Added Context variants for before/after-cpp or private.
-* Mention the variant of TR39 violations as warnings only, not defects.
-  Add a Summary paragraph.
-* Discuss the discriminatory aspect of excluded scripts.
-* Cite a TR31 paragraph for TR31 exclusions.
+None
 
 3 Summary
 =========
@@ -81,7 +72,7 @@ are not yet seen in the wild, but will appear sooner or later, same
 as they appeared in browsers and email. Also names in C object files:
 linkers, .def files, ffi's.
 
-Implementing TR39 mixed script detection per document (C++ Header and
+Implementing TR39 mixed script detection per document (C Header and
 Source file) forbids insecure mixes of Greek with Cyrillic, dangerous
 Arabic RTL bidi attacks and most confusables. You can still write in
 your language, but then only in commonly written languages, and not
@@ -178,7 +169,7 @@ Codes](https://www.unicode.org/reports/tr24/#Relation_To_ISO15924).
 4.3 Documents with identifiers in many multiple scripts/languages will become illegal
 -------------------------------------------------------------------------------------
 
-C++23 (and C23) will follow the TR39 Security Profile 4 **Moderately
+C23 (and C23++) will follow the TR39 Security Profile 4 **Moderately
 Restrictive**, with an exception for Greek.
 
 * All identifiers in a document qualify as Single Script, or
@@ -258,7 +249,7 @@ identifiers to "symbols".
 7.1 SC
 -----
 
-C++ only needs to map unicode characters to a script property via a
+C only needs to map unicode characters to a script property via a
 single byte.  There are currently 161 scripts assigned, 32 of them are
 in common use as identifiers, hence called **Recommended** scripts. The
 rest is split up into 127-31 **Excluded** scripts, which are not in common
@@ -419,7 +410,7 @@ Handling Combining Marks](https://www.unicode.org/reports/tr24/#Nonspacing_Marks
 8 TR39 Identifier Type
 ======================
 
-TR31 even recommends to disable some characters from recommended scripts:
+TR31 recommends to disable some characters from recommended scripts:
 _"Some characters used with recommended scripts may still be problematic
 for identifiers, for example because they are part of extensions that
 are not in modern customary use, and thus implementations may want to
@@ -519,11 +510,11 @@ This is not discussed in any of the unicode security guidelines for
 identifiers.  One could argue that a mixed-script profile is valid
 only for a single identifier, or it is valid for the whole source file
 document. And there needs to be a definition if before or after the
-preprocessor, and if to treat names in private structs and classes as
-seperate contexts.
+preprocessor, and if to treat names in private structs as seperate
+contexts.
 
 If valid for only a single identifier you could arbitralily mix up
-Cyrillic with Greek identifiers in a C++ namespace, and thus these
+Cyrillic with Greek identifiers in a C files, and thus these
 identifiers would not be identifiable anymore, as both both can render
 to the very same glyphs. Thus we adopt the notion of identifier
 contexts.
@@ -560,9 +551,9 @@ ago.
 - **private**: Another argument would be that all exported names end
   up in the object files and library flat, which would support the
   seperation of private and public name contexts, where to perform the
-  mixed-script checks. Private contexts (e.g. static structs or
-  private class fields) should be seperated from the rest.  This would
-  prevent from confusuables in struct/class fields/methods, and the
+  mixed-script checks. Private contexts (e.g. static structs fields)
+  should be seperated from the rest.  This would
+  prevent from confusables in struct fields/methods, and the
   rest is seperated by the checks for the public names.
 
 - **after-cpp**: The third, strictest variant would define the context in
@@ -606,7 +597,7 @@ from single codepoints, nor 2. seperating 16bit from 32bit codepoints.
 12 Issues with binutils, linkers, exported identifiers
 =====================================================
 
-The crux with C and somewhat also C++ identifiers, is that they can be
+The crux with C and somewhat also C identifiers, is that they can be
 used with other earlier compilers or languages without any unicode security
 profile or restriction. ffi's are very common, libraries or .def files
 even more, thanksfully unicode names not at all yet.
@@ -616,15 +607,15 @@ same as in most current filesystems. Identifiers are not identifiable
 there, and names are charset (=user) specific, whilst there are no header
 fields for the used charset (e.g. if SHIFT-JIS or UTF-8), nor are
 there any rules for name lookup (normalization). This is not solvable
-here (in C nor C++), only there. Only in the Rust ecosystem there are
-proper unicode identifier rules, but Rust can link against
-C++/C. I haven't detected any exported unicode names in the wild, they
+here (in C), only there. Only in the Rust ecosystem there are
+proper unicode identifier rules, but Rust can link against C.
+I haven't detected any exported unicode names in the wild, they
 are only used in local symbols still. UTF-16 compilers such as MSVC do
 export their UNICODE names either in the local character set or as
 UTF-8. If used wildly, object files would not link anymore, as local
 character sets vary, and there is no character set standard defined.
 
-The C++/C working groups should urge the binutils/linker working
+The C/C++ working groups should urge the binutils/linker working
 groups to adopt a more precise specification how exported identifiers
 are represented in object files and libraries: UTF-8 or any charset,
 and how they are looked up: any normalization, NFC or not at all.  My

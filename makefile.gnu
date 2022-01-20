@@ -57,7 +57,9 @@ ALLHDRS = $(HDRS) unic23.h
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 SOLIB = libu8ident.so
-DOCS = README.md NOTICE LICENSE c11.md c23++proposal.html c23++proposal.pdf c23++proposal.md tr31-bugs.md
+DOCS = README.md NOTICE LICENSE doc/c11.md doc/c23++proposal.html doc/c23++proposal.pdf \
+	doc/c23++proposal.md doc/c23-proposal.html doc/c23-proposal.pdf \
+	doc/c23-proposal.md doc/tr31-bugs.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
 MAN = $(MAN1) $(MAN3)
@@ -144,7 +146,7 @@ u8idlint: u8idlint.c unic23.h unic11.h $(LIB)
 
 .PHONY: check check-asan check-norms check-profiles check-tr31 check-extra check-mdl \
 	check-all-combinations clean regen-scripts regen-norm regen-confus regen-u8idlint-test \
-	install man dist-src dist-bin clang-format docs
+	install man dist-src dist clang-format docs
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
 check: test test-texts u8idlint
@@ -197,7 +199,7 @@ check-asan: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	./test-asan
 # gem install mdl
 check-mdl:
-	mdl *.md
+	mdl *.md doc/*.mdl
 
 perf: perf.c u8idroar.c $(HEADER) $(ALLHDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h
@@ -282,11 +284,20 @@ regen-scripts:
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
+
 docs: $(DOCS)
-c23++proposal.html: c23++proposal.md
-	-pandoc -s -o $@ c23++proposal.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
-c23++proposal.pdf: c23++proposal.md
-	-pandoc -s --pdf-engine=xelatex -o $@ c23++proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+doc/c23++proposal.html: doc/c23++proposal.md
+	-pandoc -s -o $@ doc/c23++proposal.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+doc/c23++proposal.pdf: doc/c23++proposal.md
+	-pandoc -s --pdf-engine=xelatex -o $@ doc/c23++proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+doc/c23-proposal.html: doc/c23-proposal.md
+	-pandoc -s -o $@ doc/c23-proposal.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
+doc/c23-proposal.pdf: doc/c23-proposal.md
+	-pandoc -s --pdf-engine=xelatex -o $@ doc/c23-proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C Identifier Security using Unicode Standard Annex 39"
+patch-c-doc:
+	patch -p0 -i doc/c23-proposal.patch
+regen-c-doc:
+	-diff -bu doc/c23++proposal.md doc/c23-proposal.md >doc/c23-proposal.patch
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h
@@ -303,7 +314,7 @@ u8ident.3: README.md
 u8idlint.1: u8idlint
 	help2man -N -s1 -p libu8ident --manual "U8IDENT Manual $(VERSION)" -o $@ ./u8idlint$(EXEEXT)
 
-dist-bin: $(LIB) $(MAN)
+dist: $(LIB) $(MAN) $(DOCS)
 	-rm -rf $(PKG)
 	$(MAKE) -f makefile.gnu install DESTDIR="$(PKG)"
 	tar cfz $(PKG_BIN).tar.gz -C $(PKG) .

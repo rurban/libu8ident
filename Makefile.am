@@ -27,9 +27,10 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE c11.md c23++proposal.md c23++proposal.pdf tr31-bugs.md
+doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/c23++proposal.md doc/c23-proposal.md
 if HAVE_PANDOC
-doc_DATA += c23++proposal.html
+doc_DATA += doc/c23++proposal.pdf doc/c23-proposal.pdf
+html_DATA = doc/c23++proposal.html doc/c23-proposal.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
@@ -117,13 +118,24 @@ regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
 docs: $(doc_DATA)
+	-mkdir doc
+
 if HAVE_PANDOC
-c23++proposal.html: $(srcdir)/c23++proposal.md
-	$(PANDOC) -s -o $@ $(srcdir)/c23++proposal.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
-c23++proposal.pdf: $(srcdir)/c23++proposal.md
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/c23++proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+doc/c23++proposal.html: $(srcdir)/doc/c23++proposal.md
+	-mkdir doc
+	$(PANDOC) -s -o $@ $(srcdir)/doc/c23++proposal.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+doc/c23++proposal.pdf: $(srcdir)/doc/c23++proposal.md
+	-mkdir doc
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/c23++proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+doc/c23-proposal.html: $(srcdir)/doc/c23-proposal.md
+	-mkdir doc
+	$(PANDOC) -s -o $@ $(srcdir)/doc/c23-proposal.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
+doc/c23-proposal.pdf: $(srcdir)/doc/c23-proposal.md
+	-mkdir doc
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/c23-proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C Identifier Security using Unicode Standard Annex 39"
 endif
-regen-all: regen-scripts regen-norm regen-confus regen-man c23++proposal.html
+
+regen-all: regen-scripts regen-norm regen-confus regen-man doc/c23++proposal.html doc/c23-proposal.html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
@@ -231,8 +243,8 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	done; \
 	rm ./test-profiles$(EXEEXT)
 # gem install mdl
-check-mdl:
-	cd $(srcdir) && mdl *.md
+check-mdl check-docs:
+	cd $(srcdir) && mdl *.md $(srcdir)doc/*.md
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
 SCAN_BUILD = scan-build
