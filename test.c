@@ -744,22 +744,30 @@ void test_medial(void) {
 #ifndef DISABLE_CHECK_XID
   if (u8ident_tr31() == U8ID_TR31_ALLOWED)
     return; // FB8A FB91 are all disallowed
+  const enum u8id_norm norm = u8ident_norm();
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ID);
   // medial at end
   int ret = u8ident_check((const uint8_t *)"\uFB8A\uFB91", NULL);
   if (!is_profile_6())
     CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else if (norm == U8ID_NFKC || norm == U8ID_NFKD)
+    CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else
     CHECK_RET(ret, U8ID_EOK, 0);
   // medial at medial
   ret = u8ident_check((const uint8_t *)"\uFB8A\uFB91\uFB51", NULL);
-  CHECK_RET(ret, U8ID_EOK, 0);
+  if (norm == U8ID_NFKC || norm == U8ID_NFKD)
+    CHECK_RET(ret, U8ID_EOK_NORM, 0);
+  else
+    CHECK_RET(ret, U8ID_EOK, 0);
   // medial at start
   ret = u8ident_check((const uint8_t *)"\uFB91\uFB51", NULL);
-  //which tr31 is not broken and detects medial at start? Only SAFEC23 so far
+  //which tr31 is not broken and detects medial at start? Only SAFEC23 so far.
   //unicode bug filed for UCD versions 1-14. v15 might have it fixed.
-  if (!is_profile_6() && u8ident_tr31() == U8ID_TR31_SAFEC23)
+  if (u8ident_tr31() == U8ID_TR31_SAFEC23)
     CHECK_RET(ret, U8ID_ERR_XID, 0);
+  else if (norm == U8ID_NFKC || norm == U8ID_NFKD)
+    CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else
     CHECK_RET(ret, U8ID_EOK, 0);
   u8ident_free();
