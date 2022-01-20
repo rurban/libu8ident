@@ -15,7 +15,7 @@ struct ctx_t *u8ident_ctx(void);
 uint8_t u8ident_get_script(const uint32_t cp);
 /* list of script indices */
 const struct scx *u8ident_get_scx(const uint32_t cp);
-/* search for safec23 entry */
+/* search for safec23 XID entry, in start or cont lists */
 const struct sc_c23 *u8ident_get_safec23(const uint32_t cp);
 bool u8ident_is_MARK(const uint32_t cp);
 bool u8ident_is_MEDIAL(const uint32_t cp);

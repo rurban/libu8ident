@@ -20,6 +20,7 @@ u8idroar.o
 /test-asan
 /test-texts
 /mkc23
+/example
 /build*
 /Scripts.txt
 /ScriptExtensions.txt

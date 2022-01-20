@@ -79,6 +79,21 @@ LTOFLAGS = -flto
 CFLAGS_REL += -march=native
 CFLAGS_PERF += -march=native
 endif
+
+RUN_LD_PATH=LD_LIBRARY_PATH=.
+OS := $(shell uname -s)
+ifeq (Darwin,$(OS))
+RUN_LD_PATH=DYLD_LIBRARY_PATH=.
+else
+ifeq (AIX,$(OS))
+RUN_LD_PATH=LIBPATH=.
+else
+ifeq (HP-UX,$(OS))
+RUN_LD_PATH=SHLIB_PATH=.
+endif
+endif
+endif
+
 # cc prints name as cc, not gcc. so check for the copyright banner
 CC_COPY := $(shell $(CC) --version | head -n2 | tail -n1 | cut -c1-7)
 # gcc has "Copyright (C) 2020 Free Software Foundation, Inc"
@@ -149,24 +164,27 @@ u8idlint: u8idlint.c unic23.h unic11.h $(LIB)
 	install man dist-src dist clang-format docs
 
 ifeq (-DHAVE_CONFUS,$(DEFINES))
-check: test test-texts u8idlint
+check: test test-texts u8idlint example
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
 	./u8idlint.test
+	$(RUN_LD_PATH) ./example
 else
 ifeq (-DHAVE_CONFUS -DHAVE_CROARING,$(DEFINES))
-check: test test-texts u8idlint
+check: test test-texts u8idlint example
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
 	./u8idlint.test
+	$(RUN_LD_PATH) ./example
 else
-check: test test-texts u8idlint
+check: test test-texts u8idlint example
 	./test
 	./test-texts > texts.tst
 	diff texts.tst texts/result.lst && rm texts.tst
 	./u8idlint.test
+	$(RUN_LD_PATH) ./example
 endif
 endif
 
@@ -178,6 +196,8 @@ test: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude test.c $(SRC) -o test
 test-texts: test-texts.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -I. -Iinclude test-texts.c $(SRC) -o test-texts $(LIBUNISTR)
+example: example.c $(SOLIB)
+	$(CC) $(CFLAGS_DBG) $(DEFINES) -Iinclude example.c -o $@ -L. -lu8ident
 regen-u8idlint-test: u8idlint
 	-./u8idlint -xsafec23 texts/homo-sec-1.c >texts/homo-sec-1.tst
 	-./u8idlint -p1 -xc11 texts/homo-sec-1.c >texts/homo-sec-1-p1.tst
@@ -209,7 +229,7 @@ perf: perf.c u8idroar.c $(HEADER) $(ALLHDRS) \
 
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o $(LIB) $(SOLIB) \
-	       perf mkroar mkc23 u8idlint \
+	       perf mkroar mkc23 u8idlint example \
 	       test test-texts test-asan test-tr31 \
 	       test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}

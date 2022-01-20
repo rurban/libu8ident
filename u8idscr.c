@@ -210,7 +210,7 @@ LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
   return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
 }
-/* Search for safec23 entry */
+/* Search for safec23 XID entry, in start or cont lists */
 LOCAL const struct sc_c23 *u8ident_get_safec23(const uint32_t cp) {
   const struct sc_c23 *sc = (const struct sc_c23 *)binary_search(
       cp, (char *)safec23_start_list, ARRAY_SIZE(safec23_start_list),

@@ -139,8 +139,8 @@ regen-all: regen-scripts regen-norm regen-confus regen-man doc/c23++proposal.htm
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
-EXTRA_PROGRAMS = mkc23 test test-texts
-TESTS = test
+EXTRA_PROGRAMS = mkc23 test test-texts example
+TESTS = test example
 if !HAVE_WINDOWS
 TESTS += test-texts.test u8idlint.test
 endif
@@ -151,6 +151,8 @@ test_texts_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_LDADD = $(u8idlint_LIBS)
 mkc23_SOURCES = mkc23.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
 mkc23_CFLAGS = $(AM_CFLAGS)
+example_SOURCES = example.c
+example_LDADD = libu8ident.la
 
 if HAVE_CROARING
 test_LDADD = u8idroar.lo
@@ -270,7 +272,7 @@ endif
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
-	     texts.tst mkc23$(EXEEXT)
+	     texts.tst mkc23$(EXEEXT) example$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html homo-sec-1.tst.rst
 distclean-compile:
 	-rm -f *.tab.c
