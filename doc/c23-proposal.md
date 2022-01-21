@@ -1,7 +1,7 @@
     C Identifier Security using Unicode Standard Annex 39
 
-    Date:       2022-01-19
-    Document:   D0xxxR0
+    Document #: D0xxxR0
+    Date:       2022-01-21
     Project:    Programming Language C
     Audience:   WG14
                 SG-16
@@ -655,9 +655,9 @@ struct sc_c23 {
     const char *scx; // List of ScriptExtensions, maxsize 8 for U+1CF2
 };
 
-// Filtering allowed scripts, XID_Start, safe IDTypes, NFC and !MARK
+// Filtering allowed scripts, XID_Start, safe IDTypes, NFC, !MEDIAL and !MARK
 // Ranges split at GC and SCX changes
-const struct sc_c23 safec23_start_list[426] = {
+const struct sc_c23 safec23_start_list[470] = {
     {'$', '$', SC_Latin, GC_Sc, NULL},
     {'A', 'Z', SC_Latin, GC_Lu, NULL},
     {'_', '_', SC_Latin, GC_Pc, NULL},
@@ -989,20 +989,64 @@ const struct sc_c23 safec23_start_list[426] = {
     {0xFB13, 0xFB17, SC_Armenian, GC_Ll, NULL}, //  ﬓ..ﬗ
     {0xFB20, 0xFB28, SC_Hebrew, GC_Lo, NULL}, //  ﬠ..ﬨ
     {0xFB4F, 0xFB4F, SC_Hebrew, GC_Lo, NULL}, //  ﭏ
-    {0xFB51, 0xFBB1, SC_Arabic, GC_Lo, NULL}, //  ﭑ..ﮱ TODO some are MEDIAL
-    {0xFBD3, 0xFC5D, SC_Arabic, GC_Lo, NULL}, //  ﯓ..ﱝ TODO some are MEDIAL
-    {0xFC64, 0xFD3D, SC_Arabic, GC_Lo, NULL}, //  ﱤ..ﴽ
+    {0xFB51, 0xFB54, SC_Arabic, GC_Lo, NULL}, //  ﭑ..ﭔ
+    {0xFB56, 0xFB58, SC_Arabic, GC_Lo, NULL}, //  ﭖ..ﭘ
+    {0xFB5A, 0xFB5C, SC_Arabic, GC_Lo, NULL}, //  ﭚ..ﭜ
+    {0xFB5E, 0xFB60, SC_Arabic, GC_Lo, NULL}, //  ﭞ..ﭠ
+    {0xFB62, 0xFB64, SC_Arabic, GC_Lo, NULL}, //  ﭢ..ﭤ
+    {0xFB66, 0xFB68, SC_Arabic, GC_Lo, NULL}, //  ﭦ..ﭨ
+    {0xFB6A, 0xFB6C, SC_Arabic, GC_Lo, NULL}, //  ﭪ..ﭬ
+    {0xFB6E, 0xFB70, SC_Arabic, GC_Lo, NULL}, //  ﭮ..ﭰ
+    {0xFB72, 0xFB74, SC_Arabic, GC_Lo, NULL}, //  ﭲ..ﭴ
+    {0xFB76, 0xFB78, SC_Arabic, GC_Lo, NULL}, //  ﭶ..ﭸ
+    {0xFB7A, 0xFB7C, SC_Arabic, GC_Lo, NULL}, //  ﭺ..ﭼ
+    {0xFB7E, 0xFB80, SC_Arabic, GC_Lo, NULL}, //  ﭾ..ﮀ
+    {0xFB82, 0xFB90, SC_Arabic, GC_Lo, NULL}, //  ﮂ..ﮐ
+    {0xFB92, 0xFB94, SC_Arabic, GC_Lo, NULL}, //  ﮒ..ﮔ
+    {0xFB96, 0xFB98, SC_Arabic, GC_Lo, NULL}, //  ﮖ..ﮘ
+    {0xFB9A, 0xFB9C, SC_Arabic, GC_Lo, NULL}, //  ﮚ..ﮜ
+    {0xFB9E, 0xFBA2, SC_Arabic, GC_Lo, NULL}, //  ﮞ..ﮢ
+    {0xFBA4, 0xFBA8, SC_Arabic, GC_Lo, NULL}, //  ﮤ..ﮨ
+    {0xFBAA, 0xFBAC, SC_Arabic, GC_Lo, NULL}, //  ﮪ..ﮬ
+    {0xFBAE, 0xFBB1, SC_Arabic, GC_Lo, NULL}, //  ﮮ..ﮱ
+    {0xFBD3, 0xFBD5, SC_Arabic, GC_Lo, NULL}, //  ﯓ..ﯕ
+    {0xFBD7, 0xFBE6, SC_Arabic, GC_Lo, NULL}, //  ﯗ..ﯦ
+    {0xFBE8, 0xFBE8, SC_Arabic, GC_Lo, NULL}, //  ﯨ
+    {0xFBEA, 0xFBFE, SC_Arabic, GC_Lo, NULL}, //  ﯪ..ﯾ
+    {0xFC00, 0xFC5D, SC_Arabic, GC_Lo, NULL}, //  ﰀ..ﱝ
+    {0xFC64, 0xFCDE, SC_Arabic, GC_Lo, NULL}, //  ﱤ..ﳞ
+    {0xFCF5, 0xFD33, SC_Arabic, GC_Lo, NULL}, //  ﳵ..ﴳ
+    {0xFD3C, 0xFD3D, SC_Arabic, GC_Lo, NULL}, //  ﴼ..ﴽ
     {0xFD50, 0xFD8F, SC_Arabic, GC_Lo, NULL}, //  ﵐ..ﶏ
     {0xFD92, 0xFDC7, SC_Arabic, GC_Lo, NULL}, //  ﶒ..ﷇ
     {0xFDF0, 0xFDF1, SC_Arabic, GC_Lo, NULL}, //  ﷰ..ﷱ
     {0xFDF2, 0xFDF9, SC_Arabic, GC_Lo, {SC_Arabic,SC_Thaana,0}}, //  ﷲ..ﷹ
     {0xFE71, 0xFE71, SC_Arabic, GC_Lo, NULL}, //  ﹱ
-    {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ TODO Tail Fragment
-    {0xFE77, 0xFE77, SC_Arabic, GC_Lo, NULL}, //  ﹷ TODO Medial
-    {0xFE79, 0xFE79, SC_Arabic, GC_Lo, NULL}, //  ﹹ TODO Medial
-    {0xFE7B, 0xFE7B, SC_Arabic, GC_Lo, NULL}, //  ﹻ TODO Medial
-    {0xFE7D, 0xFE7D, SC_Arabic, GC_Lo, NULL}, //  ﹽ
-    {0xFE7F, 0xFEFC, SC_Arabic, GC_Lo, NULL}, //  ﹿ..ﻼ  TODO Medial
+    {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ
+    {0xFE80, 0xFE8B, SC_Arabic, GC_Lo, NULL}, //  ﺀ..ﺋ
+    {0xFE8D, 0xFE91, SC_Arabic, GC_Lo, NULL}, //  ﺍ..ﺑ
+    {0xFE93, 0xFE97, SC_Arabic, GC_Lo, NULL}, //  ﺓ..ﺗ
+    {0xFE99, 0xFE9B, SC_Arabic, GC_Lo, NULL}, //  ﺙ..ﺛ
+    {0xFE9D, 0xFE9F, SC_Arabic, GC_Lo, NULL}, //  ﺝ..ﺟ
+    {0xFEA1, 0xFEA3, SC_Arabic, GC_Lo, NULL}, //  ﺡ..ﺣ
+    {0xFEA5, 0xFEA7, SC_Arabic, GC_Lo, NULL}, //  ﺥ..ﺧ
+    {0xFEA9, 0xFEB3, SC_Arabic, GC_Lo, NULL}, //  ﺩ..ﺳ
+    {0xFEB5, 0xFEB7, SC_Arabic, GC_Lo, NULL}, //  ﺵ..ﺷ
+    {0xFEB9, 0xFEBB, SC_Arabic, GC_Lo, NULL}, //  ﺹ..ﺻ
+    {0xFEBD, 0xFEBF, SC_Arabic, GC_Lo, NULL}, //  ﺽ..ﺿ
+    {0xFEC1, 0xFEC3, SC_Arabic, GC_Lo, NULL}, //  ﻁ..ﻃ
+    {0xFEC5, 0xFEC7, SC_Arabic, GC_Lo, NULL}, //  ﻅ..ﻇ
+    {0xFEC9, 0xFECB, SC_Arabic, GC_Lo, NULL}, //  ﻉ..ﻋ
+    {0xFECD, 0xFECF, SC_Arabic, GC_Lo, NULL}, //  ﻍ..ﻏ
+    {0xFED1, 0xFED3, SC_Arabic, GC_Lo, NULL}, //  ﻑ..ﻓ
+    {0xFED5, 0xFED7, SC_Arabic, GC_Lo, NULL}, //  ﻕ..ﻗ
+    {0xFED9, 0xFEDB, SC_Arabic, GC_Lo, NULL}, //  ﻙ..ﻛ
+    {0xFEDD, 0xFEDF, SC_Arabic, GC_Lo, NULL}, //  ﻝ..ﻟ
+    {0xFEE1, 0xFEE3, SC_Arabic, GC_Lo, NULL}, //  ﻡ..ﻣ
+    {0xFEE5, 0xFEE7, SC_Arabic, GC_Lo, NULL}, //  ﻥ..ﻧ
+    {0xFEE9, 0xFEEB, SC_Arabic, GC_Lo, NULL}, //  ﻩ..ﻫ
+    {0xFEED, 0xFEF3, SC_Arabic, GC_Lo, NULL}, //  ﻭ..ﻳ
+    {0xFEF5, 0xFEFC, SC_Arabic, GC_Lo, NULL}, //  ﻵ..ﻼ
     {0x10140, 0x10174, SC_Greek, GC_Nl, NULL}, //  𐅀..𐅴
     {0x10780, 0x10785, SC_Latin, GC_Lm, NULL}, //  𐞀..𐞅
     {0x10787, 0x107B0, SC_Latin, GC_Lm, NULL}, //  𐞇..𐞰
@@ -1091,7 +1135,7 @@ const struct sc_c23 safec23_start_list[426] = {
     {0x2CEB0, 0x2EBE0, SC_Han, GC_Lo, NULL}, //  𬺰..𮯠
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
-// 308 ranges, 118 singles, 99475 codepoints
+// 355 ranges, 115 singles, 99350 codepoints
 ```
 
 14 Appendix A - C23XID_Continue
@@ -1102,8 +1146,9 @@ _The SCX is modelled as if your compiler would allow static initialization of
 strings as {char,...,0}._
 
 ``` c
-// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC and !MARK
-const struct sc_c23 safec23_cont_list[22] = {
+// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC,
+// MEDIAL from XID_Start and !MARK. Split on GC and SCX
+const struct sc_c23 safec23_cont_list[75] = {
     {0x30, 0x39, SC_Common, GC_Nd, NULL}, //  0..9
     {0x5F, 0x5F, SC_Common, GC_Pc, NULL}, //  _
     {0xB7, 0xB7, SC_Common, GC_Po, NULL}, //  ·
@@ -1127,8 +1172,61 @@ const struct sc_c23 safec23_cont_list[22] = {
     {0x17E0, 0x17E9, SC_Khmer, GC_Nd, NULL}, //  ០..៩
     {0x203F, 0x2040, SC_Common, GC_Pc, NULL}, //  ‿..⁀
     {0xA9F0, 0xA9F9, SC_Myanmar, GC_Nd, NULL}, //  ꧰..꧹
+    {0xFB55, 0xFB55, SC_Arabic, GC_Lo, NULL}, //  ﭕ
+    {0xFB59, 0xFB59, SC_Arabic, GC_Lo, NULL}, //  ﭙ
+    {0xFB5D, 0xFB5D, SC_Arabic, GC_Lo, NULL}, //  ﭝ
+    {0xFB61, 0xFB61, SC_Arabic, GC_Lo, NULL}, //  ﭡ
+    {0xFB65, 0xFB65, SC_Arabic, GC_Lo, NULL}, //  ﭥ
+    {0xFB69, 0xFB69, SC_Arabic, GC_Lo, NULL}, //  ﭩ
+    {0xFB6D, 0xFB6D, SC_Arabic, GC_Lo, NULL}, //  ﭭ
+    {0xFB71, 0xFB71, SC_Arabic, GC_Lo, NULL}, //  ﭱ
+    {0xFB75, 0xFB75, SC_Arabic, GC_Lo, NULL}, //  ﭵ
+    {0xFB79, 0xFB79, SC_Arabic, GC_Lo, NULL}, //  ﭹ
+    {0xFB7D, 0xFB7D, SC_Arabic, GC_Lo, NULL}, //  ﭽ
+    {0xFB81, 0xFB81, SC_Arabic, GC_Lo, NULL}, //  ﮁ
+    {0xFB91, 0xFB91, SC_Arabic, GC_Lo, NULL}, //  ﮑ
+    {0xFB95, 0xFB95, SC_Arabic, GC_Lo, NULL}, //  ﮕ
+    {0xFB99, 0xFB99, SC_Arabic, GC_Lo, NULL}, //  ﮙ
+    {0xFB9D, 0xFB9D, SC_Arabic, GC_Lo, NULL}, //  ﮝ
+    {0xFBA3, 0xFBA3, SC_Arabic, GC_Lo, NULL}, //  ﮣ
+    {0xFBA9, 0xFBA9, SC_Arabic, GC_Lo, NULL}, //  ﮩ
+    {0xFBAD, 0xFBAD, SC_Arabic, GC_Lo, NULL}, //  ﮭ
+    {0xFBD6, 0xFBD6, SC_Arabic, GC_Lo, NULL}, //  ﯖ
+    {0xFBE7, 0xFBE7, SC_Arabic, GC_Lo, NULL}, //  ﯧ
+    {0xFBE9, 0xFBE9, SC_Arabic, GC_Lo, NULL}, //  ﯩ
+    {0xFBFF, 0xFBFF, SC_Arabic, GC_Lo, NULL}, //  ﯿ
+    {0xFCDF, 0xFCF4, SC_Arabic, GC_Lo, NULL}, //  ﳟ..ﳴ
+    {0xFD34, 0xFD3B, SC_Arabic, GC_Lo, NULL}, //  ﴴ..ﴻ
+    {0xFE77, 0xFE77, SC_Arabic, GC_Lo, NULL}, //  ﹷ
+    {0xFE79, 0xFE79, SC_Arabic, GC_Lo, NULL}, //  ﹹ
+    {0xFE7B, 0xFE7B, SC_Arabic, GC_Lo, NULL}, //  ﹻ
+    {0xFE7D, 0xFE7D, SC_Arabic, GC_Lo, NULL}, //  ﹽ
+    {0xFE7F, 0xFE7F, SC_Arabic, GC_Lo, NULL}, //  ﹿ
+    {0xFE8C, 0xFE8C, SC_Arabic, GC_Lo, NULL}, //  ﺌ
+    {0xFE92, 0xFE92, SC_Arabic, GC_Lo, NULL}, //  ﺒ
+    {0xFE98, 0xFE98, SC_Arabic, GC_Lo, NULL}, //  ﺘ
+    {0xFE9C, 0xFE9C, SC_Arabic, GC_Lo, NULL}, //  ﺜ
+    {0xFEA0, 0xFEA0, SC_Arabic, GC_Lo, NULL}, //  ﺠ
+    {0xFEA4, 0xFEA4, SC_Arabic, GC_Lo, NULL}, //  ﺤ
+    {0xFEA8, 0xFEA8, SC_Arabic, GC_Lo, NULL}, //  ﺨ
+    {0xFEB4, 0xFEB4, SC_Arabic, GC_Lo, NULL}, //  ﺴ
+    {0xFEB8, 0xFEB8, SC_Arabic, GC_Lo, NULL}, //  ﺸ
+    {0xFEBC, 0xFEBC, SC_Arabic, GC_Lo, NULL}, //  ﺼ
+    {0xFEC0, 0xFEC0, SC_Arabic, GC_Lo, NULL}, //  ﻀ
+    {0xFEC4, 0xFEC4, SC_Arabic, GC_Lo, NULL}, //  ﻄ
+    {0xFEC8, 0xFEC8, SC_Arabic, GC_Lo, NULL}, //  ﻈ
+    {0xFECC, 0xFECC, SC_Arabic, GC_Lo, NULL}, //  ﻌ
+    {0xFED0, 0xFED0, SC_Arabic, GC_Lo, NULL}, //  ﻐ
+    {0xFED4, 0xFED4, SC_Arabic, GC_Lo, NULL}, //  ﻔ
+    {0xFED8, 0xFED8, SC_Arabic, GC_Lo, NULL}, //  ﻘ
+    {0xFEDC, 0xFEDC, SC_Arabic, GC_Lo, NULL}, //  ﻜ
+    {0xFEE0, 0xFEE0, SC_Arabic, GC_Lo, NULL}, //  ﻠ
+    {0xFEE4, 0xFEE4, SC_Arabic, GC_Lo, NULL}, //  ﻤ
+    {0xFEE8, 0xFEE8, SC_Arabic, GC_Lo, NULL}, //  ﻨ
+    {0xFEEC, 0xFEEC, SC_Arabic, GC_Lo, NULL}, //  ﻬ
+    {0xFEF4, 0xFEF4, SC_Arabic, GC_Lo, NULL}, //  ﻴ
 };
-// 20 ranges, 2 singles, 172 codepoints
+// 22 ranges, 53 singles, 200 codepoints
 ```
 
 15 Appendix C - XID_Continue # Lm

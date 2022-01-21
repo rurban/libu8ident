@@ -1,16 +1,15 @@
---- doc/P2528R0.md	2022-01-21 16:39:51.474051987 +0100
-+++ doc/c23-proposal.md	2022-01-21 16:39:51.477051962 +0100
+--- doc/P2528R0.md	2022-01-21 17:27:40.693889915 +0100
++++ doc/c23-proposal.md	2022-01-21 17:32:48.711403967 +0100
 @@ -1,10 +1,10 @@
 -    C++ Identifier Security using Unicode Standard Annex 39
 +    C Identifier Security using Unicode Standard Annex 39
  
 -    Document #: P2538R0
--    Date:       2022-01-21
++    Document #: D0xxxR0
+     Date:       2022-01-21
 -    Project:    Programming Language C++
 -    Audience:   EWG
 -                CWG
-+    Date:       2022-01-19
-+    Document:   D0xxxR0
 +    Project:    Programming Language C
 +    Audience:   WG14
 +                SG-16

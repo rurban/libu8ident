@@ -315,7 +315,7 @@ doc/c23-proposal.html: doc/c23-proposal.md
 doc/c23-proposal.pdf: doc/c23-proposal.md
 	-pandoc -s --pdf-engine=xelatex -o $@ doc/c23-proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C Identifier Security using Unicode Standard Annex 39"
 patch-c-doc:
-	patch -p0 -i doc/c23-proposal.patch
+	patch -f doc/c23-proposal.md doc/c23-proposal.patch
 regen-c-patch:
 	-diff -bu doc/P2528R0.md doc/c23-proposal.md >doc/c23-proposal.patch
 
