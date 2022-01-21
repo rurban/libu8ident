@@ -436,7 +436,7 @@ static void gen_c23_safe(void) {
       "\n",
       U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
   fputs("// Filtering allowed scripts, XID_Start, Skipped Ids, !MEDIAL and NFC.\n", f);
-  fputs("// Split on GC and SCX\n", f);
+  fputs("// Ranges split on GC and SCX changes\n", f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c23 safec23_start_list[] = {\n"
         "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
@@ -493,9 +493,11 @@ static void gen_c23_safe(void) {
     }
   }
 
-  fputs("\n// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, "
-        "NFC and !MARK. Split on GC and SCX\n",
-        f);
+  fputs(
+      "\n// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, "
+      "NFC\n"
+      "// MEDIAL from XID_Start and !MARK. Split on GC and SCX\n",
+      f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c23 safec23_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);

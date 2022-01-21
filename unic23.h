@@ -19,7 +19,7 @@ struct sc_c23 {
 };
 
 // Filtering allowed scripts, XID_Start, Skipped Ids, !MEDIAL and NFC.
-// Split on GC and SCX
+// Ranges split on GC and SCX changes
 #ifndef EXTERN_SCRIPTS
 const struct sc_c23 safec23_start_list[] = {
     {'$', '$', SC_Latin, GC_Sc, NULL},
@@ -506,7 +506,8 @@ extern const struct sc_c23 safec23_start_list[470];
 #endif
 // 355 ranges, 115 singles, 99350 codepoints
 
-// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC and !MARK. Split on GC and SCX
+// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC
+// MEDIAL from XID_Start and !MARK. Split on GC and SCX
 #ifndef EXTERN_SCRIPTS
 const struct sc_c23 safec23_cont_list[] = {
     {0x30, 0x39, SC_Common, GC_Nd, NULL}, //  0..9
