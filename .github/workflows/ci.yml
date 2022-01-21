@@ -72,7 +72,7 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         path-type: minimal
-        #update: true
+        update: true
         install: >-
           base-devel
           coreutils

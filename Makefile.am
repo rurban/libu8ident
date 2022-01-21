@@ -27,10 +27,10 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/c23++proposal.md doc/c23-proposal.md
+doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/P2528R0.md doc/c23-proposal.md
 if HAVE_PANDOC
-doc_DATA += doc/c23++proposal.pdf doc/c23-proposal.pdf
-html_DATA = doc/c23++proposal.html doc/c23-proposal.html
+doc_DATA += doc/P2528R0.pdf doc/c23-proposal.pdf
+html_DATA = doc/P2528R0.html doc/c23-proposal.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
@@ -121,12 +121,12 @@ docs: $(doc_DATA)
 	-mkdir doc
 
 if HAVE_PANDOC
-doc/c23++proposal.html: $(srcdir)/doc/c23++proposal.md
+doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/c23++proposal.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
-doc/c23++proposal.pdf: $(srcdir)/doc/c23++proposal.md
+	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/c23++proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
 doc/c23-proposal.html: $(srcdir)/doc/c23-proposal.md
 	-mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/c23-proposal.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
@@ -135,7 +135,7 @@ doc/c23-proposal.pdf: $(srcdir)/doc/c23-proposal.md
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/c23-proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C Identifier Security using Unicode Standard Annex 39"
 endif
 
-regen-all: regen-scripts regen-norm regen-confus regen-man doc/c23++proposal.html doc/c23-proposal.html
+regen-all: regen-scripts regen-norm regen-confus regen-man doc/P2528R0.html doc/c23-proposal.html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
@@ -273,7 +273,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT) example$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 c23++proposal.html homo-sec-1.tst.rst
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 P2528R0.html homo-sec-1.tst.rst
 distclean-compile:
 	-rm -f *.tab.c
 	-rm -rf .deps
