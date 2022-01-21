@@ -219,7 +219,7 @@ check-asan: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	./test-asan
 # gem install mdl
 check-mdl:
-	mdl *.md doc/*.mdl
+	mdl *.md doc/*.md
 
 perf: perf.c u8idroar.c $(HEADER) $(ALLHDRS) \
       nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h allowed_croar.h confus_croar.h mark.h scripts16.h
