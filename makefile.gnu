@@ -58,8 +58,8 @@ OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 SOLIB = libu8ident.so
 DOCS = README.md NOTICE LICENSE doc/c11.md doc/P2528R0.html doc/P2528R0.html \
-	doc/P2528R0.md doc/c23-proposal.html doc/c23-proposal.pdf \
-	doc/c23-proposal.md doc/tr31-bugs.md
+	doc/P2528R0.md doc/c23-proposal.html doc/c23-proposal.md doc/c23-proposal.patch \
+	doc/tr31-bugs.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
 MAN = $(MAN1) $(MAN3)
@@ -316,7 +316,7 @@ doc/c23-proposal.pdf: doc/c23-proposal.md
 	-pandoc -s --pdf-engine=xelatex -o $@ doc/c23-proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C Identifier Security using Unicode Standard Annex 39"
 patch-c-doc:
 	patch -p0 -i doc/c23-proposal.patch
-regen-c-doc:
+regen-c-patch:
 	-diff -bu doc/P2528R0.md doc/c23-proposal.md >doc/c23-proposal.patch
 
 clang-format:

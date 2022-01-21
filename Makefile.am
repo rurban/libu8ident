@@ -27,9 +27,10 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/P2528R0.md doc/c23-proposal.md
+doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/P2528R0.md doc/c23-proposal.md \
+	   doc/c23-proposal.patch
 if HAVE_PANDOC
-doc_DATA += doc/P2528R0.pdf doc/c23-proposal.pdf
+#doc_DATA += doc/P2528R0.pdf doc/c23-proposal.pdf
 html_DATA = doc/P2528R0.html doc/c23-proposal.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
@@ -123,10 +124,10 @@ docs: $(doc_DATA)
 if HAVE_PANDOC
 doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md
 doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C++ Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/c23-proposal.html: $(srcdir)/doc/c23-proposal.md
 	-mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/c23-proposal.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
