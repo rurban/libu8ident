@@ -57,7 +57,7 @@ ALLHDRS = $(HDRS) unic23.h
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 SOLIB = libu8ident.so
-DOCS = README.md NOTICE LICENSE doc/c11.md doc/P2528R0.html doc/P2528R0.pdf \
+DOCS = README.md NOTICE LICENSE doc/c11.md doc/P2528R0.html doc/P2528R0.html \
 	doc/P2528R0.md doc/c23-proposal.html doc/c23-proposal.pdf \
 	doc/c23-proposal.md doc/tr31-bugs.md
 MAN3 = u8ident.3
