@@ -1,5 +1,5 @@
 # configure.ac - Process with autoconf to produce a configure script
-# (C) 2021  Reini Urban <rurban@cpan.org>
+# (C) 2021-2022  Reini Urban <rurban@cpan.org>
 # See LICENSE
 AC_PREREQ([2.69])
 AC_INIT([libu8ident],
@@ -12,10 +12,10 @@ AC_SUBST([LIBU8IDENT_SO_VERSION], [0:0:0])
 AM_INIT_AUTOMAKE([1.10 no-define foreign dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 #dnl m4_pattern_allow
+LT_INIT
 AC_CHECK_TOOLS([AR], [gcc-ar ar])
 AC_CHECK_TOOLS([RANLIB], [gcc-ranlib ranlib])
 AC_CHECK_TOOLS([NM], [gcc-nm nm])
-LT_INIT
 #dnl Initialize pkg-config since we are installing a .pc file
 PKG_INSTALLDIR
 AM_CPPFLAGS="-I\$(top_srcdir)/include"
