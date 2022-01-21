@@ -2,9 +2,7 @@
 # (C) 2021-2022  Reini Urban <rurban@cpan.org>
 # See LICENSE
 AC_PREREQ([2.69])
-AC_INIT([libu8ident],
-        [0.1],
-        [https://github.com/rurban/libu8ident/issues],[libu8ident],[http://github.com/rurban/libu8ident/])
+AC_INIT([libu8ident],[0.1],[https://github.com/rurban/libu8ident/issues],[libu8ident],[http://github.com/rurban/libu8ident/])
 AC_CONFIG_SRCDIR([u8ident.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_SUBST([LIBU8IDENT_SO_VERSION], [0:0:0])
@@ -162,7 +160,7 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
-AC_PROG_CC_C99
+AC_PROG_CC
 dnl AC_PROG_CC_C11
 if test "x$ac_cv_prog_cc_c11" != "xno"; then
    AC_DEFINE([HAVE_C11], 1,
@@ -214,9 +212,7 @@ AM_CONDITIONAL([HAVE_PANDOC], [test -n "$PANDOC"])
 
 AC_MSG_NOTICE([Check header files])
 # ===============================================
-AC_HEADER_STDC
 AC_HEADER_STDBOOL
-AC_HEADER_TIME
 AC_CHECK_HEADERS([stdlib.h	\
                   malloc.h	\
                   string.h	\
