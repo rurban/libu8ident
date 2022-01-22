@@ -374,8 +374,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           } else
             goto ok;
         } else if (scr == SC_Han) {
-          if (unlikely(
-                  !(ctx->is_chinese || ctx->is_japanese || ctx->is_korean || has_latin))) {
+          if (unlikely(!(ctx->is_chinese || ctx->is_japanese ||
+                         ctx->is_korean || has_latin))) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           } else

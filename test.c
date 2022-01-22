@@ -326,7 +326,8 @@ void test_norm_nfc(void) {
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFC, 0));
   testnorm("NFC", testids);
 
-  if (u8ident_tr31() != U8ID_TR31_SAFEC23) { // which demands NFC already, so fails on XID earlier
+  if (u8ident_tr31() !=
+      U8ID_TR31_SAFEC23) { // which demands NFC already, so fails on XID earlier
     char *norm = NULL;
     int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
@@ -563,7 +564,7 @@ void test_mixed_scripts_with_ctx(void) {
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // Latin + Greek
-  // assert(ret >= 0); // Latin + Greek
+                               // assert(ret >= 0); // Latin + Greek
 #endif
 
   ctx = u8ident_new_ctx(); // new ctx
@@ -730,15 +731,15 @@ void test_gc(void) {
   // check consecutive and alternating GC ranges
   assert(gc_list[0].from == 0);
   for (size_t i = 1; i < ARRAY_SIZE(gc_list); i++) {
-    assert(gc_list[i-1].to != gc_list[i].from);
-    assert(gc_list[i-1].gc != gc_list[i].gc);
+    assert(gc_list[i - 1].to != gc_list[i].from);
+    assert(gc_list[i - 1].gc != gc_list[i].gc);
   }
 }
 
 void test_medial(void) {
   // check consecutive medial ranges
   for (size_t i = 1; i < ARRAY_SIZE(medial_list); i++) {
-    assert(medial_list[i-1].to != medial_list[i].from);
+    assert(medial_list[i - 1].to != medial_list[i].from);
   }
 
 #ifndef DISABLE_CHECK_XID
@@ -762,8 +763,8 @@ void test_medial(void) {
     CHECK_RET(ret, U8ID_EOK, 0);
   // medial at start
   ret = u8ident_check((const uint8_t *)"\uFB91\uFB51", NULL);
-  //which tr31 is not broken and detects medial at start? Only SAFEC23 so far.
-  //unicode bug filed for UCD versions 1-14. v15 might have it fixed.
+  // which tr31 is not broken and detects medial at start? Only SAFEC23 so far.
+  // unicode bug filed for UCD versions 1-14. v15 might have it fixed.
   if (u8ident_tr31() == U8ID_TR31_SAFEC23)
     CHECK_RET(ret, U8ID_ERR_XID, 0);
   else if (norm == U8ID_NFKC || norm == U8ID_NFKD)
@@ -776,7 +777,7 @@ void test_medial(void) {
 
 void test_safec23(void) {
   // check consecutive and alternating scripts and safec23 ranges
-  //assert(safec23_start_list[0].from == 0);
+  // assert(safec23_start_list[0].from == 0);
   for (size_t i = 1; i < ARRAY_SIZE(safec23_start_list); i++) {
     if (safec23_start_list[i - 1].to >= safec23_start_list[i].from)
       printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
@@ -806,7 +807,7 @@ void test_safec23(void) {
 void test_greek(void) {
   // check consecutive greek_confus_list
   for (size_t i = 1; i < ARRAY_SIZE(greek_confus_list); i++) {
-    assert(greek_confus_list[i-1] < greek_confus_list[i]);
+    assert(greek_confus_list[i - 1] < greek_confus_list[i]);
   }
   // check mixed script c23_4 logic
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ID);

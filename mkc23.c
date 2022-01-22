@@ -107,7 +107,7 @@ struct stats {
   unsigned ranges, singles, codepoints;
 } stats;
 
-static char* cquote_new(const char* s) {
+static char *cquote_new(const char *s) {
   long l = (strlen(s) * 4) + 1;
   char *ret = malloc(l);
   uint8_t *p = (uint8_t *)s;
@@ -125,19 +125,21 @@ static char* cquote_new(const char* s) {
 
 // Only record major changes, like Lm => Mn or Mn => Lu.
 // if only a minor GC changed write it to outgc.
-static unsigned first_major_gc_change(const uint32_t from, const uint32_t to, char *outgc) {
+static unsigned first_major_gc_change(const uint32_t from, const uint32_t to,
+                                      char *outgc) {
   if (from == to)
     return 0U;
   const enum u8id_gc gc1 = u8ident_get_gc(from);
   for (uint32_t i = from + 1; i <= to; i++) {
     const enum u8id_gc gc2 = u8ident_get_gc(i);
     if (gc1 != gc2) {
-      const char* gcs1 = u8ident_gc_name(gc1);
-      const char* gcs2 = u8ident_gc_name(gc2);
+      const char *gcs1 = u8ident_gc_name(gc1);
+      const char *gcs2 = u8ident_gc_name(gc2);
       if (gcs1 && gcs2 && *gcs1 == *gcs2) {
         *outgc = *gcs1;
         continue;
-      // Only if one of the names is M do a major split. S and L are compatible
+        // Only if one of the names is M do a major split. S and L are
+        // compatible
       } else if (gcs1 && gcs2 && *gcs1 != 'M' && *gcs2 != 'M') {
         *outgc = 'V';
         continue;
@@ -194,7 +196,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
           if (with_sc) {
             unsigned gc_split, scx_split;
             enum u8id_gc gc = u8ident_get_gc(from);
-            char *gcname = (char*)u8ident_gc_name(gc);
+            char *gcname = (char *)u8ident_gc_name(gc);
             struct scx *this_scx = (struct scx *)u8ident_get_scx(from);
             char mgcname[3]; // a copy because the original is read-only
             char minor[1];   // if a change is not major, but only minor
@@ -206,18 +208,20 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
               fprintf(f, "    {0x%X, 0x%X", from, gc_split - 1);
               if (this_scx) {
                 char *scx = cquote_new(this_scx->scx);
-                fprintf(f, ", SC_%s, GC_%s, \"%s\"},", u8ident_script_name(s), gcname, scx);
+                fprintf(f, ", SC_%s, GC_%s, \"%s\"},", u8ident_script_name(s),
+                        gcname, scx);
                 fprintf(f, "  //");
-                for (size_t i=0; i<strlen(this_scx->scx); i++) {
-                  fprintf(f, "%s%s", i ? "," : "", u8ident_script_name((uint8_t)this_scx->scx[i]));
+                for (size_t i = 0; i < strlen(this_scx->scx); i++) {
+                  fprintf(f, "%s%s", i ? "," : "",
+                          u8ident_script_name((uint8_t)this_scx->scx[i]));
                 }
                 free(scx);
               } else {
-                fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s), gcname);
+                fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s),
+                        gcname);
               }
-              fprintf(stderr, "U+%X: split GC %s -> %s at U+%X\n", from,
-                      gcname, u8ident_gc_name(u8ident_get_gc(gc_split)),
-                      gc_split);
+              fprintf(stderr, "U+%X: split GC %s -> %s at U+%X\n", from, gcname,
+                      u8ident_gc_name(u8ident_get_gc(gc_split)), gc_split);
               if (from == gc_split - 1) {
                 stats.singles++;
               } else {
@@ -226,33 +230,39 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
               stats.codepoints += (gc_split - from - 1);
               from = gc_split;
               gc = u8ident_get_gc(from);
-              gcname = (char*)u8ident_gc_name(gc);
+              gcname = (char *)u8ident_gc_name(gc);
               this_scx = (struct scx *)u8ident_get_scx(from);
             } else {
               if (*minor) {
                 mgcname[0] = *minor;
-                mgcname[1] = '\0'; // we cannot represent L& as enum, so use just GC_L or GC_V
-                fprintf(stderr, "U+%X: minor GC %s -> %s\n", from, gcname, mgcname);
+                mgcname[1] = '\0'; // we cannot represent L& as enum, so use
+                                   // just GC_L or GC_V
+                fprintf(stderr, "U+%X: minor GC %s -> %s\n", from, gcname,
+                        mgcname);
               }
             }
             if ((scx_split = first_scx_change(from, to))) {
-              fprintf(stderr, "U+%X: split SCX changed at U+%X\n", from, scx_split);
+              fprintf(stderr, "U+%X: split SCX changed at U+%X\n", from,
+                      scx_split);
               fprintf(f, "    // SPLIT on SCX (prev to U+%X)\n", to);
               fprintf(f, "    {0x%X, 0x%X", from, scx_split - 1);
               if (this_scx) {
                 char *scx = cquote_new(this_scx->scx);
-                fprintf(f, ", SC_%s, GC_%s, \"%s\"}, //", u8ident_script_name(s), mgcname, scx);
-                for (size_t i=0; i<strlen(this_scx->scx); i++) {
-                  fprintf(f, "%s%s", i ? "," : "", u8ident_script_name((uint8_t)this_scx->scx[i]));
+                fprintf(f, ", SC_%s, GC_%s, \"%s\"}, //",
+                        u8ident_script_name(s), mgcname, scx);
+                for (size_t i = 0; i < strlen(this_scx->scx); i++) {
+                  fprintf(f, "%s%s", i ? "," : "",
+                          u8ident_script_name((uint8_t)this_scx->scx[i]));
                 }
                 free(scx);
               } else {
-                fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s), mgcname);
+                fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s),
+                        mgcname);
               }
               fprintf(f, " // %s %s",
                       s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
                       : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
-                      : "",
+                                                    : "",
                       tmp);
               if (from == scx_split - 1) {
                 stats.singles++;
@@ -270,13 +280,16 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
             fprintf(f, "    {0x%X, 0x%X", from, to);
             if (this_scx) {
               char *scx = cquote_new(this_scx->scx);
-              fprintf(f, ", SC_%s, GC_%s, \"%s\"}, //", u8ident_script_name(s), mgcname, scx);
-              for (size_t i=0; i<strlen(this_scx->scx); i++) {
-                fprintf(f, "%s%s", i ? "," : "", u8ident_script_name((uint8_t)this_scx->scx[i]));
+              fprintf(f, ", SC_%s, GC_%s, \"%s\"}, //", u8ident_script_name(s),
+                      mgcname, scx);
+              for (size_t i = 0; i < strlen(this_scx->scx); i++) {
+                fprintf(f, "%s%s", i ? "," : "",
+                        u8ident_script_name((uint8_t)this_scx->scx[i]));
               }
               free(scx);
             } else
-              fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s), mgcname);
+              fprintf(f, ", SC_%s, GC_%s, NULL},", u8ident_script_name(s),
+                      mgcname);
             fprintf(f, " // %s %s",
                     s >= FIRST_LIMITED_USE_SCRIPT ? " (Limited)"
                     : s >= FIRST_EXCLUDED_SCRIPT  ? " (Excluded)"
@@ -421,7 +434,8 @@ static void gen_c23_safe(void) {
       "\n"
       "   Generated by mkc23, do not modify.\n"
       "   UNICODE version %d.%d\n"
-      "   Filtered XID_Start/Continue with allowed scripts, safe IDTypes and NFC\n"
+      "   Filtered XID_Start/Continue with allowed scripts, safe IDTypes and "
+      "NFC\n"
       "*/\n"
       "\n"
       "struct sc_c23 {\n"
@@ -435,7 +449,9 @@ static void gen_c23_safe(void) {
       "};\n"
       "\n",
       U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
-  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids, !MEDIAL and NFC.\n", f);
+  fputs("// Filtering allowed scripts, XID_Start, Skipped Ids, !MEDIAL and "
+        "NFC.\n",
+        f);
   fputs("// Ranges split on GC and SCX changes\n", f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c23 safec23_start_list[] = {\n"
@@ -551,9 +567,10 @@ static void gen_c23_safe(void) {
           stats.singles, stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
-  fputs("\n// Only excluded scripts, XID_Continue,!XID_Start, more IDTypes, NFC "
-        "and !MARK\n",
-        f);
+  fputs(
+      "\n// Only excluded scripts, XID_Continue,!XID_Start, more IDTypes, NFC "
+      "and !MARK\n",
+      f);
   memset(c, 0, sizeof(c));
   for (size_t i = 0; i < ARRAY_SIZE(xid_cont_list); i++) {
     struct range_bool r = xid_cont_list[i];
@@ -584,9 +601,8 @@ static void gen_c23_safe(void) {
         continue;
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          u8ident_is_MEDIAL(cp) &&
-          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
-          !isHalfwidthOrFullwidth(cp)) {
+          u8ident_is_MEDIAL(cp) && !u8ident_is_MARK(cp) &&
+          !isExcludedIdtype(cp) && !isHalfwidthOrFullwidth(cp)) {
         BITSET(c, cp);
       }
     }

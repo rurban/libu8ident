@@ -52,39 +52,12 @@ enum u8id_gc {
 extern const char *const u8id_gc_names[32];
 #else
 LOCAL const char *const u8id_gc_names[] = {
-  "Cc",
-  "Cf",
-  "Co",
-  "Cs",
-  "Ll",
-  "Lm",
-  "Lo",
-  "Lt",
-  "Lu",
-  "Mc",
-  "Me",
-  "Mn",
-  "Nd",
-  "Nl",
-  "No",
-  "Pc",
-  "Pd",
-  "Pe",
-  "Pf",
-  "Pi",
-  "Po",
-  "Ps",
-  "Sc",
-  "Sk",
-  "Sm",
-  "So",
-  "Zl",
-  "Zp",
-  "Zs",
-  "L", // L& really (for unic23.h only)
-  "V", // varying (for unic23.h only)
-  "Zz"
-};
+    "Cc", "Cf", "Co", "Cs", "Ll", "Lm", "Lo", "Lt", "Lu", "Mc",
+    "Me", "Mn", "Nd", "Nl", "No", "Pc", "Pd", "Pe", "Pf", "Pi",
+    "Po", "Ps", "Sc", "Sk", "Sm", "So", "Zl", "Zp", "Zs",
+    "L", // L& really (for unic23.h only)
+    "V", // varying (for unic23.h only)
+    "Zz"};
 #endif
 
 struct gc {

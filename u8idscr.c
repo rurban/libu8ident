@@ -324,7 +324,8 @@ static inline int compar32(const void *a, const void *b) {
 }
 
 LOCAL bool u8ident_is_greek_latin_confus(const uint32_t cp) {
-  return bsearch(&cp, greek_confus_list, ARRAY_SIZE(greek_confus_list), 4, compar32) != NULL
+  return bsearch(&cp, greek_confus_list, ARRAY_SIZE(greek_confus_list), 4,
+                 compar32) != NULL
              ? true
              : false;
 }

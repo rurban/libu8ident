@@ -582,15 +582,12 @@ int main(int argc, char **argv) {
 #ifdef HAVE_GETOPT_LONG
   int option_index = 0;
   static struct option long_options[] = {
-      {"norm", 1, 0, 'n'}, // *nfc*,nfd,nfkc,nfkd
-      {"profile", 1, 0, 'p'},       // 1,2,3,*4*,5,6,c23_4,c11_6
-      {"xid", 1, 0, 'x'}, // ascii,allowed,id,*xid*,safec23,c11,allutf8
-      {"ext", 1, 0, 'e'},
-      {"recursive", 0, 0, 'r'},
-      {"help", 0, 0, 0},
-      {"version", 0, 0, 0},
-      {"quiet", 0, &quiet, 'q'},
-      {"verbose", 0, &verbose, 'v'},
+      {"norm", 1, 0, 'n'},    // *nfc*,nfd,nfkc,nfkd
+      {"profile", 1, 0, 'p'}, // 1,2,3,*4*,5,6,c23_4,c11_6
+      {"xid", 1, 0, 'x'},     // ascii,allowed,id,*xid*,safec23,c11,allutf8
+      {"ext", 1, 0, 'e'},        {"recursive", 0, 0, 'r'},
+      {"help", 0, 0, 0},         {"version", 0, 0, 0},
+      {"quiet", 0, &quiet, 'q'}, {"verbose", 0, &verbose, 'v'},
       {NULL, 0, NULL, 0}};
 #endif
 
