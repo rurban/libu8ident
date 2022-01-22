@@ -1,12 +1,12 @@
---- doc/P2528R0.md	2022-01-21 17:27:40.693889915 +0100
-+++ doc/c23-proposal.md	2022-01-21 17:32:48.711403967 +0100
+--- doc/P2528R0.md	2022-01-22 14:57:45.955123002 +0100
++++ doc/c23-proposal.md	2022-01-22 14:57:53.681055820 +0100
 @@ -1,10 +1,10 @@
 -    C++ Identifier Security using Unicode Standard Annex 39
 +    C Identifier Security using Unicode Standard Annex 39
  
 -    Document #: P2538R0
 +    Document #: D0xxxR0
-     Date:       2022-01-21
+     Date:       2022-01-22
 -    Project:    Programming Language C++
 -    Audience:   EWG
 -                CWG
@@ -20,12 +20,12 @@
  
  In response to [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
  
--Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++ 23 (and C23).
+-Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++23.
 +Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C23.
  
  * Comply to a variant of [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
-   Mixed-Scripts Moderately Restrictive profile, but allow Greek scripts,
-@@ -34,7 +34,7 @@
+   Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without
+@@ -35,7 +35,7 @@
  Recommend binutils/linker ABI identifier rules: names are UTF-8,
  add add identifier checks. E.g. `readelf -L -Ue`.
  
@@ -34,7 +34,7 @@
  earlier. The author provides the
  [libu8ident](https://github.com/rurban/libu8ident/) library (Apache 2
  licensed) and its generated tables to all implementors.
-@@ -72,7 +72,7 @@
+@@ -73,7 +73,7 @@
  as they appeared in browsers and email. Also names in C object files:
  linkers, .def files, ffi's.
  
@@ -43,7 +43,7 @@
  Source file) forbids insecure mixes of Greek with Cyrillic, dangerous
  Arabic RTL bidi attacks and most confusables. You can still write in
  your language, but then only in commonly written languages, and not
-@@ -169,7 +169,7 @@
+@@ -170,7 +170,7 @@
  4.3 Documents with identifiers in many multiple scripts/languages will become illegal
  -------------------------------------------------------------------------------------
  
@@ -52,7 +52,7 @@
  Restrictive**, with an exception for Greek.
  
  * All identifiers in a document qualify as Single Script, or
-@@ -249,7 +249,7 @@
+@@ -247,7 +247,7 @@
  7.1 SC
  -----
  
@@ -61,7 +61,23 @@
  single byte.  There are currently 161 scripts assigned, 32 of them are
  in common use as identifiers, hence called **Recommended** scripts. The
  rest is split up into 127-31 **Excluded** scripts, which are not in common
-@@ -510,11 +510,11 @@
+@@ -487,12 +487,14 @@
+              Greek confusable
+ * U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C
+              Greek confusable
++* U+0381 ; ( α → a ) GREEK SMALL LETTER ALPHA. Not confusable
++* U+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P. Not confusable
+ 
+ TR39 also compiles a convenient
+ [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
+ list. But all the math letters with Script=Common from U+2100 to
+ U+2200 are restricted, as Greek is forbidden mixed with Latin in the
+-original TR39 Moderately Restrictive profile. Most are allowed
++original TR39 Moderately Restrictive profile. These are allowed
+ according to the TR31 and TR39 rules of SAFEC23, so we need to come up
+ with our own list of `XID_Start/XID_Continue` codepoints, excluding
+ the Limited Use and Excluded scripts. And if an implementation choses
+@@ -520,11 +522,11 @@
  identifiers.  One could argue that a mixed-script profile is valid
  only for a single identifier, or it is valid for the whole source file
  document. And there needs to be a definition if before or after the
@@ -76,7 +92,7 @@
  identifiers would not be identifiable anymore, as both both can render
  to the very same glyphs. Thus we adopt the notion of identifier
  contexts.
-@@ -551,9 +551,9 @@
+@@ -561,9 +563,9 @@
  - **private**: Another argument would be that all exported names end
    up in the object files and library flat, which would support the
    seperation of private and public name contexts, where to perform the
@@ -89,7 +105,7 @@
    rest is seperated by the checks for the public names.
  
  - **after-cpp**: The third, strictest variant would define the context in
-@@ -597,7 +597,7 @@
+@@ -607,7 +609,7 @@
  12 Issues with binutils, linkers, exported identifiers
  =====================================================
  
@@ -98,7 +114,7 @@
  used with other earlier compilers or languages without any unicode security
  profile or restriction. ffi's are very common, libraries or .def files
  even more, thanksfully unicode names not at all yet.
-@@ -607,15 +607,15 @@
+@@ -617,15 +619,15 @@
  there, and names are charset (=user) specific, whilst there are no header
  fields for the used charset (e.g. if SHIFT-JIS or UTF-8), nor are
  there any rules for name lookup (normalization). This is not solvable

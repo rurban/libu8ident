@@ -22,6 +22,8 @@ bool u8ident_is_MEDIAL(const uint32_t cp);
 // member or bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.
 bool u8ident_is_bidi(const uint32_t cp);
+// Greek letters confusable with Latin
+bool u8ident_is_greek_latin_confus(const uint32_t cp);
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp);
 const char *u8ident_script_name(const int scr);

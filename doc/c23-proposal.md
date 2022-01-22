@@ -1,7 +1,7 @@
     C Identifier Security using Unicode Standard Annex 39
 
     Document #: D0xxxR0
-    Date:       2022-01-21
+    Date:       2022-01-22
     Project:    Programming Language C
     Audience:   WG14
                 SG-16
@@ -15,7 +15,8 @@ In response to [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021
 Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C23.
 
 * Comply to a variant of [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
-  Mixed-Scripts Moderately Restrictive profile, but allow Greek scripts,
+  Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without
+  its confusables with Latin,
 * Disallow all Limited Use [TR31#Table_7](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
   and Excluded scripts [TR31#Table_4](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers),
 * Only allow [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)
@@ -180,11 +181,8 @@ Restrictive**, with an exception for Greek.
   + Latin + Han + Hangul (Korean), or
 * All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
-
-Thus it explicitly allows Greek together with Latin, because the only
-found unicode identifiers examples in the wild are Greek for math
-variable names, and Greek is forbidden in the TR39 Moderately
-Restrictive profile.
+* Allow some Greek letters mixed with Latin, that are not confusable
+  with Latin letters.
 
 4.4 Mixed-script runs with combining marks will become illegal
 --------------------------------------------------------------
@@ -460,6 +458,14 @@ in libu8ident.
   + Latin + Han + Hangul (Korean), or
 * All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
+* Allow some Greek letters mixed with Latin, that are not confusable
+  with Latin letters.
+
+Greek alone is always allowed, as Cyrillic, but wherever we have a valid
+Latin letter which looks the same as the Greek counterpart, the Greek
+letter is forbidden, choose the Latin one instead. E.g.
+( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A.
+See **18 Appendix F** for the generated list with 10 exceptions.
 
 Thus it prevents Cyrillic mixed with Latin or any other script, but
 does allow any East-Asian CFK language, other common and widely used
@@ -477,6 +483,12 @@ E.g. here we have some:
 * U+2126 (Ω) OHM SIGN (Script=Greek, L&) is a greek letter,
              but with Restricted IdentifierStatus.
 * U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete, Not_XID
+* U+0392 ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B
+             Greek confusable
+* U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C
+             Greek confusable
+* U+0381 ; ( α → a ) GREEK SMALL LETTER ALPHA. Not confusable
+* U+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P. Not confusable
 
 TR39 also compiles a convenient
 [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
@@ -2118,7 +2130,126 @@ FE73          ; Technical  # 3.2        ARABIC TAIL FRAGMENT
                                         MUSICAL SYMBOL COMBINING SNAP PIZZICATO
 ```
 
-18 References
+18 Appendix F - Greek Confusables
+=================================
+
+Needed for exclusion in the **TR39 Mixed Scripts** Greek rule. Where-ever we
+have a Greek letter confusable with Latin, and we already saw Latin, forbid
+the Greek letter in favor of the Latin letter. See TR39
+[confusables.txt](https://www.unicode.org/Public/security/latest/confusables.txt).
+Note that these confusables cannot be excluded upfront in the TR31 identifier parsing,
+as Greek alone is allowed.
+
+18.1 Exceptions
+----------------
+
+Allow these 10 Greek letters and symbols to be confusable with Latin:
+`037A, 0381, 0398, 03B5, 03B7, 03B8, 03B9, 03D1, 03F1, 03F4`.
+
+``` txt
+037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I
+0381 ; ( α → a ) GREEK SMALL LETTER ALPHA
+0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...
+03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON
+03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, COMBINING
+                  VERTICAL LINE BELOW
+03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...
+03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I
+03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...
+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P
+03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...
+```
+
+18.2 Confusables
+----------------
+
+List of the Greek-Latin confusables: (Note: these include the exceptions above)
+
+    grep GREEK confusables.txt | grep LETTER | grep LATIN
+
+``` txt
+03B1 ; ( α → a ) GREEK SMALL LETTER ALPHA → LATIN SMALL LETTER A
+0391 ; ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A
+1D217; ( 𝈗 → Ɐ ) GREEK VOCAL NOTATION SYMBOL-24 → LATIN CAPITAL LETTER TURNED A
+0392 ; ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B
+03F2 ; ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C
+03F9 ; ( Ϲ → C ) GREEK CAPITAL LUNATE SIGMA SYMBOL → LATIN CAPITAL LETTER C
+03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON → LATIN SMALL LETTER C WITH BAR
+03F5 ; ( ϵ → ꞓ ) GREEK LUNATE EPSILON SYMBOL → LATIN SMALL LETTER C WITH BAR
+037D ; ( ͽ → ꜿ ) GREEK SMALL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN SMALL
+                  LETTER REVERSED C WITH DOT
+03FF ; ( Ͽ → Ꜿ ) GREEK CAPITAL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN CAPITAL
+                  LETTER REVERSED C WITH DOT
+03B4 ; ( δ → ẟ ) GREEK SMALL LETTER DELTA → LATIN SMALL LETTER DELTA
+0395 ; ( Ε → E ) GREEK CAPITAL LETTER EPSILON → LATIN CAPITAL LETTER E
+1D221; ( 𝈡 → Ɛ ) GREEK INSTRUMENTAL NOTATION SYMBOL-7 → LATIN CAPITAL LETTER
+                  OPEN E
+1D213; ( 𝈓 → F ) GREEK VOCAL NOTATION SYMBOL-20 → LATIN CAPITAL LETTER F
+03DC ; ( Ϝ → F ) GREEK LETTER DIGAMMA → LATIN CAPITAL LETTER F
+1D230; ( 𝈰 → ꟻ ) GREEK INSTRUMENTAL NOTATION SYMBOL-30 → LATIN EPIGRAPHIC
+                  LETTER REVERSED F
+0397 ; ( Η → H ) GREEK CAPITAL LETTER ETA → LATIN CAPITAL LETTER H
+0370 ; ( Ͱ → Ⱶ ) GREEK CAPITAL LETTER HETA → LATIN CAPITAL LETTER HALF H
+03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I
+1FBE ; ( ι → i ) GREEK PROSGEGRAMMENI → LATIN SMALL LETTER I
+037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I
+03F3 ; ( ϳ → j ) GREEK LETTER YOT → LATIN SMALL LETTER J
+037F ; ( Ϳ → J ) GREEK CAPITAL LETTER YOT → LATIN CAPITAL LETTER J
+039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER K
+0399 ; ( Ι → l ) GREEK CAPITAL LETTER IOTA → LATIN SMALL LETTER L
+1D22A; ( 𝈪 → L ) GREEK INSTRUMENTAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER L
+039C ; ( Μ → M ) GREEK CAPITAL LETTER MU → LATIN CAPITAL LETTER M
+03FA ; ( Ϻ → M ) GREEK CAPITAL LETTER SAN → LATIN CAPITAL LETTER M
+039D ; ( Ν → N ) GREEK CAPITAL LETTER NU → LATIN CAPITAL LETTER N
+03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, ...
+0377 ; ( ͷ → ᴎ ) GREEK SMALL LETTER PAMPHYLIAN DIGAMMA → LATIN LETTER SMALL
+                  CAPITAL REVERSED N
+03BF ; ( ο → o ) GREEK SMALL LETTER OMICRON → LATIN SMALL LETTER O
+03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA → LATIN SMALL LETTER O
+039F ; ( Ο → O ) GREEK CAPITAL LETTER OMICRON → LATIN CAPITAL LETTER O
+1D21A; ( 𝈚 → O̵ ) GREEK VOCAL NOTATION SYMBOL-52 → LATIN CAPITAL LETTER O, ...
+03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...
+03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...
+0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...
+03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...
+037B ; ( ͻ → ɔ ) GREEK SMALL REVERSED LUNATE SIGMA SYMBOL → LATIN SMALL
+                  LETTER OPEN O
+03FD ; ( Ͻ → Ɔ ) GREEK CAPITAL REVERSED LUNATE SIGMA SYMBOL → LATIN CAPITAL
+                  LETTER OPEN O
+03C1 ; ( ρ → p ) GREEK SMALL LETTER RHO → LATIN SMALL LETTER P
+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P
+03A1 ; ( Ρ → P ) GREEK CAPITAL LETTER RHO → LATIN CAPITAL LETTER P
+1D29 ; ( ᴩ → ᴘ ) GREEK LETTER SMALL CAPITAL RHO → LATIN LETTER SMALL CAPITAL P
+03C6 ; ( φ → ɸ ) GREEK SMALL LETTER PHI → LATIN SMALL LETTER PHI
+03D5 ; ( ϕ → ɸ ) GREEK PHI SYMBOL → LATIN SMALL LETTER PHI
+03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA
+03F0 ; ( ϰ → ĸ ) GREEK KAPPA SYMBOL → LATIN SMALL LETTER KRA
+1D26 ; ( ᴦ → r ) GREEK LETTER SMALL CAPITAL GAMMA → LATIN SMALL LETTER R
+1D216; ( 𝈖 → R ) GREEK VOCAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER R
+2129 ; ( ℩ → ɿ ) TURNED GREEK SMALL LETTER IOTA → LATIN SMALL LETTER
+                 REVERSED R WITH FISHHOOK
+03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER SHARP S
+03D0 ; ( ϐ → ß ) GREEK BETA SYMBOL → LATIN SMALL LETTER SHARP S
+03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER ESH
+03A4 ; ( Τ → T ) GREEK CAPITAL LETTER TAU → LATIN CAPITAL LETTER T
+03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T
+03C5 ; ( υ → u ) GREEK SMALL LETTER UPSILON → LATIN SMALL LETTER U
+03BD ; ( ν → v ) GREEK SMALL LETTER NU → LATIN SMALL LETTER V
+1D20D; ( 𝈍 → V ) GREEK VOCAL NOTATION SYMBOL-14 → LATIN CAPITAL LETTER V
+1D27 ; ( ᴧ → ʌ ) GREEK LETTER SMALL CAPITAL LAMDA → LATIN SMALL LETTER TURNED V
+039B ; ( Λ → Ʌ ) GREEK CAPITAL LETTER LAMDA → LATIN CAPITAL LETTER TURNED V
+03A7 ; ( Χ → X ) GREEK CAPITAL LETTER CHI → LATIN CAPITAL LETTER X
+03B3 ; ( γ → y ) GREEK SMALL LETTER GAMMA → LATIN SMALL LETTER Y
+03A5 ; ( Υ → Y ) GREEK CAPITAL LETTER UPSILON → LATIN CAPITAL LETTER Y
+03D2 ; ( ϒ → Y ) GREEK UPSILON WITH HOOK SYMBOL → LATIN CAPITAL LETTER Y
+0396 ; ( Ζ → Z ) GREEK CAPITAL LETTER ZETA → LATIN CAPITAL LETTER Z
+03F8 ; ( ϸ → þ ) GREEK SMALL LETTER SHO → LATIN SMALL LETTER THORN
+03F7 ; ( Ϸ → Þ ) GREEK CAPITAL LETTER SHO → LATIN CAPITAL LETTER THORN
+03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI
+03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA
+```
+
+19 References
 =============
 
 * [AltId] Unicode Standard Annex.

@@ -215,16 +215,16 @@
 <pre><code>C++ Identifier Security using Unicode Standard Annex 39
 
 Document #: P2538R0
-Date:       2022-01-21
+Date:       2022-01-22
 Project:    Programming Language C++
 Audience:   EWG
             CWG
 Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
 <h1 id="abstract">1 Abstract</h1>
 <p>In response to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a></p>
-<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of C++ 23 (and C23).</p>
+<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of C++23.</p>
 <ul>
-<li>Comply to a variant of <a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a> Mixed-Scripts Moderately Restrictive profile, but allow Greek scripts,</li>
+<li>Comply to a variant of <a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a> Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without its confusables with Latin,</li>
 <li>Disallow all Limited Use <a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts">TR31#Table_7</a> and Excluded scripts <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>,</li>
 <li>Only allow <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> Recommended, Inclusion, Technical Identifier Type properties, Honor the Median position in Arabic words (wrong in all xid lists),</li>
 <li>Demand NFC normalization. Reject all composable sequences as ill-formed. (from <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a>)</li>
@@ -296,8 +296,8 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <li>Latin + Han + Hangul (Korean), or</li>
 </ul></li>
 <li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
+<li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
 </ul>
-<p>Thus it explicitly allows Greek together with Latin, because the only found unicode identifiers examples in the wild are Greek for math variable names, and Greek is forbidden in the TR39 Moderately Restrictive profile.</p>
 <h2 id="mixed-script-runs-with-combining-marks-will-become-illegal">4.4 Mixed-script runs with combining marks will become illegal</h2>
 <p>C23++ will check for unlikely sequences of <strong>combining marks</strong>, and reject some. Combining Marks have no script property per se, but a variable list of allowed SCX scripts, which need to be checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
 <p>See 7.2 “SCX Extensions” and 7.3 “Combining marks script run detection for spoofing” below.</p>
@@ -380,7 +380,9 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <li>Latin + Han + Hangul (Korean), or</li>
 </ul></li>
 <li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
+<li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
 </ul>
+<p>Greek alone is always allowed, as Cyrillic, but wherever we have a valid Latin letter which looks the same as the Greek counterpart, the Greek letter is forbidden, choose the Latin one instead. E.g. ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A. See <strong>18 Appendix F</strong> for the generated list with 10 exceptions.</p>
 <p>Thus it prevents Cyrillic mixed with Latin or any other script, but does allow any East-Asian CFK language, other common and widely used languages and Latin mixed with Greek, mainly used for its mathematical symbols. Many mathematical symbols already exists outside of Greek, but these are mainly used for operators in advanced programming languages, not as identifiers. See also <a href="http://xahlee.info/comp/unicode_math_operators.html" class="uri">http://xahlee.info/comp/unicode_math_operators.html</a> for a nice overview.</p>
 <p>E.g. here we have some:</p>
 <ul>
@@ -388,8 +390,10 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <li>U+2107 (ℇ) EULER CONSTANT (Script=Common, Lu) is a proper letter, but with Restricted IdentifierStatus.</li>
 <li>U+2126 (Ω) OHM SIGN (Script=Greek, L&amp;) is a greek letter, but with Restricted IdentifierStatus.</li>
 <li>U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete, Not_XID</li>
+<li>U+0392 ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B Greek confusable</li>
+<li>U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C Greek confusable</li>
 </ul>
-<p>TR39 also compiles a convenient <a href="https://www.unicode.org/Public/security/latest/IdentifierStatus.txt">IdentifierStatus</a> list. But all the math letters with Script=Common from U+2100 to U+2200 are restricted, as Greek is forbidden mixed with Latin in the original TR39 Moderately Restrictive profile. These are allowed according to the TR31 and TR39 rules of SAFEC23, so we need to come up with our own list of <code>XID_Start/XID_Continue</code> codepoints, excluding the Limited Use and Excluded scripts. And if an implementation choses to allow Excluded scripts with more logic to allow only this script.</p>
+<p>TR39 also compiles a convenient <a href="https://www.unicode.org/Public/security/latest/IdentifierStatus.txt">IdentifierStatus</a> list. But all the math letters with Script=Common from U+2100 to U+2200 are restricted, as Greek is forbidden mixed with Latin in the original TR39 Moderately Restrictive profile. Most are allowed according to the TR31 and TR39 rules of SAFEC23, so we need to come up with our own list of <code>XID_Start/XID_Continue</code> codepoints, excluding the Limited Use and Excluded scripts. And if an implementation choses to allow Excluded scripts with more logic to allow only this script.</p>
 <p>Since the TR31 XID list also got the median positions wrong (for 98 Arabic codepoints), and forgot about the Halfwidth and Fullwidth, U+FF00..U+FFEF confusables, we need to fixup and generate the XID lists by ourselves.</p>
 <p>It is recommended to already exclude Limited Use and Excluded scripts from the initial list of identifier ranges, as this is the most common use-case, and shortens the common search paths. Only with the <code>#pragma Unicode ExcludedScript</code> search the full XID lists and the full scripts list.</p>
 <p>The TR39 Mixed Scripts profile alone does not prevent from all spoofing attacks, but the additional rules from 7.3 “Combining marks script run detection for spoofing” are kept tiny.</p>
@@ -1854,7 +1858,104 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <span id="cb15-153"><a href="#cb15-153" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING TRIPLE TONGUE</span>
 <span id="cb15-154"><a href="#cb15-154" aria-hidden="true" tabindex="-1"></a>1D1AA..1D1AD  ; Technical  # 3.1    [4] MUSICAL SYMBOL COMBINING DOWN BOW..</span>
 <span id="cb15-155"><a href="#cb15-155" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING SNAP PIZZICATO</span></code></pre></div>
-<h1 id="references">18 References</h1>
+<h1 id="appendix-f---greek-confusables">18 Appendix F - Greek Confusables</h1>
+<p>Needed for exclusion in the <strong>TR39 Mixed Scripts</strong> Greek rule. Where-ever we have a Greek letter confusable with Latin, and we already saw Latin, forbid the Greek letter in favor of the Latin letter. See TR39 <a href="https://www.unicode.org/Public/security/latest/confusables.txt">confusables.txt</a>. Note that these confusables cannot be excluded upfront in the TR31 identifier parsing, as Greek alone is allowed.</p>
+<h2 id="exceptions">18.1 Exceptions</h2>
+<p>Allow these 10 Greek letters and symbols to be confusable with Latin: <code>037A, 0381, 0398, 03B5, 03B7, 03B8, 03B9, 03D1, 03F1, 03F4</code>.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>0381 ; ( α → a ) GREEK SMALL LETTER ALPHA</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, COMBINING</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                  VERTICAL LINE BELOW</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span></code></pre></div>
+<h2 id="confusables">18.2 Confusables</h2>
+<p>List of the Greek-Latin confusables: (Note: these include the exceptions above)</p>
+<pre><code>grep GREEK confusables.txt | grep LETTER | grep LATIN</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>03B1 ; ( α → a ) GREEK SMALL LETTER ALPHA → LATIN SMALL LETTER A</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>0391 ; ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>1D217; ( 𝈗 → Ɐ ) GREEK VOCAL NOTATION SYMBOL-24 → LATIN CAPITAL LETTER TURNED A</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>0392 ; ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>03F2 ; ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>03F9 ; ( Ϲ → C ) GREEK CAPITAL LUNATE SIGMA SYMBOL → LATIN CAPITAL LETTER C</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON → LATIN SMALL LETTER C WITH BAR</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>03F5 ; ( ϵ → ꞓ ) GREEK LUNATE EPSILON SYMBOL → LATIN SMALL LETTER C WITH BAR</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>037D ; ( ͽ → ꜿ ) GREEK SMALL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN SMALL</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED C WITH DOT</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>03FF ; ( Ͽ → Ꜿ ) GREEK CAPITAL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN CAPITAL</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED C WITH DOT</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>03B4 ; ( δ → ẟ ) GREEK SMALL LETTER DELTA → LATIN SMALL LETTER DELTA</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>0395 ; ( Ε → E ) GREEK CAPITAL LETTER EPSILON → LATIN CAPITAL LETTER E</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>1D221; ( 𝈡 → Ɛ ) GREEK INSTRUMENTAL NOTATION SYMBOL-7 → LATIN CAPITAL LETTER</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                  OPEN E</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>1D213; ( 𝈓 → F ) GREEK VOCAL NOTATION SYMBOL-20 → LATIN CAPITAL LETTER F</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>03DC ; ( Ϝ → F ) GREEK LETTER DIGAMMA → LATIN CAPITAL LETTER F</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>1D230; ( 𝈰 → ꟻ ) GREEK INSTRUMENTAL NOTATION SYMBOL-30 → LATIN EPIGRAPHIC</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED F</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>0397 ; ( Η → H ) GREEK CAPITAL LETTER ETA → LATIN CAPITAL LETTER H</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>0370 ; ( Ͱ → Ⱶ ) GREEK CAPITAL LETTER HETA → LATIN CAPITAL LETTER HALF H</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>1FBE ; ( ι → i ) GREEK PROSGEGRAMMENI → LATIN SMALL LETTER I</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>03F3 ; ( ϳ → j ) GREEK LETTER YOT → LATIN SMALL LETTER J</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>037F ; ( Ϳ → J ) GREEK CAPITAL LETTER YOT → LATIN CAPITAL LETTER J</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER K</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>0399 ; ( Ι → l ) GREEK CAPITAL LETTER IOTA → LATIN SMALL LETTER L</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>1D22A; ( 𝈪 → L ) GREEK INSTRUMENTAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER L</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>039C ; ( Μ → M ) GREEK CAPITAL LETTER MU → LATIN CAPITAL LETTER M</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>03FA ; ( Ϻ → M ) GREEK CAPITAL LETTER SAN → LATIN CAPITAL LETTER M</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>039D ; ( Ν → N ) GREEK CAPITAL LETTER NU → LATIN CAPITAL LETTER N</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, ...</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>0377 ; ( ͷ → ᴎ ) GREEK SMALL LETTER PAMPHYLIAN DIGAMMA → LATIN LETTER SMALL</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>                  CAPITAL REVERSED N</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>03BF ; ( ο → o ) GREEK SMALL LETTER OMICRON → LATIN SMALL LETTER O</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA → LATIN SMALL LETTER O</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>039F ; ( Ο → O ) GREEK CAPITAL LETTER OMICRON → LATIN CAPITAL LETTER O</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>1D21A; ( 𝈚 → O̵ ) GREEK VOCAL NOTATION SYMBOL-52 → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>037B ; ( ͻ → ɔ ) GREEK SMALL REVERSED LUNATE SIGMA SYMBOL → LATIN SMALL</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>                  LETTER OPEN O</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>03FD ; ( Ͻ → Ɔ ) GREEK CAPITAL REVERSED LUNATE SIGMA SYMBOL → LATIN CAPITAL</span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>                  LETTER OPEN O</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>03C1 ; ( ρ → p ) GREEK SMALL LETTER RHO → LATIN SMALL LETTER P</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>03A1 ; ( Ρ → P ) GREEK CAPITAL LETTER RHO → LATIN CAPITAL LETTER P</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>1D29 ; ( ᴩ → ᴘ ) GREEK LETTER SMALL CAPITAL RHO → LATIN LETTER SMALL CAPITAL P</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>03C6 ; ( φ → ɸ ) GREEK SMALL LETTER PHI → LATIN SMALL LETTER PHI</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>03D5 ; ( ϕ → ɸ ) GREEK PHI SYMBOL → LATIN SMALL LETTER PHI</span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA</span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>03F0 ; ( ϰ → ĸ ) GREEK KAPPA SYMBOL → LATIN SMALL LETTER KRA</span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>1D26 ; ( ᴦ → r ) GREEK LETTER SMALL CAPITAL GAMMA → LATIN SMALL LETTER R</span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>1D216; ( 𝈖 → R ) GREEK VOCAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER R</span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>2129 ; ( ℩ → ɿ ) TURNED GREEK SMALL LETTER IOTA → LATIN SMALL LETTER</span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>                 REVERSED R WITH FISHHOOK</span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER SHARP S</span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>03D0 ; ( ϐ → ß ) GREEK BETA SYMBOL → LATIN SMALL LETTER SHARP S</span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER ESH</span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>03A4 ; ( Τ → T ) GREEK CAPITAL LETTER TAU → LATIN CAPITAL LETTER T</span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T</span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>03C5 ; ( υ → u ) GREEK SMALL LETTER UPSILON → LATIN SMALL LETTER U</span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>03BD ; ( ν → v ) GREEK SMALL LETTER NU → LATIN SMALL LETTER V</span>
+<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a>1D20D; ( 𝈍 → V ) GREEK VOCAL NOTATION SYMBOL-14 → LATIN CAPITAL LETTER V</span>
+<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>1D27 ; ( ᴧ → ʌ ) GREEK LETTER SMALL CAPITAL LAMDA → LATIN SMALL LETTER TURNED V</span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a>039B ; ( Λ → Ʌ ) GREEK CAPITAL LETTER LAMDA → LATIN CAPITAL LETTER TURNED V</span>
+<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>03A7 ; ( Χ → X ) GREEK CAPITAL LETTER CHI → LATIN CAPITAL LETTER X</span>
+<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a>03B3 ; ( γ → y ) GREEK SMALL LETTER GAMMA → LATIN SMALL LETTER Y</span>
+<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a>03A5 ; ( Υ → Y ) GREEK CAPITAL LETTER UPSILON → LATIN CAPITAL LETTER Y</span>
+<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a>03D2 ; ( ϒ → Y ) GREEK UPSILON WITH HOOK SYMBOL → LATIN CAPITAL LETTER Y</span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>0396 ; ( Ζ → Z ) GREEK CAPITAL LETTER ZETA → LATIN CAPITAL LETTER Z</span>
+<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a>03F8 ; ( ϸ → þ ) GREEK SMALL LETTER SHO → LATIN SMALL LETTER THORN</span>
+<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>03F7 ; ( Ϸ → Þ ) GREEK CAPITAL LETTER SHO → LATIN CAPITAL LETTER THORN</span>
+<span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a>03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI</span>
+<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a>03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA</span></code></pre></div>
+<h1 id="references">19 References</h1>
 <ul>
 <li><p>[AltId] Unicode Standard Annex. <a href="http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax</a></p></li>
 <li><p>[DefId] Unicode Standard Annex. <a href="http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax</a></p></li>

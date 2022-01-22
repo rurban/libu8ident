@@ -12,10 +12,10 @@
    * Reject illegal mark sequences (Lm, Mn, Mc) with mixed-scripts (SCX) as
    ill-formed.
 
-   See c11.md and c23++proposal.md
+   See doc/c11.md and doc/P2528R0.md
 
    TODO:
-   List of Lm chars in the resulting list, for c23++proposal 7.3
+   List of Lm chars in the resulting list, for P2528R0 7.3
    Number of Identifier_Type filtering (before, after).
    Number of Script filtering (before, after)
    Number of NFC filtering (before, after)

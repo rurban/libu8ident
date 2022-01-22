@@ -1,6 +1,8 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2021, 2022 Reini Urban
    SPDX-License-Identifier: Apache-2.0
+
+   TODO: SAFEC23_4 without Greek-Latin confusables
 */
 #include <string.h>
 #include <stdbool.h>

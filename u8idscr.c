@@ -317,20 +317,24 @@ LOCAL uint16_t u8ident_get_idtypes(const uint32_t cp) {
 }
 #endif // DISABLE_CHECK_XID
 
-#ifdef HAVE_CONFUS
-#  ifndef HAVE_CROARING
 static inline int compar32(const void *a, const void *b) {
   const uint32_t ai = *(const uint32_t *)a;
   const uint32_t bi = *(const uint32_t *)b;
   return ai < bi ? -1 : ai == bi ? 0 : 1;
 }
 
+LOCAL bool u8ident_is_greek_latin_confus(const uint32_t cp) {
+  return bsearch(&cp, greek_confus_list, ARRAY_SIZE(greek_confus_list), 4, compar32) != NULL
+             ? true
+             : false;
+}
+
+#if defined HAVE_CONFUS && !defined HAVE_CROARING
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32) != NULL
              ? true
              : false;
 }
-#  endif
 #endif
 
 EXTERN const char *u8ident_script_name(const int scr) {

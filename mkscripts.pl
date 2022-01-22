@@ -35,12 +35,13 @@ my $corep = "DerivedCoreProperties.txt";
 # --
 my $idtype = "IdentifierType.txt";
 my $idstat = "IdentifierStatus.txt";
+my $confus = "confusables.txt";
 for ($scn, $scxn, $pva, $corep, $normp) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/UNIDATA/$_");
   }
 }
-for ($idtype, $idstat) {
+for ($idtype, $idstat, $confus) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/security/latest/$_");
   }
@@ -49,7 +50,7 @@ for ($idtype, $idstat) {
 my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
     @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, %GC, $id);
 my ($started, @IDTYPES, @ALLOWED, @IDSTART, @IDCONT, @XIDSTART, @XIDCONT,
-    @SAFEC23START, @SAFEC23CONT);
+    @SAFEC23START, @SAFEC23CONT, %GCONFUS, @GCONFUS);
 open my $IDTYPE, "<", $idtype or die "$idtype $!";
 while (<$IDTYPE>) {
   if (/^#\tIdentifier_Type:/) { $started++; }
@@ -350,12 +351,44 @@ while (<$NORMP>) {
 }
 close $NORMP;
 
+open my $CONFUS, "<", $confus or die "$confus $!";
+while (<$CONFUS>) {
+  next if /^#/;
+  if (/ GREEK / and / LETTER / and / LATIN /) {
+    if (/^([0-9A-F]{4,5})\s+;.+?\tMA\t#\*?\s+(.+)\t#/) {
+      $from = $1;
+      my $comment = $2;
+      if ($comment =~ / → GREEK /) {
+        # switched Latin -> Greek
+        # e.g. A7B7 ;	03C9 ;	MA	# ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA
+        if (/^[0-9A-F]{4,5}\s+;\s+([0-9A-F]{4,5})\s+;/) {
+          $from = $1;
+          $GCONFUS{hex($from)} = $comment;
+        } else {
+          warn $_;
+        }
+      } elsif ($from !~ /^(037A|0381|0398|03B5|03B7|03B8|03B9|03D1|03F1|03F4)$/) {
+        # 10 allowed exceptions (which are not really that confusable)
+        $GCONFUS{hex($from)} = $comment;
+      }
+    }
+    else {
+      warn $_;
+    }
+  }
+}
+close $CONFUS;
+
 # @SCR bug in merge. Not needed anymore
 # push @SCR, [0x1e00, 0x1eff, 'Latin'];
 
 # sort the scripts by ->from
 @SCR = sort { $a->[0] <=> $b->[0] } @SCR;
 @SCXR = sort { $a->[0] <=> $b->[0] } @SCXR;
+for my $k (sort keys %GCONFUS) {
+  push @GCONFUS, [ $k, $GCONFUS{$k}];
+}
+@GCONFUS = sort { $a->[0] <=> $b->[0] } @GCONFUS;
 
 # splice l2 into l1
 sub merge {
@@ -1195,7 +1228,7 @@ printf $H16 <<'EOF';
 #endif // USE_NORM_CROAR
 EOF
 
-printf $H <<'EOF';
+printf $H <<'EOF', scalar(@GCONFUS);
 #endif // USE_NORM_CROAR
 
 // Bidi formatting characters for reordering attacks.
@@ -1208,6 +1241,19 @@ LOCAL const struct range_bool bidi_list[] = {
     { 0x202A, 0x202E }, // LRE, RLE, PDF, LRO, RLO
     { 0x2066, 0x2069 }, // LRI, RLI, FSI, PDI
     // clang-format on
+};
+#endif
+
+// Greek-Latin confusables. See doc/P2538R0.md for SAFEC23
+#ifdef EXTERN_SCRIPTS
+extern const uint32_t greek_confus_list[%u];
+#else
+LOCAL const uint32_t greek_confus_list[] = {
+EOF
+for my $r (@GCONFUS) {
+  printf $H "    0x%04X, // %s\n", $r->[0], $r->[1];
+};
+printf $H <<'EOF';
 };
 #endif
 EOF
