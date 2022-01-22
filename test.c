@@ -655,12 +655,32 @@ void test_combine() {
   ret = u8ident_check((const uint8_t *)"a\u1cd1", NULL);
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
+  if (u8ident_profile() != 5) {
+    // Disallow equal combiners (Inherited, Recommended, Mn)
+    ret = u8ident_check((const uint8_t *)"a\u0300\u0300", NULL);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+
+    // Disallow more then 4 combiners (Inherited, Recommended, Mn)
+    ret = u8ident_check((const uint8_t *)"a\u0300\u0301\u0302\u0303\u0304", NULL);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+  }
+  
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
+  // But ignore spacing marks Mc (Devanagari)
+  ret = u8ident_check((const uint8_t *)"\u0904\u0903\u0903", NULL);
+  //CHECK_RET(ret, U8ID_EOK or EOK_NORM, 0);
+  assert(ret >= 0);
+  ret = u8ident_check((const uint8_t *)"\u0904\u0903\u093b\u093e\u093b\u093e", NULL);
+  //CHECK_RET(ret, U8ID_EOK or EOK_NORM, 0);
+  assert(ret >= 0);
+
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   // Disallow Latin plus Cyrillic Mn. not in SCX, so ERR_SCRIPTS
   ret = u8ident_check((const uint8_t *)"a\u2dfa", NULL);
   if (u8ident_profile() == 5)
     CHECK_RET(ret, U8ID_EOK, 0);
   else
-    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);  
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
@@ -673,7 +693,6 @@ void test_combine() {
 #else
   CHECK_RET(ret, U8ID_EOK, 0);
 #endif
-
   u8ident_free();
 }
 

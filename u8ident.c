@@ -174,6 +174,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
                  "Invalid tr31_funcs[] size");
 #  endif
 #endif
+  uint32_t prev_cp = 0;
+  int seq_mn = 0;
   uint32_t cp = dec_utf8(&s);
 
 #ifndef DISABLE_CHECK_XID
@@ -310,7 +312,18 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             // Check combiners against basesc
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
+          } else if (cp == prev_cp) {
+            // TR39#5.4 "Forbid sequences of the same nonspacing mark"
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
+          } else if (gc == GC_Mn && ++seq_mn > 4) {
+            // TR39#5.4 "Forbid sequences of more than 4 nonspacing marks (gc=Mn
+            // or gc=Me)"
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
           }
+        } else { // not Mn|Mc
+          seq_mn = 0;
         }
         char *x = scx;
         while (*x) {
@@ -434,22 +447,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
       }
     ok:
-      // check illegal runs.
-      // A generic is_MARK(cp) would be too slow here. we rather should keep the
-      // SCX, and check the marks there.
-      if (scr == SC_Common || scr == SC_Inherited /*|| u8ident_is_MARK(cp)*/) {
-#if defined U8ID_PROFILE && (U8ID_PROFILE < 5 || U8ID_PROFILE == C11_4)
-        // what with a Sm as first?
-        if (basesc == SC_Unknown) {
-          // Only for Mark, not Lm.
-          // Disallow combiners without any base char (which do have a script)
-          ctx->last_cp = cp;
-          return U8ID_ERR_COMBINE;
-        } // SCX already checked above
-#endif
-      } else {
-        basesc = scr;
-      }
+      basesc = scr;
       u8ident_add_script_ctx(scr, ctx);
       // not is new, but still a possible greek confusable
     } else if (s_u8id_profile == U8ID_PROFILE_C23_4 && scr == SC_Greek &&
@@ -458,9 +456,42 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       return U8ID_ERR_SCRIPTS;
     } else if (scr != SC_Common && scr != SC_Inherited) {
       basesc = scr;
+    } else {
+      // check illegal runs.
+      // A generic is_MARK(cp) would be too slow here
+#if !defined U8ID_PROFILE
+        if (s_u8id_profile < 5 || s_u8id_profile == U8ID_PROFILE_C23_4)
+#elif (U8ID_PROFILE < 5 || U8ID_PROFILE == C23_4)
+        if (1)
+#else
+        if (0)
+#endif
+        {
+          // what with a Sm as first?
+          if (basesc == SC_Unknown) {
+            // Only for Mark, not Lm.
+            // Disallow combiners without any base char (which do have a script)
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
+          }
+          const enum u8id_gc gc = u8ident_get_gc(cp);
+          if (gc == GC_Mn || gc == GC_Me) {
+            if (cp == prev_cp) {
+              // TR39#5.4 "Forbid sequences of the same nonspacing mark"
+              ctx->last_cp = cp;
+              return U8ID_ERR_COMBINE;
+            } else if (++seq_mn > 4) {
+              // TR39#5.4 "Forbid sequences of more than 4 nonspacing marks (gc=Mn
+              // or gc=Me)"
+              ctx->last_cp = cp;
+              return U8ID_ERR_COMBINE;
+            }
+          }
+        }
     }
 
   next:
+    prev_cp = cp;
     cp = dec_utf8(&s);
 #ifndef DISABLE_CHECK_XID
     if (likely(s <= e && cp != 0)) {

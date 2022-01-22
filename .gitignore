@@ -63,6 +63,7 @@ confus_croar.bin
 nf*_croar.bin
 test-texts.test
 texts.tst
+doc/P2528R1.*
 doc/P2528R0.pdf
 doc/c23-proposal.pdf
 doc/my.latex

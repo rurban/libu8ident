@@ -1779,7 +1779,7 @@ LOCAL const struct sc nonxid_script_list[] = {
 LOCAL const struct scx scx_list[] = {
     // clang-format off
     {0x0342, 0x0345, GC_Mn, "\x0b"},	// Greek
-    {0x0363, 0x036F, GC_Mn, "\x02"},	// Latin
+    {0x0363, 0x036F, GC_Mn, "\x02"},	// Latin (Obsolete)
     {0x0483, 0x0483, GC_Mn, "\x07\x5c"},	// Cyrl Perm
     {0x0484, 0x0484, GC_Mn, "\x07\x36"},	// Cyrl Glag
     {0x0485, 0x0486, GC_Mn, "\x07\x02"},	// Cyrl Latn
