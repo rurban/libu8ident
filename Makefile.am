@@ -27,6 +27,7 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
+PDF = doc/P2528R0.pdf doc/c23-proposal.pdf
 doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/P2528R0.md doc/c23-proposal.md \
 	   doc/c23-proposal.patch
 if HAVE_PANDOC
@@ -118,8 +119,9 @@ regen-scripts:
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
-docs: $(doc_DATA)
+docs: $(doc_DATA) $(PDF)
 	-mkdir doc
+pdf: $(PDF)
 
 if HAVE_PANDOC
 doc/P2528R0.html: $(srcdir)/doc/P2528R0.md

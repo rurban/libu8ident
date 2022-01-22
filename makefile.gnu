@@ -306,6 +306,7 @@ regen-confus:
 	$(PERL) mkconfus.pl
 
 docs: $(DOCS)
+pdf: doc/P2528R0.pdf doc/c23-proposal.pdf
 doc/P2528R0.html: doc/P2528R0.md
 	-pandoc -s -o $@ doc/P2528R0.md
 doc/P2528R0.pdf: doc/P2528R0.md
