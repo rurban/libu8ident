@@ -99,13 +99,18 @@ int main(int argc, char **argv) {
         printf("\"%.*s\".%u: Wrong XID U+%X\n", (int)len, s, linenr,
                u8ident_failed_char(0));
         break;
+      case U8ID_ERR_COMBINE:
+        printf("\"%.*s\".%u: Wrong Combining Mark U+%X\n", (int)len, s, linenr,
+               u8ident_failed_char(0));
+        break;
       case U8ID_ERR_SCRIPT:
       case U8ID_ERR_SCRIPTS: {
         uint32_t cp = u8ident_failed_char(0);
         const char *scr = u8ident_failed_script_name(0);
+        const char *scripts = u8ident_existing_scripts(0);
         printf("\"%.*s\".%u: Wrong SCRIPT %s for U+%X, have %s\n", (int)len, s,
-               linenr, scr, cp, u8ident_script_name(u8ident_get_script(cp)));
-        free((char *)scr);
+               linenr, scr, cp, scripts);
+        free((char*)scripts);
         break;
       }
       default:
@@ -117,6 +122,7 @@ int main(int argc, char **argv) {
         break;
     }
   }
+  fclose(f);
 
   u8ident_free();
   return 0;
