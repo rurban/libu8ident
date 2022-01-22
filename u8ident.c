@@ -205,6 +205,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     return U8ID_ERR_XID;
   }
 #endif
+  bool has_latin = u8ident_has_script_ctx(SC_Latin, ctx);
 
   do {
 
@@ -269,7 +270,6 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     // TODO Keep list of possible scripts and reduce them.
     if (scr == SC_Common || scr == SC_Inherited) {
       // Almost everybody may mix with latin
-      const bool has_latin = u8ident_has_script_ctx(SC_Latin, ctx);
       const struct scx *this_scx = u8ident_get_scx(cp);
       if (this_scx) {
         scx = (char *)this_scx->scx;
@@ -338,8 +338,10 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 
     // ignore Latin. This is compatible with everything
     if (likely(scr == SC_Latin)) {
-      if (!u8ident_has_script_ctx(scr, ctx))
+      if (!u8ident_has_script_ctx(scr, ctx)) {
+        has_latin = true;
         u8ident_add_script_ctx(scr, ctx);
+      }
       basesc = scr;
       goto next;
     }
@@ -366,20 +368,20 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         }
         // check allowed CJK combinations
         if (scr == SC_Bopomofo) {
-          if (unlikely(!ctx->has_han)) {
+          if (unlikely(!ctx->has_han && !has_latin)) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           } else
             goto ok;
         } else if (scr == SC_Han) {
           if (unlikely(
-                  !(ctx->is_chinese || ctx->is_japanese || ctx->is_korean))) {
+                  !(ctx->is_chinese || ctx->is_japanese || ctx->is_korean || has_latin))) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           } else
             goto ok;
         } else if (scr == SC_Katakana || scr == SC_Hiragana) {
-          if (unlikely(!(ctx->is_japanese || ctx->has_han))) {
+          if (unlikely(!(ctx->is_japanese || ctx->has_han || has_latin))) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           } else
@@ -401,8 +403,14 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           }
-          if (scr == SC_Greek) {
+          // some Greek may mix with Latin
+          if (scr == SC_Greek && has_latin) {
             assert(s_u8id_profile == U8ID_PROFILE_C23_4);
+            // only not confusables
+            if (u8ident_is_greek_latin_confus(cp)) {
+              ctx->last_cp = cp;
+              return U8ID_ERR_SCRIPTS;
+            }
             goto ok;
           }
         }
@@ -411,13 +419,13 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         // but not Greek nor Cyrillic.
         // the only remaining profile
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 4
-        else if (scr == SC_Greek || scr == SC_Cyrillic) {
+        else if (!has_latin || scr == SC_Greek || scr == SC_Cyrillic) {
           assert(s_u8id_profile == U8ID_PROFILE_4);
           ctx->last_cp = cp;
           return U8ID_ERR_SCRIPTS;
         } else {
           assert(s_u8id_profile == U8ID_PROFILE_4);
-          // but not more than 2
+          // but not Latin with more than 2
           if (ctx->count >= 2) {
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
@@ -443,6 +451,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         basesc = scr;
       }
       u8ident_add_script_ctx(scr, ctx);
+      // not is new, but still a possible greek confusable
+    } else if (s_u8id_profile == U8ID_PROFILE_C23_4 && scr == SC_Greek &&
+               has_latin && u8ident_is_greek_latin_confus(cp)) {
+      ctx->last_cp = cp;
+      return U8ID_ERR_SCRIPTS;
     } else if (scr != SC_Common && scr != SC_Inherited) {
       basesc = scr;
     }

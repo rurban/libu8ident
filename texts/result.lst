@@ -512,10 +512,10 @@ Tシャツを3枚購入しました: EOK (Katakana, Latin, Hiragana, Han)
 대해야: EOK (Hangul)
 합니다: EOK (Hangul)
 -- texts/korean-2.txt
-ฝ오: EOK (Thai, Hangul)
-ʉ: EOK (Thai, Hangul, Latin)
-ฝ오: EOK (Thai, Hangul, Latin)
-ʉ: EOK (Thai, Hangul, Latin)
+ฝ오: ERR_SCRIPTS (Thai + U+C624 Hangul)!
+ʉ: EOK (Thai, Latin)
+ฝ오: ERR_SCRIPTS (Thai, Latin + U+C624 Hangul)!
+ʉ: EOK (Thai, Latin)
 -- texts/lao-1.txt
 ອັກສອນລາວ: EOK (Lao)
 ມະນຸດທຸກຄົນເກີດມາມີເສລີພາບ: EOK (Lao)

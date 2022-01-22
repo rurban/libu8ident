@@ -499,7 +499,7 @@ void test_mixed_scripts(int xid_check) {
   }
 #endif
 
-  ret = u8ident_check((const uint8_t *)"abcͻ", NULL); // Greek
+  ret = u8ident_check((const uint8_t *)"abcλ", NULL); // Greek
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
@@ -508,7 +508,7 @@ void test_mixed_scripts(int xid_check) {
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
-  ret = u8ident_check((const uint8_t *)"abcͻѝ", NULL); // Greek + Cyrillic
+  ret = u8ident_check((const uint8_t *)"abcλѝ", NULL); // Greek + Cyrillic
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C23_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
@@ -535,7 +535,7 @@ void test_mixed_scripts(int xid_check) {
 // check if mixed scripts per ctx work
 void test_mixed_scripts_with_ctx(void) {
   int ctx = u8ident_new_ctx(); // new ctx 1 (no Latin)
-  // U+37B Greek
+  // U+37B Greek confusable
   int ret = u8ident_check((const uint8_t *)"ͻ", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
   assert(u8ident_free_ctx(ctx) == 0);
@@ -554,9 +554,9 @@ void test_mixed_scripts_with_ctx(void) {
 #endif
   assert(u8ident_free_ctx(ctx) == 0);
 
-  // back to old ctx 0 (which has latin already)
-  ret = u8ident_check((const uint8_t *)"abͻώ", NULL);
-  // C23_4 allows Greek
+  // back to old empty ctx 0
+  ret = u8ident_check((const uint8_t *)"aηώ", NULL);
+  // C23_4 allows Greek (not confusable)
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0); // Latin + Greek disallowed in 2-4
 #elif U8ID_NORM == NFKD || U8ID_NORM == NFD || U8ID_NORM == FCD
@@ -803,6 +803,34 @@ void test_safec23(void) {
   }
 }
 
+void test_greek(void) {
+  // check consecutive greek_confus_list
+  for (size_t i = 1; i < ARRAY_SIZE(greek_confus_list); i++) {
+    assert(greek_confus_list[i-1] < greek_confus_list[i]);
+  }
+  // check mixed script c23_4 logic
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ID);
+  int ret = u8ident_check((const uint8_t *)"a", NULL);
+  // allow some greek with latin
+  if (u8ident_profile() == C23_4) {
+    ret = u8ident_check((const uint8_t *)"θ", NULL); // U+38B not confus
+    CHECK_RET(ret, U8ID_EOK, 0);
+    ret = u8ident_check((const uint8_t *)"Α", NULL); // U+391 confus
+    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+  } else if (u8ident_profile() < 5) {
+    ret = u8ident_check((const uint8_t *)"θ", NULL);
+    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+    ret = u8ident_check((const uint8_t *)"Α", NULL);
+    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+  } else {
+    ret = u8ident_check((const uint8_t *)"θ", NULL);
+    CHECK_RET(ret, U8ID_EOK, 0);
+    ret = u8ident_check((const uint8_t *)"Α", NULL);
+    CHECK_RET(ret, U8ID_EOK, 0);
+  }
+  u8ident_free();
+}
+
 void test_add_scripts(void) {
   int c = u8ident_new_ctx();
   struct ctx_t *ctx = u8ident_ctx();
@@ -882,6 +910,7 @@ int main(int argc, char **argv) {
     test_gc();
     test_medial();
     test_safec23();
+    test_greek();
     test_script();
   }
   if (combine) {
