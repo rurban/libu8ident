@@ -457,37 +457,39 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     } else if (scr != SC_Common && scr != SC_Inherited) {
       basesc = scr;
     } else {
-      // check illegal runs.
-      // A generic is_MARK(cp) would be too slow here
-#if !defined U8ID_PROFILE
-        if (s_u8id_profile < 5 || s_u8id_profile == U8ID_PROFILE_C23_4)
-#elif (U8ID_PROFILE < 5 || U8ID_PROFILE == C23_4)
-        if (1)
-#else
-        if (0)
-#endif
-        {
-          // what with a Sm as first?
-          if (basesc == SC_Unknown) {
-            // Only for Mark, not Lm.
-            // Disallow combiners without any base char (which do have a script)
+      // Check illegal runs.
+      // is_MARK(cp) is too slow, and we need the full GC for all cases
+#ifndef DISABLE_CHECK_XID
+#  if !defined U8ID_PROFILE
+      if (s_u8id_profile < 5 || s_u8id_profile == U8ID_PROFILE_C23_4)
+#  elif (U8ID_PROFILE < 5 || U8ID_PROFILE == C23_4)
+      if (1)
+#  else
+      if (0)
+#  endif
+      {
+        const enum u8id_gc gc = u8ident_get_gc(cp);
+        if (gc == GC_Mn || gc == GC_Me) {
+          if (cp == prev_cp) {
+            // TR39#5.4 "Forbid sequences of the same nonspacing mark"
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
+          } else if (++seq_mn > 4) {
+            // TR39#5.4 "Forbid sequences of more than 4 nonspacing marks (gc=Mn
+            // or gc=Me)"
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
           }
-          const enum u8id_gc gc = u8ident_get_gc(cp);
-          if (gc == GC_Mn || gc == GC_Me) {
-            if (cp == prev_cp) {
-              // TR39#5.4 "Forbid sequences of the same nonspacing mark"
-              ctx->last_cp = cp;
-              return U8ID_ERR_COMBINE;
-            } else if (++seq_mn > 4) {
-              // TR39#5.4 "Forbid sequences of more than 4 nonspacing marks (gc=Mn
-              // or gc=Me)"
-              ctx->last_cp = cp;
-              return U8ID_ERR_COMBINE;
-            }
-          }
         }
+        // Allow Sm as first
+        if (basesc == SC_Unknown &&
+            (gc == GC_Mn || gc == GC_Me || gc == GC_Mc)) {
+          // Disallow combiners without any base char (which do have a script)
+          ctx->last_cp = cp;
+          return U8ID_ERR_COMBINE;
+        }
+      }
+#endif
     }
 
   next:

@@ -489,7 +489,7 @@ void test_mixed_scripts(int xid_check) {
     }
   } else {
     // division sign U+F7 Math_Symbol allowed without XID check.
-    CHECK_RET(ret, U8ID_EOK, 0);
+    CHECK_RET(ret, U8ID_EOK, 0); // FIXME COMBINE
     ret = u8ident_check((const uint8_t *)"\xc6\x80", NULL);
     CHECK_RET(ret, U8ID_EOK, 0); // small letter b with stroke U+180
     ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
@@ -655,6 +655,7 @@ void test_combine() {
   ret = u8ident_check((const uint8_t *)"a\u1cd1", NULL);
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
+#ifndef DISABLE_CHECK_XID
   if (u8ident_profile() != 5) {
     // Disallow equal combiners (Inherited, Recommended, Mn)
     ret = u8ident_check((const uint8_t *)"a\u0300\u0300", NULL);
@@ -664,7 +665,8 @@ void test_combine() {
     ret = u8ident_check((const uint8_t *)"a\u0300\u0301\u0302\u0303\u0304", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
   }
-  
+#endif
+
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   // But ignore spacing marks Mc (Devanagari)
   ret = u8ident_check((const uint8_t *)"\u0904\u0903\u0903", NULL);
