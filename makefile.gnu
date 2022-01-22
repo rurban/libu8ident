@@ -57,8 +57,8 @@ ALLHDRS = $(HDRS) unic23.h
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 SOLIB = libu8ident.so
-DOCS = README.md NEWS NOTICE LICENSE doc/c11.md doc/P2528R0.html doc/P2528R0.html \
-	doc/P2528R0.md doc/n2916.html doc/n2916.md doc/n2916.patch \
+DOCS = README.md NEWS NOTICE LICENSE doc/c11.md doc/P2528R0.html doc/P2528R1.html \
+	doc/P2528R0.md doc/P2528R1.md doc/n2916.html doc/n2916.md doc/n2916.patch \
 	doc/tr31-bugs.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
@@ -309,10 +309,12 @@ docs: $(DOCS)
 pdf: doc/P2528R0.pdf doc/n2916.pdf
 doc/P2528R0.html: doc/P2528R0.md
 	-pandoc -s -o $@ doc/P2528R0.md
+doc/P2528R1.html: doc/P2528R1.md
+	-pandoc -s -o $@ doc/P2528R1.md
 doc/P2528R0.pdf: doc/P2528R0.md
 	-pandoc -s --pdf-engine=xelatex -o $@ doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/n2916.html: doc/n2916.md
-	-pandoc -s -o $@ doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
+	-pandoc -s -o $@ doc/n2916.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
 doc/n2916.pdf: doc/n2916.md
 	-pandoc -s --pdf-engine=xelatex -o $@ doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 patch-c-doc:

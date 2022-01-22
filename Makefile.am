@@ -27,13 +27,13 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-PDF = doc/P2528R0.pdf doc/n2916.pdf
+PDF = doc/P2528R0.pdf doc/P2528R1.pdf doc/n2916.pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
-	   doc/c11.md doc/P2528R0.md doc/n2916.md doc/n2916.patch \
+	   doc/c11.md doc/P2528R0.md doc/P2528R1.md doc/n2916.md doc/n2916.patch \
 	   doc/tr31-bugs.md 
 if HAVE_PANDOC
-doc_DATA += doc/P2528R0.pdf doc/n2916.pdf
-html_DATA = doc/P2528R0.html doc/n2916.html
+doc_DATA += $(PDF)
+html_DATA = doc/P2528R0.html doc/P2528R1.html doc/n2916.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
@@ -128,18 +128,24 @@ if HAVE_PANDOC
 doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md
+doc/P2528R1.html: $(srcdir)/doc/P2528R1.md
+	-mkdir doc
+	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md
 doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/n2916.html: $(srcdir)/doc/n2916.md
 	-mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s -o $@ $(srcdir)/doc/n2916.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
+doc/P2528R1.pdf: $(srcdir)/doc/P2528R1.md
+	-mkdir doc
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/n2916.pdf: $(srcdir)/doc/n2916.md
 	-mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 endif
 
-regen-all: regen-scripts regen-norm regen-confus regen-man doc/P2528R0.html doc/n2916.html
+regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) $(html_DATA)
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
@@ -277,7 +283,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT) example$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 P2528R0.html homo-sec-1.tst.rst
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst
 distclean-compile:
 	-rm -f *.tab.c
 	-rm -rf .deps

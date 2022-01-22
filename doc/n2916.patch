@@ -1,5 +1,5 @@
 --- doc/P2528R0.md	2022-01-22 15:03:34.374093280 +0100
-+++ doc/n2916.md	2022-01-23 22:31:03.605443586 +0100
++++ doc/n2916.md	2022-01-24 08:08:28.905760328 +0100
 @@ -1,10 +1,9 @@
 -    C++ Identifier Security using Unicode Standard Annex 39
 +    n2916 - C Identifier Security using Unicode Standard Annex 39
@@ -42,7 +42,17 @@
  Source file) forbids insecure mixes of Greek with Cyrillic, dangerous
  Arabic RTL bidi attacks and most confusables. You can still write in
  your language, but then only in commonly written languages, and not
-@@ -170,7 +169,7 @@
+@@ -119,7 +118,8 @@
+ `XID_Start`: 131876 codepoints,
+ `XID_Continue`: 135053 codepoints (= `XID_Start` + 3173)
+ 
+-See 13 "Appendix A - C23XID_Start" and 13 "Appendix B - C23XID_Continue"
++See [13 "Appendix A - C23XID_Start"](#appendix-a---c23xid_start) and
++[14 "Appendix B - C23XID_Continue"](#appendix-b---c23xid_continue)
+ 
+ 4.2 Only Recommended scripts are now allowed, Excluded and Limited_Use not
+ --------------------------------------------------------------------------
+@@ -170,7 +170,7 @@
  4.3 Documents with identifiers in many multiple scripts/languages will become illegal
  -------------------------------------------------------------------------------------
  
@@ -51,7 +61,19 @@
  Restrictive**, with an exception for Greek.
  
  * All identifiers in a document qualify as Single Script, or
-@@ -247,7 +246,7 @@
+@@ -193,8 +193,9 @@
+ the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND
+ MARK modifier letters.
+ 
+-See 7.2 "SCX Extensions" and 7.3 "Combining marks script run detection
+-for spoofing" below.
++See [7.2 "SCX Extensions"](#scx-extensions) and [7.3 "Combining marks
++script run detection for spoofing"](#combining-marks-script-run-detection-for-spoofing)
++below.
+ 
+ 5 What will this proposal not change
+ ====================================
+@@ -247,7 +248,7 @@
  7.1 SC
  -----
  
@@ -60,7 +82,45 @@
  single byte.  There are currently 161 scripts assigned, 32 of them are
  in common use as identifiers, hence called **Recommended** scripts. The
  rest is split up into 127-31 **Excluded** scripts, which are not in common
-@@ -487,12 +486,14 @@
+@@ -272,7 +273,7 @@
+ Table 7, Limited Use Scripts. To avoid security issues, some
+ implementations may wish to disallow the limited-use scripts in
+ identifiers. For more information on usage, see the Unicode Locale
+-project [CLDR](http://cldr.unicode.org/)."
++project [CLDR](http://cldr.unicode.org/)."_
+ 
+ Regarding stability: New scripts are added on a yearly basis, but
+ nothing was added to the stable set of recommended scripts. For a
+@@ -314,7 +315,8 @@
+ Some of the SCX scripts contain only a single script. These could be
+ directly added to the list of SC scripts for the purpose of identifier
+ security checks, but I advise against, for easier Combining Marks
+-checks against the base character script. See below 7.3.
++checks against the base character script. See below
++[7.3](#combining-marks-script-run-detection-for-spoofing).
+ 
+ E.g.
+ 
+@@ -437,7 +439,7 @@
+ 
+     grep ', U8ID_Technical' scripts.h | egrep -v 'Not_XID|U8ID_Obsolete|U8ID_Exclusion'
+ 
+-See 17 Appendix E - IDType Technical.
++See [17 Appendix E - IDType Technical](#appendix-e---idtype-technical).
+ 
+ 9 TR39 Mixed Scripts
+ ====================
+@@ -465,7 +467,8 @@
+ Latin letter which looks the same as the Greek counterpart, the Greek
+ letter is forbidden, choose the Latin one instead. E.g.
+ ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A.
+-See **18 Appendix F** for the generated list with 10 exceptions.
++See [18 Appendix F](#appendix-f---greek-confusables) for the generated
++list with 10 exceptions.
+ 
+ Thus it prevents Cyrillic mixed with Latin or any other script, but
+ does allow any East-Asian CFK language, other common and widely used
+@@ -487,6 +490,8 @@
               Greek confusable
  * U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C
               Greek confusable
@@ -69,14 +129,7 @@
  
  TR39 also compiles a convenient
  [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
- list. But all the math letters with Script=Common from U+2100 to
- U+2200 are restricted, as Greek is forbidden mixed with Latin in the
--original TR39 Moderately Restrictive profile. Most are allowed
-+original TR39 Moderately Restrictive profile. These are allowed
- according to the TR31 and TR39 rules of SAFEC23, so we need to come up
- with our own list of `XID_Start/XID_Continue` codepoints, excluding
- the Limited Use and Excluded scripts. And if an implementation choses
-@@ -520,11 +521,11 @@
+@@ -520,20 +525,19 @@
  identifiers.  One could argue that a mixed-script profile is valid
  only for a single identifier, or it is valid for the whole source file
  document. And there needs to be a definition if before or after the
@@ -91,7 +144,25 @@
  identifiers would not be identifiable anymore, as both both can render
  to the very same glyphs. Thus we adopt the notion of identifier
  contexts.
-@@ -561,9 +562,9 @@
+ 
+ With programming languages this is a source file, with objects files
+ this is a module.  For identifiers in object files see below [12
+-Issues with binutils, linkers, exported identifiers](#12 Issues with
+-binutils, linkers, exported identifiers). For filesystems this would
+-be a directory.
++Issues with binutils, linkers, exported identifiers](#issues-with-binutils-linkers-exported-identifiers).
++For filesystems this would be a directory.
+ 
+ For every source file we need to store a context with the list of
+ already seen scripts and how many.  The maximal number of scripts is
+@@ -556,14 +560,15 @@
+   arabic fields, and include another header with Cyrillic only
+   names. This would allow confusables in the resulting object
+   file, and source files would be easy to check with external tools.
+-  See also the binutils section 12 below.
++  See also the [binutils section 12](#12-issues-with-binutils-linkers-exported-identifiers)
++  below.
+ 
  - **private**: Another argument would be that all exported names end
    up in the object files and library flat, which would support the
    seperation of private and public name contexts, where to perform the
@@ -104,7 +175,7 @@
    rest is seperated by the checks for the public names.
  
  - **after-cpp**: The third, strictest variant would define the context in
-@@ -607,7 +608,7 @@
+@@ -607,7 +612,7 @@
  12 Issues with binutils, linkers, exported identifiers
  =====================================================
  
@@ -113,7 +184,7 @@
  used with other earlier compilers or languages without any unicode security
  profile or restriction. ffi's are very common, libraries or .def files
  even more, thanksfully unicode names not at all yet.
-@@ -617,15 +618,15 @@
+@@ -617,28 +622,29 @@
  there, and names are charset (=user) specific, whilst there are no header
  fields for the used charset (e.g. if SHIFT-JIS or UTF-8), nor are
  there any rules for name lookup (normalization). This is not solvable
@@ -133,3 +204,60 @@
  groups to adopt a more precise specification how exported identifiers
  are represented in object files and libraries: UTF-8 or any charset,
  and how they are looked up: any normalization, NFC or not at all.  My
+-recommendation would be to interpret them as UTF-8, require NFC, and
+-reject all illegal UTF-8 and non-NFC identifiers. As long as there no
++recommendation would be to interpret them as UTF-8, use NFC for the
++lookup, and reject all illegal UTF-8 identifiers. As long as there no
+ unicode names in the wild this is still easy. There are also many
+ object file producers in the wild, with possibly completely insecure
+ unicode names in the future.
+ 
+ binutils `readelf -L -Ul` is currently broken displaying unicode
+ identifiers.  I have patches to display them in the current multi-byte
+-locale, and to add u8ident checks with -L. I haven't found any
+-violations so far in my used libraries.
++locale, and to add u8ident checks with `-L`. I haven't found any
++violations so far in my used libraries, but a Debian/Fedora/FreeBSD
++mass-scan seems necessary.
+ 
+ Even better would be for the C ABI's to also adopt secure unicode
+ identifiers, as linkers and FFI's have the same unicode security
+@@ -1148,7 +1154,7 @@
+ // 355 ranges, 115 singles, 99350 codepoints
+ ```
+ 
+-14 Appendix A - C23XID_Continue
++14 Appendix B - C23XID_Continue
+ ===============================
+ 
+ Created with mkc23 from libu8ident.
+@@ -1963,8 +1969,9 @@
+ 17 Appendix E - IDType Technical
+ =================================
+ 
+-Needed for **#8 TR39 Identifier Type**. List of Technical ID characters, added
+-the TR39 Recommended and Inclusion IDTypes. TR39#Table 1
++Needed for Section 8 [TR39 Identifier Type](#tr39-identifier-type).
++List of Technical ID characters, added to the TR39 Recommended and Inclusion
++IDTypes. TR39#Table 1
+ <https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type>
+ 
+     grep ' Technical ' IdentifierType.txt |
+@@ -2131,12 +2138,12 @@
+ 18 Appendix F - Greek Confusables
+ =================================
+ 
+-Needed for exclusion in the **TR39 Mixed Scripts** Greek rule. Where-ever we
+-have a Greek letter confusable with Latin, and we already saw Latin, forbid
+-the Greek letter in favor of the Latin letter. See TR39
++Needed for exclusion in the [9 TR39 Mixed Scripts](#tr39-mixed-scripts) Greek
++rule.  Where-ever we have a Greek letter confusable with Latin, and we already
++saw Latin, forbid the Greek letter in favor of the Latin letter. See TR39
+ [confusables.txt](https://www.unicode.org/Public/security/latest/confusables.txt).
+-Note that these confusables cannot be excluded upfront in the TR31 identifier parsing,
+-as Greek alone is allowed.
++Note that these confusables cannot be excluded upfront in the TR31
++identifier parsing, as Greek alone is allowed.
+ 
+ 18.1 Exceptions
+ ----------------
