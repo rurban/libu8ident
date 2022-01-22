@@ -155,15 +155,15 @@ This is the recommended profile, don't fall into the unicode identifier trap.
 
 `c23_4`. **SAFEC23**
 
-* We also provide a special profile, called **`U8ID_PROFILE_C11_4`**,
+* We also provide a special profile, called **`U8ID_PROFILE_C23_4`**,
   also defined by `-DU8ID_PROFILE_SAFEC23`. This is an extended Moderate
-  Profile (4), plus allowing Greek with Latin, plus only allowing Allowed
-  IdentifierStatus.
+  Profile (4), plus allowing some Greek with Latin, plus only allowing secure
+  identifiers.
 * `U8ID_PROFILE_C23_4` aka `U8ID_PROFILE_SAFEC23` is the secure
   extension over C11, disallowing the restricted and limited_use
   scripts and identifiers, arbitrary rtl and ltr overrides, and all
-  the insecure mixed scripts combinations.  See `unic11.h`,
-  [c11.md](c11.md) and the unfinished [c23++proposal.md](c23++proposal.md).
+  the insecure mixed scripts combinations.  See `unic23.h`,
+  and the C23++ proposal [P2528R0](doc/P2528R0.md).
 
 `c11_6`. **C11STD**
 
@@ -175,8 +175,9 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   See [c11.md](c11.md), `unic11.h` and [N2731](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf)
   Annex D (p. 425).
 
-Recommended is Level 4, the **Moderately Restrictive level** or its **C23_4** variant.
-It is always easier to widen restrictions than narrow them.
+Recommended is Level 4, the **Moderately Restrictive level** or its
+improved **C23_4** variant. It is always easier to widen restrictions
+than narrow them.
 
 configure options
 -----------------
