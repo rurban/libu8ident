@@ -20,8 +20,6 @@ Remember, the meaning of identifiers is to be **identifiable**. A user
 should not confuse one identifier with another. Only a program, IDE or
 library can properly check unicode identifiers, humans certainly not.
 Leaving such checks to a linter is not recommended, and they don't even exist.
-(_The C 20 Standard commitee is wrong. They believe the whole UCD is needed
-for those checks. So they rather ignore the problem._)
 
 Valid characters
 ----------------
@@ -43,10 +41,11 @@ With the optional `U8ID_TR31` options we check for valid UTF-8
 encoding, valid ID_Start/Continue properties and allowed script of
 each character.
 
-Some parsers also need to check for allowed **median** characters,
+Some parsers also need to check for allowed **medial** characters,
 which are not allowed at the very end of an identifier. Esp. for
 unrestrictive mixed-script security profiles or insecure xid
-ranges. This library does not do this yet.
+ranges. All the UCD ID\_Start and XID\_Start properties incorrectly list
+them there, and not in X?ID\_Continue btw.
 
 **u8idlint** has its own tokenizer, which can be configured with the
 **--xid** options: **ASCII, SAFEC23, ALLOWED, ID, XID, C11** and
@@ -516,8 +515,6 @@ TODO
 
 * Add special checks for zero-with (non-)joiners, only allowed in special
   median or cont positions. See TR31 2.3 A1,A2 or B.
-  Ditto for other tr31 special median positions, e.g. MIDDLE DOT, HEBREW U+5F3,
-  KATAKANA U+30A0, U+30FB.
 
 * **[IdentifierType](http://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)**
   The list of idtypes is provided, but not yet integrated into any API.
