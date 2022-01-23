@@ -58,7 +58,7 @@ OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 SOLIB = libu8ident.so
 DOCS = README.md NOTICE LICENSE doc/c11.md doc/P2528R0.html doc/P2528R0.html \
-	doc/P2528R0.md doc/c23-proposal.html doc/c23-proposal.md doc/c23-proposal.patch \
+	doc/P2528R0.md doc/n2916.html doc/n2916.md doc/n2916.patch \
 	doc/tr31-bugs.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
@@ -306,19 +306,19 @@ regen-confus:
 	$(PERL) mkconfus.pl
 
 docs: $(DOCS)
-pdf: doc/P2528R0.pdf doc/c23-proposal.pdf
+pdf: doc/P2528R0.pdf doc/n2916.pdf
 doc/P2528R0.html: doc/P2528R0.md
 	-pandoc -s -o $@ doc/P2528R0.md
 doc/P2528R0.pdf: doc/P2528R0.md
 	-pandoc -s --pdf-engine=xelatex -o $@ doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-doc/c23-proposal.html: doc/c23-proposal.md
-	-pandoc -s -o $@ doc/c23-proposal.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
-doc/c23-proposal.pdf: doc/c23-proposal.md
-	-pandoc -s --pdf-engine=xelatex -o $@ doc/c23-proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C Identifier Security using Unicode Standard Annex 39"
+doc/n2916.html: doc/n2916.md
+	-pandoc -s -o $@ doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
+doc/n2916.pdf: doc/n2916.md
+	-pandoc -s --pdf-engine=xelatex -o $@ doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 patch-c-doc:
-	patch -f doc/c23-proposal.md doc/c23-proposal.patch
+	patch -f doc/n2916.md doc/n2916.patch
 regen-c-patch:
-	-diff -bu doc/P2528R0.md doc/c23-proposal.md >doc/c23-proposal.patch
+	-diff -bu doc/P2528R0.md doc/n2916.md >doc/n2916.patch
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h

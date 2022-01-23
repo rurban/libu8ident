@@ -27,12 +27,12 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-PDF = doc/P2528R0.pdf doc/c23-proposal.pdf
-doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/P2528R0.md doc/c23-proposal.md \
-	   doc/c23-proposal.patch
+PDF = doc/P2528R0.pdf doc/n2916.pdf
+doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/P2528R0.md doc/n2916.md \
+	   doc/n2916.patch
 if HAVE_PANDOC
-#doc_DATA += doc/P2528R0.pdf doc/c23-proposal.pdf
-html_DATA = doc/P2528R0.html doc/c23-proposal.html
+#doc_DATA += doc/P2528R0.pdf doc/n2916.pdf
+html_DATA = doc/P2528R0.html doc/n2916.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
@@ -130,15 +130,15 @@ doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
 doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-doc/c23-proposal.html: $(srcdir)/doc/c23-proposal.md
+doc/n2916.html: $(srcdir)/doc/n2916.md
 	-mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/c23-proposal.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
-doc/c23-proposal.pdf: $(srcdir)/doc/c23-proposal.md
+	$(PANDOC) -s -o $@ $(srcdir)/doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
+doc/n2916.pdf: $(srcdir)/doc/n2916.md
 	-mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/c23-proposal.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="C Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 endif
 
-regen-all: regen-scripts regen-norm regen-confus regen-man doc/P2528R0.html doc/c23-proposal.html
+regen-all: regen-scripts regen-norm regen-confus regen-man doc/P2528R0.html doc/n2916.html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
