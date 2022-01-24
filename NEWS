@@ -1,0 +1,8 @@
+libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
+Copyright (C) 2022 Reini Urban
+
+libu8ident 0.1 - 2022-01-24:
+
+First release, with the library, u8idlint and lots of C23 support:
+the optimized unic23.h, and the 2 technical papers for C23++ and C23
+to use TR39.

@@ -28,10 +28,11 @@ dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 PDF = doc/P2528R0.pdf doc/n2916.pdf
-doc_DATA = README.md NOTICE LICENSE doc/c11.md doc/tr31-bugs.md doc/P2528R0.md doc/n2916.md \
-	   doc/n2916.patch
+doc_DATA = README.md NEWS NOTICE LICENSE \
+	   doc/c11.md doc/P2528R0.md doc/n2916.md doc/n2916.patch \
+	   doc/tr31-bugs.md 
 if HAVE_PANDOC
-#doc_DATA += doc/P2528R0.pdf doc/n2916.pdf
+doc_DATA += doc/P2528R0.pdf doc/n2916.pdf
 html_DATA = doc/P2528R0.html doc/n2916.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
