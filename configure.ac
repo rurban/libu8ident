@@ -2,10 +2,20 @@
 # (C) 2021-2022  Reini Urban <rurban@cpan.org>
 # See LICENSE
 AC_PREREQ([2.69])
-AC_INIT([libu8ident],[0.1],[https://github.com/rurban/libu8ident/issues],[libu8ident],[http://github.com/rurban/libu8ident/])
+AC_INIT([libu8ident],
+        m4_esyscmd([build-aux/git-version-gen .version]),
+	[https://github.com/rurban/libu8ident/issues],,
+	[http://github.com/rurban/libu8ident/])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([u8ident.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_SUBST([LIBU8IDENT_SO_VERSION], [0:0:0])
+VERSION_FILE=".version"
+AC_SUBST([VERSION_FILE])
+AC_MSG_CHECKING([git version])
+AC_MSG_RESULT($PACKAGE_VERSION)
+AC_MSG_CHECKING([so version-info])
+AC_MSG_RESULT($LIBU8IDENT_SO_VERSION)
 
 AM_INIT_AUTOMAKE([1.10 no-define foreign dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])

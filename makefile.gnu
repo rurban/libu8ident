@@ -122,6 +122,9 @@ most: $(LIB) $(SOLIB) $(MAN) u8idlint
 
 all: mkc23 most test-texts test perf docs
 
+.version: makefile.gnu
+	build-aux/git-version-gen .version
+
 .c.o:
 	$(CC) $(CFLAGS_REL) $(LTOFLAGS) $(DEFINES) -Iinclude -c $< -o $@
 .c.i:

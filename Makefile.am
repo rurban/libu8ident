@@ -279,11 +279,15 @@ else
 endif
 	rm -rf inst
 
+dist-hook:
+	echo dist-hook distdir="$(distdir)"
+	echo $(VERSION) > $(distdir)/.version
+
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
 	     texts.tst mkc23$(EXEEXT) example$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst test-texts.test
 distclean-compile:
 	-rm -f *.tab.c
 	-rm -rf .deps
@@ -291,18 +295,17 @@ distclean-compile:
 MAINTAINERCLEANFILES  = *~ Makefile.in Makefile
 LIBTOOL_DISTCLEAN_FILES = \
 	aclocal.m4 \
-	compile \
-	config.guess \
-	config.h.in \
-	config.sub \
 	configure \
-	depcomp \
-	install-sh \
-	ltmain.sh \
-	missing \
+	config.h.in \
+	build-aux/compile \
+	build-aux/config.guess \
+	build-aux/config.sub \
+	build-aux/depcomp \
+	build-aux/install-sh \
+	build-aux/ltmain.sh \
+	build-aux/missing \
 	m4/libtool.m4 \
 	m4/ltoptions.m4 \
 	m4/ltsugar.m4 \
 	m4/ltversion.m4 \
-	m4/lt~obsolete.m4 \
-	test-texts.test
+	m4/lt~obsolete.m4
