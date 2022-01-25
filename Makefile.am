@@ -130,7 +130,7 @@ doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
 	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md
 doc/P2528R1.html: $(srcdir)/doc/P2528R1.md
 	-mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md
+	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
 doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
 	-mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
