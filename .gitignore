@@ -22,6 +22,7 @@ u8idroar.o
 /mkc23
 /example
 /build
+/build-[b-z0-9]*/
 /Scripts.txt
 /ScriptExtensions.txt
 /PropertyValueAliases.txt
@@ -53,6 +54,7 @@ roaring.h
 u8ident.3
 mkroar
 perf
+gconfus.h.in
 allowed_croar.h
 nfc_croar.h
 nfd_croar.h
@@ -61,8 +63,11 @@ nfkd_croar.h
 allowed_croar.bin
 confus_croar.bin
 nf*_croar.bin
+mark_croar.bin
 test-texts.test
 texts.tst
 doc/my.latex
 homo-sec-1
 homo-sec-1.o
+Dockerfile.pandoc
+doc/P2528R*.pdf
