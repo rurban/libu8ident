@@ -21,7 +21,7 @@ u8idroar.o
 /test-texts
 /mkc23
 /example
-/build*
+/build
 /Scripts.txt
 /ScriptExtensions.txt
 /PropertyValueAliases.txt
