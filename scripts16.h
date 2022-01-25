@@ -37,89 +37,89 @@ LOCAL const struct sc16 xid_script_list16[] = {
     // clang-format off
     {0x0000, 0x0040, 0},	// Common
     {0x0041, 0x005A, 2},	// Latin
-    {0x005B, 0x0060, 0},	// Common
+    {0x005B, 0x0060, 0},	// Common (Not_XID)
     {0x0061, 0x007A, 2},	// Latin
-    {0x007B, 0x00A9, 0},	// Common
-    {0x00AA, 0x00AA, 2},	// Latin
-    {0x00AB, 0x00B9, 0},	// Common
-    {0x00BA, 0x00BA, 2},	// Latin
-    {0x00BB, 0x00BF, 0},	// Common
+    {0x007B, 0x00A9, 0},	// Common (Not_XID)
+    {0x00AA, 0x00AA, 2},	// Latin (Not_NFKC)
+    {0x00AB, 0x00B9, 0},	// Common (Not_XID)
+    {0x00BA, 0x00BA, 2},	// Latin (Not_NFKC)
+    {0x00BB, 0x00BF, 0},	// Common (Not_XID)
     {0x00C0, 0x00D6, 2},	// Latin
-    {0x00D7, 0x00D7, 0},	// Common
+    {0x00D7, 0x00D7, 0},	// Common (Not_XID)
     {0x00D8, 0x00F6, 2},	// Latin
-    {0x00F7, 0x00F7, 0},	// Common
+    {0x00F7, 0x00F7, 0},	// Common (Not_XID)
     {0x00F8, 0x02B8, 2},	// Latin
     {0x02B9, 0x02DF, 0},	// Common
-    {0x02E0, 0x02E4, 2},	// Latin
-    {0x02E5, 0x02E9, 0},	// Common
-    {0x02EA, 0x02EB, 6},	// Bopomofo
+    {0x02E0, 0x02E4, 2},	// Latin (Not_NFKC)
+    {0x02E5, 0x02E9, 0},	// Common (Not_XID)
+    {0x02EA, 0x02EB, 6},	// Bopomofo (Not_XID)
     {0x02EC, 0x02FF, 0},	// Common
     {0x0300, 0x036F, 1},	// Inherited
-    {0x0370, 0x0373, 11},	// Greek
-    {0x0374, 0x0374, 0},	// Common
+    {0x0370, 0x0373, 11},	// Greek (Obsolete)
+    {0x0374, 0x0374, 0},	// Common (Not_NFKC)
     {0x0375, 0x0377, 11},	// Greek
-    {0x037A, 0x037D, 11},	// Greek
-    {0x037E, 0x037E, 0},	// Common
-    {0x037F, 0x037F, 11},	// Greek
-    {0x0384, 0x0384, 11},	// Greek
-    {0x0385, 0x0385, 0},	// Common
+    {0x037A, 0x037D, 11},	// Greek (Not_NFKC)
+    {0x037E, 0x037E, 0},	// Common (Not_NFKC)
+    {0x037F, 0x037F, 11},	// Greek (Obsolete)
+    {0x0384, 0x0384, 11},	// Greek (Not_NFKC)
+    {0x0385, 0x0385, 0},	// Common (Not_NFKC)
     {0x0386, 0x0386, 11},	// Greek
-    {0x0387, 0x0387, 0},	// Common
+    {0x0387, 0x0387, 0},	// Common (Not_NFKC)
     {0x0388, 0x038A, 11},	// Greek
     {0x038C, 0x038C, 11},	// Greek
     {0x038E, 0x03A1, 11},	// Greek
     {0x03A3, 0x03E1, 11},	// Greek
-    {0x03E2, 0x03EF, 43},	// Coptic
-    {0x03F0, 0x03FF, 11},	// Greek
+    {0x03E2, 0x03EF, 43},	// Coptic (Exclusion)
+    {0x03F0, 0x03FF, 11},	// Greek (Not_NFKC)
     {0x0400, 0x0484, 7},	// Cyrillic
-    {0x0485, 0x0486, 1},	// Inherited
-    {0x0487, 0x052F, 7},	// Cyrillic
+    {0x0485, 0x0486, 1},	// Inherited (Technical Obsolete)
+    {0x0487, 0x052F, 7},	// Cyrillic (Technical Obsolete)
     {0x0531, 0x0556, 4},	// Armenian
     {0x0559, 0x058A, 4},	// Armenian
-    {0x058D, 0x058F, 4},	// Armenian
-    {0x0591, 0x05C7, 16},	// Hebrew
+    {0x058D, 0x058F, 4},	// Armenian (Not_XID)
+    {0x0591, 0x05C7, 16},	// Hebrew (Uncommon_Use)
     {0x05D0, 0x05EA, 16},	// Hebrew
     {0x05EF, 0x05F4, 16},	// Hebrew
-    {0x0600, 0x0604, 3},	// Arabic
-    {0x0605, 0x0605, 0},	// Common
-    {0x0606, 0x060B, 3},	// Arabic
-    {0x060C, 0x060C, 0},	// Common
-    {0x060D, 0x061A, 3},	// Arabic
-    {0x061B, 0x061B, 0},	// Common
-    {0x061C, 0x061E, 3},	// Arabic
-    {0x061F, 0x061F, 0},	// Common
+    {0x0600, 0x0604, 3},	// Arabic (Not_XID)
+    {0x0605, 0x0605, 0},	// Common (Not_XID)
+    {0x0606, 0x060B, 3},	// Arabic (Not_XID)
+    {0x060C, 0x060C, 0},	// Common (Not_XID)
+    {0x060D, 0x061A, 3},	// Arabic (Not_XID)
+    {0x061B, 0x061B, 0},	// Common (Not_XID)
+    {0x061C, 0x061E, 3},	// Arabic (Default_Ignorable)
+    {0x061F, 0x061F, 0},	// Common (Not_XID)
     {0x0620, 0x063F, 3},	// Arabic
-    {0x0640, 0x0640, 0},	// Common
+    {0x0640, 0x0640, 0},	// Common (Obsolete)
     {0x0641, 0x064A, 3},	// Arabic
     {0x064B, 0x0655, 1},	// Inherited
-    {0x0656, 0x066F, 3},	// Arabic
+    {0x0656, 0x066F, 3},	// Arabic (Uncommon_Use)
     {0x0670, 0x0670, 1},	// Inherited
     {0x0671, 0x06DC, 3},	// Arabic
-    {0x06DD, 0x06DD, 0},	// Common
-    {0x06DE, 0x06FF, 3},	// Arabic
-    {0x0700, 0x070D, 153},	// Syriac
-    {0x070F, 0x074A, 153},	// Syriac
-    {0x074D, 0x074F, 153},	// Syriac
+    {0x06DD, 0x06DD, 0},	// Common (Not_XID)
+    {0x06DE, 0x06FF, 3},	// Arabic (Not_XID)
+    {0x0700, 0x070D, 153},	// Syriac (Limited_Use Not_XID)
+    {0x070F, 0x074A, 153},	// Syriac (Limited_Use Not_XID)
+    {0x074D, 0x074F, 153},	// Syriac (Limited_Use)
     {0x0750, 0x077F, 3},	// Arabic
     {0x0780, 0x07B1, 28},	// Thaana
-    {0x07C0, 0x07FA, 146},	// Nko
-    {0x07FD, 0x07FF, 146},	// Nko
-    {0x0800, 0x082D, 107},	// Samaritan
-    {0x0830, 0x083E, 107},	// Samaritan
-    {0x0840, 0x085B, 141},	// Mandaic
-    {0x085E, 0x085E, 141},	// Mandaic
-    {0x0860, 0x086A, 153},	// Syriac
+    {0x07C0, 0x07FA, 146},	// Nko (Limited_Use)
+    {0x07FD, 0x07FF, 146},	// Nko (Limited_Use)
+    {0x0800, 0x082D, 107},	// Samaritan (Exclusion)
+    {0x0830, 0x083E, 107},	// Samaritan (Exclusion Not_XID)
+    {0x0840, 0x085B, 141},	// Mandaic (Limited_Use)
+    {0x085E, 0x085E, 141},	// Mandaic (Limited_Use Not_XID)
+    {0x0860, 0x086A, 153},	// Syriac (Limited_Use)
     {0x0870, 0x088E, 3},	// Arabic
-    {0x0890, 0x0891, 3},	// Arabic
-    {0x0898, 0x08E1, 3},	// Arabic
-    {0x08E2, 0x08E2, 0},	// Common
-    {0x08E3, 0x08FF, 3},	// Arabic
-    {0x0900, 0x0950, 8},	// Devanagari
-    {0x0951, 0x0954, 1},	// Inherited
-    {0x0955, 0x0963, 8},	// Devanagari
-    {0x0964, 0x0965, 0},	// Common
+    {0x0890, 0x0891, 3},	// Arabic (Not_XID)
+    {0x0898, 0x08E1, 3},	// Arabic (Uncommon_Use)
+    {0x08E2, 0x08E2, 0},	// Common (Not_XID)
+    {0x08E3, 0x08FF, 3},	// Arabic (Uncommon_Use)
+    {0x0900, 0x0950, 8},	// Devanagari (Uncommon_Use)
+    {0x0951, 0x0954, 1},	// Inherited (Obsolete)
+    {0x0955, 0x0963, 8},	// Devanagari (Uncommon_Use)
+    {0x0964, 0x0965, 0},	// Common (Not_XID)
     {0x0966, 0x097F, 8},	// Devanagari
-    {0x0980, 0x0983, 5},	// Bengali
+    {0x0980, 0x0983, 5},	// Bengali (Obsolete)
     {0x0985, 0x098C, 5},	// Bengali
     {0x098F, 0x0990, 5},	// Bengali
     {0x0993, 0x09A8, 5},	// Bengali
@@ -130,8 +130,8 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x09C7, 0x09C8, 5},	// Bengali
     {0x09CB, 0x09CE, 5},	// Bengali
     {0x09D7, 0x09D7, 5},	// Bengali
-    {0x09DC, 0x09DD, 5},	// Bengali
-    {0x09DF, 0x09E3, 5},	// Bengali
+    {0x09DC, 0x09DD, 5},	// Bengali (Not_NFKC)
+    {0x09DF, 0x09E3, 5},	// Bengali (Not_NFKC)
     {0x09E6, 0x09FE, 5},	// Bengali
     {0x0A01, 0x0A03, 13},	// Gurmukhi
     {0x0A05, 0x0A0A, 13},	// Gurmukhi
@@ -145,9 +145,9 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x0A3E, 0x0A42, 13},	// Gurmukhi
     {0x0A47, 0x0A48, 13},	// Gurmukhi
     {0x0A4B, 0x0A4D, 13},	// Gurmukhi
-    {0x0A51, 0x0A51, 13},	// Gurmukhi
-    {0x0A59, 0x0A5C, 13},	// Gurmukhi
-    {0x0A5E, 0x0A5E, 13},	// Gurmukhi
+    {0x0A51, 0x0A51, 13},	// Gurmukhi (Uncommon_Use)
+    {0x0A59, 0x0A5C, 13},	// Gurmukhi (Not_NFKC)
+    {0x0A5E, 0x0A5E, 13},	// Gurmukhi (Not_NFKC)
     {0x0A66, 0x0A76, 13},	// Gurmukhi
     {0x0A81, 0x0A83, 12},	// Gujarati
     {0x0A85, 0x0A8D, 12},	// Gujarati
@@ -162,7 +162,7 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x0AD0, 0x0AD0, 12},	// Gujarati
     {0x0AE0, 0x0AE3, 12},	// Gujarati
     {0x0AE6, 0x0AF1, 12},	// Gujarati
-    {0x0AF9, 0x0AFF, 12},	// Gujarati
+    {0x0AF9, 0x0AFF, 12},	// Gujarati (Uncommon_Use)
     {0x0B01, 0x0B03, 24},	// Oriya
     {0x0B05, 0x0B0C, 24},	// Oriya
     {0x0B0F, 0x0B10, 24},	// Oriya
@@ -174,7 +174,7 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x0B47, 0x0B48, 24},	// Oriya
     {0x0B4B, 0x0B4D, 24},	// Oriya
     {0x0B55, 0x0B57, 24},	// Oriya
-    {0x0B5C, 0x0B5D, 24},	// Oriya
+    {0x0B5C, 0x0B5D, 24},	// Oriya (Not_NFKC)
     {0x0B5F, 0x0B63, 24},	// Oriya
     {0x0B66, 0x0B77, 24},	// Oriya
     {0x0B82, 0x0B83, 26},	// Tamil
@@ -193,7 +193,7 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x0BD0, 0x0BD0, 26},	// Tamil
     {0x0BD7, 0x0BD7, 26},	// Tamil
     {0x0BE6, 0x0BFA, 26},	// Tamil
-    {0x0C00, 0x0C0C, 27},	// Telugu
+    {0x0C00, 0x0C0C, 27},	// Telugu (Obsolete)
     {0x0C0E, 0x0C10, 27},	// Telugu
     {0x0C12, 0x0C28, 27},	// Telugu
     {0x0C2A, 0x0C39, 27},	// Telugu
@@ -201,11 +201,11 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x0C46, 0x0C48, 27},	// Telugu
     {0x0C4A, 0x0C4D, 27},	// Telugu
     {0x0C55, 0x0C56, 27},	// Telugu
-    {0x0C58, 0x0C5A, 27},	// Telugu
+    {0x0C58, 0x0C5A, 27},	// Telugu (Obsolete)
     {0x0C5D, 0x0C5D, 27},	// Telugu
     {0x0C60, 0x0C63, 27},	// Telugu
     {0x0C66, 0x0C6F, 27},	// Telugu
-    {0x0C77, 0x0C7F, 27},	// Telugu
+    {0x0C77, 0x0C7F, 27},	// Telugu (Not_XID)
     {0x0C80, 0x0C8C, 19},	// Kannada
     {0x0C8E, 0x0C90, 19},	// Kannada
     {0x0C92, 0x0CA8, 19},	// Kannada
@@ -236,10 +236,10 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x0DCF, 0x0DD4, 25},	// Sinhala
     {0x0DD6, 0x0DD6, 25},	// Sinhala
     {0x0DD8, 0x0DDF, 25},	// Sinhala
-    {0x0DE6, 0x0DEF, 25},	// Sinhala
+    {0x0DE6, 0x0DEF, 25},	// Sinhala (Obsolete)
     {0x0DF2, 0x0DF4, 25},	// Sinhala
     {0x0E01, 0x0E3A, 29},	// Thai
-    {0x0E3F, 0x0E3F, 0},	// Common
+    {0x0E3F, 0x0E3F, 0},	// Common (Not_XID)
     {0x0E40, 0x0E5B, 29},	// Thai
     {0x0E81, 0x0E82, 21},	// Lao
     {0x0E84, 0x0E84, 21},	// Lao
@@ -251,23 +251,23 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x0EC6, 0x0EC6, 21},	// Lao
     {0x0EC8, 0x0ECD, 21},	// Lao
     {0x0ED0, 0x0ED9, 21},	// Lao
-    {0x0EDC, 0x0EDF, 21},	// Lao
+    {0x0EDC, 0x0EDF, 21},	// Lao (Not_NFKC)
     {0x0F00, 0x0F47, 30},	// Tibetan
     {0x0F49, 0x0F6C, 30},	// Tibetan
     {0x0F71, 0x0F97, 30},	// Tibetan
     {0x0F99, 0x0FBC, 30},	// Tibetan
-    {0x0FBE, 0x0FCC, 30},	// Tibetan
-    {0x0FCE, 0x0FD4, 30},	// Tibetan
-    {0x0FD5, 0x0FD8, 0},	// Common
-    {0x0FD9, 0x0FDA, 30},	// Tibetan
+    {0x0FBE, 0x0FCC, 30},	// Tibetan (Not_XID)
+    {0x0FCE, 0x0FD4, 30},	// Tibetan (Not_XID)
+    {0x0FD5, 0x0FD8, 0},	// Common (Not_XID)
+    {0x0FD9, 0x0FDA, 30},	// Tibetan (Not_XID)
     {0x1000, 0x109F, 23},	// Myanmar
-    {0x10A0, 0x10C5, 10},	// Georgian
+    {0x10A0, 0x10C5, 10},	// Georgian (Obsolete)
     {0x10C7, 0x10C7, 10},	// Georgian
     {0x10CD, 0x10CD, 10},	// Georgian
     {0x10D0, 0x10FA, 10},	// Georgian
-    {0x10FB, 0x10FB, 0},	// Common
-    {0x10FC, 0x10FF, 10},	// Georgian
-    {0x1100, 0x11FF, 14},	// Hangul
+    {0x10FB, 0x10FB, 0},	// Common (Not_XID)
+    {0x10FC, 0x10FF, 10},	// Georgian (Not_NFKC)
+    {0x1100, 0x11FF, 14},	// Hangul (Obsolete)
     {0x1200, 0x1248, 9},	// Ethiopic
     {0x124A, 0x124D, 9},	// Ethiopic
     {0x1250, 0x1256, 9},	// Ethiopic
@@ -286,89 +286,89 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x1318, 0x135A, 9},	// Ethiopic
     {0x135D, 0x137C, 9},	// Ethiopic
     {0x1380, 0x1399, 9},	// Ethiopic
-    {0x13A0, 0x13F5, 134},	// Cherokee
-    {0x13F8, 0x13FD, 134},	// Cherokee
-    {0x1400, 0x167F, 131},	// Canadian_Aboriginal
-    {0x1680, 0x169C, 88},	// Ogham
-    {0x16A0, 0x16EA, 106},	// Runic
-    {0x16EB, 0x16ED, 0},	// Common
-    {0x16EE, 0x16F8, 106},	// Runic
-    {0x1700, 0x1715, 115},	// Tagalog
-    {0x171F, 0x171F, 115},	// Tagalog
-    {0x1720, 0x1734, 58},	// Hanunoo
-    {0x1735, 0x1736, 0},	// Common
-    {0x1740, 0x1753, 39},	// Buhid
-    {0x1760, 0x176C, 116},	// Tagbanwa
-    {0x176E, 0x1770, 116},	// Tagbanwa
-    {0x1772, 0x1773, 116},	// Tagbanwa
+    {0x13A0, 0x13F5, 134},	// Cherokee (Limited_Use)
+    {0x13F8, 0x13FD, 134},	// Cherokee (Limited_Use)
+    {0x1400, 0x167F, 131},	// Canadian_Aboriginal (Limited_Use Not_XID)
+    {0x1680, 0x169C, 88},	// Ogham (Exclusion Not_XID)
+    {0x16A0, 0x16EA, 106},	// Runic (Exclusion)
+    {0x16EB, 0x16ED, 0},	// Common (Not_XID)
+    {0x16EE, 0x16F8, 106},	// Runic (Exclusion)
+    {0x1700, 0x1715, 115},	// Tagalog (Exclusion)
+    {0x171F, 0x171F, 115},	// Tagalog (Exclusion)
+    {0x1720, 0x1734, 58},	// Hanunoo (Exclusion)
+    {0x1735, 0x1736, 0},	// Common (Exclusion Not_XID)
+    {0x1740, 0x1753, 39},	// Buhid (Exclusion)
+    {0x1760, 0x176C, 116},	// Tagbanwa (Exclusion)
+    {0x176E, 0x1770, 116},	// Tagbanwa (Exclusion)
+    {0x1772, 0x1773, 116},	// Tagbanwa (Exclusion)
     {0x1780, 0x17DD, 20},	// Khmer
     {0x17E0, 0x17E9, 20},	// Khmer
-    {0x17F0, 0x17F9, 20},	// Khmer
-    {0x1800, 0x1801, 82},	// Mongolian
-    {0x1802, 0x1803, 0},	// Common
-    {0x1804, 0x1804, 82},	// Mongolian
-    {0x1805, 0x1805, 0},	// Common
-    {0x1806, 0x1819, 82},	// Mongolian
-    {0x1820, 0x1878, 82},	// Mongolian
-    {0x1880, 0x18AA, 82},	// Mongolian
-    {0x18B0, 0x18F5, 131},	// Canadian_Aboriginal
-    {0x1900, 0x191E, 139},	// Limbu
-    {0x1920, 0x192B, 139},	// Limbu
-    {0x1930, 0x193B, 139},	// Limbu
-    {0x1940, 0x1940, 139},	// Limbu
-    {0x1944, 0x194F, 139},	// Limbu
-    {0x1950, 0x196D, 154},	// Tai_Le
-    {0x1970, 0x1974, 154},	// Tai_Le
-    {0x1980, 0x19AB, 144},	// New_Tai_Lue
-    {0x19B0, 0x19C9, 144},	// New_Tai_Lue
-    {0x19D0, 0x19DA, 144},	// New_Tai_Lue
-    {0x19DE, 0x19DF, 144},	// New_Tai_Lue
-    {0x19E0, 0x19FF, 20},	// Khmer
-    {0x1A00, 0x1A1B, 38},	// Buginese
-    {0x1A1E, 0x1A1F, 38},	// Buginese
-    {0x1A20, 0x1A5E, 155},	// Tai_Tham
-    {0x1A60, 0x1A7C, 155},	// Tai_Tham
-    {0x1A7F, 0x1A89, 155},	// Tai_Tham
-    {0x1A90, 0x1A99, 155},	// Tai_Tham
-    {0x1AA0, 0x1AAD, 155},	// Tai_Tham
-    {0x1AB0, 0x1ACE, 1},	// Inherited
-    {0x1B00, 0x1B4C, 128},	// Balinese
-    {0x1B50, 0x1B7E, 128},	// Balinese
-    {0x1B80, 0x1BBF, 151},	// Sundanese
-    {0x1BC0, 0x1BF3, 130},	// Batak
-    {0x1BFC, 0x1BFF, 130},	// Batak
-    {0x1C00, 0x1C37, 138},	// Lepcha
-    {0x1C3B, 0x1C49, 138},	// Lepcha
-    {0x1C4D, 0x1C4F, 138},	// Lepcha
-    {0x1C50, 0x1C7F, 148},	// Ol_Chiki
-    {0x1C80, 0x1C88, 7},	// Cyrillic
+    {0x17F0, 0x17F9, 20},	// Khmer (Not_XID)
+    {0x1800, 0x1801, 82},	// Mongolian (Exclusion Not_XID)
+    {0x1802, 0x1803, 0},	// Common (Exclusion Not_XID)
+    {0x1804, 0x1804, 82},	// Mongolian (Exclusion Not_XID)
+    {0x1805, 0x1805, 0},	// Common (Exclusion Not_XID)
+    {0x1806, 0x1819, 82},	// Mongolian (Exclusion Not_XID)
+    {0x1820, 0x1878, 82},	// Mongolian (Exclusion)
+    {0x1880, 0x18AA, 82},	// Mongolian (Exclusion)
+    {0x18B0, 0x18F5, 131},	// Canadian_Aboriginal (Limited_Use)
+    {0x1900, 0x191E, 139},	// Limbu (Limited_Use)
+    {0x1920, 0x192B, 139},	// Limbu (Limited_Use)
+    {0x1930, 0x193B, 139},	// Limbu (Limited_Use)
+    {0x1940, 0x1940, 139},	// Limbu (Limited_Use Not_XID)
+    {0x1944, 0x194F, 139},	// Limbu (Limited_Use Not_XID)
+    {0x1950, 0x196D, 154},	// Tai_Le (Limited_Use)
+    {0x1970, 0x1974, 154},	// Tai_Le (Limited_Use)
+    {0x1980, 0x19AB, 144},	// New_Tai_Lue (Limited_Use)
+    {0x19B0, 0x19C9, 144},	// New_Tai_Lue (Limited_Use)
+    {0x19D0, 0x19DA, 144},	// New_Tai_Lue (Limited_Use)
+    {0x19DE, 0x19DF, 144},	// New_Tai_Lue (Limited_Use Not_XID)
+    {0x19E0, 0x19FF, 20},	// Khmer (Not_XID)
+    {0x1A00, 0x1A1B, 38},	// Buginese (Exclusion)
+    {0x1A1E, 0x1A1F, 38},	// Buginese (Exclusion Not_XID)
+    {0x1A20, 0x1A5E, 155},	// Tai_Tham (Limited_Use)
+    {0x1A60, 0x1A7C, 155},	// Tai_Tham (Limited_Use)
+    {0x1A7F, 0x1A89, 155},	// Tai_Tham (Limited_Use)
+    {0x1A90, 0x1A99, 155},	// Tai_Tham (Limited_Use)
+    {0x1AA0, 0x1AAD, 155},	// Tai_Tham (Limited_Use Not_XID)
+    {0x1AB0, 0x1ACE, 1},	// Inherited (Obsolete)
+    {0x1B00, 0x1B4C, 128},	// Balinese (Limited_Use)
+    {0x1B50, 0x1B7E, 128},	// Balinese (Limited_Use)
+    {0x1B80, 0x1BBF, 151},	// Sundanese (Limited_Use)
+    {0x1BC0, 0x1BF3, 130},	// Batak (Limited_Use)
+    {0x1BFC, 0x1BFF, 130},	// Batak (Limited_Use Not_XID)
+    {0x1C00, 0x1C37, 138},	// Lepcha (Limited_Use)
+    {0x1C3B, 0x1C49, 138},	// Lepcha (Limited_Use Not_XID)
+    {0x1C4D, 0x1C4F, 138},	// Lepcha (Limited_Use)
+    {0x1C50, 0x1C7F, 148},	// Ol_Chiki (Limited_Use)
+    {0x1C80, 0x1C88, 7},	// Cyrillic (Obsolete)
     {0x1C90, 0x1CBA, 10},	// Georgian
     {0x1CBD, 0x1CBF, 10},	// Georgian
-    {0x1CC0, 0x1CC7, 151},	// Sundanese
-    {0x1CD0, 0x1CD2, 1},	// Inherited
-    {0x1CD3, 0x1CD3, 0},	// Common
-    {0x1CD4, 0x1CE0, 1},	// Inherited
-    {0x1CE1, 0x1CE1, 0},	// Common
-    {0x1CE2, 0x1CE8, 1},	// Inherited
-    {0x1CE9, 0x1CEC, 0},	// Common
-    {0x1CED, 0x1CED, 1},	// Inherited
-    {0x1CEE, 0x1CF3, 0},	// Common
-    {0x1CF4, 0x1CF4, 1},	// Inherited
-    {0x1CF5, 0x1CF7, 0},	// Common
-    {0x1CF8, 0x1CF9, 1},	// Inherited
-    {0x1CFA, 0x1CFA, 0},	// Common
+    {0x1CC0, 0x1CC7, 151},	// Sundanese (Limited_Use Not_XID)
+    {0x1CD0, 0x1CD2, 1},	// Inherited (Obsolete)
+    {0x1CD3, 0x1CD3, 0},	// Common (Obsolete Not_XID)
+    {0x1CD4, 0x1CE0, 1},	// Inherited (Obsolete)
+    {0x1CE1, 0x1CE1, 0},	// Common (Obsolete)
+    {0x1CE2, 0x1CE8, 1},	// Inherited (Obsolete)
+    {0x1CE9, 0x1CEC, 0},	// Common (Obsolete)
+    {0x1CED, 0x1CED, 1},	// Inherited (Obsolete)
+    {0x1CEE, 0x1CF3, 0},	// Common (Obsolete)
+    {0x1CF4, 0x1CF4, 1},	// Inherited (Obsolete)
+    {0x1CF5, 0x1CF7, 0},	// Common (Obsolete)
+    {0x1CF8, 0x1CF9, 1},	// Inherited (Obsolete)
+    {0x1CFA, 0x1CFA, 0},	// Common (Exclusion)
     {0x1D00, 0x1D25, 2},	// Latin
     {0x1D26, 0x1D2A, 11},	// Greek
     {0x1D2B, 0x1D2B, 7},	// Cyrillic
-    {0x1D2C, 0x1D5C, 2},	// Latin
-    {0x1D5D, 0x1D61, 11},	// Greek
-    {0x1D62, 0x1D65, 2},	// Latin
-    {0x1D66, 0x1D6A, 11},	// Greek
+    {0x1D2C, 0x1D5C, 2},	// Latin (Not_NFKC)
+    {0x1D5D, 0x1D61, 11},	// Greek (Not_NFKC)
+    {0x1D62, 0x1D65, 2},	// Latin (Not_NFKC)
+    {0x1D66, 0x1D6A, 11},	// Greek (Not_NFKC)
     {0x1D6B, 0x1D77, 2},	// Latin
-    {0x1D78, 0x1D78, 7},	// Cyrillic
+    {0x1D78, 0x1D78, 7},	// Cyrillic (Not_NFKC)
     {0x1D79, 0x1DBE, 2},	// Latin
-    {0x1DBF, 0x1DBF, 11},	// Greek
-    {0x1DC0, 0x1DFF, 1},	// Inherited
+    {0x1DBF, 0x1DBF, 11},	// Greek (Not_NFKC)
+    {0x1DC0, 0x1DFF, 1},	// Inherited (Technical Obsolete)
     {0x1E00, 0x1EFF, 2},	// Latin
     {0x1F00, 0x1F15, 11},	// Greek
     {0x1F18, 0x1F1D, 11},	// Greek
@@ -383,48 +383,48 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x1FB6, 0x1FC4, 11},	// Greek
     {0x1FC6, 0x1FD3, 11},	// Greek
     {0x1FD6, 0x1FDB, 11},	// Greek
-    {0x1FDD, 0x1FEF, 11},	// Greek
+    {0x1FDD, 0x1FEF, 11},	// Greek (Not_NFKC)
     {0x1FF2, 0x1FF4, 11},	// Greek
     {0x1FF6, 0x1FFE, 11},	// Greek
-    {0x2000, 0x200B, 0},	// Common
+    {0x2000, 0x200B, 0},	// Common (Not_NFKC)
     {0x200C, 0x200D, 1},	// Inherited
-    {0x200E, 0x2064, 0},	// Common
-    {0x2066, 0x2070, 0},	// Common
-    {0x2071, 0x2071, 2},	// Latin
-    {0x2074, 0x207E, 0},	// Common
-    {0x207F, 0x207F, 2},	// Latin
-    {0x2080, 0x208E, 0},	// Common
-    {0x2090, 0x209C, 2},	// Latin
-    {0x20A0, 0x20C0, 0},	// Common
+    {0x200E, 0x2064, 0},	// Common (Default_Ignorable)
+    {0x2066, 0x2070, 0},	// Common (Default_Ignorable)
+    {0x2071, 0x2071, 2},	// Latin (Not_NFKC)
+    {0x2074, 0x207E, 0},	// Common (Not_NFKC)
+    {0x207F, 0x207F, 2},	// Latin (Not_NFKC)
+    {0x2080, 0x208E, 0},	// Common (Not_NFKC)
+    {0x2090, 0x209C, 2},	// Latin (Not_NFKC)
+    {0x20A0, 0x20C0, 0},	// Common (Not_XID)
     {0x20D0, 0x20F0, 1},	// Inherited
-    {0x2100, 0x2125, 0},	// Common
-    {0x2126, 0x2126, 11},	// Greek
-    {0x2127, 0x2129, 0},	// Common
-    {0x212A, 0x212B, 2},	// Latin
-    {0x212C, 0x2131, 0},	// Common
-    {0x2132, 0x2132, 2},	// Latin
-    {0x2133, 0x214D, 0},	// Common
-    {0x214E, 0x214E, 2},	// Latin
-    {0x214F, 0x215F, 0},	// Common
-    {0x2160, 0x2188, 2},	// Latin
-    {0x2189, 0x218B, 0},	// Common
-    {0x2190, 0x2426, 0},	// Common
-    {0x2440, 0x244A, 0},	// Common
-    {0x2460, 0x27FF, 0},	// Common
-    {0x2800, 0x28FF, 37},	// Braille
-    {0x2900, 0x2B73, 0},	// Common
-    {0x2B76, 0x2B95, 0},	// Common
-    {0x2B97, 0x2BFF, 0},	// Common
-    {0x2C00, 0x2C5F, 54},	// Glagolitic
+    {0x2100, 0x2125, 0},	// Common (Not_NFKC)
+    {0x2126, 0x2126, 11},	// Greek (Not_NFKC)
+    {0x2127, 0x2129, 0},	// Common (Obsolete Not_XID)
+    {0x212A, 0x212B, 2},	// Latin (Not_NFKC)
+    {0x212C, 0x2131, 0},	// Common (Not_NFKC)
+    {0x2132, 0x2132, 2},	// Latin (Obsolete)
+    {0x2133, 0x214D, 0},	// Common (Not_NFKC)
+    {0x214E, 0x214E, 2},	// Latin (Obsolete)
+    {0x214F, 0x215F, 0},	// Common (Obsolete Not_XID)
+    {0x2160, 0x2188, 2},	// Latin (Not_NFKC)
+    {0x2189, 0x218B, 0},	// Common (Not_NFKC)
+    {0x2190, 0x2426, 0},	// Common (Not_XID)
+    {0x2440, 0x244A, 0},	// Common (Not_XID)
+    {0x2460, 0x27FF, 0},	// Common (Not_NFKC)
+    {0x2800, 0x28FF, 37},	// Braille (Technical Not_XID)
+    {0x2900, 0x2B73, 0},	// Common (Not_XID)
+    {0x2B76, 0x2B95, 0},	// Common (Not_XID)
+    {0x2B97, 0x2BFF, 0},	// Common (Not_XID)
+    {0x2C00, 0x2C5F, 54},	// Glagolitic (Exclusion)
     {0x2C60, 0x2C7F, 2},	// Latin
-    {0x2C80, 0x2CF3, 43},	// Coptic
-    {0x2CF9, 0x2CFF, 43},	// Coptic
-    {0x2D00, 0x2D25, 10},	// Georgian
+    {0x2C80, 0x2CF3, 43},	// Coptic (Exclusion)
+    {0x2CF9, 0x2CFF, 43},	// Coptic (Exclusion Not_XID)
+    {0x2D00, 0x2D25, 10},	// Georgian (Obsolete)
     {0x2D27, 0x2D27, 10},	// Georgian
     {0x2D2D, 0x2D2D, 10},	// Georgian
-    {0x2D30, 0x2D67, 157},	// Tifinagh
-    {0x2D6F, 0x2D70, 157},	// Tifinagh
-    {0x2D7F, 0x2D7F, 157},	// Tifinagh
+    {0x2D30, 0x2D67, 157},	// Tifinagh (Limited_Use)
+    {0x2D6F, 0x2D70, 157},	// Tifinagh (Not_NFKC)
+    {0x2D7F, 0x2D7F, 157},	// Tifinagh (Limited_Use)
     {0x2D80, 0x2D96, 9},	// Ethiopic
     {0x2DA0, 0x2DA6, 9},	// Ethiopic
     {0x2DA8, 0x2DAE, 9},	// Ethiopic
@@ -434,148 +434,148 @@ LOCAL const struct sc16 xid_script_list16[] = {
     {0x2DC8, 0x2DCE, 9},	// Ethiopic
     {0x2DD0, 0x2DD6, 9},	// Ethiopic
     {0x2DD8, 0x2DDE, 9},	// Ethiopic
-    {0x2DE0, 0x2DFF, 7},	// Cyrillic
-    {0x2E00, 0x2E5D, 0},	// Common
-    {0x2E80, 0x2E99, 15},	// Han
-    {0x2E9B, 0x2EF3, 15},	// Han
-    {0x2F00, 0x2FD5, 15},	// Han
-    {0x2FF0, 0x2FFB, 0},	// Common
-    {0x3000, 0x3004, 0},	// Common
+    {0x2DE0, 0x2DFF, 7},	// Cyrillic (Obsolete)
+    {0x2E00, 0x2E5D, 0},	// Common (Technical Obsolete Not_XID)
+    {0x2E80, 0x2E99, 15},	// Han (Not_XID)
+    {0x2E9B, 0x2EF3, 15},	// Han (Not_XID)
+    {0x2F00, 0x2FD5, 15},	// Han (Not_NFKC)
+    {0x2FF0, 0x2FFB, 0},	// Common (Not_XID)
+    {0x3000, 0x3004, 0},	// Common (Not_NFKC)
     {0x3005, 0x3005, 15},	// Han
     {0x3006, 0x3006, 0},	// Common
     {0x3007, 0x3007, 15},	// Han
-    {0x3008, 0x3020, 0},	// Common
+    {0x3008, 0x3020, 0},	// Common (Not_XID)
     {0x3021, 0x3029, 15},	// Han
     {0x302A, 0x302D, 1},	// Inherited
-    {0x302E, 0x302F, 14},	// Hangul
-    {0x3030, 0x3037, 0},	// Common
-    {0x3038, 0x303B, 15},	// Han
+    {0x302E, 0x302F, 14},	// Hangul (Technical Obsolete)
+    {0x3030, 0x3037, 0},	// Common (Not_XID)
+    {0x3038, 0x303B, 15},	// Han (Not_NFKC)
     {0x303C, 0x303F, 0},	// Common
     {0x3041, 0x3096, 17},	// Hiragana
     {0x3099, 0x309A, 1},	// Inherited
-    {0x309B, 0x309C, 0},	// Common
+    {0x309B, 0x309C, 0},	// Common (Not_NFKC)
     {0x309D, 0x309F, 17},	// Hiragana
     {0x30A0, 0x30A0, 0},	// Common
     {0x30A1, 0x30FA, 18},	// Katakana
     {0x30FB, 0x30FC, 0},	// Common
     {0x30FD, 0x30FF, 18},	// Katakana
     {0x3105, 0x312F, 6},	// Bopomofo
-    {0x3131, 0x318E, 14},	// Hangul
-    {0x3190, 0x319F, 0},	// Common
+    {0x3131, 0x318E, 14},	// Hangul (Not_NFKC)
+    {0x3190, 0x319F, 0},	// Common (Not_XID)
     {0x31A0, 0x31BF, 6},	// Bopomofo
-    {0x31C0, 0x31E3, 0},	// Common
-    {0x31F0, 0x31FF, 18},	// Katakana
-    {0x3200, 0x321E, 14},	// Hangul
-    {0x3220, 0x325F, 0},	// Common
-    {0x3260, 0x327E, 14},	// Hangul
-    {0x327F, 0x32CF, 0},	// Common
-    {0x32D0, 0x32FE, 18},	// Katakana
-    {0x32FF, 0x32FF, 0},	// Common
-    {0x3300, 0x3357, 18},	// Katakana
-    {0x3358, 0x33FF, 0},	// Common
+    {0x31C0, 0x31E3, 0},	// Common (Not_XID)
+    {0x31F0, 0x31FF, 18},	// Katakana (Obsolete)
+    {0x3200, 0x321E, 14},	// Hangul (Not_NFKC)
+    {0x3220, 0x325F, 0},	// Common (Not_NFKC)
+    {0x3260, 0x327E, 14},	// Hangul (Not_NFKC)
+    {0x327F, 0x32CF, 0},	// Common (Technical Not_XID)
+    {0x32D0, 0x32FE, 18},	// Katakana (Not_NFKC)
+    {0x32FF, 0x32FF, 0},	// Common (Not_NFKC)
+    {0x3300, 0x3357, 18},	// Katakana (Not_NFKC)
+    {0x3358, 0x33FF, 0},	// Common (Not_NFKC)
     {0x3400, 0x4DBF, 15},	// Han
-    {0x4DC0, 0x4DFF, 0},	// Common
+    {0x4DC0, 0x4DFF, 0},	// Common (Technical Not_XID)
     {0x4E00, 0x9FFF, 15},	// Han
-    {0xA000, 0xA48C, 160},	// Yi
-    {0xA490, 0xA4C6, 160},	// Yi
-    {0xA4D0, 0xA4FF, 140},	// Lisu
-    {0xA500, 0xA62B, 158},	// Vai
-    {0xA640, 0xA69F, 7},	// Cyrillic
-    {0xA6A0, 0xA6F7, 129},	// Bamum
-    {0xA700, 0xA721, 0},	// Common
-    {0xA722, 0xA787, 2},	// Latin
+    {0xA000, 0xA48C, 160},	// Yi (Limited_Use)
+    {0xA490, 0xA4C6, 160},	// Yi (Limited_Use Not_XID)
+    {0xA4D0, 0xA4FF, 140},	// Lisu (Limited_Use)
+    {0xA500, 0xA62B, 158},	// Vai (Limited_Use)
+    {0xA640, 0xA69F, 7},	// Cyrillic (Obsolete)
+    {0xA6A0, 0xA6F7, 129},	// Bamum (Limited_Use)
+    {0xA700, 0xA721, 0},	// Common (Obsolete Not_XID)
+    {0xA722, 0xA787, 2},	// Latin (Technical Obsolete)
     {0xA788, 0xA78A, 0},	// Common
-    {0xA78B, 0xA7CA, 2},	// Latin
+    {0xA78B, 0xA7CA, 2},	// Latin (Uncommon_Use)
     {0xA7D0, 0xA7D1, 2},	// Latin
     {0xA7D3, 0xA7D3, 2},	// Latin
     {0xA7D5, 0xA7D9, 2},	// Latin
-    {0xA7F2, 0xA7FF, 2},	// Latin
-    {0xA800, 0xA82C, 152},	// Syloti_Nagri
-    {0xA830, 0xA839, 0},	// Common
-    {0xA840, 0xA877, 102},	// Phags_Pa
-    {0xA880, 0xA8C5, 150},	// Saurashtra
-    {0xA8CE, 0xA8D9, 150},	// Saurashtra
-    {0xA8E0, 0xA8FF, 8},	// Devanagari
-    {0xA900, 0xA92D, 137},	// Kayah_Li
-    {0xA92E, 0xA92E, 0},	// Common
-    {0xA92F, 0xA92F, 137},	// Kayah_Li
-    {0xA930, 0xA953, 105},	// Rejang
-    {0xA95F, 0xA95F, 105},	// Rejang
-    {0xA960, 0xA97C, 14},	// Hangul
-    {0xA980, 0xA9CD, 136},	// Javanese
-    {0xA9CF, 0xA9CF, 0},	// Common
-    {0xA9D0, 0xA9D9, 136},	// Javanese
-    {0xA9DE, 0xA9DF, 136},	// Javanese
-    {0xA9E0, 0xA9FE, 23},	// Myanmar
-    {0xAA00, 0xAA36, 133},	// Cham
-    {0xAA40, 0xAA4D, 133},	// Cham
-    {0xAA50, 0xAA59, 133},	// Cham
-    {0xAA5C, 0xAA5F, 133},	// Cham
+    {0xA7F2, 0xA7FF, 2},	// Latin (Not_NFKC)
+    {0xA800, 0xA82C, 152},	// Syloti_Nagri (Limited_Use)
+    {0xA830, 0xA839, 0},	// Common (Not_XID)
+    {0xA840, 0xA877, 102},	// Phags_Pa (Exclusion)
+    {0xA880, 0xA8C5, 150},	// Saurashtra (Limited_Use)
+    {0xA8CE, 0xA8D9, 150},	// Saurashtra (Limited_Use Not_XID)
+    {0xA8E0, 0xA8FF, 8},	// Devanagari (Obsolete)
+    {0xA900, 0xA92D, 137},	// Kayah_Li (Limited_Use)
+    {0xA92E, 0xA92E, 0},	// Common (Not_XID)
+    {0xA92F, 0xA92F, 137},	// Kayah_Li (Limited_Use Not_XID)
+    {0xA930, 0xA953, 105},	// Rejang (Exclusion)
+    {0xA95F, 0xA95F, 105},	// Rejang (Exclusion Not_XID)
+    {0xA960, 0xA97C, 14},	// Hangul (Obsolete)
+    {0xA980, 0xA9CD, 136},	// Javanese (Limited_Use)
+    {0xA9CF, 0xA9CF, 0},	// Common (Limited_Use Exclusion)
+    {0xA9D0, 0xA9D9, 136},	// Javanese (Limited_Use)
+    {0xA9DE, 0xA9DF, 136},	// Javanese (Limited_Use Not_XID)
+    {0xA9E0, 0xA9FE, 23},	// Myanmar (Obsolete)
+    {0xAA00, 0xAA36, 133},	// Cham (Limited_Use)
+    {0xAA40, 0xAA4D, 133},	// Cham (Limited_Use)
+    {0xAA50, 0xAA59, 133},	// Cham (Limited_Use)
+    {0xAA5C, 0xAA5F, 133},	// Cham (Limited_Use Not_XID)
     {0xAA60, 0xAA7F, 23},	// Myanmar
-    {0xAA80, 0xAAC2, 156},	// Tai_Viet
-    {0xAADB, 0xAADF, 156},	// Tai_Viet
-    {0xAAE0, 0xAAF6, 142},	// Meetei_Mayek
+    {0xAA80, 0xAAC2, 156},	// Tai_Viet (Limited_Use)
+    {0xAADB, 0xAADF, 156},	// Tai_Viet (Limited_Use)
+    {0xAAE0, 0xAAF6, 142},	// Meetei_Mayek (Limited_Use)
     {0xAB01, 0xAB06, 9},	// Ethiopic
     {0xAB09, 0xAB0E, 9},	// Ethiopic
     {0xAB11, 0xAB16, 9},	// Ethiopic
     {0xAB20, 0xAB26, 9},	// Ethiopic
     {0xAB28, 0xAB2E, 9},	// Ethiopic
-    {0xAB30, 0xAB5A, 2},	// Latin
-    {0xAB5B, 0xAB5B, 0},	// Common
-    {0xAB5C, 0xAB64, 2},	// Latin
-    {0xAB65, 0xAB65, 11},	// Greek
+    {0xAB30, 0xAB5A, 2},	// Latin (Obsolete)
+    {0xAB5B, 0xAB5B, 0},	// Common (Not_XID)
+    {0xAB5C, 0xAB64, 2},	// Latin (Not_NFKC)
+    {0xAB65, 0xAB65, 11},	// Greek (Obsolete)
     {0xAB66, 0xAB69, 2},	// Latin
-    {0xAB6A, 0xAB6B, 0},	// Common
-    {0xAB70, 0xABBF, 134},	// Cherokee
-    {0xABC0, 0xABED, 142},	// Meetei_Mayek
-    {0xABF0, 0xABF9, 142},	// Meetei_Mayek
+    {0xAB6A, 0xAB6B, 0},	// Common (Not_XID)
+    {0xAB70, 0xABBF, 134},	// Cherokee (Limited_Use)
+    {0xABC0, 0xABED, 142},	// Meetei_Mayek (Limited_Use)
+    {0xABF0, 0xABF9, 142},	// Meetei_Mayek (Limited_Use)
     {0xAC00, 0xD7A3, 14},	// Hangul
-    {0xD7B0, 0xD7C6, 14},	// Hangul
-    {0xD7CB, 0xD7FB, 14},	// Hangul
-    {0xF900, 0xFA6D, 15},	// Han
-    {0xFA70, 0xFAD9, 15},	// Han
-    {0xFB00, 0xFB06, 2},	// Latin
-    {0xFB13, 0xFB17, 4},	// Armenian
-    {0xFB1D, 0xFB36, 16},	// Hebrew
-    {0xFB38, 0xFB3C, 16},	// Hebrew
-    {0xFB3E, 0xFB3E, 16},	// Hebrew
-    {0xFB40, 0xFB41, 16},	// Hebrew
-    {0xFB43, 0xFB44, 16},	// Hebrew
-    {0xFB46, 0xFB4F, 16},	// Hebrew
-    {0xFB50, 0xFBC2, 3},	// Arabic
-    {0xFBD3, 0xFD3D, 3},	// Arabic
-    {0xFD3E, 0xFD3F, 0},	// Common
-    {0xFD40, 0xFD8F, 3},	// Arabic
-    {0xFD92, 0xFDC7, 3},	// Arabic
-    {0xFDCF, 0xFDCF, 3},	// Arabic
-    {0xFDF0, 0xFDFF, 3},	// Arabic
-    {0xFE00, 0xFE0F, 1},	// Inherited
-    {0xFE10, 0xFE19, 0},	// Common
+    {0xD7B0, 0xD7C6, 14},	// Hangul (Obsolete)
+    {0xD7CB, 0xD7FB, 14},	// Hangul (Obsolete)
+    {0xF900, 0xFA6D, 15},	// Han (Not_NFKC)
+    {0xFA70, 0xFAD9, 15},	// Han (Not_NFKC)
+    {0xFB00, 0xFB06, 2},	// Latin (Not_NFKC)
+    {0xFB13, 0xFB17, 4},	// Armenian (Not_NFKC)
+    {0xFB1D, 0xFB36, 16},	// Hebrew (Not_NFKC)
+    {0xFB38, 0xFB3C, 16},	// Hebrew (Not_NFKC)
+    {0xFB3E, 0xFB3E, 16},	// Hebrew (Not_NFKC)
+    {0xFB40, 0xFB41, 16},	// Hebrew (Not_NFKC)
+    {0xFB43, 0xFB44, 16},	// Hebrew (Not_NFKC)
+    {0xFB46, 0xFB4F, 16},	// Hebrew (Not_NFKC)
+    {0xFB50, 0xFBC2, 3},	// Arabic (Not_NFKC)
+    {0xFBD3, 0xFD3D, 3},	// Arabic (Not_NFKC)
+    {0xFD3E, 0xFD3F, 0},	// Common (Technical Not_XID)
+    {0xFD40, 0xFD8F, 3},	// Arabic (Technical Not_XID)
+    {0xFD92, 0xFDC7, 3},	// Arabic (Not_NFKC)
+    {0xFDCF, 0xFDCF, 3},	// Arabic (Technical Not_XID)
+    {0xFDF0, 0xFDFF, 3},	// Arabic (Not_NFKC)
+    {0xFE00, 0xFE0F, 1},	// Inherited (Default_Ignorable)
+    {0xFE10, 0xFE19, 0},	// Common (Not_NFKC)
     {0xFE20, 0xFE2D, 1},	// Inherited
-    {0xFE2E, 0xFE2F, 7},	// Cyrillic
-    {0xFE30, 0xFE52, 0},	// Common
-    {0xFE54, 0xFE66, 0},	// Common
-    {0xFE68, 0xFE6B, 0},	// Common
-    {0xFE70, 0xFE74, 3},	// Arabic
-    {0xFE76, 0xFEFC, 3},	// Arabic
-    {0xFEFF, 0xFEFF, 0},	// Common
-    {0xFF01, 0xFF20, 0},	// Common
-    {0xFF21, 0xFF3A, 2},	// Latin
-    {0xFF3B, 0xFF40, 0},	// Common
-    {0xFF41, 0xFF5A, 2},	// Latin
-    {0xFF5B, 0xFF65, 0},	// Common
-    {0xFF66, 0xFF6F, 18},	// Katakana
-    {0xFF70, 0xFF70, 0},	// Common
-    {0xFF71, 0xFF9D, 18},	// Katakana
-    {0xFF9E, 0xFF9F, 0},	// Common
-    {0xFFA0, 0xFFBE, 14},	// Hangul
-    {0xFFC2, 0xFFC7, 14},	// Hangul
-    {0xFFCA, 0xFFCF, 14},	// Hangul
-    {0xFFD2, 0xFFD7, 14},	// Hangul
-    {0xFFDA, 0xFFDC, 14},	// Hangul
-    {0xFFE0, 0xFFE6, 0},	// Common
-    {0xFFE8, 0xFFEE, 0},	// Common
-    {0xFFF9, 0xFFFD, 0},	// Common
+    {0xFE2E, 0xFE2F, 7},	// Cyrillic (Uncommon_Use Technical)
+    {0xFE30, 0xFE52, 0},	// Common (Not_NFKC)
+    {0xFE54, 0xFE66, 0},	// Common (Not_NFKC)
+    {0xFE68, 0xFE6B, 0},	// Common (Not_NFKC)
+    {0xFE70, 0xFE74, 3},	// Arabic (Not_NFKC)
+    {0xFE76, 0xFEFC, 3},	// Arabic (Not_NFKC)
+    {0xFEFF, 0xFEFF, 0},	// Common (Default_Ignorable)
+    {0xFF01, 0xFF20, 0},	// Common (Not_NFKC)
+    {0xFF21, 0xFF3A, 2},	// Latin (Not_NFKC)
+    {0xFF3B, 0xFF40, 0},	// Common (Not_NFKC)
+    {0xFF41, 0xFF5A, 2},	// Latin (Not_NFKC)
+    {0xFF5B, 0xFF65, 0},	// Common (Not_NFKC)
+    {0xFF66, 0xFF6F, 18},	// Katakana (Not_NFKC)
+    {0xFF70, 0xFF70, 0},	// Common (Not_NFKC)
+    {0xFF71, 0xFF9D, 18},	// Katakana (Not_NFKC)
+    {0xFF9E, 0xFF9F, 0},	// Common (Not_NFKC)
+    {0xFFA0, 0xFFBE, 14},	// Hangul (Default_Ignorable)
+    {0xFFC2, 0xFFC7, 14},	// Hangul (Not_NFKC)
+    {0xFFCA, 0xFFCF, 14},	// Hangul (Not_NFKC)
+    {0xFFD2, 0xFFD7, 14},	// Hangul (Not_NFKC)
+    {0xFFDA, 0xFFDC, 14},	// Hangul (Not_NFKC)
+    {0xFFE0, 0xFFE6, 0},	// Common (Not_NFKC)
+    {0xFFE8, 0xFFEE, 0},	// Common (Not_NFKC)
+    {0xFFF9, 0xFFFD, 0},	// Common (Not_XID)
     // clang-format on
 }; // 459 ranges, 82 single codepoints
 #  else
@@ -585,407 +585,407 @@ extern const struct sc16 xid_script_list16[541];
 #  ifndef EXTERN_SCRIPTS
 LOCAL const struct sc xid_script_list32[] = {
     // clang-format off
-    {0x10000, 0x1000B, 69},	// Linear_B
-    {0x1000D, 0x10026, 69},	// Linear_B
-    {0x10028, 0x1003A, 69},	// Linear_B
-    {0x1003C, 0x1003D, 69},	// Linear_B
-    {0x1003F, 0x1004D, 69},	// Linear_B
-    {0x10050, 0x1005D, 69},	// Linear_B
-    {0x10080, 0x100FA, 69},	// Linear_B
-    {0x10100, 0x10102, 0},	// Common
-    {0x10107, 0x10133, 0},	// Common
-    {0x10137, 0x1013F, 0},	// Common
-    {0x10140, 0x1018E, 11},	// Greek
-    {0x10190, 0x1019C, 0},	// Common
-    {0x101A0, 0x101A0, 11},	// Greek
-    {0x101D0, 0x101FC, 0},	// Common
-    {0x101FD, 0x101FD, 1},	// Inherited
-    {0x10280, 0x1029C, 70},	// Lycian
-    {0x102A0, 0x102D0, 40},	// Carian
-    {0x102E0, 0x102E0, 1},	// Inherited
-    {0x102E1, 0x102FB, 0},	// Common
-    {0x10300, 0x10323, 90},	// Old_Italic
-    {0x1032D, 0x1032F, 90},	// Old_Italic
-    {0x10330, 0x1034A, 55},	// Gothic
-    {0x10350, 0x1037A, 92},	// Old_Permic
-    {0x10380, 0x1039D, 122},	// Ugaritic
-    {0x1039F, 0x1039F, 122},	// Ugaritic
-    {0x103A0, 0x103C3, 93},	// Old_Persian
-    {0x103C8, 0x103D5, 93},	// Old_Persian
-    {0x10400, 0x1044F, 47},	// Deseret
-    {0x10450, 0x1047F, 109},	// Shavian
-    {0x10480, 0x1049D, 98},	// Osmanya
-    {0x104A0, 0x104A9, 98},	// Osmanya
-    {0x104B0, 0x104D3, 149},	// Osage
-    {0x104D8, 0x104FB, 149},	// Osage
-    {0x10500, 0x10527, 52},	// Elbasan
-    {0x10530, 0x10563, 41},	// Caucasian_Albanian
-    {0x1056F, 0x1056F, 41},	// Caucasian_Albanian
-    {0x10570, 0x1057A, 123},	// Vithkuqi
-    {0x1057C, 0x1058A, 123},	// Vithkuqi
-    {0x1058C, 0x10592, 123},	// Vithkuqi
-    {0x10594, 0x10595, 123},	// Vithkuqi
-    {0x10597, 0x105A1, 123},	// Vithkuqi
-    {0x105A3, 0x105B1, 123},	// Vithkuqi
-    {0x105B3, 0x105B9, 123},	// Vithkuqi
-    {0x105BB, 0x105BC, 123},	// Vithkuqi
-    {0x10600, 0x10736, 68},	// Linear_A
-    {0x10740, 0x10755, 68},	// Linear_A
-    {0x10760, 0x10767, 68},	// Linear_A
-    {0x10780, 0x10785, 2},	// Latin
-    {0x10787, 0x107B0, 2},	// Latin
-    {0x107B2, 0x107BA, 2},	// Latin
-    {0x10800, 0x10805, 45},	// Cypriot
-    {0x10808, 0x10808, 45},	// Cypriot
-    {0x1080A, 0x10835, 45},	// Cypriot
-    {0x10837, 0x10838, 45},	// Cypriot
-    {0x1083C, 0x1083C, 45},	// Cypriot
-    {0x1083F, 0x1083F, 45},	// Cypriot
-    {0x10840, 0x10855, 60},	// Imperial_Aramaic
-    {0x10857, 0x1085F, 60},	// Imperial_Aramaic
-    {0x10860, 0x1087F, 100},	// Palmyrene
-    {0x10880, 0x1089E, 85},	// Nabataean
-    {0x108A7, 0x108AF, 85},	// Nabataean
-    {0x108E0, 0x108F2, 59},	// Hatran
-    {0x108F4, 0x108F5, 59},	// Hatran
-    {0x108FB, 0x108FF, 59},	// Hatran
-    {0x10900, 0x1091B, 103},	// Phoenician
-    {0x1091F, 0x1091F, 103},	// Phoenician
-    {0x10920, 0x10939, 71},	// Lydian
-    {0x1093F, 0x1093F, 71},	// Lydian
-    {0x10980, 0x1099F, 80},	// Meroitic_Hieroglyphs
-    {0x109A0, 0x109B7, 79},	// Meroitic_Cursive
-    {0x109BC, 0x109CF, 79},	// Meroitic_Cursive
-    {0x109D2, 0x109FF, 79},	// Meroitic_Cursive
-    {0x10A00, 0x10A03, 64},	// Kharoshthi
-    {0x10A05, 0x10A06, 64},	// Kharoshthi
-    {0x10A0C, 0x10A13, 64},	// Kharoshthi
-    {0x10A15, 0x10A17, 64},	// Kharoshthi
-    {0x10A19, 0x10A35, 64},	// Kharoshthi
-    {0x10A38, 0x10A3A, 64},	// Kharoshthi
-    {0x10A3F, 0x10A48, 64},	// Kharoshthi
-    {0x10A50, 0x10A58, 64},	// Kharoshthi
-    {0x10A60, 0x10A7F, 95},	// Old_South_Arabian
-    {0x10A80, 0x10A9F, 91},	// Old_North_Arabian
-    {0x10AC0, 0x10AE6, 74},	// Manichaean
-    {0x10AEB, 0x10AF6, 74},	// Manichaean
-    {0x10B00, 0x10B35, 33},	// Avestan
-    {0x10B39, 0x10B3F, 33},	// Avestan
-    {0x10B40, 0x10B55, 62},	// Inscriptional_Parthian
-    {0x10B58, 0x10B5F, 62},	// Inscriptional_Parthian
-    {0x10B60, 0x10B72, 61},	// Inscriptional_Pahlavi
-    {0x10B78, 0x10B7F, 61},	// Inscriptional_Pahlavi
-    {0x10B80, 0x10B91, 104},	// Psalter_Pahlavi
-    {0x10B99, 0x10B9C, 104},	// Psalter_Pahlavi
-    {0x10BA9, 0x10BAF, 104},	// Psalter_Pahlavi
-    {0x10C00, 0x10C48, 96},	// Old_Turkic
-    {0x10C80, 0x10CB2, 89},	// Old_Hungarian
-    {0x10CC0, 0x10CF2, 89},	// Old_Hungarian
-    {0x10CFA, 0x10CFF, 89},	// Old_Hungarian
-    {0x10D00, 0x10D27, 135},	// Hanifi_Rohingya
-    {0x10D30, 0x10D39, 135},	// Hanifi_Rohingya
-    {0x10E60, 0x10E7E, 3},	// Arabic
-    {0x10E80, 0x10EA9, 125},	// Yezidi
-    {0x10EAB, 0x10EAD, 125},	// Yezidi
-    {0x10EB0, 0x10EB1, 125},	// Yezidi
-    {0x10F00, 0x10F27, 94},	// Old_Sogdian
-    {0x10F30, 0x10F59, 112},	// Sogdian
-    {0x10F70, 0x10F89, 97},	// Old_Uyghur
-    {0x10FB0, 0x10FCB, 42},	// Chorasmian
-    {0x10FE0, 0x10FF6, 53},	// Elymaic
-    {0x11000, 0x1104D, 36},	// Brahmi
-    {0x11052, 0x11075, 36},	// Brahmi
-    {0x1107F, 0x1107F, 36},	// Brahmi
-    {0x11080, 0x110C2, 63},	// Kaithi
-    {0x110CD, 0x110CD, 63},	// Kaithi
-    {0x110D0, 0x110E8, 113},	// Sora_Sompeng
-    {0x110F0, 0x110F9, 113},	// Sora_Sompeng
-    {0x11100, 0x11134, 132},	// Chakma
-    {0x11136, 0x11147, 132},	// Chakma
-    {0x11150, 0x11176, 72},	// Mahajani
-    {0x11180, 0x111DF, 108},	// Sharada
-    {0x111E1, 0x111F4, 25},	// Sinhala
-    {0x11200, 0x11211, 66},	// Khojki
-    {0x11213, 0x1123E, 66},	// Khojki
-    {0x11280, 0x11286, 84},	// Multani
-    {0x11288, 0x11288, 84},	// Multani
-    {0x1128A, 0x1128D, 84},	// Multani
-    {0x1128F, 0x1129D, 84},	// Multani
-    {0x1129F, 0x112A9, 84},	// Multani
-    {0x112B0, 0x112EA, 67},	// Khudawadi
-    {0x112F0, 0x112F9, 67},	// Khudawadi
-    {0x11300, 0x11303, 56},	// Grantha
-    {0x11305, 0x1130C, 56},	// Grantha
-    {0x1130F, 0x11310, 56},	// Grantha
-    {0x11313, 0x11328, 56},	// Grantha
-    {0x1132A, 0x11330, 56},	// Grantha
-    {0x11332, 0x11333, 56},	// Grantha
-    {0x11335, 0x11339, 56},	// Grantha
+    {0x10000, 0x1000B, 69},	// Linear_B (Exclusion)
+    {0x1000D, 0x10026, 69},	// Linear_B (Exclusion)
+    {0x10028, 0x1003A, 69},	// Linear_B (Exclusion)
+    {0x1003C, 0x1003D, 69},	// Linear_B (Exclusion)
+    {0x1003F, 0x1004D, 69},	// Linear_B (Exclusion)
+    {0x10050, 0x1005D, 69},	// Linear_B (Exclusion)
+    {0x10080, 0x100FA, 69},	// Linear_B (Exclusion)
+    {0x10100, 0x10102, 0},	// Common (Exclusion Not_XID)
+    {0x10107, 0x10133, 0},	// Common (Exclusion Not_XID)
+    {0x10137, 0x1013F, 0},	// Common (Exclusion Not_XID)
+    {0x10140, 0x1018E, 11},	// Greek (Obsolete)
+    {0x10190, 0x1019C, 0},	// Common (Not_XID)
+    {0x101A0, 0x101A0, 11},	// Greek (Not_XID)
+    {0x101D0, 0x101FC, 0},	// Common (Obsolete Not_XID)
+    {0x101FD, 0x101FD, 1},	// Inherited (Obsolete)
+    {0x10280, 0x1029C, 70},	// Lycian (Exclusion)
+    {0x102A0, 0x102D0, 40},	// Carian (Exclusion)
+    {0x102E0, 0x102E0, 1},	// Inherited (Obsolete)
+    {0x102E1, 0x102FB, 0},	// Common (Obsolete Not_XID)
+    {0x10300, 0x10323, 90},	// Old_Italic (Exclusion)
+    {0x1032D, 0x1032F, 90},	// Old_Italic (Exclusion)
+    {0x10330, 0x1034A, 55},	// Gothic (Exclusion)
+    {0x10350, 0x1037A, 92},	// Old_Permic (Exclusion)
+    {0x10380, 0x1039D, 122},	// Ugaritic (Exclusion)
+    {0x1039F, 0x1039F, 122},	// Ugaritic (Exclusion Not_XID)
+    {0x103A0, 0x103C3, 93},	// Old_Persian (Exclusion)
+    {0x103C8, 0x103D5, 93},	// Old_Persian (Exclusion)
+    {0x10400, 0x1044F, 47},	// Deseret (Exclusion)
+    {0x10450, 0x1047F, 109},	// Shavian (Exclusion)
+    {0x10480, 0x1049D, 98},	// Osmanya (Exclusion)
+    {0x104A0, 0x104A9, 98},	// Osmanya (Exclusion)
+    {0x104B0, 0x104D3, 149},	// Osage (Limited_Use)
+    {0x104D8, 0x104FB, 149},	// Osage (Limited_Use)
+    {0x10500, 0x10527, 52},	// Elbasan (Exclusion)
+    {0x10530, 0x10563, 41},	// Caucasian_Albanian (Exclusion)
+    {0x1056F, 0x1056F, 41},	// Caucasian_Albanian (Exclusion Not_XID)
+    {0x10570, 0x1057A, 123},	// Vithkuqi (Exclusion)
+    {0x1057C, 0x1058A, 123},	// Vithkuqi (Exclusion)
+    {0x1058C, 0x10592, 123},	// Vithkuqi (Exclusion)
+    {0x10594, 0x10595, 123},	// Vithkuqi (Exclusion)
+    {0x10597, 0x105A1, 123},	// Vithkuqi (Exclusion)
+    {0x105A3, 0x105B1, 123},	// Vithkuqi (Exclusion)
+    {0x105B3, 0x105B9, 123},	// Vithkuqi (Exclusion)
+    {0x105BB, 0x105BC, 123},	// Vithkuqi (Exclusion)
+    {0x10600, 0x10736, 68},	// Linear_A (Exclusion)
+    {0x10740, 0x10755, 68},	// Linear_A (Exclusion)
+    {0x10760, 0x10767, 68},	// Linear_A (Exclusion)
+    {0x10780, 0x10785, 2},	// Latin (Uncommon_Use)
+    {0x10787, 0x107B0, 2},	// Latin (Not_NFKC)
+    {0x107B2, 0x107BA, 2},	// Latin (Not_NFKC)
+    {0x10800, 0x10805, 45},	// Cypriot (Exclusion)
+    {0x10808, 0x10808, 45},	// Cypriot (Exclusion)
+    {0x1080A, 0x10835, 45},	// Cypriot (Exclusion)
+    {0x10837, 0x10838, 45},	// Cypriot (Exclusion)
+    {0x1083C, 0x1083C, 45},	// Cypriot (Exclusion)
+    {0x1083F, 0x1083F, 45},	// Cypriot (Exclusion)
+    {0x10840, 0x10855, 60},	// Imperial_Aramaic (Exclusion)
+    {0x10857, 0x1085F, 60},	// Imperial_Aramaic (Exclusion Not_XID)
+    {0x10860, 0x1087F, 100},	// Palmyrene (Exclusion)
+    {0x10880, 0x1089E, 85},	// Nabataean (Exclusion)
+    {0x108A7, 0x108AF, 85},	// Nabataean (Exclusion Not_XID)
+    {0x108E0, 0x108F2, 59},	// Hatran (Exclusion)
+    {0x108F4, 0x108F5, 59},	// Hatran (Exclusion)
+    {0x108FB, 0x108FF, 59},	// Hatran (Exclusion Not_XID)
+    {0x10900, 0x1091B, 103},	// Phoenician (Exclusion)
+    {0x1091F, 0x1091F, 103},	// Phoenician (Exclusion Not_XID)
+    {0x10920, 0x10939, 71},	// Lydian (Exclusion)
+    {0x1093F, 0x1093F, 71},	// Lydian (Exclusion Not_XID)
+    {0x10980, 0x1099F, 80},	// Meroitic_Hieroglyphs (Exclusion)
+    {0x109A0, 0x109B7, 79},	// Meroitic_Cursive (Exclusion)
+    {0x109BC, 0x109CF, 79},	// Meroitic_Cursive (Exclusion Not_XID)
+    {0x109D2, 0x109FF, 79},	// Meroitic_Cursive (Exclusion Not_XID)
+    {0x10A00, 0x10A03, 64},	// Kharoshthi (Exclusion)
+    {0x10A05, 0x10A06, 64},	// Kharoshthi (Exclusion)
+    {0x10A0C, 0x10A13, 64},	// Kharoshthi (Exclusion)
+    {0x10A15, 0x10A17, 64},	// Kharoshthi (Exclusion)
+    {0x10A19, 0x10A35, 64},	// Kharoshthi (Exclusion)
+    {0x10A38, 0x10A3A, 64},	// Kharoshthi (Exclusion)
+    {0x10A3F, 0x10A48, 64},	// Kharoshthi (Exclusion)
+    {0x10A50, 0x10A58, 64},	// Kharoshthi (Exclusion Not_XID)
+    {0x10A60, 0x10A7F, 95},	// Old_South_Arabian (Exclusion)
+    {0x10A80, 0x10A9F, 91},	// Old_North_Arabian (Exclusion)
+    {0x10AC0, 0x10AE6, 74},	// Manichaean (Exclusion)
+    {0x10AEB, 0x10AF6, 74},	// Manichaean (Exclusion Not_XID)
+    {0x10B00, 0x10B35, 33},	// Avestan (Exclusion)
+    {0x10B39, 0x10B3F, 33},	// Avestan (Exclusion Not_XID)
+    {0x10B40, 0x10B55, 62},	// Inscriptional_Parthian (Exclusion)
+    {0x10B58, 0x10B5F, 62},	// Inscriptional_Parthian (Exclusion Not_XID)
+    {0x10B60, 0x10B72, 61},	// Inscriptional_Pahlavi (Exclusion)
+    {0x10B78, 0x10B7F, 61},	// Inscriptional_Pahlavi (Exclusion Not_XID)
+    {0x10B80, 0x10B91, 104},	// Psalter_Pahlavi (Exclusion)
+    {0x10B99, 0x10B9C, 104},	// Psalter_Pahlavi (Exclusion Not_XID)
+    {0x10BA9, 0x10BAF, 104},	// Psalter_Pahlavi (Exclusion Not_XID)
+    {0x10C00, 0x10C48, 96},	// Old_Turkic (Exclusion)
+    {0x10C80, 0x10CB2, 89},	// Old_Hungarian (Exclusion)
+    {0x10CC0, 0x10CF2, 89},	// Old_Hungarian (Exclusion)
+    {0x10CFA, 0x10CFF, 89},	// Old_Hungarian (Exclusion Not_XID)
+    {0x10D00, 0x10D27, 135},	// Hanifi_Rohingya (Limited_Use)
+    {0x10D30, 0x10D39, 135},	// Hanifi_Rohingya (Limited_Use)
+    {0x10E60, 0x10E7E, 3},	// Arabic (Not_XID)
+    {0x10E80, 0x10EA9, 125},	// Yezidi (Exclusion)
+    {0x10EAB, 0x10EAD, 125},	// Yezidi (Exclusion)
+    {0x10EB0, 0x10EB1, 125},	// Yezidi (Exclusion)
+    {0x10F00, 0x10F27, 94},	// Old_Sogdian (Exclusion)
+    {0x10F30, 0x10F59, 112},	// Sogdian (Exclusion)
+    {0x10F70, 0x10F89, 97},	// Old_Uyghur (Exclusion)
+    {0x10FB0, 0x10FCB, 42},	// Chorasmian (Exclusion)
+    {0x10FE0, 0x10FF6, 53},	// Elymaic (Exclusion)
+    {0x11000, 0x1104D, 36},	// Brahmi (Exclusion)
+    {0x11052, 0x11075, 36},	// Brahmi (Exclusion Not_XID)
+    {0x1107F, 0x1107F, 36},	// Brahmi (Exclusion)
+    {0x11080, 0x110C2, 63},	// Kaithi (Exclusion)
+    {0x110CD, 0x110CD, 63},	// Kaithi (Exclusion Not_XID)
+    {0x110D0, 0x110E8, 113},	// Sora_Sompeng (Exclusion)
+    {0x110F0, 0x110F9, 113},	// Sora_Sompeng (Exclusion)
+    {0x11100, 0x11134, 132},	// Chakma (Limited_Use)
+    {0x11136, 0x11147, 132},	// Chakma (Limited_Use)
+    {0x11150, 0x11176, 72},	// Mahajani (Exclusion)
+    {0x11180, 0x111DF, 108},	// Sharada (Exclusion)
+    {0x111E1, 0x111F4, 25},	// Sinhala (Not_XID)
+    {0x11200, 0x11211, 66},	// Khojki (Exclusion)
+    {0x11213, 0x1123E, 66},	// Khojki (Exclusion)
+    {0x11280, 0x11286, 84},	// Multani (Exclusion)
+    {0x11288, 0x11288, 84},	// Multani (Exclusion)
+    {0x1128A, 0x1128D, 84},	// Multani (Exclusion)
+    {0x1128F, 0x1129D, 84},	// Multani (Exclusion)
+    {0x1129F, 0x112A9, 84},	// Multani (Exclusion)
+    {0x112B0, 0x112EA, 67},	// Khudawadi (Exclusion)
+    {0x112F0, 0x112F9, 67},	// Khudawadi (Exclusion)
+    {0x11300, 0x11303, 56},	// Grantha (Exclusion)
+    {0x11305, 0x1130C, 56},	// Grantha (Exclusion)
+    {0x1130F, 0x11310, 56},	// Grantha (Exclusion)
+    {0x11313, 0x11328, 56},	// Grantha (Exclusion)
+    {0x1132A, 0x11330, 56},	// Grantha (Exclusion)
+    {0x11332, 0x11333, 56},	// Grantha (Exclusion)
+    {0x11335, 0x11339, 56},	// Grantha (Exclusion)
     {0x1133B, 0x1133B, 1},	// Inherited
     {0x1133C, 0x11344, 56},	// Grantha
-    {0x11347, 0x11348, 56},	// Grantha
-    {0x1134B, 0x1134D, 56},	// Grantha
-    {0x11350, 0x11350, 56},	// Grantha
-    {0x11357, 0x11357, 56},	// Grantha
-    {0x1135D, 0x11363, 56},	// Grantha
-    {0x11366, 0x1136C, 56},	// Grantha
-    {0x11370, 0x11374, 56},	// Grantha
-    {0x11400, 0x1145B, 145},	// Newa
-    {0x1145D, 0x11461, 145},	// Newa
-    {0x11480, 0x114C7, 120},	// Tirhuta
-    {0x114D0, 0x114D9, 120},	// Tirhuta
-    {0x11580, 0x115B5, 110},	// Siddham
-    {0x115B8, 0x115DD, 110},	// Siddham
-    {0x11600, 0x11644, 81},	// Modi
-    {0x11650, 0x11659, 81},	// Modi
-    {0x11660, 0x1166C, 82},	// Mongolian
-    {0x11680, 0x116B9, 117},	// Takri
-    {0x116C0, 0x116C9, 117},	// Takri
-    {0x11700, 0x1171A, 31},	// Ahom
-    {0x1171D, 0x1172B, 31},	// Ahom
-    {0x11730, 0x11746, 31},	// Ahom
-    {0x11800, 0x1183B, 49},	// Dogra
-    {0x118A0, 0x118F2, 124},	// Warang_Citi
-    {0x118FF, 0x118FF, 124},	// Warang_Citi
-    {0x11900, 0x11906, 48},	// Dives_Akuru
-    {0x11909, 0x11909, 48},	// Dives_Akuru
-    {0x1190C, 0x11913, 48},	// Dives_Akuru
-    {0x11915, 0x11916, 48},	// Dives_Akuru
-    {0x11918, 0x11935, 48},	// Dives_Akuru
-    {0x11937, 0x11938, 48},	// Dives_Akuru
-    {0x1193B, 0x11946, 48},	// Dives_Akuru
-    {0x11950, 0x11959, 48},	// Dives_Akuru
-    {0x119A0, 0x119A7, 86},	// Nandinagari
-    {0x119AA, 0x119D7, 86},	// Nandinagari
-    {0x119DA, 0x119E4, 86},	// Nandinagari
-    {0x11A00, 0x11A47, 126},	// Zanabazar_Square
-    {0x11A50, 0x11AA2, 114},	// Soyombo
-    {0x11AB0, 0x11ABF, 131},	// Canadian_Aboriginal
-    {0x11AC0, 0x11AF8, 101},	// Pau_Cin_Hau
-    {0x11C00, 0x11C08, 35},	// Bhaiksuki
-    {0x11C0A, 0x11C36, 35},	// Bhaiksuki
-    {0x11C38, 0x11C45, 35},	// Bhaiksuki
-    {0x11C50, 0x11C6C, 35},	// Bhaiksuki
-    {0x11C70, 0x11C8F, 75},	// Marchen
-    {0x11C92, 0x11CA7, 75},	// Marchen
-    {0x11CA9, 0x11CB6, 75},	// Marchen
-    {0x11D00, 0x11D06, 76},	// Masaram_Gondi
-    {0x11D08, 0x11D09, 76},	// Masaram_Gondi
-    {0x11D0B, 0x11D36, 76},	// Masaram_Gondi
-    {0x11D3A, 0x11D3A, 76},	// Masaram_Gondi
-    {0x11D3C, 0x11D3D, 76},	// Masaram_Gondi
-    {0x11D3F, 0x11D47, 76},	// Masaram_Gondi
-    {0x11D50, 0x11D59, 76},	// Masaram_Gondi
-    {0x11D60, 0x11D65, 57},	// Gunjala_Gondi
-    {0x11D67, 0x11D68, 57},	// Gunjala_Gondi
-    {0x11D6A, 0x11D8E, 57},	// Gunjala_Gondi
-    {0x11D90, 0x11D91, 57},	// Gunjala_Gondi
-    {0x11D93, 0x11D98, 57},	// Gunjala_Gondi
-    {0x11DA0, 0x11DA9, 57},	// Gunjala_Gondi
-    {0x11EE0, 0x11EF8, 73},	// Makasar
-    {0x11FB0, 0x11FB0, 140},	// Lisu
-    {0x11FC0, 0x11FF1, 26},	// Tamil
-    {0x11FFF, 0x11FFF, 26},	// Tamil
-    {0x12000, 0x12399, 44},	// Cuneiform
-    {0x12400, 0x1246E, 44},	// Cuneiform
-    {0x12470, 0x12474, 44},	// Cuneiform
-    {0x12480, 0x12543, 44},	// Cuneiform
-    {0x12F90, 0x12FF2, 46},	// Cypro_Minoan
-    {0x13000, 0x1342E, 51},	// Egyptian_Hieroglyphs
-    {0x13430, 0x13438, 51},	// Egyptian_Hieroglyphs
-    {0x14400, 0x14646, 32},	// Anatolian_Hieroglyphs
-    {0x16800, 0x16A38, 129},	// Bamum
-    {0x16A40, 0x16A5E, 83},	// Mro
-    {0x16A60, 0x16A69, 83},	// Mro
-    {0x16A6E, 0x16A6F, 83},	// Mro
-    {0x16A70, 0x16ABE, 118},	// Tangsa
-    {0x16AC0, 0x16AC9, 118},	// Tangsa
-    {0x16AD0, 0x16AED, 34},	// Bassa_Vah
-    {0x16AF0, 0x16AF5, 34},	// Bassa_Vah
-    {0x16B00, 0x16B45, 99},	// Pahawh_Hmong
-    {0x16B50, 0x16B59, 99},	// Pahawh_Hmong
-    {0x16B5B, 0x16B61, 99},	// Pahawh_Hmong
-    {0x16B63, 0x16B77, 99},	// Pahawh_Hmong
-    {0x16B7D, 0x16B8F, 99},	// Pahawh_Hmong
-    {0x16E40, 0x16E9A, 77},	// Medefaidrin
-    {0x16F00, 0x16F4A, 143},	// Miao
-    {0x16F4F, 0x16F87, 143},	// Miao
-    {0x16F8F, 0x16F9F, 143},	// Miao
-    {0x16FE0, 0x16FE0, 119},	// Tangut
-    {0x16FE1, 0x16FE1, 87},	// Nushu
-    {0x16FE2, 0x16FE3, 15},	// Han
-    {0x16FE4, 0x16FE4, 65},	// Khitan_Small_Script
+    {0x11347, 0x11348, 56},	// Grantha (Exclusion)
+    {0x1134B, 0x1134D, 56},	// Grantha (Exclusion)
+    {0x11350, 0x11350, 56},	// Grantha (Exclusion)
+    {0x11357, 0x11357, 56},	// Grantha (Exclusion)
+    {0x1135D, 0x11363, 56},	// Grantha (Exclusion)
+    {0x11366, 0x1136C, 56},	// Grantha (Exclusion)
+    {0x11370, 0x11374, 56},	// Grantha (Exclusion)
+    {0x11400, 0x1145B, 145},	// Newa (Limited_Use)
+    {0x1145D, 0x11461, 145},	// Newa (Limited_Use Not_XID)
+    {0x11480, 0x114C7, 120},	// Tirhuta (Exclusion)
+    {0x114D0, 0x114D9, 120},	// Tirhuta (Exclusion)
+    {0x11580, 0x115B5, 110},	// Siddham (Exclusion)
+    {0x115B8, 0x115DD, 110},	// Siddham (Exclusion)
+    {0x11600, 0x11644, 81},	// Modi (Exclusion)
+    {0x11650, 0x11659, 81},	// Modi (Exclusion)
+    {0x11660, 0x1166C, 82},	// Mongolian (Exclusion Not_XID)
+    {0x11680, 0x116B9, 117},	// Takri (Exclusion)
+    {0x116C0, 0x116C9, 117},	// Takri (Exclusion)
+    {0x11700, 0x1171A, 31},	// Ahom (Exclusion)
+    {0x1171D, 0x1172B, 31},	// Ahom (Exclusion)
+    {0x11730, 0x11746, 31},	// Ahom (Exclusion)
+    {0x11800, 0x1183B, 49},	// Dogra (Exclusion)
+    {0x118A0, 0x118F2, 124},	// Warang_Citi (Exclusion)
+    {0x118FF, 0x118FF, 124},	// Warang_Citi (Exclusion)
+    {0x11900, 0x11906, 48},	// Dives_Akuru (Exclusion)
+    {0x11909, 0x11909, 48},	// Dives_Akuru (Exclusion)
+    {0x1190C, 0x11913, 48},	// Dives_Akuru (Exclusion)
+    {0x11915, 0x11916, 48},	// Dives_Akuru (Exclusion)
+    {0x11918, 0x11935, 48},	// Dives_Akuru (Exclusion)
+    {0x11937, 0x11938, 48},	// Dives_Akuru (Exclusion)
+    {0x1193B, 0x11946, 48},	// Dives_Akuru (Exclusion)
+    {0x11950, 0x11959, 48},	// Dives_Akuru (Exclusion)
+    {0x119A0, 0x119A7, 86},	// Nandinagari (Exclusion)
+    {0x119AA, 0x119D7, 86},	// Nandinagari (Exclusion)
+    {0x119DA, 0x119E4, 86},	// Nandinagari (Exclusion)
+    {0x11A00, 0x11A47, 126},	// Zanabazar_Square (Exclusion)
+    {0x11A50, 0x11AA2, 114},	// Soyombo (Exclusion)
+    {0x11AB0, 0x11ABF, 131},	// Canadian_Aboriginal (Limited_Use)
+    {0x11AC0, 0x11AF8, 101},	// Pau_Cin_Hau (Exclusion)
+    {0x11C00, 0x11C08, 35},	// Bhaiksuki (Exclusion)
+    {0x11C0A, 0x11C36, 35},	// Bhaiksuki (Exclusion)
+    {0x11C38, 0x11C45, 35},	// Bhaiksuki (Exclusion)
+    {0x11C50, 0x11C6C, 35},	// Bhaiksuki (Exclusion)
+    {0x11C70, 0x11C8F, 75},	// Marchen (Exclusion Not_XID)
+    {0x11C92, 0x11CA7, 75},	// Marchen (Exclusion)
+    {0x11CA9, 0x11CB6, 75},	// Marchen (Exclusion)
+    {0x11D00, 0x11D06, 76},	// Masaram_Gondi (Exclusion)
+    {0x11D08, 0x11D09, 76},	// Masaram_Gondi (Exclusion)
+    {0x11D0B, 0x11D36, 76},	// Masaram_Gondi (Exclusion)
+    {0x11D3A, 0x11D3A, 76},	// Masaram_Gondi (Exclusion)
+    {0x11D3C, 0x11D3D, 76},	// Masaram_Gondi (Exclusion)
+    {0x11D3F, 0x11D47, 76},	// Masaram_Gondi (Exclusion)
+    {0x11D50, 0x11D59, 76},	// Masaram_Gondi (Exclusion)
+    {0x11D60, 0x11D65, 57},	// Gunjala_Gondi (Limited_Use)
+    {0x11D67, 0x11D68, 57},	// Gunjala_Gondi (Limited_Use)
+    {0x11D6A, 0x11D8E, 57},	// Gunjala_Gondi (Limited_Use)
+    {0x11D90, 0x11D91, 57},	// Gunjala_Gondi (Limited_Use)
+    {0x11D93, 0x11D98, 57},	// Gunjala_Gondi (Limited_Use)
+    {0x11DA0, 0x11DA9, 57},	// Gunjala_Gondi (Limited_Use)
+    {0x11EE0, 0x11EF8, 73},	// Makasar (Exclusion)
+    {0x11FB0, 0x11FB0, 140},	// Lisu (Limited_Use)
+    {0x11FC0, 0x11FF1, 26},	// Tamil (Not_XID)
+    {0x11FFF, 0x11FFF, 26},	// Tamil (Not_XID)
+    {0x12000, 0x12399, 44},	// Cuneiform (Exclusion)
+    {0x12400, 0x1246E, 44},	// Cuneiform (Exclusion)
+    {0x12470, 0x12474, 44},	// Cuneiform (Exclusion Not_XID)
+    {0x12480, 0x12543, 44},	// Cuneiform (Exclusion)
+    {0x12F90, 0x12FF2, 46},	// Cypro_Minoan (Exclusion)
+    {0x13000, 0x1342E, 51},	// Egyptian_Hieroglyphs (Exclusion)
+    {0x13430, 0x13438, 51},	// Egyptian_Hieroglyphs (Exclusion Not_XID)
+    {0x14400, 0x14646, 32},	// Anatolian_Hieroglyphs (Exclusion)
+    {0x16800, 0x16A38, 129},	// Bamum (Limited_Use)
+    {0x16A40, 0x16A5E, 83},	// Mro (Uncommon_Use Exclusion)
+    {0x16A60, 0x16A69, 83},	// Mro (Uncommon_Use Exclusion)
+    {0x16A6E, 0x16A6F, 83},	// Mro (Exclusion Not_XID)
+    {0x16A70, 0x16ABE, 118},	// Tangsa (Exclusion)
+    {0x16AC0, 0x16AC9, 118},	// Tangsa (Exclusion)
+    {0x16AD0, 0x16AED, 34},	// Bassa_Vah (Exclusion)
+    {0x16AF0, 0x16AF5, 34},	// Bassa_Vah (Exclusion)
+    {0x16B00, 0x16B45, 99},	// Pahawh_Hmong (Exclusion)
+    {0x16B50, 0x16B59, 99},	// Pahawh_Hmong (Exclusion)
+    {0x16B5B, 0x16B61, 99},	// Pahawh_Hmong (Exclusion Not_XID)
+    {0x16B63, 0x16B77, 99},	// Pahawh_Hmong (Exclusion)
+    {0x16B7D, 0x16B8F, 99},	// Pahawh_Hmong (Exclusion)
+    {0x16E40, 0x16E9A, 77},	// Medefaidrin (Exclusion)
+    {0x16F00, 0x16F4A, 143},	// Miao (Limited_Use)
+    {0x16F4F, 0x16F87, 143},	// Miao (Limited_Use)
+    {0x16F8F, 0x16F9F, 143},	// Miao (Limited_Use)
+    {0x16FE0, 0x16FE0, 119},	// Tangut (Exclusion)
+    {0x16FE1, 0x16FE1, 87},	// Nushu (Exclusion)
+    {0x16FE2, 0x16FE3, 15},	// Han (Not_XID)
+    {0x16FE4, 0x16FE4, 65},	// Khitan_Small_Script (Exclusion)
     {0x16FF0, 0x16FF1, 15},	// Han
-    {0x17000, 0x187F7, 119},	// Tangut
-    {0x18800, 0x18AFF, 119},	// Tangut
-    {0x18B00, 0x18CD5, 65},	// Khitan_Small_Script
-    {0x18D00, 0x18D08, 119},	// Tangut
-    {0x1AFF0, 0x1AFF3, 18},	// Katakana
-    {0x1AFF5, 0x1AFFB, 18},	// Katakana
-    {0x1AFFD, 0x1AFFE, 18},	// Katakana
-    {0x1B000, 0x1B000, 18},	// Katakana
-    {0x1B001, 0x1B11F, 17},	// Hiragana
+    {0x17000, 0x187F7, 119},	// Tangut (Exclusion)
+    {0x18800, 0x18AFF, 119},	// Tangut (Exclusion)
+    {0x18B00, 0x18CD5, 65},	// Khitan_Small_Script (Exclusion)
+    {0x18D00, 0x18D08, 119},	// Tangut (Exclusion)
+    {0x1AFF0, 0x1AFF3, 18},	// Katakana (Uncommon_Use)
+    {0x1AFF5, 0x1AFFB, 18},	// Katakana (Uncommon_Use)
+    {0x1AFFD, 0x1AFFE, 18},	// Katakana (Uncommon_Use)
+    {0x1B000, 0x1B000, 18},	// Katakana (Obsolete)
+    {0x1B001, 0x1B11F, 17},	// Hiragana (Obsolete)
     {0x1B120, 0x1B122, 18},	// Katakana
     {0x1B150, 0x1B152, 17},	// Hiragana
     {0x1B164, 0x1B167, 18},	// Katakana
-    {0x1B170, 0x1B2FB, 87},	// Nushu
-    {0x1BC00, 0x1BC6A, 50},	// Duployan
-    {0x1BC70, 0x1BC7C, 50},	// Duployan
-    {0x1BC80, 0x1BC88, 50},	// Duployan
-    {0x1BC90, 0x1BC99, 50},	// Duployan
-    {0x1BC9C, 0x1BC9F, 50},	// Duployan
-    {0x1BCA0, 0x1BCA3, 0},	// Common
+    {0x1B170, 0x1B2FB, 87},	// Nushu (Exclusion)
+    {0x1BC00, 0x1BC6A, 50},	// Duployan (Exclusion)
+    {0x1BC70, 0x1BC7C, 50},	// Duployan (Exclusion)
+    {0x1BC80, 0x1BC88, 50},	// Duployan (Exclusion)
+    {0x1BC90, 0x1BC99, 50},	// Duployan (Exclusion)
+    {0x1BC9C, 0x1BC9F, 50},	// Duployan (Exclusion Not_XID)
+    {0x1BCA0, 0x1BCA3, 0},	// Common (Default_Ignorable)
     {0x1CF00, 0x1CF2D, 1},	// Inherited
     {0x1CF30, 0x1CF46, 1},	// Inherited
-    {0x1CF50, 0x1CFC3, 0},	// Common
-    {0x1D000, 0x1D0F5, 0},	// Common
-    {0x1D100, 0x1D126, 0},	// Common
-    {0x1D129, 0x1D166, 0},	// Common
+    {0x1CF50, 0x1CFC3, 0},	// Common (Technical Not_XID)
+    {0x1D000, 0x1D0F5, 0},	// Common (Technical Not_XID)
+    {0x1D100, 0x1D126, 0},	// Common (Technical Not_XID)
+    {0x1D129, 0x1D166, 0},	// Common (Technical Not_XID)
     {0x1D167, 0x1D169, 1},	// Inherited
-    {0x1D16A, 0x1D17A, 0},	// Common
+    {0x1D16A, 0x1D17A, 0},	// Common (Technical Not_XID)
     {0x1D17B, 0x1D182, 1},	// Inherited
-    {0x1D183, 0x1D184, 0},	// Common
+    {0x1D183, 0x1D184, 0},	// Common (Technical Not_XID)
     {0x1D185, 0x1D18B, 1},	// Inherited
-    {0x1D18C, 0x1D1A9, 0},	// Common
+    {0x1D18C, 0x1D1A9, 0},	// Common (Technical Not_XID)
     {0x1D1AA, 0x1D1AD, 1},	// Inherited
-    {0x1D1AE, 0x1D1EA, 0},	// Common
-    {0x1D200, 0x1D245, 11},	// Greek
-    {0x1D2E0, 0x1D2F3, 0},	// Common
-    {0x1D300, 0x1D356, 0},	// Common
-    {0x1D360, 0x1D378, 0},	// Common
-    {0x1D400, 0x1D454, 0},	// Common
-    {0x1D456, 0x1D49C, 0},	// Common
-    {0x1D49E, 0x1D49F, 0},	// Common
-    {0x1D4A2, 0x1D4A2, 0},	// Common
-    {0x1D4A5, 0x1D4A6, 0},	// Common
-    {0x1D4A9, 0x1D4AC, 0},	// Common
-    {0x1D4AE, 0x1D4B9, 0},	// Common
-    {0x1D4BB, 0x1D4BB, 0},	// Common
-    {0x1D4BD, 0x1D4C3, 0},	// Common
-    {0x1D4C5, 0x1D505, 0},	// Common
-    {0x1D507, 0x1D50A, 0},	// Common
-    {0x1D50D, 0x1D514, 0},	// Common
-    {0x1D516, 0x1D51C, 0},	// Common
-    {0x1D51E, 0x1D539, 0},	// Common
-    {0x1D53B, 0x1D53E, 0},	// Common
-    {0x1D540, 0x1D544, 0},	// Common
-    {0x1D546, 0x1D546, 0},	// Common
-    {0x1D54A, 0x1D550, 0},	// Common
-    {0x1D552, 0x1D6A5, 0},	// Common
-    {0x1D6A8, 0x1D7CB, 0},	// Common
-    {0x1D7CE, 0x1D7FF, 0},	// Common
-    {0x1D800, 0x1DA8B, 111},	// SignWriting
-    {0x1DA9B, 0x1DA9F, 111},	// SignWriting
-    {0x1DAA1, 0x1DAAF, 111},	// SignWriting
+    {0x1D1AE, 0x1D1EA, 0},	// Common (Technical Not_XID)
+    {0x1D200, 0x1D245, 11},	// Greek (Obsolete Not_XID)
+    {0x1D2E0, 0x1D2F3, 0},	// Common (Not_XID)
+    {0x1D300, 0x1D356, 0},	// Common (Technical Not_XID)
+    {0x1D360, 0x1D378, 0},	// Common (Not_XID)
+    {0x1D400, 0x1D454, 0},	// Common (Not_NFKC)
+    {0x1D456, 0x1D49C, 0},	// Common (Not_NFKC)
+    {0x1D49E, 0x1D49F, 0},	// Common (Not_NFKC)
+    {0x1D4A2, 0x1D4A2, 0},	// Common (Not_NFKC)
+    {0x1D4A5, 0x1D4A6, 0},	// Common (Not_NFKC)
+    {0x1D4A9, 0x1D4AC, 0},	// Common (Not_NFKC)
+    {0x1D4AE, 0x1D4B9, 0},	// Common (Not_NFKC)
+    {0x1D4BB, 0x1D4BB, 0},	// Common (Not_NFKC)
+    {0x1D4BD, 0x1D4C3, 0},	// Common (Not_NFKC)
+    {0x1D4C5, 0x1D505, 0},	// Common (Not_NFKC)
+    {0x1D507, 0x1D50A, 0},	// Common (Not_NFKC)
+    {0x1D50D, 0x1D514, 0},	// Common (Not_NFKC)
+    {0x1D516, 0x1D51C, 0},	// Common (Not_NFKC)
+    {0x1D51E, 0x1D539, 0},	// Common (Not_NFKC)
+    {0x1D53B, 0x1D53E, 0},	// Common (Not_NFKC)
+    {0x1D540, 0x1D544, 0},	// Common (Not_NFKC)
+    {0x1D546, 0x1D546, 0},	// Common (Not_NFKC)
+    {0x1D54A, 0x1D550, 0},	// Common (Not_NFKC)
+    {0x1D552, 0x1D6A5, 0},	// Common (Not_NFKC)
+    {0x1D6A8, 0x1D7CB, 0},	// Common (Not_NFKC)
+    {0x1D7CE, 0x1D7FF, 0},	// Common (Not_NFKC)
+    {0x1D800, 0x1DA8B, 111},	// SignWriting (Exclusion Not_XID)
+    {0x1DA9B, 0x1DA9F, 111},	// SignWriting (Exclusion)
+    {0x1DAA1, 0x1DAAF, 111},	// SignWriting (Exclusion)
     {0x1DF00, 0x1DF1E, 2},	// Latin
-    {0x1E000, 0x1E006, 54},	// Glagolitic
-    {0x1E008, 0x1E018, 54},	// Glagolitic
-    {0x1E01B, 0x1E021, 54},	// Glagolitic
-    {0x1E023, 0x1E024, 54},	// Glagolitic
-    {0x1E026, 0x1E02A, 54},	// Glagolitic
-    {0x1E100, 0x1E12C, 147},	// Nyiakeng_Puachue_Hmong
-    {0x1E130, 0x1E13D, 147},	// Nyiakeng_Puachue_Hmong
-    {0x1E140, 0x1E149, 147},	// Nyiakeng_Puachue_Hmong
-    {0x1E14E, 0x1E14F, 147},	// Nyiakeng_Puachue_Hmong
-    {0x1E290, 0x1E2AE, 121},	// Toto
-    {0x1E2C0, 0x1E2F9, 159},	// Wancho
-    {0x1E2FF, 0x1E2FF, 159},	// Wancho
+    {0x1E000, 0x1E006, 54},	// Glagolitic (Exclusion)
+    {0x1E008, 0x1E018, 54},	// Glagolitic (Exclusion)
+    {0x1E01B, 0x1E021, 54},	// Glagolitic (Exclusion)
+    {0x1E023, 0x1E024, 54},	// Glagolitic (Exclusion)
+    {0x1E026, 0x1E02A, 54},	// Glagolitic (Exclusion)
+    {0x1E100, 0x1E12C, 147},	// Nyiakeng_Puachue_Hmong (Limited_Use)
+    {0x1E130, 0x1E13D, 147},	// Nyiakeng_Puachue_Hmong (Limited_Use)
+    {0x1E140, 0x1E149, 147},	// Nyiakeng_Puachue_Hmong (Limited_Use)
+    {0x1E14E, 0x1E14F, 147},	// Nyiakeng_Puachue_Hmong (Limited_Use)
+    {0x1E290, 0x1E2AE, 121},	// Toto (Exclusion)
+    {0x1E2C0, 0x1E2F9, 159},	// Wancho (Limited_Use)
+    {0x1E2FF, 0x1E2FF, 159},	// Wancho (Limited_Use Not_XID)
     {0x1E7E0, 0x1E7E6, 9},	// Ethiopic
     {0x1E7E8, 0x1E7EB, 9},	// Ethiopic
     {0x1E7ED, 0x1E7EE, 9},	// Ethiopic
     {0x1E7F0, 0x1E7FE, 9},	// Ethiopic
-    {0x1E800, 0x1E8C4, 78},	// Mende_Kikakui
-    {0x1E8C7, 0x1E8D6, 78},	// Mende_Kikakui
-    {0x1E900, 0x1E94B, 127},	// Adlam
-    {0x1E950, 0x1E959, 127},	// Adlam
-    {0x1E95E, 0x1E95F, 127},	// Adlam
-    {0x1EC71, 0x1ECB4, 0},	// Common
-    {0x1ED01, 0x1ED3D, 0},	// Common
-    {0x1EE00, 0x1EE03, 3},	// Arabic
-    {0x1EE05, 0x1EE1F, 3},	// Arabic
-    {0x1EE21, 0x1EE22, 3},	// Arabic
-    {0x1EE24, 0x1EE24, 3},	// Arabic
-    {0x1EE27, 0x1EE27, 3},	// Arabic
-    {0x1EE29, 0x1EE32, 3},	// Arabic
-    {0x1EE34, 0x1EE37, 3},	// Arabic
-    {0x1EE39, 0x1EE39, 3},	// Arabic
-    {0x1EE3B, 0x1EE3B, 3},	// Arabic
-    {0x1EE42, 0x1EE42, 3},	// Arabic
-    {0x1EE47, 0x1EE47, 3},	// Arabic
-    {0x1EE49, 0x1EE49, 3},	// Arabic
-    {0x1EE4B, 0x1EE4B, 3},	// Arabic
-    {0x1EE4D, 0x1EE4F, 3},	// Arabic
-    {0x1EE51, 0x1EE52, 3},	// Arabic
-    {0x1EE54, 0x1EE54, 3},	// Arabic
-    {0x1EE57, 0x1EE57, 3},	// Arabic
-    {0x1EE59, 0x1EE59, 3},	// Arabic
-    {0x1EE5B, 0x1EE5B, 3},	// Arabic
-    {0x1EE5D, 0x1EE5D, 3},	// Arabic
-    {0x1EE5F, 0x1EE5F, 3},	// Arabic
-    {0x1EE61, 0x1EE62, 3},	// Arabic
-    {0x1EE64, 0x1EE64, 3},	// Arabic
-    {0x1EE67, 0x1EE6A, 3},	// Arabic
-    {0x1EE6C, 0x1EE72, 3},	// Arabic
-    {0x1EE74, 0x1EE77, 3},	// Arabic
-    {0x1EE79, 0x1EE7C, 3},	// Arabic
-    {0x1EE7E, 0x1EE7E, 3},	// Arabic
-    {0x1EE80, 0x1EE89, 3},	// Arabic
-    {0x1EE8B, 0x1EE9B, 3},	// Arabic
-    {0x1EEA1, 0x1EEA3, 3},	// Arabic
-    {0x1EEA5, 0x1EEA9, 3},	// Arabic
-    {0x1EEAB, 0x1EEBB, 3},	// Arabic
-    {0x1EEF0, 0x1EEF1, 3},	// Arabic
-    {0x1F000, 0x1F02B, 0},	// Common
-    {0x1F030, 0x1F093, 0},	// Common
-    {0x1F0A0, 0x1F0AE, 0},	// Common
-    {0x1F0B1, 0x1F0BF, 0},	// Common
-    {0x1F0C1, 0x1F0CF, 0},	// Common
-    {0x1F0D1, 0x1F0F5, 0},	// Common
-    {0x1F100, 0x1F1AD, 0},	// Common
-    {0x1F1E6, 0x1F1FF, 0},	// Common
-    {0x1F200, 0x1F200, 17},	// Hiragana
-    {0x1F201, 0x1F202, 0},	// Common
-    {0x1F210, 0x1F23B, 0},	// Common
-    {0x1F240, 0x1F248, 0},	// Common
-    {0x1F250, 0x1F251, 0},	// Common
-    {0x1F260, 0x1F265, 0},	// Common
-    {0x1F300, 0x1F6D7, 0},	// Common
-    {0x1F6DD, 0x1F6EC, 0},	// Common
-    {0x1F6F0, 0x1F6FC, 0},	// Common
-    {0x1F700, 0x1F773, 0},	// Common
-    {0x1F780, 0x1F7D8, 0},	// Common
-    {0x1F7E0, 0x1F7EB, 0},	// Common
-    {0x1F7F0, 0x1F7F0, 0},	// Common
-    {0x1F800, 0x1F80B, 0},	// Common
-    {0x1F810, 0x1F847, 0},	// Common
-    {0x1F850, 0x1F859, 0},	// Common
-    {0x1F860, 0x1F887, 0},	// Common
-    {0x1F890, 0x1F8AD, 0},	// Common
-    {0x1F8B0, 0x1F8B1, 0},	// Common
-    {0x1F900, 0x1FA53, 0},	// Common
-    {0x1FA60, 0x1FA6D, 0},	// Common
-    {0x1FA70, 0x1FA74, 0},	// Common
-    {0x1FA78, 0x1FA7C, 0},	// Common
-    {0x1FA80, 0x1FA86, 0},	// Common
-    {0x1FA90, 0x1FAAC, 0},	// Common
-    {0x1FAB0, 0x1FABA, 0},	// Common
-    {0x1FAC0, 0x1FAC5, 0},	// Common
-    {0x1FAD0, 0x1FAD9, 0},	// Common
-    {0x1FAE0, 0x1FAE7, 0},	// Common
-    {0x1FAF0, 0x1FAF6, 0},	// Common
-    {0x1FB00, 0x1FB92, 0},	// Common
-    {0x1FB94, 0x1FBCA, 0},	// Common
-    {0x1FBF0, 0x1FBF9, 0},	// Common
+    {0x1E800, 0x1E8C4, 78},	// Mende_Kikakui (Exclusion)
+    {0x1E8C7, 0x1E8D6, 78},	// Mende_Kikakui (Exclusion Not_XID)
+    {0x1E900, 0x1E94B, 127},	// Adlam (Limited_Use)
+    {0x1E950, 0x1E959, 127},	// Adlam (Limited_Use)
+    {0x1E95E, 0x1E95F, 127},	// Adlam (Limited_Use Not_XID)
+    {0x1EC71, 0x1ECB4, 0},	// Common (Not_XID)
+    {0x1ED01, 0x1ED3D, 0},	// Common (Not_XID)
+    {0x1EE00, 0x1EE03, 3},	// Arabic (Not_NFKC)
+    {0x1EE05, 0x1EE1F, 3},	// Arabic (Not_NFKC)
+    {0x1EE21, 0x1EE22, 3},	// Arabic (Not_NFKC)
+    {0x1EE24, 0x1EE24, 3},	// Arabic (Not_NFKC)
+    {0x1EE27, 0x1EE27, 3},	// Arabic (Not_NFKC)
+    {0x1EE29, 0x1EE32, 3},	// Arabic (Not_NFKC)
+    {0x1EE34, 0x1EE37, 3},	// Arabic (Not_NFKC)
+    {0x1EE39, 0x1EE39, 3},	// Arabic (Not_NFKC)
+    {0x1EE3B, 0x1EE3B, 3},	// Arabic (Not_NFKC)
+    {0x1EE42, 0x1EE42, 3},	// Arabic (Not_NFKC)
+    {0x1EE47, 0x1EE47, 3},	// Arabic (Not_NFKC)
+    {0x1EE49, 0x1EE49, 3},	// Arabic (Not_NFKC)
+    {0x1EE4B, 0x1EE4B, 3},	// Arabic (Not_NFKC)
+    {0x1EE4D, 0x1EE4F, 3},	// Arabic (Not_NFKC)
+    {0x1EE51, 0x1EE52, 3},	// Arabic (Not_NFKC)
+    {0x1EE54, 0x1EE54, 3},	// Arabic (Not_NFKC)
+    {0x1EE57, 0x1EE57, 3},	// Arabic (Not_NFKC)
+    {0x1EE59, 0x1EE59, 3},	// Arabic (Not_NFKC)
+    {0x1EE5B, 0x1EE5B, 3},	// Arabic (Not_NFKC)
+    {0x1EE5D, 0x1EE5D, 3},	// Arabic (Not_NFKC)
+    {0x1EE5F, 0x1EE5F, 3},	// Arabic (Not_NFKC)
+    {0x1EE61, 0x1EE62, 3},	// Arabic (Not_NFKC)
+    {0x1EE64, 0x1EE64, 3},	// Arabic (Not_NFKC)
+    {0x1EE67, 0x1EE6A, 3},	// Arabic (Not_NFKC)
+    {0x1EE6C, 0x1EE72, 3},	// Arabic (Not_NFKC)
+    {0x1EE74, 0x1EE77, 3},	// Arabic (Not_NFKC)
+    {0x1EE79, 0x1EE7C, 3},	// Arabic (Not_NFKC)
+    {0x1EE7E, 0x1EE7E, 3},	// Arabic (Not_NFKC)
+    {0x1EE80, 0x1EE89, 3},	// Arabic (Not_NFKC)
+    {0x1EE8B, 0x1EE9B, 3},	// Arabic (Not_NFKC)
+    {0x1EEA1, 0x1EEA3, 3},	// Arabic (Not_NFKC)
+    {0x1EEA5, 0x1EEA9, 3},	// Arabic (Not_NFKC)
+    {0x1EEAB, 0x1EEBB, 3},	// Arabic (Not_NFKC)
+    {0x1EEF0, 0x1EEF1, 3},	// Arabic (Not_XID)
+    {0x1F000, 0x1F02B, 0},	// Common (Not_XID)
+    {0x1F030, 0x1F093, 0},	// Common (Not_XID)
+    {0x1F0A0, 0x1F0AE, 0},	// Common (Not_XID)
+    {0x1F0B1, 0x1F0BF, 0},	// Common (Not_XID)
+    {0x1F0C1, 0x1F0CF, 0},	// Common (Not_XID)
+    {0x1F0D1, 0x1F0F5, 0},	// Common (Not_XID)
+    {0x1F100, 0x1F1AD, 0},	// Common (Not_NFKC)
+    {0x1F1E6, 0x1F1FF, 0},	// Common (Not_XID)
+    {0x1F200, 0x1F200, 17},	// Hiragana (Not_NFKC)
+    {0x1F201, 0x1F202, 0},	// Common (Not_NFKC)
+    {0x1F210, 0x1F23B, 0},	// Common (Not_NFKC)
+    {0x1F240, 0x1F248, 0},	// Common (Not_NFKC)
+    {0x1F250, 0x1F251, 0},	// Common (Not_NFKC)
+    {0x1F260, 0x1F265, 0},	// Common (Not_XID)
+    {0x1F300, 0x1F6D7, 0},	// Common (Not_XID)
+    {0x1F6DD, 0x1F6EC, 0},	// Common (Not_XID)
+    {0x1F6F0, 0x1F6FC, 0},	// Common (Not_XID)
+    {0x1F700, 0x1F773, 0},	// Common (Not_XID)
+    {0x1F780, 0x1F7D8, 0},	// Common (Not_XID)
+    {0x1F7E0, 0x1F7EB, 0},	// Common (Not_XID)
+    {0x1F7F0, 0x1F7F0, 0},	// Common (Not_XID)
+    {0x1F800, 0x1F80B, 0},	// Common (Not_XID)
+    {0x1F810, 0x1F847, 0},	// Common (Not_XID)
+    {0x1F850, 0x1F859, 0},	// Common (Not_XID)
+    {0x1F860, 0x1F887, 0},	// Common (Not_XID)
+    {0x1F890, 0x1F8AD, 0},	// Common (Not_XID)
+    {0x1F8B0, 0x1F8B1, 0},	// Common (Not_XID)
+    {0x1F900, 0x1FA53, 0},	// Common (Not_XID)
+    {0x1FA60, 0x1FA6D, 0},	// Common (Not_XID)
+    {0x1FA70, 0x1FA74, 0},	// Common (Not_XID)
+    {0x1FA78, 0x1FA7C, 0},	// Common (Not_XID)
+    {0x1FA80, 0x1FA86, 0},	// Common (Not_XID)
+    {0x1FA90, 0x1FAAC, 0},	// Common (Not_XID)
+    {0x1FAB0, 0x1FABA, 0},	// Common (Not_XID)
+    {0x1FAC0, 0x1FAC5, 0},	// Common (Not_XID)
+    {0x1FAD0, 0x1FAD9, 0},	// Common (Not_XID)
+    {0x1FAE0, 0x1FAE7, 0},	// Common (Not_XID)
+    {0x1FAF0, 0x1FAF6, 0},	// Common (Not_XID)
+    {0x1FB00, 0x1FB92, 0},	// Common (Not_XID)
+    {0x1FB94, 0x1FBCA, 0},	// Common (Not_XID)
+    {0x1FBF0, 0x1FBF9, 0},	// Common (Not_NFKC)
     {0x20000, 0x2A6DF, 15},	// Han
     {0x2A700, 0x2B738, 15},	// Han
     {0x2B740, 0x2B81D, 15},	// Han
     {0x2B820, 0x2CEA1, 15},	// Han
     {0x2CEB0, 0x2EBE0, 15},	// Han
-    {0x2F800, 0x2FA1D, 15},	// Han
+    {0x2F800, 0x2FA1D, 15},	// Han (Not_NFKC)
     {0x30000, 0x3134A, 15},	// Han
-    {0xE0001, 0xE0001, 0},	// Common
-    {0xE0020, 0xE007F, 0},	// Common
-    {0xE0100, 0xE01EF, 1},	// Inherited
+    {0xE0001, 0xE0001, 0},	// Common (Deprecated)
+    {0xE0020, 0xE007F, 0},	// Common (Default_Ignorable)
+    {0xE0100, 0xE01EF, 1},	// Inherited (Default_Ignorable)
     // clang-format on
 }; // 353 ranges, 48 single codepoints
 #  else

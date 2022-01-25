@@ -219,6 +219,18 @@ sub ok_idtype {
   return 0; # unknown identifier type
 }
 
+sub notok_idtype {
+  my $cp = shift;
+  for my $r (@IDTYPES) {
+    if ($cp >= $r->[0] and $cp <= $r->[1]) {
+      return $r->[2] if $r->[2] =~ /\b(Limited_Use|Obsolete|Exclusion|Not_XID|Not_NFKC|Uncommon_Use|Default_Ignorable|Deprecated)\b/;
+      return '' if $r->[2] =~ /\b(Recommended|Inclusion|Technical)\b/;
+      return ''; # unknown identifier type
+    }
+  }
+  return ''; # not a character
+}
+
 # TOOD: generate these 2 lists from the IDTYPES or the webpage.
 # http://www.unicode.org/reports/tr31/#Table_Recommended_Scripts
 my @recommended = qw(
@@ -685,7 +697,13 @@ for my $r (@SCR) {
   } else {
     $b++;
   }
-  printf $H "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  my $cmt = $r->[2];
+  my $suffix = notok_idtype($r->[0]);
+  if ($suffix) {
+      $suffix =~ s/\s+$//;
+  }
+  $cmt .= " ($suffix)" if $suffix;
+  printf $H "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $cmt;
   if (@$r == 4) {
     printf $H ", originally SC %s\n", $r->[3];
   } else {
@@ -714,7 +732,13 @@ for my $r (@SCR) {
   } else {
     $b++;
   }
-  printf $H16 "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  my $cmt = $r->[2];
+  my $suffix = notok_idtype($r->[0]);
+  if ($suffix) {
+      $suffix =~ s/\s+$//;
+  }
+  $cmt .= " ($suffix)" if $suffix;
+  printf $H16 "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $cmt;
   if (@$r == 4) {
     printf $H16 ", originally SC %s\n", $r->[3];
   } else {
@@ -740,7 +764,13 @@ for my $r (@SCR) {
   } else {
     $b++;
   }
-  printf $H16 "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  my $cmt = $r->[2];
+  my $suffix = notok_idtype($r->[0]);
+  if ($suffix) {
+      $suffix =~ s/\s+$//;
+  }
+  $cmt .= " ($suffix)" if $suffix;
+  printf $H16 "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $cmt;
   if (@$r == 4) {
     printf $H16 ", originally SC %s\n", $r->[3];
   } else {
@@ -775,7 +805,13 @@ for my $r (@SCRF) {
   } else {
     $b++;
   }
-  printf $H "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $r->[2];
+  my $cmt = $r->[2];
+  my $suffix = notok_idtype($r->[0]);
+  if ($suffix) {
+      $suffix =~ s/\s+$//;
+  }
+  $cmt .= " ($suffix)" if $suffix;
+  printf $H "    {0x%04X, 0x%04X, %d},\t// %s", $r->[0], $r->[1], $SC{$r->[2]}, $cmt;
   if (@$r == 4) {
     printf $H ", from SC %s\n", $r->[3];
   } else {
@@ -818,8 +854,14 @@ for my $r (@SCXR) {
   #  printf $H "    // {0x%04X, 0x%04X, %s, \"%s\"},\t// %s, moved to sc proper\n",
   #      $r->[0], $r->[1], $gc, $code, $r->[2];
   #} else {
+  my $cmt = $r->[2];
+  my $suffix = notok_idtype($r->[0]);
+  if ($suffix) {
+      $suffix =~ s/\s+$//;
+  }
+  $cmt .= " ($suffix)" if $suffix;
   printf $H "    {0x%04X, 0x%04X, %s, \"%s\"},\t// %s\n",
-    $r->[0], $r->[1], $gc, $code, $r->[2];
+    $r->[0], $r->[1], $gc, $code, $cmt;
   #}
 };
 printf $H <<"EOF", $b, $s, $size;
@@ -1196,11 +1238,11 @@ EOF
   printf $H16 <<'EOF', $b, $s, $list, $b + $s, $list;
     // clang-format on
 }; // %u ranges, %u single codepoints
-#  else
+#    else
 extern const struct range_bool16 %s_list16[%u];
-#  endif
+#    endif
 
-#  ifndef EXTERN_SCRIPTS
+#    ifndef EXTERN_SCRIPTS
 LOCAL const struct range_bool %s_list32[] = {
     // clang-format off
 EOF
@@ -1261,6 +1303,10 @@ close $H;
 close $H16;
 chmod 0444, $scripts_h;
 chmod 0444, $scripts16_h;
+
+# some UCD comments are too hard to wrap
+system "clang-format -i $scripts_h";
+system "clang-format -i $scripts16_h";
 
 # patch our header
 my $inc = "include/u8ident.h";
