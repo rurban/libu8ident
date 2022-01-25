@@ -335,7 +335,7 @@ RONN_ARGS=--roff --manual "U8IDENT Manual $(VERSION)" --organization=rurban/libu
 u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < README.md > $@
 u8idlint.1: u8idlint
-	help2man -N -s1 -p libu8ident --manual "U8IDENT Manual $(VERSION)" -o $@ ./u8idlint$(EXEEXT)
+	LC_ALL=C help2man -N -s1 -p libu8ident --manual "U8IDENT Manual $(VERSION)" -o $@ ./u8idlint$(EXEEXT)
 
 dist: $(LIB) $(MAN) $(DOCS)
 	-rm -rf $(PKG)

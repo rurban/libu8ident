@@ -89,7 +89,7 @@ clang-format:
 $(dist_man1_MANS) regen-man: $(bin_PROGRAMS)
 	-for p in $(dist_man1_MANS); do \
 	  base=`basename $$p .1`; \
-	  help2man -N -s1 -p $(PACKAGE_NAME) --manual "U8IDENT Manual $(VERSION)" -o $$p ./$$base$(EXEEXT); done
+	  LC_ALL=C help2man -N -s1 -p $(PACKAGE_NAME) --manual "U8IDENT Manual $(VERSION)" -o $$p ./$$base$(EXEEXT); done
 
 # Create the normalization headers via a current perl
 Unicode-Normalize: un8ifcan.h
