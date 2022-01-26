@@ -125,25 +125,44 @@ docs: $(doc_DATA) $(PDF)
 pdf: $(PDF)
 
 if HAVE_PANDOC
-doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
-	-mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md
+#doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
+#	-mkdir doc
+#	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md
+#doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
+#	-mkdir doc
+#	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/P2528R1.html: $(srcdir)/doc/P2528R1.md
 	-mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
-doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
-	-mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-doc/n2916.html: $(srcdir)/doc/n2916.md
-	-mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/n2916.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
 doc/P2528R1.pdf: $(srcdir)/doc/P2528R1.md
 	-mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+doc/n2916.html: $(srcdir)/doc/n2916.md
+	-mkdir doc
+	$(PANDOC) -s -o $@ $(srcdir)/doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 doc/n2916.pdf: $(srcdir)/doc/n2916.md
 	-mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 endif
+
+Dockerfile.pandoc: $(srcdir)/makefile.gnu
+	echo "FROM fedora:35" >Dockerfile.pandoc
+	echo "RUN yum -y install pandoc texlive-xetex dejavu-sans-mono-fonts dejavu-serif-fonts dejavu-sans-fonts" >> Dockerfile.pandoc
+	echo "RUN useradd --no-log-init -U user -u 1000 -m" >> Dockerfile.pandoc
+	echo "USER user" >> Dockerfile.pandoc
+	echo "WORKDIR /home/user" >> Dockerfile.pandoc
+	docker build -t pandoc -f Dockerfile.pandoc .
+docker-html: Dockerfile.pandoc
+	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s -o /doc/P2528R1.html /doc/P2528R1.md
+	chown $$USER:$$USER $(srcdir)/doc/P2528R1.html
+docker-pdf: Dockerfile.pandoc
+	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/P2528R1.pdf /doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	chown $$USER:$$USER $(srcdir)/doc/P2528R1.pdf
+
+patch-c-doc:
+	cd $(srcdir) && patch -f doc/n2916.md doc/n2916.patch
+regen-c-patch:
+	-cd $(srcdir) && diff -bu doc/P2528R0.md doc/n2916.md >doc/n2916.patch
 
 regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) $(html_DATA)
 

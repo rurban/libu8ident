@@ -15,6 +15,7 @@ DEFINES += -DPACKAGE_VERSION="\"$(VERSION)\""
 # This should to be a recent perl, matching the target unicode version
 PERL := perl
 WGET := wget
+PANDOC := pandoc
 # End Maintainer-only
 
 HEADER = include/u8ident.h
@@ -309,26 +310,32 @@ regen-confus:
 	$(PERL) mkconfus.pl
 
 docs: $(DOCS)
-pdf: doc/P2528R0.pdf doc/n2916.pdf
-doc/P2528R0.html: doc/P2528R0.md
-	-pandoc -s -o $@ doc/P2528R0.md
+# doc/P2528R0.md doc/P2528R0.html doc/P2528R0.pdf are frozen
+pdf: doc/P2528R1.pdf
 doc/P2528R1.html: doc/P2528R1.md
-	-pandoc -s -o $@ doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
-doc/P2528R0.pdf: doc/P2528R0.md
-	-pandoc -s --pdf-engine=xelatex -o $@ doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	-$(PANDOC) -s -o $@ doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
+#doc/P2528R0.html: doc/P2528R0.md
+#	-$(PANDOC) -s -o $@ doc/P2528R0.md --metadata title="P258R0 - C++ Identifier Security using Unicode Standard Annex 39"
+#doc/P2528R0.pdf: doc/P2528R0.md
+#	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/n2916.html: doc/n2916.md
-	-pandoc -s -o $@ doc/n2916.md --metadata title="C Identifier Security using Unicode Standard Annex 39"
+	-$(PANDOC) -s -o $@ doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 doc/n2916.pdf: doc/n2916.md
-	-pandoc -s --pdf-engine=xelatex -o $@ doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
+	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 
 Dockerfile.pandoc: makefile.gnu
 	echo "FROM fedora:35" >Dockerfile.pandoc
 	echo "RUN yum -y install pandoc texlive-xetex dejavu-sans-mono-fonts dejavu-serif-fonts dejavu-sans-fonts" >> Dockerfile.pandoc
+	echo "RUN useradd --no-log-init -U user -u 1000 -m" >> Dockerfile.pandoc
+	echo "USER user" >> Dockerfile.pandoc
+	echo "WORKDIR /home/user" >> Dockerfile.pandoc
 	docker build -t pandoc -f Dockerfile.pandoc .
 docker-html: Dockerfile.pandoc
-	-docker run -v `pwd`/doc:/doc -it pandoc pandoc -s -o /doc/P2528R1.html /doc/P2528R1.md
+	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s -o /doc/P2528R1.html /doc/P2528R1.md
+	chown $$USER:$$USER doc/P2528R1.html
 docker-pdf: Dockerfile.pandoc
-	-docker run -v `pwd`/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/P2528R1.pdf /doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/P2528R1.pdf /doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	chown $$USER:$$USER doc/P2528R1.pdf
 
 patch-c-doc:
 	patch -f doc/n2916.md doc/n2916.patch
