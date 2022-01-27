@@ -19,7 +19,8 @@ which did so, I publish this little library so that others can follow.
 Remember, the meaning of identifiers is to be **identifiable**. A user
 should not confuse one identifier with another. Only a program, IDE or
 library can properly check unicode identifiers, humans certainly not.
-Leaving such checks to a linter is not recommended, and they don't even exist.
+Leaving such checks to a linter is not recommended, and they did't
+even exist until now.
 
 Valid characters
 ----------------
