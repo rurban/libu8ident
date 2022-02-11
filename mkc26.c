@@ -4,15 +4,17 @@
 
    Create and test a secure variant of C11 identifiers, the SAFEC26 profile:
    * TR39#5.2 Mixed-Scripts Moderately Restrictive (4), but allow Greek scripts
-   (hence C26_4),
+     (hence C26_4),
    * Disallow all Limited_Use and Excluded scripts,
-   * Only allow TR 39#1 Recommended, Inclusion, Technical Identifier Type
-   properties,
+   * Only allow TR 39#1 Recommended, Inclusion, and not-confusable Technical
+     Identifier Type properties,
+     Forbid confusables in Technical, such as ǃ U+1C3 "LATIN LETTER ALVEOLAR CLICK"
+     ǀ U+1C0 "LATIN LETTER DENTAL CLICK" and ǁ U+1C1 "LATIN LETTER LATERAL CLICK"
    * Demand NFC normalization. Reject all composable sequences as ill-formed.
    * Reject illegal mark sequences (Lm, Mn, Mc) with mixed-scripts (SCX) as
-   ill-formed.
+     ill-formed.
 
-   See doc/c11.md and doc/P2528R0.md
+   See doc/c11.md and doc/P2528R1.md
 
    TODO:
    List of Lm chars in the resulting list, for P2528R0 7.3

@@ -238,12 +238,14 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
 <li>Implementations may allow an optional <code>#pragma unicode &lt;LongScript&gt;</code> that Excluded scripts can be added to the allowed set of scripts per source file.</li>
 </ul>
 <p>Recommend binutils/linker ABI identifier rules: names are UTF-8, add identifier checks. E.g. <code>readelf -L -Ue</code>.</p>
-<p>In addition adopt this proposal as a Defect Report against C++20 and earlier. The author provides the <a href="https://github.com/rurban/libu8ident/">libu8ident</a> library (Apache 2 licensed) and its generated tables to all implementors.</p>
-<p>TR39 checks could be weakened to warnings, TR31 violations not. But note that even TR31 has bugs still, to be fixed in the next Unicode version.</p>
+<p>In addition adopt this proposal as a Defect Report against C++23 and earlier. The author provides the <a href="https://github.com/rurban/libu8ident/">libu8ident</a> library (Apache 2 licensed) and its generated tables to all implementors.</p>
+<p>TR39 checks could be implemented as warnings, TR31 violations not. But note that even TR31 has bugs still, to be fixed in the next Unicode version.</p>
 <h1 id="changes">2 Changes</h1>
 <p>From R0:</p>
 <ul>
-<li>Add internal links</li>
+<li>Add internal links.</li>
+<li>Rename C23 to C26, it’s too late for C++23.</li>
+<li>Disallow non-confusable <code>Technical</code> U+1C0..U+1C3</li>
 </ul>
 <h1 id="summary">3 Summary</h1>
 <p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a> correctly detected that Unicode identifiers are still not identifiable, and are prone to bidi- and homoglyph attacks. But it stated that implementing TR31 and TR39 would be too hard. Having properly implemented the Unicode Security Guidelines for identifers for several years, plus pushed Rust to do so also, proves the contrary.</p>
@@ -360,18 +362,19 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CYRILLIC POKRYTIE</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
-<p>From these 67 Lm plus 513 M[cn] ranges filtering out the non-C26 XID candidates, only #8 Identifier_Type = Recommended, Inclusion, Technical, plus only #4.2 Recommended Scripts, plus only codepoints with multiple SCX entries, plus only codepoints which don’t decompose to NFC, leads only to the Lm characters, which can mix with all scripts. Not a single Mn or Mc codepoints is left.</p>
+<p>From these 67 Lm plus 513 M[cn] ranges filtering out the non-C26 XID candidates, only #8 Identifier_Type = Recommended, Inclusion, non-confusable Technical, plus only #4.2 Recommended Scripts, plus only codepoints with multiple SCX entries, plus only codepoints which don’t decompose to NFC, leads only to the Lm characters, which can mix with all scripts. Not a single Mn or Mc codepoints is left.</p>
 <p>So some of the Common <code>XID_Continue</code> marks therefore cannot be detected with the SCX logic. But all of them do not combine with Latin and are already filtered by the C26 Mixed Script profile. And all of the Combining Marks are caught by the NFC requirement.</p>
 <p>Most Lm Modifier Letters (besides the 4 Japanese PROLONGED SOUND MARKs) are freestanding base characters, which can be combined with any other letter.</p>
 <p>See <a href="https://www.unicode.org/reports/tr31/#Combining_Marks">TR31#2.1 Combining_Marks</a> and <a href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2 Modifier_Letters</a></p>
 <p>See also <a href="https://www.unicode.org/reports/tr24/#Common">TR24#5.1 Handling Characters with the Common Script Property</a> and <a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks">TR24#5.2 Handling Combining Marks</a>.</p>
 <h1 id="tr39-identifier-type">8 TR39 Identifier Type</h1>
 <p>TR31 recommends to disable some characters from recommended scripts: <em>“Some characters used with recommended scripts may still be problematic for identifiers, for example because they are part of extensions that are not in modern customary use, and thus implementations may want to exclude them from identifiers. These include characters for historic and obsolete orthographies, characters used mostly liturgically, and in orthographies for languages used only in very small communities or with very limited current or declining usage. Some characters also have architectural issues that may make them unsuitable for identifiers.”</em></p>
-<p>The <strong>Identifier Type</strong> property <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> recommendation should be mandatory, with the addition of the <code>Technical</code> Identifier Type to be allowed.</p>
+<p>The <strong>Identifier Type</strong> property <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> recommendation should be mandatory, with the addition of the non-confusable <code>Technical</code> Identifier Type to be allowed.</p>
 <p>I.e. <code>Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,</code> <code>Deprecated, Not_Character</code> are not part of identifiers.</p>
-<p>Allowed are <code>Recommended, Inclusion, Technical</code> TR39 Identifier Types.</p>
+<p>Allowed are Recommended, Inclusion, and all non-confusable Technical TR39 Identifier Types.</p>
+<p>Note that several Technical Identifier_Type are confusable, but not marked as such. So far only the the Latin letters U+1C0 ǀ, U+1C1 ǁ, U+1C3 ǃ which are confusable with operators.</p>
 <p>Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are forbidden, even if allowed in TR31. They are confusable with the Latin base alphabet A-Z.</p>
-<p>And there are 80 Technical ranges added to the original list of Recommended and Inclusion ID’s.</p>
+<p>And there are 79 Technical ranges added to the original list of Recommended and Inclusion ID’s.</p>
 <pre><code>grep &#39;, U8ID_Technical&#39; scripts.h | egrep -v &#39;Not_XID|U8ID_Obsolete|U8ID_Exclusion&#39;</code></pre>
 <p>See <a href="#appendix-e---idtype-technical">17 Appendix E - IDType Technical</a>.</p>
 <h1 id="tr39-mixed-scripts">9 TR39 Mixed Scripts</h1>

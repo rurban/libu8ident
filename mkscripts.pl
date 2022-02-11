@@ -51,17 +51,63 @@ my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
     @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, %GC, $id);
 my ($started, @IDTYPES, @ALLOWED, @IDSTART, @IDCONT, @XIDSTART, @XIDCONT,
     @SAFEC23START, @SAFEC23CONT, %GCONFUS, @GCONFUS);
+
+open my $CONFUS, "<", $confus or die "$confus $!";
+while (<$CONFUS>) {
+  next if /^#/;
+  if (/ GREEK / and / LETTER / and / LATIN /) {
+    if (/^([0-9A-F]{4,5})\s+;.+?\tMA\t#\*?\s+(.+)\t#/) {
+      $from = $1;
+      my $comment = $2;
+      if ($comment =~ / → GREEK /) {
+        # switched Latin -> Greek
+        # e.g. A7B7 ;	03C9 ;	MA	# ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA
+        if (/^[0-9A-F]{4,5}\s+;\s+([0-9A-F]{4,5})\s+;/) {
+          $from = $1;
+          $GCONFUS{hex($from)} = $comment;
+        } else {
+          warn $_;
+        }
+      } elsif ($from !~ /^(037A|0381|0398|03B5|03B7|03B8|03B9|03D1|03F1|03F4)$/) {
+        # 10 allowed exceptions (which are not really that confusable)
+        $GCONFUS{hex($from)} = $comment;
+      }
+    }
+    else {
+      warn $_;
+    }
+  }
+}
+close $CONFUS;
+
 open my $IDTYPE, "<", $idtype or die "$idtype $!";
 while (<$IDTYPE>) {
   if (/^#\tIdentifier_Type:/) { $started++; }
   next unless $started;
   if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; ([\w ]+)\s+#/) {
     ($from, $to, $id) = (hex($1), hex($2), $3);
+    # IdType bugs with confusable Technical ǀ ǁ ǂ ǃ
+    if ($from == 0x1C0 && $to == 0x1C3) {
+      $id = 'Technical Exclusion';
+      warn "$1, $2, $id";
+    }
+    if ($id eq 'Technical') {
+      for my $cp ($from..$to) {
+        if ($GCONFUS{$cp}) {
+          $id = 'Technical Exclusion';
+          warn "TODO: SPLIT $from, $to, $id";
+        }
+      }
+    }
     push @IDTYPES, [$from, $to, $id];
     # TODO match from-to with @SC ranges
   }
   elsif (/^([0-9A-F]{4,5})\s+; ([\w ]+)\s+#/) {
     ($from, $id) = (hex($1), $2);
+    if ($id eq 'Technical' && $GCONFUS{$from}) {
+      $id = 'Technical Exclusion';
+      warn "TODO: $1, $id";
+    }
     push @IDTYPES, [$from, $from, $id];
   }
 }
@@ -199,7 +245,7 @@ sub is_allowed {
 
 # Restricted: skip Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable, Deprecated
 # Allowed: keep Recommended, Inclusion
-# Maybe allow by request Technical
+# Maybe allow by request non-confusable Technical
 sub ok_idtype_cp {
   my $cp = shift;
   for my $r (@IDTYPES) {
@@ -362,34 +408,6 @@ while (<$NORMP>) {
   push @{$name}, [$from, $to];
 }
 close $NORMP;
-
-open my $CONFUS, "<", $confus or die "$confus $!";
-while (<$CONFUS>) {
-  next if /^#/;
-  if (/ GREEK / and / LETTER / and / LATIN /) {
-    if (/^([0-9A-F]{4,5})\s+;.+?\tMA\t#\*?\s+(.+)\t#/) {
-      $from = $1;
-      my $comment = $2;
-      if ($comment =~ / → GREEK /) {
-        # switched Latin -> Greek
-        # e.g. A7B7 ;	03C9 ;	MA	# ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA
-        if (/^[0-9A-F]{4,5}\s+;\s+([0-9A-F]{4,5})\s+;/) {
-          $from = $1;
-          $GCONFUS{hex($from)} = $comment;
-        } else {
-          warn $_;
-        }
-      } elsif ($from !~ /^(037A|0381|0398|03B5|03B7|03B8|03B9|03D1|03F1|03F4)$/) {
-        # 10 allowed exceptions (which are not really that confusable)
-        $GCONFUS{hex($from)} = $comment;
-      }
-    }
-    else {
-      warn $_;
-    }
-  }
-}
-close $CONFUS;
 
 # @SCR bug in merge. Not needed anymore
 # push @SCR, [0x1e00, 0x1eff, 'Latin'];
@@ -1135,7 +1153,7 @@ print $H <<"EOF";
    Restricted: Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC,
                Default_Ignorable, Deprecated, Not_Character
    Allowed:    Recommended, Inclusion
-   Maybe allow by request: Technical. C23 should include Technical.
+   Maybe allow by request: Technical. C26 should include non-confusable Technical.
 
    Not_XID, Not_NFKC, Not_Character are not in XID already.
 */
