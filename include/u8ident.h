@@ -1,5 +1,5 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021 Reini Urban
+   Copyright 2021,2022 Reini Urban
    SPDX-License-Identifier: Apache-2.0
 */
 
@@ -27,8 +27,8 @@ enum u8id_profile {
   U8ID_PROFILE_5 = 5,     // Minimally Restrictive
   U8ID_PROFILE_6 = 6,     // Unrestricted
   U8ID_PROFILE_C11_6 = 7, // The C11 std
-  // PROFILE_4 + Greek with only Allowed ID's ("SAFEC23")
-  U8ID_PROFILE_C23_4 = 8,
+  // PROFILE_4 + Greek with only Allowed ID's ("SAFEC26")
+  U8ID_PROFILE_C26_4 = 8,
 };
 enum u8id_options {
   // clang-format off
@@ -39,7 +39,7 @@ enum u8id_options {
   U8ID_TR31_ID = 65,  // all letters, plus numbers, punctuation and marks. With
                       // exotic scripts.
   U8ID_TR31_ALLOWED = 66, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
-  U8ID_TR31_SAFEC23 = 67, // practical XID with TR39 security measures. see c23++proposal
+  U8ID_TR31_SAFEC26 = 67, // practical XID with TR39 security measures. see doc/P2528R1.md
   U8ID_TR31_C11 = 68, // the stable insecure AltId ranges from the C11 standard, Annex D
   U8ID_TR31_ALLUTF8 = 69, // allow all > 128, e.g. D, php, nim, crystal
   U8ID_TR31_ASCII = 70, // only ASCII letters (as e.g. zig, j. older compilers)

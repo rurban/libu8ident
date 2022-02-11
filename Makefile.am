@@ -37,7 +37,7 @@ html_DATA = doc/P2528R0.html doc/P2528R1.html doc/n2916.html
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h medial.h unic11.h unic23.h scripts16.h
+	confus_croar.h mark.h medial.h unic11.h unic26.h scripts16.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
 	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
 	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -115,7 +115,7 @@ regen-scripts:
 	$(PERL) mkscripts.pl
 	$(PERL) mkgc.pl
 	$(PERL) mkmark.pl
-	-$(MAKE) unic23.h
+	-$(MAKE) unic26.h
 # Download some UCD files and create confus.h
 regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
@@ -125,12 +125,10 @@ docs: $(doc_DATA) $(PDF)
 pdf: $(PDF)
 
 if HAVE_PANDOC
-#doc/P2528R0.html: $(srcdir)/doc/P2528R0.md
-#	-mkdir doc
-#	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R0.md
-#doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.md
-#	-mkdir doc
-#	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+#doc/P2528R0.html: $(srcdir)/doc/P2528R0.html
+#	cp $(srcdir)/doc/P2528R0.pdf $@
+#doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.pdf
+#	cp $(srcdir)/doc/P2528R0.pdf $@
 doc/P2528R1.html: $(srcdir)/doc/P2528R1.md
 	-mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
@@ -168,7 +166,7 @@ regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) $(html_DA
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
-EXTRA_PROGRAMS = mkc23 test test-texts example
+EXTRA_PROGRAMS = mkc26 test test-texts example
 TESTS = test example
 if !HAVE_WINDOWS
 TESTS += test-texts.test u8idlint.test
@@ -178,8 +176,8 @@ test_CFLAGS = $(AM_CFLAGS)
 test_texts_SOURCES = test-texts.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
 test_texts_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_LDADD = $(u8idlint_LIBS)
-mkc23_SOURCES = mkc23.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
-mkc23_CFLAGS = $(AM_CFLAGS)
+mkc26_SOURCES = mkc26.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
+mkc26_CFLAGS = $(AM_CFLAGS)
 example_SOURCES = example.c
 example_LDADD = libu8ident.la
 
@@ -199,12 +197,12 @@ perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
 endif
 
-c11-all.h unic23.h: mkc23$(EXEEXT) scripts.h mark.h medial.h
-	./mkc23$(EXEXT)
+c11-all.h unic26.h: mkc26$(EXEEXT) scripts.h mark.h medial.h
+	./mkc26$(EXEXT)
 if !HAVE_WINDOWS
-	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unic23.h $(srcdir)/
+	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unic26.h $(srcdir)/
 else
-	-copy /y c11-all.h unic23.h $(srcdir)/
+	-copy /y c11-all.h unic26.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
@@ -238,13 +236,13 @@ check-norms:
 	done; \
 	rm test-norm$(EXEEXT)
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in 2 3 4 5 6 C11_6 C23_4; do \
+	for n in 2 3 4 5 6 C11_6 C26_4; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
 	done
-	for n in SAFEC23 C11STD; do \
+	for n in SAFEC26 C11STD; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
@@ -252,7 +250,7 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	done; \
 	rm test-profiles$(EXEEXT)
 check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+	for n in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
 	    echo U8ID_TR31=$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_TR31=$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-tr31$(EXEEXT) && \
@@ -261,8 +259,8 @@ check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	rm test-tr31$(EXEEXT)
 check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
-	  for p in 2 3 4 5 6 C11_6 C23_4; do \
-	    for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+	  for p in 2 3 4 5 6 C11_6 C26_4; do \
+	    for x in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
 	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
 	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
 		-Wfatal-errors $(srcdir)/test.c \
@@ -303,9 +301,9 @@ dist-hook:
 	echo $(VERSION) > $(distdir)/.version
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
-	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD}$(EXEEXT) \
+	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C26_4,C11_6,SAFEC26,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
-	     texts.tst mkc23$(EXEEXT) example$(EXEEXT)
+	     texts.tst mkc26$(EXEEXT) example$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst test-texts.test
 distclean-compile:
 	-rm -f *.tab.c

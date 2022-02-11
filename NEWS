@@ -1,6 +1,10 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022 Reini Urban
 
+libu8ident 0.2 - 2022-02-??:
+
+The C++23 deadline is gone, rename all c23 to c26.
+
 libu8ident 0.1 - 2022-01-24:
 
 First release, with the library, u8idlint and lots of C23 support:

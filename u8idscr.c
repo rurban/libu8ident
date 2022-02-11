@@ -36,7 +36,7 @@
 // we are the owner of these lists
 #undef EXTERN_SCRIPTS
 #include "unic11.h"
-#include "unic23.h"
+#include "unic26.h"
 #include "medial.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
@@ -210,17 +210,17 @@ LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
   return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
 }
-/* Search for safec23 XID entry, in start or cont lists */
-LOCAL const struct sc_c23 *u8ident_get_safec23(const uint32_t cp) {
-  const struct sc_c23 *sc = (const struct sc_c23 *)binary_search(
-      cp, (char *)safec23_start_list, ARRAY_SIZE(safec23_start_list),
-      sizeof(*safec23_start_list));
+/* Search for safec26 XID entry, in start or cont lists */
+LOCAL const struct sc_c26 *u8ident_get_safec26(const uint32_t cp) {
+  const struct sc_c26 *sc = (const struct sc_c26 *)binary_search(
+      cp, (char *)safec26_start_list, ARRAY_SIZE(safec26_start_list),
+      sizeof(*safec26_start_list));
   if (sc)
     return sc;
   else
-    return (const struct sc_c23 *)binary_search(cp, (char *)safec23_cont_list,
-                                                ARRAY_SIZE(safec23_cont_list),
-                                                sizeof(*safec23_cont_list));
+    return (const struct sc_c26 *)binary_search(cp, (char *)safec26_cont_list,
+                                                ARRAY_SIZE(safec26_cont_list),
+                                                sizeof(*safec26_cont_list));
 }
 
 LOCAL bool u8ident_is_MARK(uint32_t cp) {
@@ -255,17 +255,17 @@ LOCAL bool isALLOWED_start(const uint32_t cp) {
 LOCAL bool isALLOWED_cont(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
-LOCAL bool isSAFEC23_start(const uint32_t cp) {
-  return binary_search(cp, (char *)safec23_start_list,
-                       ARRAY_SIZE(safec23_start_list),
-                       sizeof(*safec23_start_list))
+LOCAL bool isSAFEC26_start(const uint32_t cp) {
+  return binary_search(cp, (char *)safec26_start_list,
+                       ARRAY_SIZE(safec26_start_list),
+                       sizeof(*safec26_start_list))
              ? true
              : false;
 }
-LOCAL bool isSAFEC23_cont(const uint32_t cp) {
-  return binary_search(cp, (char *)safec23_cont_list,
-                       ARRAY_SIZE(safec23_cont_list),
-                       sizeof(*safec23_cont_list))
+LOCAL bool isSAFEC26_cont(const uint32_t cp) {
+  return binary_search(cp, (char *)safec26_cont_list,
+                       ARRAY_SIZE(safec26_cont_list),
+                       sizeof(*safec26_cont_list))
              ? true
              : false;
 }

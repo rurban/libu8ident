@@ -53,7 +53,7 @@ CFLAGS += -I../CRoaring
 HDRS += confus_croar.h roaring.h
 endif
 endif
-ALLHDRS = $(HDRS) unic23.h
+ALLHDRS = $(HDRS) unic26.h
 #OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
@@ -121,7 +121,7 @@ endif
 
 most: $(LIB) $(SOLIB) $(MAN) u8idlint
 
-all: mkc23 most test-texts test perf docs
+all: mkc26 most test-texts test perf docs
 
 .version: makefile.gnu
 	build-aux/git-version-gen .version
@@ -160,7 +160,7 @@ medial.h: mkmedial.pl # UnicodeData.txt
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl
 
-u8idlint: u8idlint.c unic23.h unic11.h $(LIB)
+u8idlint: u8idlint.c unic26.h unic11.h $(LIB)
 	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB) $(LIBUNISTR)
 
 .PHONY: check check-asan check-norms check-profiles check-tr31 check-extra check-mdl \
@@ -203,21 +203,21 @@ test-texts: test-texts.c $(SRC) $(HEADER) $(ALLHDRS)
 example: example.c $(SOLIB)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -Iinclude example.c -o $@ -L. -lu8ident
 regen-u8idlint-test: u8idlint
-	-./u8idlint -xsafec23 texts/homo-sec-1.c >texts/homo-sec-1.tst
+	-./u8idlint -xsafec26 texts/homo-sec-1.c >texts/homo-sec-1.tst
 	-./u8idlint -p1 -xc11 texts/homo-sec-1.c >texts/homo-sec-1-p1.tst
 	-./u8idlint -xc11 texts/homo-1.c >texts/homo-1.tst
 	-./u8idlint -xallowed texts/bidi-sec-1.c >texts/bidi-sec-1.tst
 	-./u8idlint -xc11 texts/bidi-sec-1.c >texts/bidi-sec-1-c11.tst
-	-./u8idlint -xsafec23 texts/bidi-sec-1.c >texts/bidi-sec-1-c23.tst
+	-./u8idlint -xsafec26 texts/bidi-sec-1.c >texts/bidi-sec-1-c26.tst
 	-./u8idlint -xascii texts/bidi-sec-2.c >texts/bidi-sec-2-ascii.tst
 	-./u8idlint -xallowed texts/bidi-sec-2.c >texts/bidi-sec-2-allowed.tst
 	-./u8idlint -xid texts/bidi-sec-2.c >texts/bidi-sec-2.tst
 	-./u8idlint -xc11 texts/bidi-sec-2.c >texts/bidi-sec-2-c11.tst
 
-c11-all.h unic23.h: mkc23 scripts.h mark.h medial.h
-	./mkc23
-mkc23: mkc23.c $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC23 -I. -Iinclude mkc23.c $(SRC) -o $@
+c11-all.h unic26.h: mkc26 scripts.h mark.h medial.h
+	./mkc26
+mkc26: mkc26.c $(SRC) $(HEADER) $(HDRS)
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC26 -I. -Iinclude mkc26.c $(SRC) -o $@
 check-asan: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
@@ -233,9 +233,9 @@ perf: perf.c u8idroar.c $(HEADER) $(ALLHDRS) \
 
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o $(LIB) $(SOLIB) \
-	       perf mkroar mkc23 u8idlint example \
+	       perf mkroar mkc26 u8idlint example \
 	       test test-texts test-asan test-tr31 \
-	       test-prof{2,3,4,5,6,C23_4,C11_6,SAFEC23,C11STD} \
+	       test-prof{2,3,4,5,6,C26_4,C11_6,SAFEC26,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
 
 # Maintainer-only
@@ -250,20 +250,20 @@ check-norms: $(SRC) $(HEADER) $(ALLHDRS)
 	    if ./test-norm-$$n norm; then rm test-norm-$$n; else exit; fi; \
         done
 check-profiles: $(SRC) $(HEADER) $(ALLHDRS)
-	for n in 2 3 4 5 6 C11_6 C23_4; do \
+	for n in 2 3 4 5 6 C11_6 C26_4; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && \
 	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
-	for n in SAFEC23 C11STD; do \
+	for n in SAFEC26 C11STD; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE_$${n} -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && \
 	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
 check-tr31: $(SRC) $(HEADER) $(ALLHDRS)
-	for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+	for x in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
             echo U8ID_TR31_$$x; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_TR31=$$x -I. -Iinclude test.c $(SRC) \
 	      -o test-xid-$$x && \
@@ -271,8 +271,8 @@ check-tr31: $(SRC) $(HEADER) $(ALLHDRS)
         done
 check-all-combinations: $(SRC) $(HEADER) $(ALLHDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
-	  for p in 2 3 4 5 6 C11_6 C23_4; do \
-	    for x in ALLOWED SAFEC23 ID XID C11 ALLUTF8 NONE; do \
+	  for p in 2 3 4 5 6 C11_6 C26_4; do \
+	    for x in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
 	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
 	      $(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
 		-Wfatal-errors test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c \

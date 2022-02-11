@@ -9,7 +9,7 @@ AC_INIT([libu8ident],
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([u8ident.c])
 AC_CONFIG_MACRO_DIR([m4])
-AC_SUBST([LIBU8IDENT_SO_VERSION], [0:0:0])
+AC_SUBST([LIBU8IDENT_SO_VERSION], [1:0:0])
 VERSION_FILE=".version"
 AC_SUBST([VERSION_FILE])
 AC_MSG_CHECKING([git version])
@@ -38,19 +38,19 @@ Check options])
 # Recommended: --with-tr31=allowed or none
 AC_MSG_CHECKING([for --with-tr31=])
 AC_ARG_WITH([tr31],
-      [AS_HELP_STRING([--with-tr31={ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE}],
+      [AS_HELP_STRING([--with-tr31={ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE}],
       	[support only this TR31 identifier profile. @<:@default=xid@:>@
       	 Recommended: --with-tr31=allowed])],
       [case "${with_tr31}" in
-      ALLOWED|SAFEC23|ID|XID|C11|ALLUTF8) U8ID_TR31=${with_tr31}; AC_MSG_RESULT([$with_tr31]) ;;
+      ALLOWED|SAFEC26|ID|XID|C11|ALLUTF8) U8ID_TR31=${with_tr31}; AC_MSG_RESULT([$with_tr31]) ;;
       NONE) CFLAGS="$CFLAGS -DDISABLE_U8ID_TR31"; AC_MSG_RESULT([$with_tr31]) ;;
-      *)    AC_MSG_RESULT([invalid ${with_tr31}: only ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE]) ;;
+      *)    AC_MSG_RESULT([invalid ${with_tr31}: only ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE]) ;;
       esac],
       [ U8ID_TR31=; AC_MSG_RESULT([none. support all (default). Recommended: ALLOWED]) ]
       )
 if test -n "$U8ID_TR31"; then
   CFLAGS="$CFLAGS -DU8ID_TR31=$U8ID_TR31"
-  dnl AC_DEFINE([U8IDP_TR31],[$U8ID_TR31],[Define to ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8 to support only this TR31 identifier charset])
+  dnl AC_DEFINE([U8IDP_TR31],[$U8ID_TR31],[Define to ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8 to support only this TR31 identifier charset])
 fi
 AC_SUBST([U8ID_TR31])
 
@@ -58,18 +58,18 @@ AC_SUBST([U8ID_TR31])
 # Recommended: --with-profile=4
 AC_MSG_CHECKING([for --with-profile=])
 AC_ARG_WITH([profile],
-	[AS_HELP_STRING([--with-profile={2,3,4,5,6,C23_4,C11_6}],
+	[AS_HELP_STRING([--with-profile={2,3,4,5,6,C26_4,C11_6}],
 		[support only this TR39 Unicode security profile. @<:@default=4@:>@
 		 Recommended: --with-profile=4])],
 	[case "${with_profile}" in
-	2|3|4|5|6|C23_4|C11_6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
-	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6,C23_4,C11_6]) ;;
+	2|3|4|5|6|C26_4|C11_6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
+	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6,C26_4,C11_6]) ;;
 	esac],
         [ U8ID_PROFILE=; AC_MSG_RESULT([none. support all (default). Recommended: 4]) ]
 	)
 if test -n "$U8ID_PROFILE"; then
   CFLAGS="$CFLAGS -DU8ID_PROFILE=$U8ID_PROFILE"
-  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 2-6,C23_4,C11_6 to support only this Unicode security profile])
+  dnl AC_DEFINE([U8ID_PROFILE],[$U8ID_PROFILE],[Define to 2-6,C26_4,C11_6 to support only this Unicode security profile])
 fi
 AC_SUBST([U8ID_PROFILE])
 

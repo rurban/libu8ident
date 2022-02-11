@@ -39,15 +39,15 @@
 #include "u8idscr.h"
 #define EXTERN_SCRIPTS
 #include "unic11.h"
-#include "unic23.h"
+#include "unic26.h"
 //#include "mark.h"
 
 int verbose = 0;
 int quiet = 0;
 int recursive = 0;
-enum xid_e xid = SAFEC23;
+enum xid_e xid = SAFEC26;
 enum u8id_norm norm = U8ID_NFC;
-enum u8id_profile profile = U8ID_PROFILE_C23_4;
+enum u8id_profile profile = U8ID_PROFILE_C26_4;
 unsigned u8idopts = 0;
 // if the --xid option was given, to set profile defaults
 bool opt_xid = false;
@@ -122,7 +122,7 @@ static const struct ext_xid {
   ID       - all letters, plus numbers, punctuation and marks. With exotic
              scripts.
   ALLOWED  - TR31 ID with only recommended scripts. Allowed IdentifierStatus.
-  SAFEC23  - see c23++proposal XID minus exotic scripts, filtered by NFC and
+  SAFEC26  - see c26++proposal XID minus exotic scripts, filtered by NFC and
              IdentifierType.
   C11      - the AltId ranges from the C11 standard
   ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
@@ -131,7 +131,7 @@ static const struct ext_xid {
 // clang-format on
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
-    {isALLOWED_start, isALLOWED_cont}, {isSAFEC23_start, isSAFEC23_cont},
+    {isALLOWED_start, isALLOWED_cont}, {isSAFEC26_start, isSAFEC26_cont},
     {isC11_start, isC11_cont},         {isALLUTF8_start, isALLUTF8_cont},
     {isASCII_start, isASCII_cont},
 };
@@ -200,7 +200,7 @@ static void usage(int exitcode) {
   puts("OPTIONS:");
   puts(" -n|--norm=nfc,nfkc,nfd,nfkc            default: nfc");
   puts("  set to nfkd by default for python");
-  puts(" -p|--profile=1,2,3,4,5,6,c23_4,c11_6        default: c23_4");
+  puts(" -p|--profile=1,2,3,4,5,6,c26_4,c11_6        default: c26_4");
   puts("  TR39 unicode mixed-script security profile for identifiers:");
   puts("    1      ASCII. Sets xid ascii.");
   puts("    2      Single script");
@@ -209,13 +209,13 @@ static void usage(int exitcode) {
   puts("    5      Minimally Restrictive");
   puts("    6      Unrestricted");
   puts("    c11_6  C11STD. Sets xid c11.");
-  puts("    c23_4  SAFEC23 (i.e. 4 with Greek). Sets xid safec23.");
-  puts(" -x|--xid=ascii,allowed,safec23,id,xid,c11,allutf8     default: "
+  puts("    c26_4  SAFEC26 (i.e. 4 with Greek). Sets xid safec26.");
+  puts(" -x|--xid=ascii,allowed,safec26,id,xid,c11,allutf8     default: "
        "allowed");
   puts("  TR31 set of identifiers:"); // sorted from most secure to least secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
   puts("    allowed   tr31 with only recommended scripts, IdentifierStatus");
-  puts("    safec23   allowed but different Identifier_Type and NFC");
+  puts("    safec26   allowed but different Identifier_Type and NFC");
   puts("    id        all letters. plus numbers, punctuations and combining "
        "marks");
   puts("    xid       stable id subset, no NFKC quirks");
@@ -508,9 +508,10 @@ static void option_xid(const char *optarg) {
   else if (strEQc(optarg, "allowed") || strEQc(optarg, "ALLOWED") ||
            strEQc(optarg, "tr39"))
     xid = ALLOWED;
-  else if (strEQc(optarg, "safec23") || strEQc(optarg, "SAFEC23") ||
-           strEQc(optarg, "c23"))
-    xid = SAFEC23;
+  else if (strEQc(optarg, "safec26") || strEQc(optarg, "SAFEC26") ||
+           strEQc(optarg, "safec23") || strEQc(optarg, "SAFEC23") ||
+           strEQc(optarg, "c26") || strEQc(optarg, "c23"))
+    xid = SAFEC26;
   else if (strEQc(optarg, "id") || strEQc(optarg, "ID"))
     xid = ID;
   else if (strEQc(optarg, "xid") || strEQc(optarg, "XID"))
@@ -543,9 +544,10 @@ static void option_profile(const char *optarg) {
     profile = U8ID_PROFILE_5;
   else if (strEQc(optarg, "6"))
     profile = U8ID_PROFILE_6;
-  else if (strEQc(optarg, "c23_4") || strEQc(optarg, "C23_4") ||
-           strEQc(optarg, "SAFEC23")) {
-    profile = U8ID_PROFILE_C23_4;
+  else if (strEQc(optarg, "c26_4") || strEQc(optarg, "C26_4") ||
+           strEQc(optarg, "c23_4") || strEQc(optarg, "C23_4") ||
+           strEQc(optarg, "SAFEC23") || strEQc(optarg, "SAFEC26")) {
+    profile = U8ID_PROFILE_C26_4;
   } else if (strEQc(optarg, "c11_6") || strEQc(optarg, "C11_6") ||
              strEQc(optarg, "C11")) {
     profile = U8ID_PROFILE_C11_6;
@@ -583,8 +585,8 @@ int main(int argc, char **argv) {
   int option_index = 0;
   static struct option long_options[] = {
       {"norm", 1, 0, 'n'},    // *nfc*,nfd,nfkc,nfkd
-      {"profile", 1, 0, 'p'}, // 1,2,3,*4*,5,6,c23_4,c11_6
-      {"xid", 1, 0, 'x'},     // ascii,allowed,id,*xid*,safec23,c11,allutf8
+      {"profile", 1, 0, 'p'}, // 1,2,3,*4*,5,6,c26_4,c11_6
+      {"xid", 1, 0, 'x'},     // ascii,allowed,id,*xid*,safec26,c11,allutf8
       {"ext", 1, 0, 'e'},        {"recursive", 0, 0, 'r'},
       {"help", 0, 0, 0},         {"version", 0, 0, 0},
       {"quiet", 0, &quiet, 'q'}, {"verbose", 0, &verbose, 'v'},
@@ -618,16 +620,16 @@ int main(int argc, char **argv) {
       option_profile(optarg);
       if (profile == U8ID_PROFILE_1 && !opt_xid)
         opt_xid = ASCII;
-      if (profile == U8ID_PROFILE_C23_4 && !opt_xid) {
-        xid = SAFEC23;
-        u8idopts |= U8ID_TR31_SAFEC23;
+      if (profile == U8ID_PROFILE_C26_4 && !opt_xid) {
+        xid = SAFEC26;
+        u8idopts |= U8ID_TR31_SAFEC26;
       }
       if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
         xid = C11;
         u8idopts |= U8ID_TR31_C11;
       }
       break;
-    case 'x': // ascii,allowed,id,xid,safec23,c11,allutf8
+    case 'x': // ascii,allowed,id,xid,safec26,c11,allutf8
       opt_xid = true;
       option_xid(optarg);
       if (xid == ASCII && !opt_profile)
@@ -707,9 +709,9 @@ int main(int argc, char **argv) {
       option_profile(argv[i] + 1);
       if (profile == U8ID_PROFILE_1 && !opt_xid)
         opt_xid = ASCII;
-      if (profile == U8ID_PROFILE_C23_4 && !opt_xid) {
-        xid = SAFEC23;
-        u8idopts |= U8ID_TR31_SAFEC23;
+      if (profile == U8ID_PROFILE_C26_4 && !opt_xid) {
+        xid = SAFEC26;
+        u8idopts |= U8ID_TR31_SAFEC26;
       }
       if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
         xid = C11;

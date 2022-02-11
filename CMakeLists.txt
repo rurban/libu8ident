@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.9)
 # Supported options:
 #  -DBUILD_SHARED_LIBS=ON,OFF
 #  -DU8ID_NORM=NFC,NFKC,NFD,NFKD
-#  -DU8ID_PROFILE=2,3,4,5,6,C23_4,C11_6
-#  -DU8ID_TR31=ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE
+#  -DU8ID_PROFILE=2,3,4,5,6,C26_4,C11_6
+#  -DU8ID_TR31=ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE
 #  -DHAVE_CONFUS=ON
 #  -DHAVE_CROARING=ON
 # for smaller builds and lib.
@@ -70,8 +70,8 @@ endif()
 
 option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
 option(U8ID_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
-option(U8ID_PROFILE "force a single profile: 2-6,C23_4,C11_6" OFF)
-option(U8ID_TR31 "force TR31 charset: ALLOWED,SAFEC23,ID,XID,C11,ALLUTF8,NONE" OFF)
+option(U8ID_PROFILE "force a single profile: 2-6,C26_4,C11_6" OFF)
+option(U8ID_TR31 "force TR31 charset: ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE" OFF)
 option(HAVE_CONFUS "add confus.h set" OFF)
 option(HAVE_CROARING "use CRoaring bitsets" ON)
 
@@ -109,7 +109,9 @@ else()
 endif()
 
 set(libu8ident_DOCS
-    README.md c11.md c23++proposal.md NOTICE LICENSE)
+  README.md doc/c11.md doc/n2916.md doc/P2528R0.md doc/P2528R1.md
+  doc/tr31-bugs.md doc/n2916.patch
+  NOTICE LICENSE)
 
 set(libu8ident_HEADERS
     include/u8ident.h)
@@ -221,10 +223,10 @@ if(NOT CMAKE_CROSSCOMPILING)
   set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
   add_executable(test-texts test-texts.c ${libu8ident_SOURCES})
   add_test(test-texts ./test-texts)
-  add_executable(mkc23 mkc23.c ${libu8ident_SOURCES})
-  set_source_files_properties(mkc23
-    PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_SAFEC23)
-  add_test(mkc23 ./mkc23)
+  add_executable(mkc26 mkc26.c ${libu8ident_SOURCES})
+  set_source_files_properties(mkc26
+    PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_SAFEC26)
+  add_test(mkc26 ./mkc26)
 endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(

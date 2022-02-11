@@ -19,7 +19,7 @@ u8idroar.o
 /test
 /test-asan
 /test-texts
-/mkc23
+/mkc26
 /example
 /build
 /build-[b-z0-9]*/
