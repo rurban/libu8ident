@@ -22,6 +22,45 @@ library can properly check unicode identifiers, humans certainly not.
 Leaving such checks to a linter is not recommended, and they did't
 even exist until now.
 
+Motivation
+----------
+
+* <https://websec.github.io/unicode-security-guide/visual-spoofing/>
+* <http://www.unicode.org/reports/tr31/>, <http://www.unicode.org/reports/tr36/>
+and <http://www.unicode.org/reports/tr39>
+* <https://twitter.com/zygoloid/status/1187150150835195905>,
+  <https://github.com/golang/go/issues/20209>,
+  <https://twitter.com/jupenur/status/1244286243518713857>
+* <https://certitude.consulting/blog/en/invisible-backdoor/>
+
+with
+
+```js
+const [ ENV_PROD, ENV_DEV ] = [ 'PRODUCTION', 'DEVELOPMENT'];
+/* … */
+const environment = 'PRODUCTION';
+/* … */
+function isUserAdmin(user) {
+    if(environmentǃ=ENV_PROD){
+        // bypass authZ checks in DEV
+        return true;
+    }
+
+    /* … */
+    return false;
+}
+```
+
+where `environmentǃ` is an identifier, because the `ǃ` is the
+U+1C3 "LATIN LETTER ALVEOLAR CLICK", a Technical, Lo identifier,
+completely flipping the logic. A safe TR31 ID set recommended by TR39 would
+have forbidden that.
+
+There's now even a [Unicode taskforce](https://www.unicode.org/L2/L2022/22007-avoiding-spoof.pdf),
+because of the <https://trojansource.codes> CVE's, even when they were about
+bidi overrides, not identifiers.
+
+
 Valid characters
 ----------------
 
