@@ -413,8 +413,11 @@ static void gen_c26_safe(void) {
     struct range_bool r = xid_start_list[i];
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
-      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) &&
-          !isHalfwidthOrFullwidth(cp) && !u8ident_is_MEDIAL(cp)) {
+      if (s < FIRST_EXCLUDED_SCRIPT &&
+          !u8ident_is_MARK(cp) &&
+          !isSkipIdtype(cp) &&
+          !isHalfwidthOrFullwidth(cp) &&
+          !u8ident_is_MEDIAL(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -482,8 +485,10 @@ static void gen_c26_safe(void) {
       if (BITGET(u, cp))
         continue;
       uint8_t s = u8ident_get_script(cp);
-      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) &&
-          !isSkipIdtype(cp) && !isHalfwidthOrFullwidth(cp)) {
+      if (s < FIRST_EXCLUDED_SCRIPT &&
+          !u8ident_is_MARK(cp) &&
+          !isSkipIdtype(cp) &&
+          !isHalfwidthOrFullwidth(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));

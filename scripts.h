@@ -5208,7 +5208,7 @@ LOCAL const struct range_short idtype_list[] = {
     {0x01BC, 0x01BD, U8ID_Uncommon_Use},
     {0x01BE, 0x01BE, U8ID_Technical | U8ID_Obsolete},
     {0x01BF, 0x01BF, U8ID_Obsolete},
-    {0x01C0, 0x01C3, U8ID_Technical | U8ID_Not_XID},
+    {0x01C0, 0x01C3, U8ID_Technical | U8ID_Exclusion},
     {0x01C4, 0x01CC, U8ID_Not_NFKC},
     {0x01CD, 0x01DC, U8ID_Recommended},
     {0x01DD, 0x01DD, U8ID_Uncommon_Use},

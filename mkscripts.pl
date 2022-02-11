@@ -86,7 +86,7 @@ while (<$IDTYPE>) {
   next unless $started;
   if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; ([\w ]+)\s+#/) {
     ($from, $to, $id) = (hex($1), hex($2), $3);
-    # IdType bugs with confusable Technical ǀ ǁ ǂ ǃ
+    # IdType bugs with confusable Technical ǀ ǁ ǂ ǃ => Exclusion
     if ($from == 0x1C0 && $to == 0x1C3) {
       $id = 'Technical Exclusion';
       warn "$1, $2, $id";

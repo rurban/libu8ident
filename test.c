@@ -769,15 +769,17 @@ void test_medial(void) {
   const enum u8id_norm norm = u8ident_norm();
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ID);
   // medial at end
-  int ret = u8ident_check((const uint8_t *)"\uFB8A\uFB91", NULL);
+  int ret = u8ident_check((const uint8_t *)"\u06A2\uFB8A\uFB91", NULL);
   if (!is_profile_6())
     CHECK_RET(ret, U8ID_ERR_XID, 0);
   else if (norm == U8ID_NFKC || norm == U8ID_NFKD)
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else
     CHECK_RET(ret, U8ID_EOK, 0);
+  if (u8ident_tr31() == U8ID_TR31_SAFEC26)
+    return; // FB8A is disallowed
   // medial at medial
-  ret = u8ident_check((const uint8_t *)"\uFB8A\uFB91\uFB51", NULL);
+  ret = u8ident_check((const uint8_t *)"\u06A2\uFB8A\uFB91\uFB51", NULL);
   if (norm == U8ID_NFKC || norm == U8ID_NFKD)
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else

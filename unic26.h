@@ -26,39 +26,64 @@ const struct sc_c26 safec26_start_list[] = {
     {'A', 'Z', SC_Latin, GC_Lu, NULL},
     {'_', '_', SC_Latin, GC_Pc, NULL},
     {'a', 'z', SC_Latin, GC_Ll, NULL},
-    {0xAA, 0xAA, SC_Latin, GC_Lo, NULL}, //  ª
-    {0xB5, 0xB5, SC_Common, GC_Ll, NULL}, //  µ
-    {0xBA, 0xBA, SC_Latin, GC_Lo, NULL}, //  º
     {0xC0, 0xD6, SC_Latin, GC_Lu, NULL}, //  À..Ö
     {0xD8, 0xF6, SC_Latin, GC_L, NULL}, //  Ø..ö
-    {0xF8, 0x2B8, SC_Latin, GC_L, NULL}, //  ø..ʸ
-    {0x2BA, 0x2C1, SC_Common, GC_Lm, NULL}, //  ʺ..ˁ
+    {0xF8, 0x131, SC_Latin, GC_L, NULL}, //  ø..ı
+    {0x134, 0x13E, SC_Latin, GC_L, NULL}, //  Ĵ..ľ
+    {0x141, 0x148, SC_Latin, GC_L, NULL}, //  Ł..ň
+    {0x14A, 0x17E, SC_Latin, GC_L, NULL}, //  Ŋ..ž
+    {0x180, 0x180, SC_Latin, GC_Ll, NULL}, //  ƀ
+    {0x18F, 0x18F, SC_Latin, GC_Lu, NULL}, //  Ə
+    {0x1A0, 0x1A1, SC_Latin, GC_L, NULL}, //  Ơ..ơ
+    {0x1AF, 0x1B0, SC_Latin, GC_L, NULL}, //  Ư..ư
+    {0x1CD, 0x1DC, SC_Latin, GC_L, NULL}, //  Ǎ..ǜ
+    {0x1DE, 0x1E3, SC_Latin, GC_L, NULL}, //  Ǟ..ǣ
+    {0x1E6, 0x1F0, SC_Latin, GC_L, NULL}, //  Ǧ..ǰ
+    {0x1F4, 0x1F5, SC_Latin, GC_L, NULL}, //  Ǵ..ǵ
+    {0x1F8, 0x21B, SC_Latin, GC_L, NULL}, //  Ǹ..ț
+    {0x21E, 0x21F, SC_Latin, GC_L, NULL}, //  Ȟ..ȟ
+    {0x226, 0x236, SC_Latin, GC_L, NULL}, //  Ȧ..ȶ
+    {0x250, 0x252, SC_Latin, GC_Ll, NULL}, //  ɐ..ɒ
+    {0x255, 0x255, SC_Latin, GC_Ll, NULL}, //  ɕ
+    {0x258, 0x25A, SC_Latin, GC_Ll, NULL}, //  ɘ..ɚ
+    {0x25C, 0x262, SC_Latin, GC_Ll, NULL}, //  ɜ..ɢ
+    {0x264, 0x267, SC_Latin, GC_Ll, NULL}, //  ɤ..ɧ
+    {0x26A, 0x271, SC_Latin, GC_Ll, NULL}, //  ɪ..ɱ
+    {0x273, 0x276, SC_Latin, GC_Ll, NULL}, //  ɳ..ɶ
+    {0x278, 0x27B, SC_Latin, GC_Ll, NULL}, //  ɸ..ɻ
+    {0x27D, 0x288, SC_Latin, GC_Ll, NULL}, //  ɽ..ʈ
+    {0x28A, 0x291, SC_Latin, GC_Ll, NULL}, //  ʊ..ʑ
+    {0x293, 0x29D, SC_Latin, GC_L, NULL}, //  ʓ..ʝ
+    {0x29F, 0x2AF, SC_Latin, GC_Ll, NULL}, //  ʟ..ʯ
+    {0x2B9, 0x2C1, SC_Common, GC_Lm, NULL}, //  ʹ..ˁ
     {0x2C6, 0x2D1, SC_Common, GC_Lm, NULL}, //  ˆ..ˑ
-    {0x2E0, 0x2E4, SC_Latin, GC_Lm, NULL}, //  ˠ..ˤ
     {0x2EC, 0x2EC, SC_Common, GC_Lm, NULL}, //  ˬ
     {0x2EE, 0x2EE, SC_Common, GC_Lm, NULL}, //  ˮ
-    {0x370, 0x373, SC_Greek, GC_L, NULL}, //  Ͱ..ͳ
-    {0x376, 0x377, SC_Greek, GC_L, NULL}, //  Ͷ..ͷ
     {0x37B, 0x37D, SC_Greek, GC_Ll, NULL}, //  ͻ..ͽ
-    {0x37F, 0x37F, SC_Greek, GC_Lu, NULL}, //  Ϳ
     {0x386, 0x386, SC_Greek, GC_Lu, NULL}, //  Ά
     {0x388, 0x38A, SC_Greek, GC_Lu, NULL}, //  Έ..Ί
     {0x38C, 0x38C, SC_Greek, GC_Lu, NULL}, //  Ό
     {0x38E, 0x3A1, SC_Greek, GC_L, NULL}, //  Ύ..Ρ
-    {0x3A3, 0x3E1, SC_Greek, GC_L, NULL}, //  Σ..ϡ
-    {0x3F0, 0x3F5, SC_Greek, GC_L, NULL}, //  ϰ..ϵ
-    {0x3F7, 0x3FF, SC_Greek, GC_L, NULL}, //  Ϸ..Ͽ
-    {0x401, 0x481, SC_Cyrillic, GC_L, NULL}, //  Ё..ҁ
-    {0x48A, 0x52F, SC_Cyrillic, GC_L, NULL}, //  Ҋ..ԯ
+    {0x3A3, 0x3CF, SC_Greek, GC_L, NULL}, //  Σ..Ϗ
+    {0x3D7, 0x3D7, SC_Greek, GC_Ll, NULL}, //  ϗ
+    {0x3FC, 0x3FF, SC_Greek, GC_L, NULL}, //  ϼ..Ͽ
+    {0x401, 0x45F, SC_Cyrillic, GC_L, NULL}, //  Ё..џ
+    {0x48A, 0x4FF, SC_Cyrillic, GC_L, NULL}, //  Ҋ..ӿ
+    {0x510, 0x529, SC_Cyrillic, GC_L, NULL}, //  Ԑ..ԩ
+    {0x52E, 0x52F, SC_Cyrillic, GC_L, NULL}, //  Ԯ..ԯ
     {0x531, 0x556, SC_Armenian, GC_Lu, NULL}, //  Ա..Ֆ
     {0x559, 0x559, SC_Armenian, GC_Lm, NULL}, //  ՙ
-    {0x560, 0x588, SC_Armenian, GC_Ll, NULL}, //  ՠ..ֈ
+    {0x560, 0x586, SC_Armenian, GC_Ll, NULL}, //  ՠ..ֆ
+    {0x588, 0x588, SC_Armenian, GC_Ll, NULL}, //  ֈ
     {0x5D0, 0x5EA, SC_Hebrew, GC_Lo, NULL}, //  א..ת
     {0x5EF, 0x5F2, SC_Hebrew, GC_Lo, NULL}, //  ׯ..ײ
     {0x620, 0x63F, SC_Arabic, GC_Lo, NULL}, //  ؠ..ؿ
     {0x641, 0x64A, SC_Arabic, GC_Lo, NULL}, //  ف..ي
-    {0x66E, 0x66F, SC_Arabic, GC_Lo, NULL}, //  ٮ..ٯ
-    {0x671, 0x6D3, SC_Arabic, GC_Lo, NULL}, //  ٱ..ۓ
+    {0x671, 0x672, SC_Arabic, GC_Lo, NULL}, //  ٱ..ٲ
+    {0x674, 0x674, SC_Arabic, GC_Lo, NULL}, //  ٴ
+    {0x679, 0x68D, SC_Arabic, GC_Lo, NULL}, //  ٹ..ڍ
+    {0x68F, 0x6A0, SC_Arabic, GC_Lo, NULL}, //  ڏ..ڠ
+    {0x6A2, 0x6D3, SC_Arabic, GC_Lo, NULL}, //  ڢ..ۓ
     {0x6D5, 0x6D5, SC_Arabic, GC_Lo, NULL}, //  ە
     {0x6E5, 0x6E6, SC_Arabic, GC_Lm, NULL}, //  ۥ..ۦ
     {0x6EE, 0x6EF, SC_Arabic, GC_Lo, NULL}, //  ۮ..ۯ
@@ -69,12 +94,15 @@ const struct sc_c26 safec26_start_list[] = {
     {0x7B1, 0x7B1, SC_Thaana, GC_Lo, NULL}, //  ޱ
     {0x870, 0x887, SC_Arabic, GC_Lo, NULL}, //  ࡰ..ࢇ
     {0x889, 0x88E, SC_Arabic, GC_Lo, NULL}, //  ࢉ..ࢎ
-    {0x8A0, 0x8C9, SC_Arabic, GC_L, NULL}, //  ࢠ..ࣉ
+    {0x8A0, 0x8AC, SC_Arabic, GC_Lo, NULL}, //  ࢠ..ࢬ
+    {0x8B2, 0x8B2, SC_Arabic, GC_Lo, NULL}, //  ࢲ
+    {0x8B5, 0x8C9, SC_Arabic, GC_L, NULL}, //  ࢵ..ࣉ
     {0x904, 0x939, SC_Devanagari, GC_Lo, NULL}, //  ऄ..ह
     {0x93D, 0x93D, SC_Devanagari, GC_Lo, NULL}, //  ऽ
     {0x950, 0x950, SC_Devanagari, GC_Lo, NULL}, //  ॐ
     {0x960, 0x961, SC_Devanagari, GC_Lo, NULL}, //  ॠ..ॡ
-    {0x971, 0x97F, SC_Devanagari, GC_L, NULL}, //  ॱ..ॿ
+    {0x971, 0x977, SC_Devanagari, GC_L, NULL}, //  ॱ..ॷ
+    {0x979, 0x97F, SC_Devanagari, GC_Lo, NULL}, //  ॹ..ॿ
     {0x985, 0x98C, SC_Bengali, GC_Lo, NULL}, //  অ..ঌ
     {0x98F, 0x990, SC_Bengali, GC_Lo, NULL}, //  এ..ঐ
     {0x993, 0x9A8, SC_Bengali, GC_Lo, NULL}, //  ও..ন
@@ -85,7 +113,6 @@ const struct sc_c26 safec26_start_list[] = {
     {0x9CE, 0x9CE, SC_Bengali, GC_Lo, NULL}, //  ৎ
     {0x9E0, 0x9E1, SC_Bengali, GC_Lo, NULL}, //  ৠ..ৡ
     {0x9F0, 0x9F1, SC_Bengali, GC_Lo, NULL}, //  ৰ..ৱ
-    {0x9FC, 0x9FC, SC_Bengali, GC_Lo, NULL}, //  ৼ
     {0xA05, 0xA0A, SC_Gurmukhi, GC_Lo, NULL}, //  ਅ..ਊ
     {0xA0F, 0xA10, SC_Gurmukhi, GC_Lo, NULL}, //  ਏ..ਐ
     {0xA13, 0xA28, SC_Gurmukhi, GC_Lo, NULL}, //  ਓ..ਨ
@@ -104,7 +131,6 @@ const struct sc_c26 safec26_start_list[] = {
     {0xABD, 0xABD, SC_Gujarati, GC_Lo, NULL}, //  ઽ
     {0xAD0, 0xAD0, SC_Gujarati, GC_Lo, NULL}, //  ૐ
     {0xAE0, 0xAE1, SC_Gujarati, GC_Lo, NULL}, //  ૠ..ૡ
-    {0xAF9, 0xAF9, SC_Gujarati, GC_Lo, NULL}, //  ૹ
     {0xB05, 0xB0C, SC_Oriya, GC_Lo, NULL}, //  ଅ..ଌ
     {0xB0F, 0xB10, SC_Oriya, GC_Lo, NULL}, //  ଏ..ଐ
     {0xB13, 0xB28, SC_Oriya, GC_Lo, NULL}, //  ଓ..ନ
@@ -128,9 +154,9 @@ const struct sc_c26 safec26_start_list[] = {
     {0xC05, 0xC0C, SC_Telugu, GC_Lo, NULL}, //  అ..ఌ
     {0xC0E, 0xC10, SC_Telugu, GC_Lo, NULL}, //  ఎ..ఐ
     {0xC12, 0xC28, SC_Telugu, GC_Lo, NULL}, //  ఒ..న
-    {0xC2A, 0xC39, SC_Telugu, GC_Lo, NULL}, //  ప..హ
+    {0xC2A, 0xC33, SC_Telugu, GC_Lo, NULL}, //  ప..ళ
+    {0xC35, 0xC39, SC_Telugu, GC_Lo, NULL}, //  వ..హ
     {0xC3D, 0xC3D, SC_Telugu, GC_Lo, NULL}, //  ఽ
-    {0xC58, 0xC5A, SC_Telugu, GC_Lo, NULL}, //  ౘ..ౚ
     {0xC5D, 0xC5D, SC_Telugu, GC_Lo, NULL}, //  ౝ
     {0xC60, 0xC61, SC_Telugu, GC_Lo, NULL}, //  ౠ..ౡ
     {0xC80, 0xC80, SC_Kannada, GC_Lo, NULL}, //  ಀ
@@ -140,19 +166,21 @@ const struct sc_c26 safec26_start_list[] = {
     {0xCAA, 0xCB3, SC_Kannada, GC_Lo, NULL}, //  ಪ..ಳ
     {0xCB5, 0xCB9, SC_Kannada, GC_Lo, NULL}, //  ವ..ಹ
     {0xCBD, 0xCBD, SC_Kannada, GC_Lo, NULL}, //  ಽ
-    {0xCDD, 0xCDE, SC_Kannada, GC_Lo, NULL}, //  ೝ..ೞ
+    {0xCDD, 0xCDD, SC_Kannada, GC_Lo, NULL}, //  ೝ
     {0xCE0, 0xCE1, SC_Kannada, GC_Lo, NULL}, //  ೠ..ೡ
     {0xCF1, 0xCF2, SC_Kannada, GC_Lo, NULL}, //  ೱ..ೲ
-    {0xD04, 0xD0C, SC_Malayalam, GC_Lo, NULL}, //  ഄ..ഌ
+    {0xD05, 0xD0C, SC_Malayalam, GC_Lo, NULL}, //  അ..ഌ
     {0xD0E, 0xD10, SC_Malayalam, GC_Lo, NULL}, //  എ..ഐ
     {0xD12, 0xD3A, SC_Malayalam, GC_Lo, NULL}, //  ഒ..ഺ
     {0xD3D, 0xD3D, SC_Malayalam, GC_Lo, NULL}, //  ഽ
     {0xD4E, 0xD4E, SC_Malayalam, GC_Lo, NULL}, //  ൎ
     {0xD54, 0xD56, SC_Malayalam, GC_Lo, NULL}, //  ൔ..ൖ
-    {0xD5F, 0xD61, SC_Malayalam, GC_Lo, NULL}, //  ൟ..ൡ
+    {0xD60, 0xD61, SC_Malayalam, GC_Lo, NULL}, //  ൠ..ൡ
     {0xD7A, 0xD7F, SC_Malayalam, GC_Lo, NULL}, //  ൺ..ൿ
-    {0xD85, 0xD96, SC_Sinhala, GC_Lo, NULL}, //  අ..ඖ
-    {0xD9A, 0xDB1, SC_Sinhala, GC_Lo, NULL}, //  ක..න
+    {0xD85, 0xD8E, SC_Sinhala, GC_Lo, NULL}, //  අ..ඎ
+    {0xD91, 0xD96, SC_Sinhala, GC_Lo, NULL}, //  එ..ඖ
+    {0xD9A, 0xDA5, SC_Sinhala, GC_Lo, NULL}, //  ක..ඥ
+    {0xDA7, 0xDB1, SC_Sinhala, GC_Lo, NULL}, //  ට..න
     {0xDB3, 0xDBB, SC_Sinhala, GC_Lo, NULL}, //  ඳ..ර
     {0xDBD, 0xDBD, SC_Sinhala, GC_Lo, NULL}, //  ල
     {0xDC0, 0xDC6, SC_Sinhala, GC_Lo, NULL}, //  ව..ෆ
@@ -169,7 +197,7 @@ const struct sc_c26 safec26_start_list[] = {
     {0xEBD, 0xEBD, SC_Lao, GC_Lo, NULL}, //  ຽ
     {0xEC0, 0xEC4, SC_Lao, GC_Lo, NULL}, //  ເ..ໄ
     {0xEC6, 0xEC6, SC_Lao, GC_Lm, NULL}, //  ໆ
-    {0xEDC, 0xEDF, SC_Lao, GC_Lo, NULL}, //  ໜ..ໟ
+    {0xEDE, 0xEDF, SC_Lao, GC_Lo, NULL}, //  ໞ..ໟ
     {0xF00, 0xF00, SC_Tibetan, GC_Lo, NULL}, //  ༀ
     {0xF40, 0xF42, SC_Tibetan, GC_Lo, NULL}, //  ཀ..ག
     {0xF44, 0xF47, SC_Tibetan, GC_Lo, NULL}, //  ང..ཇ
@@ -189,13 +217,12 @@ const struct sc_c26 safec26_start_list[] = {
     {0x106E, 0x1070, SC_Myanmar, GC_Lo, NULL}, //  ၮ..ၰ
     {0x1075, 0x1081, SC_Myanmar, GC_Lo, NULL}, //  ၵ..ႁ
     {0x108E, 0x108E, SC_Myanmar, GC_Lo, NULL}, //  ႎ
-    {0x10A0, 0x10C5, SC_Georgian, GC_Lu, NULL}, //  Ⴀ..Ⴥ
     {0x10C7, 0x10C7, SC_Georgian, GC_Lu, NULL}, //  Ⴧ
     {0x10CD, 0x10CD, SC_Georgian, GC_Lu, NULL}, //  Ⴭ
-    {0x10D0, 0x10FA, SC_Georgian, GC_Ll, NULL}, //  ა..ჺ
-    {0x10FC, 0x10FF, SC_Georgian, GC_L, NULL}, //  ჼ..ჿ
-    {0x1101, 0x11FF, SC_Hangul, GC_Lo, NULL}, //  ᄁ..ᇿ
-    {0x1201, 0x1248, SC_Ethiopic, GC_Lo, NULL}, //  ሁ..ቈ
+    {0x10D0, 0x10F0, SC_Georgian, GC_Ll, NULL}, //  ა..ჰ
+    {0x10F7, 0x10FA, SC_Georgian, GC_Ll, NULL}, //  ჷ..ჺ
+    {0x10FD, 0x10FF, SC_Georgian, GC_Ll, NULL}, //  ჽ..ჿ
+    {0x1200, 0x1248, SC_Ethiopic, GC_Lo, NULL}, //  ሀ..ቈ
     {0x124A, 0x124D, SC_Ethiopic, GC_Lo, NULL}, //  ቊ..ቍ
     {0x1250, 0x1256, SC_Ethiopic, GC_Lo, NULL}, //  ቐ..ቖ
     {0x1258, 0x1258, SC_Ethiopic, GC_Lo, NULL}, //  ቘ
@@ -212,29 +239,22 @@ const struct sc_c26 safec26_start_list[] = {
     {0x1312, 0x1315, SC_Ethiopic, GC_Lo, NULL}, //  ጒ..ጕ
     {0x1318, 0x135A, SC_Ethiopic, GC_Lo, NULL}, //  ጘ..ፚ
     {0x1380, 0x138F, SC_Ethiopic, GC_Lo, NULL}, //  ᎀ..ᎏ
-    {0x1780, 0x17B3, SC_Khmer, GC_Lo, NULL}, //  ក..ឳ
+    {0x1780, 0x17A2, SC_Khmer, GC_Lo, NULL}, //  ក..អ
+    {0x17A5, 0x17A7, SC_Khmer, GC_Lo, NULL}, //  ឥ..ឧ
+    {0x17A9, 0x17B3, SC_Khmer, GC_Lo, NULL}, //  ឩ..ឳ
     {0x17D7, 0x17D7, SC_Khmer, GC_Lm, NULL}, //  ៗ
     {0x17DC, 0x17DC, SC_Khmer, GC_Lo, NULL}, //  ៜ
-    {0x1C80, 0x1C88, SC_Cyrillic, GC_Ll, NULL}, //  ᲀ..ᲈ
     {0x1C90, 0x1CBA, SC_Georgian, GC_Lu, NULL}, //  Ა..Ჺ
     {0x1CBD, 0x1CBF, SC_Georgian, GC_Lu, NULL}, //  Ჽ..Ჿ
-    // SPLIT on SCX (prev to U+1CEC)
-    {0x1CE9, 0x1CE9, SC_Common, GC_Lo, "\x08\x56"}, //Devanagari,Nandinagari //  ᳩ
-    {0x1CEA, 0x1CEC, SC_Common, GC_Lo, "\x05\x08"}, //Bengali,Devanagari //  ᳪ..ᳬ
-    // SPLIT on SCX (prev to U+1CF3)
-    {0x1CEE, 0x1CF1, SC_Common, GC_Lo, "\x08"}, //Devanagari //  ᳮ..ᳱ
-    {0x1CF2, 0x1CF3, SC_Common, GC_Lo, "\x05\x08\x38\x13\x56\x18\x1b\x78"}, //Bengali,Devanagari,Grantha,Kannada,Nandinagari,Oriya,Telugu,Tirhuta //  ᳲ..ᳳ
-    {0x1CF5, 0x1CF6, SC_Common, GC_Lo, "\x05\x08"}, //Bengali,Devanagari //  ᳵ..ᳶ
-    {0x1CFA, 0x1CFA, SC_Common, GC_Lo, "\x56"}, //Nandinagari //  ᳺ
     {0x1D00, 0x1D25, SC_Latin, GC_Ll, NULL}, //  ᴀ..ᴥ
     {0x1D27, 0x1D2A, SC_Greek, GC_Ll, NULL}, //  ᴧ..ᴪ
-    {0x1D2C, 0x1D5C, SC_Latin, GC_Lm, NULL}, //  ᴬ..ᵜ
-    {0x1D5E, 0x1D61, SC_Greek, GC_Lm, NULL}, //  ᵞ..ᵡ
-    {0x1D63, 0x1D65, SC_Latin, GC_Lm, NULL}, //  ᵣ..ᵥ
-    {0x1D67, 0x1D6A, SC_Greek, GC_Lm, NULL}, //  ᵧ..ᵪ
-    {0x1D6C, 0x1D77, SC_Latin, GC_Ll, NULL}, //  ᵬ..ᵷ
-    {0x1D79, 0x1DBE, SC_Latin, GC_L, NULL}, //  ᵹ..ᶾ
-    {0x1E00, 0x1EFF, SC_Latin, GC_L, NULL}, //  Ḁ..ỿ
+    {0x1D2F, 0x1D2F, SC_Latin, GC_Lm, NULL}, //  ᴯ
+    {0x1D3B, 0x1D3B, SC_Latin, GC_Lm, NULL}, //  ᴻ
+    {0x1D4E, 0x1D4E, SC_Latin, GC_Lm, NULL}, //  ᵎ
+    {0x1D6B, 0x1D77, SC_Latin, GC_Ll, NULL}, //  ᵫ..ᵷ
+    {0x1D79, 0x1D9A, SC_Latin, GC_Ll, NULL}, //  ᵹ..ᶚ
+    {0x1E00, 0x1E99, SC_Latin, GC_L, NULL}, //  Ḁ..ẙ
+    {0x1E9C, 0x1EFF, SC_Latin, GC_L, NULL}, //  ẜ..ỿ
     {0x1F01, 0x1F15, SC_Greek, GC_L, NULL}, //  ἁ..ἕ
     {0x1F18, 0x1F1D, SC_Greek, GC_Lu, NULL}, //  Ἐ..Ἕ
     {0x1F20, 0x1F45, SC_Greek, GC_L, NULL}, //  ἠ..ὅ
@@ -266,24 +286,10 @@ const struct sc_c26 safec26_start_list[] = {
     {0x1FF6, 0x1FF8, SC_Greek, GC_L, NULL}, //  ῶ..Ὸ
     {0x1FFA, 0x1FFA, SC_Greek, GC_Lu, NULL}, //  Ὼ
     {0x1FFC, 0x1FFC, SC_Greek, GC_Lt, NULL}, //  ῼ
-    {0x2071, 0x2071, SC_Latin, GC_Lm, NULL}, //  ⁱ
-    {0x207F, 0x207F, SC_Latin, GC_Lm, NULL}, //  ⁿ
-    {0x2090, 0x209C, SC_Latin, GC_Lm, NULL}, //  ₐ..ₜ
-    {0x2102, 0x2102, SC_Common, GC_Lu, NULL}, //  ℂ
-    {0x2107, 0x2107, SC_Common, GC_Lu, NULL}, //  ℇ
-    {0x210A, 0x2113, SC_Common, GC_L, NULL}, //  ℊ..ℓ
-    {0x2115, 0x2115, SC_Common, GC_Lu, NULL}, //  ℕ
-    {0x2118, 0x211D, SC_Common, GC_V, NULL}, //  ℘..ℝ
-    {0x2124, 0x2124, SC_Common, GC_Lu, NULL}, //  ℤ
-    {0x2128, 0x2128, SC_Common, GC_Lu, NULL}, //  ℨ
-    {0x212C, 0x2131, SC_Common, GC_L, NULL}, //  ℬ..ℱ
-    {0x2133, 0x2139, SC_Common, GC_L, NULL}, //  ℳ..ℹ
-    {0x213C, 0x213F, SC_Common, GC_L, NULL}, //  ℼ..ℿ
-    {0x2145, 0x2149, SC_Common, GC_L, NULL}, //  ⅅ..ⅉ
-    {0x214E, 0x214E, SC_Latin, GC_Ll, NULL}, //  ⅎ
-    {0x2160, 0x2188, SC_Latin, GC_V, NULL}, //  Ⅰ..ↈ
-    {0x2C60, 0x2C7F, SC_Latin, GC_L, NULL}, //  Ⱡ..Ɀ
-    {0x2D00, 0x2D25, SC_Georgian, GC_Ll, NULL}, //  ⴀ..ⴥ
+    {0x2118, 0x2118, SC_Common, GC_Sm, NULL}, //  ℘
+    {0x212E, 0x212E, SC_Common, GC_So, NULL}, //  ℮
+    {0x2C60, 0x2C67, SC_Latin, GC_L, NULL}, //  Ⱡ..Ⱨ
+    {0x2C77, 0x2C7B, SC_Latin, GC_Ll, NULL}, //  ⱷ..ⱻ
     {0x2D27, 0x2D27, SC_Georgian, GC_Ll, NULL}, //  ⴧ
     {0x2D2D, 0x2D2D, SC_Georgian, GC_Ll, NULL}, //  ⴭ
     {0x2D80, 0x2D96, SC_Ethiopic, GC_Lo, NULL}, //  ⶀ..ⶖ
@@ -299,36 +305,30 @@ const struct sc_c26 safec26_start_list[] = {
     {0x3007, 0x3007, SC_Han, GC_Nl, NULL}, //  〇
     {0x3021, 0x3029, SC_Han, GC_Nl, NULL}, //  〡..〩
     {0x3031, 0x3035, SC_Common, GC_Lm, "\x11\x12"}, //Hiragana,Katakana //  〱..〵
-    {0x3038, 0x303B, SC_Han, GC_V, NULL}, //  〸..〻
+    {0x303B, 0x303B, SC_Han, GC_Lm, NULL}, //  〻
     {0x3041, 0x3096, SC_Hiragana, GC_Lo, NULL}, //  ぁ..ゖ
-    {0x309D, 0x309F, SC_Hiragana, GC_L, NULL}, //  ゝ..ゟ
+    {0x309D, 0x309E, SC_Hiragana, GC_Lm, NULL}, //  ゝ..ゞ
     {0x30A1, 0x30FA, SC_Katakana, GC_Lo, NULL}, //  ァ..ヺ
     {0x30FC, 0x30FC, SC_Common, GC_Lm, "\x11\x12"}, //Hiragana,Katakana //  ー
-    {0x30FE, 0x30FF, SC_Katakana, GC_L, NULL}, //  ヾ..ヿ
-    {0x3105, 0x312F, SC_Bopomofo, GC_Lo, NULL}, //  ㄅ..ㄯ
-    {0x3131, 0x318E, SC_Hangul, GC_Lo, NULL}, //  ㄱ..ㆎ
+    {0x30FE, 0x30FE, SC_Katakana, GC_Lm, NULL}, //  ヾ
+    {0x3105, 0x312D, SC_Bopomofo, GC_Lo, NULL}, //  ㄅ..ㄭ
+    {0x312F, 0x312F, SC_Bopomofo, GC_Lo, NULL}, //  ㄯ
     {0x31A0, 0x31BF, SC_Bopomofo, GC_Lo, NULL}, //  ㆠ..ㆿ
-    {0x31F0, 0x31FF, SC_Katakana, GC_Lo, NULL}, //  ㇰ..ㇿ
     {0x3400, 0x4DBF, SC_Han, GC_Lo, NULL}, //  㐀..䶿
     {0x4E00, 0x9FFF, SC_Han, GC_Lo, NULL}, //  一..鿿
-    {0xA640, 0xA66E, SC_Cyrillic, GC_L, NULL}, //  Ꙁ..ꙮ
-    {0xA67F, 0xA69D, SC_Cyrillic, GC_L, NULL}, //  ꙿ..ꚝ
+    {0xA67F, 0xA67F, SC_Cyrillic, GC_Lm, NULL}, //  ꙿ
     {0xA717, 0xA71F, SC_Common, GC_Lm, NULL}, //  ꜗ..ꜟ
-    {0xA722, 0xA787, SC_Latin, GC_L, NULL}, //  Ꜣ..ꞇ
-    {0xA78B, 0xA7CA, SC_Latin, GC_L, NULL}, //  Ꞌ..ꟊ
+    {0xA788, 0xA788, SC_Common, GC_Lm, NULL}, //  ꞈ
+    {0xA78D, 0xA78E, SC_Latin, GC_L, NULL}, //  Ɥ..ꞎ
+    {0xA792, 0xA793, SC_Latin, GC_L, NULL}, //  Ꞓ..ꞓ
+    {0xA7AA, 0xA7AA, SC_Latin, GC_Lu, NULL}, //  Ɦ
+    {0xA7AE, 0xA7AF, SC_Latin, GC_L, NULL}, //  Ɪ..ꞯ
+    {0xA7B8, 0xA7CA, SC_Latin, GC_L, NULL}, //  Ꞹ..ꟊ
     {0xA7D0, 0xA7D1, SC_Latin, GC_L, NULL}, //  Ꟑ..ꟑ
     {0xA7D3, 0xA7D3, SC_Latin, GC_Ll, NULL}, //  ꟓ
     {0xA7D5, 0xA7D9, SC_Latin, GC_L, NULL}, //  ꟕ..ꟙ
-    {0xA7F2, 0xA7FF, SC_Latin, GC_L, NULL}, //  ꟲ..ꟿ
-    // SPLIT on SCX (prev to U+A8F7)
-    {0xA8F2, 0xA8F2, SC_Devanagari, GC_Lo, NULL}, //  ꣲ
-    {0xA8F3, 0xA8F7, SC_Devanagari, GC_Lo, "\x08\x1a"}, //Devanagari,Tamil //  ꣳ..ꣷ
-    {0xA8FB, 0xA8FB, SC_Devanagari, GC_Lo, NULL}, //  ꣻ
-    {0xA8FD, 0xA8FE, SC_Devanagari, GC_Lo, NULL}, //  ꣽ..ꣾ
-    {0xA960, 0xA97C, SC_Hangul, GC_Lo, NULL}, //  ꥠ..ꥼ
-    {0xA9CF, 0xA9CF, SC_Common, GC_Lm, "\x26\x88"}, //Buginese,Javanese //  ꧏ
-    {0xA9E0, 0xA9E4, SC_Myanmar, GC_Lo, NULL}, //  ꧠ..ꧤ
-    {0xA9E6, 0xA9EF, SC_Myanmar, GC_L, NULL}, //  ꧦ..ꧯ
+    {0xA7FA, 0xA7FA, SC_Latin, GC_Ll, NULL}, //  ꟺ
+    {0xA9E7, 0xA9EF, SC_Myanmar, GC_Lo, NULL}, //  ꧧ..ꧯ
     {0xA9FA, 0xA9FE, SC_Myanmar, GC_Lo, NULL}, //  ꧺ..ꧾ
     {0xAA60, 0xAA76, SC_Myanmar, GC_L, NULL}, //  ꩠ..ꩶ
     {0xAA7A, 0xAA7A, SC_Myanmar, GC_Lo, NULL}, //  ꩺ
@@ -338,11 +338,7 @@ const struct sc_c26 safec26_start_list[] = {
     {0xAB11, 0xAB16, SC_Ethiopic, GC_Lo, NULL}, //  ꬑ..ꬖ
     {0xAB20, 0xAB26, SC_Ethiopic, GC_Lo, NULL}, //  ꬠ..ꬦ
     {0xAB28, 0xAB2E, SC_Ethiopic, GC_Lo, NULL}, //  ꬨ..ꬮ
-    {0xAB30, 0xAB5A, SC_Latin, GC_Ll, NULL}, //  ꬰ..ꭚ
-    {0xAB5C, 0xAB64, SC_Latin, GC_L, NULL}, //  ꭜ..ꭤ
-    {0xAB66, 0xAB69, SC_Latin, GC_L, NULL}, //  ꭦ..ꭩ
-    {0xD7B0, 0xD7C6, SC_Hangul, GC_Lo, NULL}, //  ힰ..ퟆ
-    {0xD7CB, 0xD7FB, SC_Hangul, GC_Lo, NULL}, //  ퟋ..ퟻ
+    {0xAB66, 0xAB68, SC_Latin, GC_Ll, NULL}, //  ꭦ..ꭨ
     {0xFA0E, 0xFA0F, SC_Han, GC_Lo, NULL}, //  﨎..﨏
     {0xFA11, 0xFA11, SC_Han, GC_Lo, NULL}, //  﨑
     {0xFA13, 0xFA14, SC_Han, GC_Lo, NULL}, //  﨓..﨔
@@ -350,150 +346,16 @@ const struct sc_c26 safec26_start_list[] = {
     {0xFA21, 0xFA21, SC_Han, GC_Lo, NULL}, //  﨡
     {0xFA23, 0xFA24, SC_Han, GC_Lo, NULL}, //  﨣..﨤
     {0xFA27, 0xFA29, SC_Han, GC_Lo, NULL}, //  﨧..﨩
-    {0xFB00, 0xFB06, SC_Latin, GC_Ll, NULL}, //  ﬀ..ﬆ
-    {0xFB13, 0xFB17, SC_Armenian, GC_Ll, NULL}, //  ﬓ..ﬗ
-    {0xFB20, 0xFB28, SC_Hebrew, GC_Lo, NULL}, //  ﬠ..ﬨ
-    {0xFB4F, 0xFB4F, SC_Hebrew, GC_Lo, NULL}, //  ﭏ
-    {0xFB51, 0xFB54, SC_Arabic, GC_Lo, NULL}, //  ﭑ..ﭔ
-    {0xFB56, 0xFB58, SC_Arabic, GC_Lo, NULL}, //  ﭖ..ﭘ
-    {0xFB5A, 0xFB5C, SC_Arabic, GC_Lo, NULL}, //  ﭚ..ﭜ
-    {0xFB5E, 0xFB60, SC_Arabic, GC_Lo, NULL}, //  ﭞ..ﭠ
-    {0xFB62, 0xFB64, SC_Arabic, GC_Lo, NULL}, //  ﭢ..ﭤ
-    {0xFB66, 0xFB68, SC_Arabic, GC_Lo, NULL}, //  ﭦ..ﭨ
-    {0xFB6A, 0xFB6C, SC_Arabic, GC_Lo, NULL}, //  ﭪ..ﭬ
-    {0xFB6E, 0xFB70, SC_Arabic, GC_Lo, NULL}, //  ﭮ..ﭰ
-    {0xFB72, 0xFB74, SC_Arabic, GC_Lo, NULL}, //  ﭲ..ﭴ
-    {0xFB76, 0xFB78, SC_Arabic, GC_Lo, NULL}, //  ﭶ..ﭸ
-    {0xFB7A, 0xFB7C, SC_Arabic, GC_Lo, NULL}, //  ﭺ..ﭼ
-    {0xFB7E, 0xFB80, SC_Arabic, GC_Lo, NULL}, //  ﭾ..ﮀ
-    {0xFB82, 0xFB90, SC_Arabic, GC_Lo, NULL}, //  ﮂ..ﮐ
-    {0xFB92, 0xFB94, SC_Arabic, GC_Lo, NULL}, //  ﮒ..ﮔ
-    {0xFB96, 0xFB98, SC_Arabic, GC_Lo, NULL}, //  ﮖ..ﮘ
-    {0xFB9A, 0xFB9C, SC_Arabic, GC_Lo, NULL}, //  ﮚ..ﮜ
-    {0xFB9E, 0xFBA2, SC_Arabic, GC_Lo, NULL}, //  ﮞ..ﮢ
-    {0xFBA4, 0xFBA8, SC_Arabic, GC_Lo, NULL}, //  ﮤ..ﮨ
-    {0xFBAA, 0xFBAC, SC_Arabic, GC_Lo, NULL}, //  ﮪ..ﮬ
-    {0xFBAE, 0xFBB1, SC_Arabic, GC_Lo, NULL}, //  ﮮ..ﮱ
-    {0xFBD3, 0xFBD5, SC_Arabic, GC_Lo, NULL}, //  ﯓ..ﯕ
-    {0xFBD7, 0xFBE6, SC_Arabic, GC_Lo, NULL}, //  ﯗ..ﯦ
-    {0xFBE8, 0xFBE8, SC_Arabic, GC_Lo, NULL}, //  ﯨ
-    {0xFBEA, 0xFBFE, SC_Arabic, GC_Lo, NULL}, //  ﯪ..ﯾ
-    {0xFC00, 0xFC5D, SC_Arabic, GC_Lo, NULL}, //  ﰀ..ﱝ
-    {0xFC64, 0xFCDE, SC_Arabic, GC_Lo, NULL}, //  ﱤ..ﳞ
-    {0xFCF5, 0xFD33, SC_Arabic, GC_Lo, NULL}, //  ﳵ..ﴳ
-    {0xFD3C, 0xFD3D, SC_Arabic, GC_Lo, NULL}, //  ﴼ..ﴽ
-    {0xFD50, 0xFD8F, SC_Arabic, GC_Lo, NULL}, //  ﵐ..ﶏ
-    {0xFD92, 0xFDC7, SC_Arabic, GC_Lo, NULL}, //  ﶒ..ﷇ
-    // SPLIT on SCX (prev to U+FDF9)
-    {0xFDF0, 0xFDF1, SC_Arabic, GC_Lo, NULL}, //  ﷰ..ﷱ
-    {0xFDF2, 0xFDF9, SC_Arabic, GC_Lo, "\x03\x1c"}, //Arabic,Thaana //  ﷲ..ﷹ
-    {0xFE71, 0xFE71, SC_Arabic, GC_Lo, NULL}, //  ﹱ
     {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ
-    {0xFE80, 0xFE8B, SC_Arabic, GC_Lo, NULL}, //  ﺀ..ﺋ
-    {0xFE8D, 0xFE91, SC_Arabic, GC_Lo, NULL}, //  ﺍ..ﺑ
-    {0xFE93, 0xFE97, SC_Arabic, GC_Lo, NULL}, //  ﺓ..ﺗ
-    {0xFE99, 0xFE9B, SC_Arabic, GC_Lo, NULL}, //  ﺙ..ﺛ
-    {0xFE9D, 0xFE9F, SC_Arabic, GC_Lo, NULL}, //  ﺝ..ﺟ
-    {0xFEA1, 0xFEA3, SC_Arabic, GC_Lo, NULL}, //  ﺡ..ﺣ
-    {0xFEA5, 0xFEA7, SC_Arabic, GC_Lo, NULL}, //  ﺥ..ﺧ
-    {0xFEA9, 0xFEB3, SC_Arabic, GC_Lo, NULL}, //  ﺩ..ﺳ
-    {0xFEB5, 0xFEB7, SC_Arabic, GC_Lo, NULL}, //  ﺵ..ﺷ
-    {0xFEB9, 0xFEBB, SC_Arabic, GC_Lo, NULL}, //  ﺹ..ﺻ
-    {0xFEBD, 0xFEBF, SC_Arabic, GC_Lo, NULL}, //  ﺽ..ﺿ
-    {0xFEC1, 0xFEC3, SC_Arabic, GC_Lo, NULL}, //  ﻁ..ﻃ
-    {0xFEC5, 0xFEC7, SC_Arabic, GC_Lo, NULL}, //  ﻅ..ﻇ
-    {0xFEC9, 0xFECB, SC_Arabic, GC_Lo, NULL}, //  ﻉ..ﻋ
-    {0xFECD, 0xFECF, SC_Arabic, GC_Lo, NULL}, //  ﻍ..ﻏ
-    {0xFED1, 0xFED3, SC_Arabic, GC_Lo, NULL}, //  ﻑ..ﻓ
-    {0xFED5, 0xFED7, SC_Arabic, GC_Lo, NULL}, //  ﻕ..ﻗ
-    {0xFED9, 0xFEDB, SC_Arabic, GC_Lo, NULL}, //  ﻙ..ﻛ
-    {0xFEDD, 0xFEDF, SC_Arabic, GC_Lo, NULL}, //  ﻝ..ﻟ
-    {0xFEE1, 0xFEE3, SC_Arabic, GC_Lo, NULL}, //  ﻡ..ﻣ
-    {0xFEE5, 0xFEE7, SC_Arabic, GC_Lo, NULL}, //  ﻥ..ﻧ
-    {0xFEE9, 0xFEEB, SC_Arabic, GC_Lo, NULL}, //  ﻩ..ﻫ
-    {0xFEED, 0xFEF3, SC_Arabic, GC_Lo, NULL}, //  ﻭ..ﻳ
-    {0xFEF5, 0xFEFC, SC_Arabic, GC_Lo, NULL}, //  ﻵ..ﻼ
-    {0x10140, 0x10174, SC_Greek, GC_Nl, NULL}, //  𐅀..𐅴
-    {0x10780, 0x10785, SC_Latin, GC_Lm, NULL}, //  𐞀..𐞅
-    {0x10787, 0x107B0, SC_Latin, GC_Lm, NULL}, //  𐞇..𐞰
-    {0x107B2, 0x107BA, SC_Latin, GC_Lm, NULL}, //  𐞲..𐞺
-    {0x16FE3, 0x16FE3, SC_Han, GC_Lm, NULL}, //  𖿣
-    {0x1AFF0, 0x1AFF3, SC_Katakana, GC_Lm, NULL}, //  𚿰..𚿳
-    {0x1AFF5, 0x1AFFB, SC_Katakana, GC_Lm, NULL}, //  𚿵..𚿻
-    {0x1AFFD, 0x1AFFE, SC_Katakana, GC_Lm, NULL}, //  𚿽..𚿾
-    {0x1B000, 0x1B000, SC_Katakana, GC_Lo, NULL}, //  𛀀
-    {0x1B002, 0x1B11F, SC_Hiragana, GC_Lo, NULL}, //  𛀂..𛄟
+    {0x1B11F, 0x1B11F, SC_Hiragana, GC_Lo, NULL}, //  𛄟
     {0x1B121, 0x1B122, SC_Katakana, GC_Lo, NULL}, //  𛄡..𛄢
     {0x1B150, 0x1B152, SC_Hiragana, GC_Lo, NULL}, //  𛅐..𛅒
     {0x1B164, 0x1B167, SC_Katakana, GC_Lo, NULL}, //  𛅤..𛅧
-    {0x1D400, 0x1D454, SC_Common, GC_L, NULL}, //  𝐀..𝑔
-    {0x1D456, 0x1D49C, SC_Common, GC_L, NULL}, //  𝑖..𝒜
-    {0x1D49E, 0x1D49F, SC_Common, GC_Lu, NULL}, //  𝒞..𝒟
-    {0x1D4A2, 0x1D4A2, SC_Common, GC_Lu, NULL}, //  𝒢
-    {0x1D4A5, 0x1D4A6, SC_Common, GC_Lu, NULL}, //  𝒥..𝒦
-    {0x1D4A9, 0x1D4AC, SC_Common, GC_Lu, NULL}, //  𝒩..𝒬
-    {0x1D4AE, 0x1D4B9, SC_Common, GC_L, NULL}, //  𝒮..𝒹
-    {0x1D4BB, 0x1D4BB, SC_Common, GC_Ll, NULL}, //  𝒻
-    {0x1D4BD, 0x1D4C3, SC_Common, GC_Ll, NULL}, //  𝒽..𝓃
-    {0x1D4C5, 0x1D505, SC_Common, GC_L, NULL}, //  𝓅..𝔅
-    {0x1D507, 0x1D50A, SC_Common, GC_Lu, NULL}, //  𝔇..𝔊
-    {0x1D50D, 0x1D514, SC_Common, GC_Lu, NULL}, //  𝔍..𝔔
-    {0x1D516, 0x1D51C, SC_Common, GC_Lu, NULL}, //  𝔖..𝔜
-    {0x1D51E, 0x1D539, SC_Common, GC_L, NULL}, //  𝔞..𝔹
-    {0x1D53B, 0x1D53E, SC_Common, GC_Lu, NULL}, //  𝔻..𝔾
-    {0x1D540, 0x1D544, SC_Common, GC_Lu, NULL}, //  𝕀..𝕄
-    {0x1D546, 0x1D546, SC_Common, GC_Lu, NULL}, //  𝕆
-    {0x1D54A, 0x1D550, SC_Common, GC_Lu, NULL}, //  𝕊..𝕐
-    {0x1D552, 0x1D6A5, SC_Common, GC_L, NULL}, //  𝕒..𝚥
-    {0x1D6A8, 0x1D6C0, SC_Common, GC_Lu, NULL}, //  𝚨..𝛀
-    {0x1D6C2, 0x1D6DA, SC_Common, GC_Ll, NULL}, //  𝛂..𝛚
-    {0x1D6DC, 0x1D6FA, SC_Common, GC_L, NULL}, //  𝛜..𝛺
-    {0x1D6FC, 0x1D714, SC_Common, GC_Ll, NULL}, //  𝛼..𝜔
-    {0x1D716, 0x1D734, SC_Common, GC_L, NULL}, //  𝜖..𝜴
-    {0x1D736, 0x1D74E, SC_Common, GC_Ll, NULL}, //  𝜶..𝝎
-    {0x1D750, 0x1D76E, SC_Common, GC_L, NULL}, //  𝝐..𝝮
-    {0x1D770, 0x1D788, SC_Common, GC_Ll, NULL}, //  𝝰..𝞈
-    {0x1D78A, 0x1D7A8, SC_Common, GC_L, NULL}, //  𝞊..𝞨
-    {0x1D7AA, 0x1D7C2, SC_Common, GC_Ll, NULL}, //  𝞪..𝟂
-    {0x1D7C4, 0x1D7CB, SC_Common, GC_L, NULL}, //  𝟄..𝟋
     {0x1DF00, 0x1DF1E, SC_Latin, GC_L, NULL}, //  𝼀..𝼞
     {0x1E7E0, 0x1E7E6, SC_Ethiopic, GC_Lo, NULL}, //  𞟠..𞟦
     {0x1E7E8, 0x1E7EB, SC_Ethiopic, GC_Lo, NULL}, //  𞟨..𞟫
     {0x1E7ED, 0x1E7EE, SC_Ethiopic, GC_Lo, NULL}, //  𞟭..𞟮
     {0x1E7F0, 0x1E7FE, SC_Ethiopic, GC_Lo, NULL}, //  𞟰..𞟾
-    {0x1EE00, 0x1EE03, SC_Arabic, GC_Lo, NULL}, //  𞸀..𞸃
-    {0x1EE05, 0x1EE1F, SC_Arabic, GC_Lo, NULL}, //  𞸅..𞸟
-    {0x1EE21, 0x1EE22, SC_Arabic, GC_Lo, NULL}, //  𞸡..𞸢
-    {0x1EE24, 0x1EE24, SC_Arabic, GC_Lo, NULL}, //  𞸤
-    {0x1EE27, 0x1EE27, SC_Arabic, GC_Lo, NULL}, //  𞸧
-    {0x1EE29, 0x1EE32, SC_Arabic, GC_Lo, NULL}, //  𞸩..𞸲
-    {0x1EE34, 0x1EE37, SC_Arabic, GC_Lo, NULL}, //  𞸴..𞸷
-    {0x1EE39, 0x1EE39, SC_Arabic, GC_Lo, NULL}, //  𞸹
-    {0x1EE3B, 0x1EE3B, SC_Arabic, GC_Lo, NULL}, //  𞸻
-    {0x1EE42, 0x1EE42, SC_Arabic, GC_Lo, NULL}, //  𞹂
-    {0x1EE47, 0x1EE47, SC_Arabic, GC_Lo, NULL}, //  𞹇
-    {0x1EE49, 0x1EE49, SC_Arabic, GC_Lo, NULL}, //  𞹉
-    {0x1EE4B, 0x1EE4B, SC_Arabic, GC_Lo, NULL}, //  𞹋
-    {0x1EE4D, 0x1EE4F, SC_Arabic, GC_Lo, NULL}, //  𞹍..𞹏
-    {0x1EE51, 0x1EE52, SC_Arabic, GC_Lo, NULL}, //  𞹑..𞹒
-    {0x1EE54, 0x1EE54, SC_Arabic, GC_Lo, NULL}, //  𞹔
-    {0x1EE57, 0x1EE57, SC_Arabic, GC_Lo, NULL}, //  𞹗
-    {0x1EE59, 0x1EE59, SC_Arabic, GC_Lo, NULL}, //  𞹙
-    {0x1EE5B, 0x1EE5B, SC_Arabic, GC_Lo, NULL}, //  𞹛
-    {0x1EE5D, 0x1EE5D, SC_Arabic, GC_Lo, NULL}, //  𞹝
-    {0x1EE5F, 0x1EE5F, SC_Arabic, GC_Lo, NULL}, //  𞹟
-    {0x1EE61, 0x1EE62, SC_Arabic, GC_Lo, NULL}, //  𞹡..𞹢
-    {0x1EE64, 0x1EE64, SC_Arabic, GC_Lo, NULL}, //  𞹤
-    {0x1EE67, 0x1EE6A, SC_Arabic, GC_Lo, NULL}, //  𞹧..𞹪
-    {0x1EE6C, 0x1EE72, SC_Arabic, GC_Lo, NULL}, //  𞹬..𞹲
-    {0x1EE74, 0x1EE77, SC_Arabic, GC_Lo, NULL}, //  𞹴..𞹷
-    {0x1EE79, 0x1EE7C, SC_Arabic, GC_Lo, NULL}, //  𞹹..𞹼
-    {0x1EE7E, 0x1EE7E, SC_Arabic, GC_Lo, NULL}, //  𞹾
-    {0x1EE80, 0x1EE89, SC_Arabic, GC_Lo, NULL}, //  𞺀..𞺉
-    {0x1EE8B, 0x1EE9B, SC_Arabic, GC_Lo, NULL}, //  𞺋..𞺛
-    {0x1EEA1, 0x1EEA3, SC_Arabic, GC_Lo, NULL}, //  𞺡..𞺣
-    {0x1EEA5, 0x1EEA9, SC_Arabic, GC_Lo, NULL}, //  𞺥..𞺩
-    {0x1EEAB, 0x1EEBB, SC_Arabic, GC_Lo, NULL}, //  𞺫..𞺻
     {0x20000, 0x2A6DF, SC_Han, GC_Lo, NULL}, //  𠀀..𪛟
     {0x2A700, 0x2B738, SC_Han, GC_Lo, NULL}, //  𪜀..𫜸
     {0x2B740, 0x2B81D, SC_Han, GC_Lo, NULL}, //  𫝀..𫠝
@@ -502,9 +364,9 @@ const struct sc_c26 safec26_start_list[] = {
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
 #else
-extern const struct sc_c26 safec26_start_list[470];
+extern const struct sc_c26 safec26_start_list[336];
 #endif
-// 355 ranges, 115 singles, 99350 codepoints
+// 243 ranges, 93 singles, 95986 codepoints
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC
 // MEDIAL from XID_Start and !MARK. Split on GC and SCX
