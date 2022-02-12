@@ -36,19 +36,20 @@ Motivation
 with
 
 ```js
-const [ ENV_PROD, ENV_DEV ] = [ 'PRODUCTION', 'DEVELOPMENT'];
-/* … */
-const environment = 'PRODUCTION';
-/* … */
-function isUserAdmin(user) {
-    if(environmentǃ=ENV_PROD){
-        // bypass authZ checks in DEV
-        return true;
-    }
 
+    const [ ENV_PROD, ENV_DEV ] = [ 'PRODUCTION', 'DEVELOPMENT'];
     /* … */
-    return false;
-}
+    const environment = 'PRODUCTION';
+    /* … */
+    function isUserAdmin(user) {
+        if(environmentǃ=ENV_PROD){
+            // bypass authZ checks in DEV
+            return true;
+        }
+    
+        /* … */
+        return false;
+    }
 ```
 
 where `environmentǃ` is an identifier, because the `ǃ` is the
@@ -202,7 +203,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   extension over C11, disallowing the restricted and limited_use
   scripts and identifiers, arbitrary rtl and ltr overrides, and all
   the insecure mixed scripts combinations.  See `unic26.h`,
-  and the C23++ proposal [P2528R0](doc/P2528R0.md).
+  and the C23++ proposal [P2528R1](doc/P2528R1.md).
 
 `c11_6`. **C11STD**
 

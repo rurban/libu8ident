@@ -34,6 +34,7 @@ doc_DATA = README.md NEWS NOTICE LICENSE \
 if HAVE_PANDOC
 doc_DATA += $(PDF)
 html_DATA = doc/P2528R0.html doc/P2528R1.html doc/n2916.html
+doc_DATA += $(html_DATA)
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
@@ -125,10 +126,12 @@ docs: $(doc_DATA) $(PDF)
 pdf: $(PDF)
 
 if HAVE_PANDOC
-#doc/P2528R0.html: $(srcdir)/doc/P2528R0.html
-#	cp $(srcdir)/doc/P2528R0.pdf $@
-#doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.pdf
-#	cp $(srcdir)/doc/P2528R0.pdf $@
+doc/P2528R0.html:
+	-test -d doc || mkdir doc
+	cp $(srcdir)/doc/P2528R0.html $@
+doc/P2528R0.pdf:
+	-test -d doc || mkdir doc
+	cp $(srcdir)/doc/P2528R0.pdf $@
 doc/P2528R1.html: $(srcdir)/doc/P2528R1.md
 	-test -d doc || mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"

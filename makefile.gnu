@@ -311,13 +311,13 @@ regen-confus:
 
 docs: $(DOCS)
 # doc/P2528R0.md doc/P2528R0.html doc/P2528R0.pdf are frozen
-pdf: doc/P2528R1.pdf
+pdf: doc/P2528R1.pdf doc/n2916.pdf
 doc/P2528R1.html: doc/P2528R1.md
 	-$(PANDOC) -s -o $@ doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
+doc/P2528R1.pdf: doc/P2528R1.md
+	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 #doc/P2528R0.html: doc/P2528R0.md
 #	-$(PANDOC) -s -o $@ doc/P2528R0.md --metadata title="P258R0 - C++ Identifier Security using Unicode Standard Annex 39"
-#doc/P2528R0.pdf: doc/P2528R0.md
-#	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/P2528R0.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/n2916.html: doc/n2916.md
 	-$(PANDOC) -s -o $@ doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 doc/n2916.pdf: doc/n2916.md

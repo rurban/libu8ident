@@ -37,3 +37,22 @@ Other medial exceptions are noted in TR31 at 2.4 Specific Character
 Adjustments, but the tables DerivedCoreProperties and TR39 Identifier
 tables and thus all user parsers are wrong.
 <https://www.unicode.org/reports/tr31/#Specific_Character_Adjustments>
+
+Confusable Technical IdTypes
+----------------------------
+
+DerivedCoreProperties.txt lists the three ǃ U+1C3 "LATIN LETTER ALVEOLAR CLICK"
+ǀ U+1C0 "LATIN LETTER DENTAL CLICK" and ǁ U+1C1 "LATIN LETTER LATERAL CLICK"
+as `ID_Start`. But they should not be included in ID at all, as they are
+confusable with common operators.
+
+TR39 IdentifierTypes.txt lists the three ǃ U+1C3 "LATIN LETTER
+ALVEOLAR CLICK" ǀ U+1C0 "LATIN LETTER DENTAL CLICK" and ǁ U+1C1 "LATIN
+LETTER LATERAL CLICK" as Technical. So for normal IdentifierStatus
+Allowed these would be excluded.  But C++26 whishes to add Technical
+also. Add at least an Exclusion, if not the Non_XID property for XID
+stability concerns. But security bugs should trump stability
+guarantees.
+
+See <https://certitude.consulting/blog/en/invisible-backdoor/>
+for an exploit.

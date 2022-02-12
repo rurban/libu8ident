@@ -10,6 +10,7 @@ include/u8ident.h.bak
 libu8ident.a
 libu8ident.so
 libu8ident.so.0
+libu8ident.so.1
 a.out
 u8idlint
 u8ident.o
