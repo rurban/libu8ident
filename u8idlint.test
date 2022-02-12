@@ -18,7 +18,7 @@ check3() {
     if diff "$tst" "$rst"; then
 	rm -- ./"$rst"
     else
-	echo $arg $3.rst failed
+	echo "$arg $3.rst failed"
 	exit
     fi
 }
