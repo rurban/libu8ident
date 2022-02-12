@@ -56,7 +56,10 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/bidi-sec-1.tst      texts/bidi-sec-1-c11.tst  texts/bidi-sec-1-allowed.tst \
 	texts/bidi-sec-2.tst      texts/bidi-sec-2-c11.tst  texts/bidi-sec-2-allowed.tst \
 	texts/bidi-sec-2-allowed.tst \
-	texts/homo-sec-1.tst   	  texts/homo-sec-1-p1.tst   texts/homo-1.tst
+	texts/homo-sec-1.tst   	  texts/homo-sec-1-p1.tst   texts/homo-1.tst \
+	texts/bidi-sec-1.py	  texts/homo-sec-1.js	 texts/homo-sec-1.py    texts/norm-sec-1.py \
+	texts/norm-sec-1.cperl	  texts/norm-sec-1.raku
+
 EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.pl makefile.gnu \
 	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4

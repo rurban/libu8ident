@@ -1,0 +1,4 @@
+use utf8;
+use feature 'unicode_strings';
+$x = 8;
+print $x²; # => 64
