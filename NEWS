@@ -1,9 +1,13 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022 Reini Urban
 
-libu8ident 0.2 - 2022-02-??:
+libu8ident 0.2 - 2022-02-12:
 
-The C++23 deadline is gone, rename all c23 to c26.
+Bump SOLIB MAJOR to 1
+The C++23 deadline is gone, rename all c23 to c26. Esp. command-line
+and configure options.
+Fixed SAFEC26 to exclude confusable Technical, and to skip a lot of
+not Allowed ID_Start ranges.
 
 libu8ident 0.1 - 2022-01-24:
 

@@ -10,7 +10,7 @@ RANLIB := ranlib
 RONN := ronn
 # Maintainer only
 VERSION := $(shell build-aux/git-version-gen .version)
-SO_MAJ = 0
+SO_MAJ = 1
 DEFINES += -DPACKAGE_VERSION="\"$(VERSION)\""
 # This should to be a recent perl, matching the target unicode version
 PERL := perl

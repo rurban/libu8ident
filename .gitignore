@@ -67,6 +67,7 @@ mark_croar.bin
 test-texts.test
 texts.tst
 doc/my.latex
+texts/homo-sec-2.cc
 homo-sec-1
 homo-sec-1.o
 Dockerfile.pandoc
