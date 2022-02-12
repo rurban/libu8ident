@@ -35,6 +35,7 @@ nfc:  bsearch: 3747484 	2x bsearch: 7600398 	 102.81% slower
 #include <stdint.h>
 #include <stdbool.h>
 #include "u8id_private.h"
+#include "u8id_gc.h"
 #include "scripts.h"
 #include "u8idroar.h"
 #undef EXTERN_SCRIPTS
