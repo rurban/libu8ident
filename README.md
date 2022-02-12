@@ -46,7 +46,7 @@ with
             // bypass authZ checks in DEV
             return true;
         }
-    
+
         /* … */
         return false;
     }
