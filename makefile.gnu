@@ -119,7 +119,7 @@ endif
 endif
 endif
 
-most: $(LIB) $(SOLIB) $(MAN) u8idlint
+most: $(LIB) $(SOLIB) u8idlint doc/P2528R1.html
 
 all: mkc26 most test-texts test perf docs
 
@@ -163,7 +163,7 @@ allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkco
 u8idlint: u8idlint.c unic26.h unic11.h $(LIB)
 	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB) $(LIBUNISTR)
 
-.PHONY: check check-asan check-norms check-profiles check-tr31 check-extra check-mdl \
+.PHONY: check check-all check-extra check-asan check-norms check-profiles check-tr31 check-mdl \
 	check-all-combinations clean regen-scripts regen-norm regen-confus regen-u8idlint-test \
 	install man dist-src dist clang-format docs
 

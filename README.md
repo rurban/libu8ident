@@ -27,7 +27,7 @@ Motivation
 
 * <https://websec.github.io/unicode-security-guide/visual-spoofing/>
 * <http://www.unicode.org/reports/tr31/>, <http://www.unicode.org/reports/tr36/>
-and <http://www.unicode.org/reports/tr39>
+  and <http://www.unicode.org/reports/tr39>
 * <https://twitter.com/zygoloid/status/1187150150835195905>,
   <https://github.com/golang/go/issues/20209>,
   <https://twitter.com/jupenur/status/1244286243518713857>
@@ -54,12 +54,12 @@ function isUserAdmin(user) {
 where `environmentǃ` is an identifier, because the `ǃ` is the
 U+1C3 "LATIN LETTER ALVEOLAR CLICK", a Technical, Lo identifier,
 completely flipping the logic. A safe TR31 ID set recommended by TR39 would
-have forbidden that.
+have forbidden that. Such ID confusables with operators are U+1C0 ǀ, U+1C1 ǁ,
+U+1C3 ǃ
 
 There's now even a [Unicode taskforce](https://www.unicode.org/L2/L2022/22007-avoiding-spoof.pdf),
 because of the <https://trojansource.codes> CVE's, even when they were about
 bidi overrides, not identifiers.
-
 
 Valid characters
 ----------------

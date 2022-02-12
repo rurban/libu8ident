@@ -121,7 +121,7 @@ regen-confus:
 	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
 	$(PERL) mkconfus.pl
 docs: $(doc_DATA) $(PDF)
-	-mkdir doc
+	-test -d doc || mkdir doc
 pdf: $(PDF)
 
 if HAVE_PANDOC
@@ -130,16 +130,16 @@ if HAVE_PANDOC
 #doc/P2528R0.pdf: $(srcdir)/doc/P2528R0.pdf
 #	cp $(srcdir)/doc/P2528R0.pdf $@
 doc/P2528R1.html: $(srcdir)/doc/P2528R1.md
-	-mkdir doc
+	-test -d doc || mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
 doc/P2528R1.pdf: $(srcdir)/doc/P2528R1.md
-	-mkdir doc
+	-test -d doc || mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/n2916.html: $(srcdir)/doc/n2916.md
-	-mkdir doc
+	-test -d doc || mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 doc/n2916.pdf: $(srcdir)/doc/n2916.md
-	-mkdir doc
+	-test -d doc || mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
 endif
 
@@ -162,7 +162,7 @@ patch-c-doc:
 regen-c-patch:
 	-cd $(srcdir) && diff -bu doc/P2528R0.md doc/n2916.md >doc/n2916.patch
 
-regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) $(html_DATA)
+regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/P2528R1.html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
 
