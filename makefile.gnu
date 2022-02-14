@@ -58,8 +58,13 @@ ALLHDRS = $(HDRS) unic26.h
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
 SOLIB = libu8ident.so
-DOCS = README.md NEWS NOTICE LICENSE doc/c11.md doc/P2528R0.html doc/P2528R1.html \
-	doc/P2528R0.md doc/P2528R1.md doc/n2916.html doc/n2916.md doc/n2916.patch \
+PCXX = P2528R0
+NC   = n2916
+PCURCXX = P2528R1
+NCURC   = n2916-new
+DOCS = README.md NEWS NOTICE LICENSE doc/c11.md doc/$(PCXX).html doc/$(PCURCXX).html \
+	doc/$(PCXX).md doc/$(PCURCXX).md doc/$(NC).html doc/$(NC).md doc/$(NC).patch \
+	doc/$(NCURC).html doc/$(NCURC).md \
 	doc/tr31-bugs.md
 MAN3 = u8ident.3
 MAN1 = u8idlint.1
@@ -119,7 +124,7 @@ endif
 endif
 endif
 
-most: $(LIB) $(SOLIB) u8idlint doc/P2528R1.html
+most: $(LIB) $(SOLIB) u8idlint doc/$(PCURCXX).html
 
 all: mkc26 most test-texts test perf docs
 
@@ -310,18 +315,17 @@ regen-confus:
 	$(PERL) mkconfus.pl
 
 docs: $(DOCS)
-# doc/P2528R0.md doc/P2528R0.html doc/P2528R0.pdf are frozen
-pdf: doc/P2528R1.pdf doc/n2916.pdf
-doc/P2528R1.html: doc/P2528R1.md
-	-$(PANDOC) -s -o $@ doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
-doc/P2528R1.pdf: doc/P2528R1.md
-	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-#doc/P2528R0.html: doc/P2528R0.md
-#	-$(PANDOC) -s -o $@ doc/P2528R0.md --metadata title="P258R0 - C++ Identifier Security using Unicode Standard Annex 39"
-doc/n2916.html: doc/n2916.md
-	-$(PANDOC) -s -o $@ doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
-doc/n2916.pdf: doc/n2916.md
-	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
+# doc/P2528R0.* and doc/n2916.* are frozen
+html: doc/$(PCURCXX).html doc/$(NCURC).html
+pdf: doc/$(PCURCXX).pdf doc/$(NCURC).pdf
+doc/$(PCURCXX).html: doc/$(PCURCXX).md
+	-$(PANDOC) -s -o $@ doc/$(PCURCXX).md --metadata title="$(PCURCXX) - C++ Identifier Security using Unicode Standard Annex 39"
+doc/$(PCURCXX).pdf: doc/$(PCURCXX).md
+	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+doc/$(NCURC).html: doc/$(NCURC).md
+	-$(PANDOC) -s -o $@ doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
+doc/$(NCURC).pdf: doc/$(NCURC).md
+	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/$(NCURC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
 
 Dockerfile.pandoc: makefile.gnu
 	echo "FROM fedora:35" >Dockerfile.pandoc
@@ -331,16 +335,16 @@ Dockerfile.pandoc: makefile.gnu
 	echo "WORKDIR /home/user" >> Dockerfile.pandoc
 	docker build -t pandoc -f Dockerfile.pandoc .
 docker-html: Dockerfile.pandoc
-	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s -o /doc/P2528R1.html /doc/P2528R1.md
-	chown $$USER:$$USER doc/P2528R1.html
+	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s -o /doc/$(PCURCXX).html /doc/$(PCURCXX).md
+	chown $$USER:$$USER doc/$(PCURCXX).html
 docker-pdf: Dockerfile.pandoc
-	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/P2528R1.pdf /doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-	chown $$USER:$$USER doc/P2528R1.pdf
+	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/$(PCURCXX).pdf /doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	chown $$USER:$$USER doc/$(PCURCXX).pdf
 
 patch-c-doc:
-	patch -f doc/n2916.md doc/n2916.patch
+	patch -f doc/$(NCURC).md doc/$(NC).patch
 regen-c-patch:
-	-diff -bu doc/P2528R0.md doc/n2916.md >doc/n2916.patch
+	-diff -bu doc/$(PCXX).md doc/$(NC).md >doc/$(NC).patch
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h

@@ -27,13 +27,17 @@ pcdata_DATA = libu8ident.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
-PDF = doc/P2528R0.pdf doc/P2528R1.pdf doc/n2916.pdf
+PCXX = P2528R0
+NC   = n2916
+PCURCXX = P2528R1
+NCURC   = n2916-new
+PDF = doc/$(PCXX).pdf doc/$(PCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
-	   doc/c11.md doc/P2528R0.md doc/P2528R1.md doc/n2916.md doc/n2916.patch \
+	   doc/c11.md doc/$(PCXX).md doc/$(PCURCXX).md doc/n2916.md doc/n2916.patch \
 	   doc/tr31-bugs.md 
 if HAVE_PANDOC
 doc_DATA += $(PDF)
-html_DATA = doc/P2528R0.html doc/P2528R1.html doc/n2916.html
+html_DATA = doc/$(PCXX).html doc/$(PCURCXX).html doc/n2916.html
 doc_DATA += $(html_DATA)
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
@@ -130,24 +134,31 @@ docs: $(doc_DATA) $(PDF)
 pdf: $(PDF)
 
 if HAVE_PANDOC
-doc/P2528R0.html:
+doc/$(PCXX).html:
 	-test -d doc || mkdir doc
-	cp $(srcdir)/doc/P2528R0.html $@
-doc/P2528R0.pdf:
+	cp $(srcdir)/doc/$(PCXX).html $@
+doc/$(PCXX).pdf:
 	-test -d doc || mkdir doc
-	cp $(srcdir)/doc/P2528R0.pdf $@
-doc/P2528R1.html: $(srcdir)/doc/P2528R1.md
+	cp $(srcdir)/doc/$(PCXX).pdf $@
+doc/$(NC).html:
 	-test -d doc || mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/P2528R1.md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
-doc/P2528R1.pdf: $(srcdir)/doc/P2528R1.md
+	cp $(srcdir)/doc/$(NC).html $@
+doc/$(NC).pdf:
 	-test -d doc || mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-doc/n2916.html: $(srcdir)/doc/n2916.md
+	cp $(srcdir)/doc/$(NC).pdf $@
+
+doc/$(PCURCXX).html: $(srcdir)/doc/$(PCURCXX).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/n2916.md --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
-doc/n2916.pdf: $(srcdir)/doc/n2916.md
+	$(PANDOC) -s -o $@ $(srcdir)/doc/$(PCURCXX).md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
+doc/$(PCURCXX).pdf: $(srcdir)/doc/$(PCURCXX).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/n2916.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="n2916 - C Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+doc/$(NCURC).html: $(srcdir)/doc/$(NCURC).md
+	-test -d doc || mkdir doc
+	$(PANDOC) -s -o $@ $(srcdir)/doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
+doc/$(NCURC).pdf: $(srcdir)/doc/$(NCURC).md
+	-test -d doc || mkdir doc
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(NC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
 endif
 
 Dockerfile.pandoc: $(srcdir)/makefile.gnu
@@ -158,20 +169,21 @@ Dockerfile.pandoc: $(srcdir)/makefile.gnu
 	echo "WORKDIR /home/user" >> Dockerfile.pandoc
 	docker build -t pandoc -f Dockerfile.pandoc .
 docker-html: Dockerfile.pandoc
-	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s -o /doc/P2528R1.html /doc/P2528R1.md
-	chown $$USER:$$USER $(srcdir)/doc/P2528R1.html
+	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s -o /doc/$(PCURCXX).html /doc/$(PCURCXX).md
+	chown $$USER:$$USER $(srcdir)/doc/$(PCURCXX).html
 docker-pdf: Dockerfile.pandoc
-	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/P2528R1.pdf /doc/P2528R1.md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-	chown $$USER:$$USER $(srcdir)/doc/P2528R1.pdf
+	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/$(PCURCXX).pdf /doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	chown $$USER:$$USER $(srcdir)/doc/$(PCURCXX).pdf
 
-patch-c-doc:
-	cd $(srcdir) && patch -f doc/n2916.md doc/n2916.patch
-regen-c-patch:
-	-cd $(srcdir) && diff -bu doc/P2528R0.md doc/n2916.md >doc/n2916.patch
+doc/$(NCURC).md patch-c-doc: doc/$(NC).patch
+	cd $(srcdir) && patch -f doc/$(NCURC).md doc/$(NC).patch
+doc/$(NC).patch regen-c-patch: doc/$(PCXX).md doc/$(NC).md
+	-cd $(srcdir) && diff -bu doc/$(PCXX).md doc/$(NC).md >doc/$(NC).patch
 
-regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/P2528R1.html
+regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(PCURCXX).html
 
-.PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man pkg docs
+.PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man \
+	pkg docs patch-c-doc regen-c-patch docker-html docker-pdf
 
 EXTRA_PROGRAMS = mkc26 test test-texts example
 TESTS = test example
