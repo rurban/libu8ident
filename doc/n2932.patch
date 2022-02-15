@@ -1,8 +1,8 @@
---- doc/P2528R1.md	2022-02-15 13:43:04.462266443 +0100
-+++ doc/n2932.md	2022-02-15 13:43:10.534215574 +0100
+--- doc/P2528R1.md	2022-02-15 13:44:14.210682108 +0100
++++ doc/n2932.md	2022-02-15 13:45:14.746174957 +0100
 @@ -1,20 +1,19 @@
 -    C++ Identifier Security using Unicode Standard Annex 39
-+    n2932 - C Identifier Security using Unicode Standard Annex 39
++    n2932 - C Identifier Security using Unicode Standard Annex 39 v2
  
 -    Document #: P2538R1
 -    Date:       2022-02-12

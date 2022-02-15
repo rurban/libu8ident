@@ -323,9 +323,9 @@ doc/$(PCURCXX).html: doc/$(PCURCXX).md
 doc/$(PCURCXX).pdf: doc/$(PCURCXX).md
 	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/$(NCURC).html: doc/$(NCURC).md
-	-$(PANDOC) -s -o $@ doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
+	-$(PANDOC) -s -o $@ doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
 doc/$(NCURC).pdf: doc/$(NCURC).md
-	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/$(NCURC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
+	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/$(NCURC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
 
 Dockerfile.pandoc: makefile.gnu
 	echo "FROM fedora:35" >Dockerfile.pandoc

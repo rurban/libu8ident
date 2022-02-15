@@ -155,10 +155,10 @@ doc/$(PCURCXX).pdf: $(srcdir)/doc/$(PCURCXX).md
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/$(NCURC).html: $(srcdir)/doc/$(NCURC).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s -o $@ $(srcdir)/doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
 doc/$(NCURC).pdf: $(srcdir)/doc/$(NCURC).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(NC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(NC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
 endif
 
 Dockerfile.pandoc: $(srcdir)/makefile.gnu
