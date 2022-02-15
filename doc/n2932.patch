@@ -1,0 +1,204 @@
+--- doc/P2528R1.md	2022-02-15 13:43:04.462266443 +0100
++++ doc/n2932.md	2022-02-15 13:43:10.534215574 +0100
+@@ -1,20 +1,19 @@
+-    C++ Identifier Security using Unicode Standard Annex 39
++    n2932 - C Identifier Security using Unicode Standard Annex 39
+ 
+-    Document #: P2538R1
+-    Date:       2022-02-12
+-    Project:    Programming Language C++
+-    Audience:   SG-16
+-                EWG
+-                CWG
++    Date:       2022-02-15
++    Project:    Programming Language C
++    Audience:   WG14
++                SG-16
+     Reply-to:   Reini Urban <reini.urban@gmail.com>
+ 
+ 1 Abstract
+ ==========
+ 
+-In response to [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html), and
+-in parallel to [n2932](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm) for C.
++In response to [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html),
++replaces [n2916](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2916.htm),
++in parallel to [P2528R1](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/P2528R1.html) for C++.
+ 
+-Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++26.
++Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C26.
+ 
+ * Comply to a variant of [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
+   Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without
+@@ -37,7 +36,7 @@
+ Recommend binutils/linker ABI identifier rules: names are UTF-8,
+ add identifier checks. E.g. `readelf -L -Ue`.
+ 
+-In addition adopt this proposal as a Defect Report against C++23 and
++In addition adopt this proposal as a Defect Report against C11 and
+ earlier. The author provides the
+ [libu8ident](https://github.com/rurban/libu8ident/) library (Apache 2
+ licensed) and its generated tables to all implementors.
+@@ -48,10 +47,9 @@
+ 2 Changes
+ =========
+ 
+-From R0:
++From [n2916](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2916.htm) 2022-01-22:
+ 
+-* Add internal links.
+-* Rename C23 to C26, it's too late for C++23.
++* Rename C23 to C26, it's too late for C23, at least for C++23.
+ * Disallow non-confusable `Technical` U+1C0..U+1C3
+ * Fix a lot of not Allowed ID_Start ranges. safec26_start_list
+   from 355 ranges, 115 singles, 99350 codepoints
+@@ -83,7 +81,7 @@
+ as they appeared in browsers and email. Also names in C object files:
+ linkers, .def files, ffi's.
+ 
+-Implementing TR39 mixed script detection per document (C++ Header and
++Implementing TR39 mixed script detection per document (C Header and
+ Source file) forbids insecure mixes of Greek and Cyrillic, dangerous
+ Arabic RTL bidi attacks and most confusables. You can still write in
+ your language, but then only in commonly written languages, and not
+@@ -91,13 +89,13 @@
+ 
+ The question remains if TR39 security violations should be ill-formed
+ (throw an compilation error or warning), or not. Since we do have the
+-`-std=c++26` option, and the issues are security relevant, an error
+-the issues are security relevant, an error seems to be best.
+-Implementations might choose to go for warnings on not-valid scripts,
+-mixed scripts, or invalid sequences of combining marks though, even if
+-the Unicode Standard recommended for decades that identifiers should
+-stay identifiable. If the standard committee opts for the insecure
+-option, they should rather rename identifiers to symbols then.
++`-std=c2x` option, and the issues are security relevant, an error
++seems to be best.  Implementations might choose to go for warnings on
++not-valid scripts, mixed scripts, or invalid sequences of combining
++marks though, even if the Unicode Standard recommended for decades
++that identifiers should stay identifiable. If the standard committee
++opts for the insecure option, they should rather rename identifiers to
++symbols then.
+ 
+ 4 Motivation
+ ============
+@@ -109,11 +107,12 @@
+   <https://github.com/golang/go/issues/20209>,
+   <https://twitter.com/jupenur/status/1244286243518713857>
+ * <https://certitude.consulting/blog/en/invisible-backdoor/>
+-* <https://github.com/rurban/libu8ident/tree/master/texts/> with \*-sec\*.c\*
++* <https://github.com/rurban/libu8ident/tree/master/texts/> with \*-sec\*.c
+ 
+ These changes would fix all of the known security problems with C++/C
+ identifiers. With C++ it is more severe as declarations are easily
+-confusable with initializations.
++confusable with initializations, but C is still affected in unclear
++situations.
+ 
+ 5 What will this proposal change
+ ================================
+@@ -196,7 +195,7 @@
+ 5.3 Documents with identifiers in many multiple scripts/languages will become illegal
+ -------------------------------------------------------------------------------------
+ 
+-C++26 (and C26) will follow the TR39 Security Profile 4 **Moderately
++C26 (and C26++) will follow the TR39 Security Profile 4 **Moderately
+ Restrictive**, with an exception for Greek.
+ 
+ * All identifiers in a document qualify as Single Script, or
+@@ -213,7 +212,7 @@
+ 5.4 Mixed-script runs with combining marks will become illegal
+ --------------------------------------------------------------
+ 
+-C++26 will check for unlikely sequences of **combining marks**, and
++C26 will check for unlikely sequences of **combining marks**, and
+ reject some.  Combining Marks have no script property per se, but a
+ variable list of allowed SCX scripts, which need to be checked against
+ the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND
+@@ -278,7 +277,7 @@
+ 8.1 SC
+ -----
+ 
+-C++ only needs to map unicode characters to a script property via a
++C only needs to map unicode characters to a script property via a
+ single byte.  There are currently 161 scripts assigned, 32 of them are
+ in common use as identifiers, hence called **Recommended** scripts. The
+ rest is split up into 127-31 **Excluded** scripts, which are not in common
+@@ -389,7 +388,7 @@
+ SOUND MARKs, all other Lm modifiers may mix with all SCX.
+ 
+ The list of allowed combining mark characters (with Common or Inherited
+-scripts) in the C++26 TR31 profile is: Lm `Modifier_Letter`,
++scripts) in the C26 TR31 profile is: Lm `Modifier_Letter`,
+ Mc `Spacing_Mark`, Mn `Nonspacing_Mark`, Me `Enclosing_Mark`. Sk and Cf are
+ not part of XIDs.
+ 
+@@ -416,7 +415,7 @@
+ ...
+ ```
+ 
+-From these 67 Lm plus 513 M\[cn\] ranges filtering out the non-C++26 XID
++From these 67 Lm plus 513 M\[cn\] ranges filtering out the non-C26 XID
+ candidates, only #8 Identifier_Type = Recommended, Inclusion,
+ non-confusable Technical, plus only #4.2 Recommended Scripts, plus only codepoints
+ with multiple SCX entries, plus only codepoints which don't decompose
+@@ -425,7 +424,7 @@
+ 
+ So some of the Common `XID_Continue` marks therefore cannot be
+ detected with the SCX logic. But all of them do not combine with Latin
+-and are already filtered by the C++26 Mixed Script profile.
++and are already filtered by the C26 Mixed Script profile.
+ And all of the Combining Marks are caught by the NFC requirement.
+ 
+ Most Lm Modifier Letters (besides the 4 Japanese PROLONGED SOUND
+@@ -564,11 +563,11 @@
+ identifiers.  One could argue that a mixed-script profile is valid
+ only for a single identifier, or it is valid for the whole source file
+ document. And there needs to be a definition if before or after the
+-preprocessor, and if to treat names in private structs, classes and
+-local names in functions as seperate contexts.
++preprocessor, and if to treat names in private structs and local names
++in functions as seperate contexts.
+ 
+ If valid for only a single identifier you could arbitralily mix up
+-Cyrillic with Greek identifiers in a C++ namespace, and thus these
++Cyrillic with Greek identifiers in a C files, and thus these
+ identifiers would not be identifiable anymore, as both both can render
+ to the very same glyphs. Thus we adopt the notion of identifier
+ contexts.
+@@ -605,11 +604,10 @@
+ - **private**: Another argument would be that all exported names end
+   up in the object files and library flat, which would support the
+   seperation of private and public name contexts, where to perform the
+-  mixed-script checks. Private contexts (e.g. static structs, private
+-  class fields, local names in functions) should be seperated from the
+-  rest.  This would prevent from confusables in struct/class
+-  fields/methods, and the rest is seperated by the checks for the
+-  public names.
++  mixed-script checks. Private contexts (e.g. static structs fields or
++  local names in functions) should be seperated from the rest.  This
++  would prevent from confusables in struct fields/methods, and the
++  rest is seperated by the checks for the public names.
+ 
+ - **after-cpp**: The third, strictest variant would define the context in
+   the file after cpp. You would not be able to include a Cyrillic-only
+@@ -668,13 +666,13 @@
+ there, and names are charset (=user) specific, whilst there are no
+ header fields for the used charset (e.g. if SHIFT-JIS or UTF-8), nor
+ are there any rules for name lookup (normalization). This is not
+-solvable here (in C nor C++), only there or the gABI. Only in the Rust
++solvable here (in C), only there or the gABI. Only in the Rust
+ ecosystem there are proper unicode identifier rules, but Rust can link
+-against C++/C. I haven't detected any exported unicode names in the
+-wild, they are only used in local symbols still. UTF-16 compilers such
+-as MSVC do export their UNICODE names either in the local character
+-set or as UTF-8. If used wildly, object files would not link anymore,
+-as local character sets vary, and there is no character set standard
++against C.  I haven't detected any exported unicode names in the wild,
++they are only used in local symbols still. UTF-16 compilers such as
++MSVC do export their UNICODE names either in the local character set
++or as UTF-8. If used wildly, object files would not link anymore, as
++local character sets vary, and there is no character set standard
+ defined.
+ 
+ The C++/C working groups should urge the binutils/linker working

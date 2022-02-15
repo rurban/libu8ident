@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>P2528R1 - C++ Identifier Security using Unicode Standard Annex 39</title>
+  <title>n2932 - C Identifier Security using Unicode Standard Annex 39</title>
   <style>
     html {
       line-height: 1.5;
@@ -213,20 +213,18 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">P2528R1 - C++ Identifier Security using Unicode Standard Annex 39</h1>
+<h1 class="title">n2932 - C Identifier Security using Unicode Standard Annex 39</h1>
 </header>
-<pre><code>C++ Identifier Security using Unicode Standard Annex 39
+<pre><code>n2932 - C Identifier Security using Unicode Standard Annex 39
 
-Document #: P2538R1
-Date:       2022-02-12
-Project:    Programming Language C++
-Audience:   SG-16
-            EWG
-            CWG
+Date:       2022-02-15
+Project:    Programming Language C
+Audience:   WG14
+            SG-16
 Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
 <h1 id="abstract">1 Abstract</h1>
-<p>In response to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, and in parallel to <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm">n2932</a> for C.</p>
-<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of C++26.</p>
+<p>In response to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, replaces <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2916.htm">n2916</a>, in parallel to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/P2528R1.html">P2528R1</a> for C++.</p>
+<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of C26.</p>
 <ul>
 <li>Comply to a variant of <a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a> Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without its confusables with Latin,</li>
 <li>Disallow all Limited Use <a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts">TR31#Table_7</a> and Excluded scripts <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>,</li>
@@ -239,13 +237,12 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
 <li>Implementations may allow an optional <code>#pragma unicode &lt;LongScript&gt;</code> that Excluded scripts can be added to the allowed set of scripts per source file.</li>
 </ul>
 <p>Recommend binutils/linker ABI identifier rules: names are UTF-8, add identifier checks. E.g. <code>readelf -L -Ue</code>.</p>
-<p>In addition adopt this proposal as a Defect Report against C++23 and earlier. The author provides the <a href="https://github.com/rurban/libu8ident/">libu8ident</a> library (Apache 2 licensed) and its generated tables to all implementors.</p>
+<p>In addition adopt this proposal as a Defect Report against C11 and earlier. The author provides the <a href="https://github.com/rurban/libu8ident/">libu8ident</a> library (Apache 2 licensed) and its generated tables to all implementors.</p>
 <p>TR39 checks could be implemented as warnings, TR31 violations not. But note that even TR31 has bugs still, to be hopefully fixed in the next Unicode version.</p>
 <h1 id="changes">2 Changes</h1>
-<p>From R0:</p>
+<p>From <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2916.htm">n2916</a> 2022-01-22:</p>
 <ul>
-<li>Add internal links.</li>
-<li>Rename C23 to C26, it’s too late for C++23.</li>
+<li>Rename C23 to C26, it’s too late for C23, at least for C++23.</li>
 <li>Disallow non-confusable <code>Technical</code> U+1C0..U+1C3</li>
 <li>Fix a lot of not Allowed ID_Start ranges. safec26_start_list from 355 ranges, 115 singles, 99350 codepoints to 243 ranges, 93 singles, 95986 codepoints</li>
 <li>Inserted chapter <a href="#motivation">4 Motivation</a> with links to spoofs.</li>
@@ -253,17 +250,17 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
 <h1 id="summary">3 Summary</h1>
 <p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a> correctly detected that Unicode identifiers are still not identifiable, and are prone to bidi- and homoglyph attacks. But it stated that implementing TR31 and TR39 would be too hard. Having properly implemented the Unicode Security Guidelines for identifers for several years, plus pushed Rust to do so also, proves the contrary. TR39 would catch all known homoglyph and bidi identifier attacks.</p>
 <p>Further restriction of the TR31 profile to only recommended scripts leads to smaller sets for identifiers, and implementation of a proper TR39 mixed script profile and identifier types fixes most of the known unicode security problems with identifiers. The only remaining problems are bidi overrides in strings or comments, which cannot be handled with identifier restrictions, but tokenizer or preprocessor warnings, as recently added to gcc. <code>#include filename</code> restrictions should be done also, but that is out of the scope of this document, as the existing filesystems care much less about unicode security for identifiers than programming languages. Spoofing attacks on filenames are not yet seen in the wild, but will appear sooner or later, same as they appeared in browsers and email. Also names in C object files: linkers, .def files, ffi’s.</p>
-<p>Implementing TR39 mixed script detection per document (C++ Header and Source file) forbids insecure mixes of Greek and Cyrillic, dangerous Arabic RTL bidi attacks and most confusables. You can still write in your language, but then only in commonly written languages, and not mixed with others. Identifiers are still identifiable.</p>
-<p>The question remains if TR39 security violations should be ill-formed (throw an compilation error or warning), or not. Since we do have the <code>-std=c++26</code> option, and the issues are security relevant, an error the issues are security relevant, an error seems to be best. Implementations might choose to go for warnings on not-valid scripts, mixed scripts, or invalid sequences of combining marks though, even if the Unicode Standard recommended for decades that identifiers should stay identifiable. If the standard committee opts for the insecure option, they should rather rename identifiers to symbols then.</p>
+<p>Implementing TR39 mixed script detection per document (C Header and Source file) forbids insecure mixes of Greek and Cyrillic, dangerous Arabic RTL bidi attacks and most confusables. You can still write in your language, but then only in commonly written languages, and not mixed with others. Identifiers are still identifiable.</p>
+<p>The question remains if TR39 security violations should be ill-formed (throw an compilation error or warning), or not. Since we do have the <code>-std=c2x</code> option, and the issues are security relevant, an error seems to be best. Implementations might choose to go for warnings on not-valid scripts, mixed scripts, or invalid sequences of combining marks though, even if the Unicode Standard recommended for decades that identifiers should stay identifiable. If the standard committee opts for the insecure option, they should rather rename identifiers to symbols then.</p>
 <h1 id="motivation">4 Motivation</h1>
 <ul>
 <li><a href="https://websec.github.io/unicode-security-guide/visual-spoofing/" class="uri">https://websec.github.io/unicode-security-guide/visual-spoofing/</a></li>
 <li><a href="http://www.unicode.org/reports/tr31/" class="uri">http://www.unicode.org/reports/tr31/</a>, <a href="http://www.unicode.org/reports/tr36/" class="uri">http://www.unicode.org/reports/tr36/</a> and <a href="http://www.unicode.org/reports/tr39" class="uri">http://www.unicode.org/reports/tr39</a></li>
 <li><a href="https://twitter.com/zygoloid/status/1187150150835195905" class="uri">https://twitter.com/zygoloid/status/1187150150835195905</a>, <a href="https://github.com/golang/go/issues/20209" class="uri">https://github.com/golang/go/issues/20209</a>, <a href="https://twitter.com/jupenur/status/1244286243518713857" class="uri">https://twitter.com/jupenur/status/1244286243518713857</a></li>
 <li><a href="https://certitude.consulting/blog/en/invisible-backdoor/" class="uri">https://certitude.consulting/blog/en/invisible-backdoor/</a></li>
-<li><a href="https://github.com/rurban/libu8ident/tree/master/texts/" class="uri">https://github.com/rurban/libu8ident/tree/master/texts/</a> with *-sec*.c*</li>
+<li><a href="https://github.com/rurban/libu8ident/tree/master/texts/" class="uri">https://github.com/rurban/libu8ident/tree/master/texts/</a> with *-sec*.c</li>
 </ul>
-<p>These changes would fix all of the known security problems with C++/C identifiers. With C++ it is more severe as declarations are easily confusable with initializations.</p>
+<p>These changes would fix all of the known security problems with C++/C identifiers. With C++ it is more severe as declarations are easily confusable with initializations, but C is still affected in unclear situations.</p>
 <h1 id="what-will-this-proposal-change">5 What will this proposal change</h1>
 <h2 id="the-set-of-tr31-xid-characters-will-become-much-smaller">5.1 The set of TR31 XID characters will become much smaller</h2>
 <p>Restricting the <strong>Identifier Type</strong> plus the Recommended Scripts, plus demanding NFC will shrink the original XID set from 971267 codepoints to 99350 codepoints. The ranges expand from 36 to 426. (when split by scripts already, 25 splits happen). Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are now forbidden.</p>
@@ -306,7 +303,7 @@ Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
 Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <p>The script property and its name are defined in <a href="https://www.unicode.org/reports/tr24/">TR24</a>. We use the long Unicode Script property value, not the abbrevated 4-letter short name, which maps somehow to the 4-letter <a href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924">ISO 15924 Codes</a>.</p>
 <h2 id="documents-with-identifiers-in-many-multiple-scriptslanguages-will-become-illegal">5.3 Documents with identifiers in many multiple scripts/languages will become illegal</h2>
-<p>C++26 (and C26) will follow the TR39 Security Profile 4 <strong>Moderately Restrictive</strong>, with an exception for Greek.</p>
+<p>C26 (and C26++) will follow the TR39 Security Profile 4 <strong>Moderately Restrictive</strong>, with an exception for Greek.</p>
 <ul>
 <li>All identifiers in a document qualify as Single Script, or</li>
 <li>All identifiers in a document are covered by any of the following sets of scripts, according to the definition in Mixed Scripts:
@@ -319,7 +316,7 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
 </ul>
 <h2 id="mixed-script-runs-with-combining-marks-will-become-illegal">5.4 Mixed-script runs with combining marks will become illegal</h2>
-<p>C++26 will check for unlikely sequences of <strong>combining marks</strong>, and reject some. Combining Marks have no script property per se, but a variable list of allowed SCX scripts, which need to be checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
+<p>C26 will check for unlikely sequences of <strong>combining marks</strong>, and reject some. Combining Marks have no script property per se, but a variable list of allowed SCX scripts, which need to be checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
 <p>See <a href="#scx-extensions">8.2 “SCX Extensions”</a> and <a href="#combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> below.</p>
 <h1 id="what-will-this-proposal-not-change">6 What will this proposal not change</h1>
 <h2 id="the-validity-of-extended-characters-in-identifiers">6.1 The validity of “extended” characters in identifiers</h2>
@@ -332,7 +329,7 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <p>So far only Rust, cperl and Java follow a unicode security guideline for identifiers, zig and J refused to support non-ASCII identifiers. Everbody else is vulnerable to potential security attacks and does allow non-identifiable identifiers. They should rename identifiers to “symbols”.</p>
 <h1 id="tr24-scripts-the-sc-and-scx-properties">8 TR24 Scripts, the SC and SCX properties</h1>
 <h2 id="sc">8.1 SC</h2>
-<p>C++ only needs to map unicode characters to a script property via a single byte. There are currently 161 scripts assigned, 32 of them are in common use as identifiers, hence called <strong>Recommended</strong> scripts. The rest is split up into 127-31 <strong>Excluded</strong> scripts, which are not in common use, and 161-127 <strong>Limited_Use</strong> scripts, which are not to be used in identifiers at all.</p>
+<p>C only needs to map unicode characters to a script property via a single byte. There are currently 161 scripts assigned, 32 of them are in common use as identifiers, hence called <strong>Recommended</strong> scripts. The rest is split up into 127-31 <strong>Excluded</strong> scripts, which are not in common use, and 161-127 <strong>Limited_Use</strong> scripts, which are not to be used in identifiers at all.</p>
 <p>Regarding the discriminatory aspect of Excluded Scripts from <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>. <em>“Some scripts are not in customary modern use, and thus implementations may want to exclude them from identifiers. These include historic and obsolete scripts, scripts used mostly liturgically, and regional scripts used only in very small communities or with very limited current usage. Some scripts also have unresolved architectural issues that make them currently unsuitable for identifiers. The scripts in Table 4, Excluded Scripts are recommended for exclusion from identifiers.”</em> Nevertheless an implementation might choose to allow some optionally via a new <code>#pragma unicode Script</code>.</p>
 <p>Regarding Limited Use scripts: TR31#2.4: <em>“Modern scripts that are in more limited use are listed in Table 7, Limited Use Scripts. To avoid security issues, some implementations may wish to disallow the limited-use scripts in identifiers. For more information on usage, see the Unicode Locale project <a href="http://cldr.unicode.org/">CLDR</a>.”</em></p>
 <p>Regarding stability: New scripts are added on a yearly basis, but nothing was added to the stable set of recommended scripts. For a while there was a list of <strong>Aspirational</strong> scripts to be added eventually, but this list was abandoned with Unicode 10.0. Probably also because nobody but Java, cperl and Rust implemented its identifier profile by scripts, rather went with insecure identifiers.</p>
@@ -361,7 +358,7 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <p>Since we disallow already most combining marks (at least the Latin ones) with the requirement of NFC <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, this set of cases is quite small.</p>
 <p>Special-cases:</p>
 <p>Using the Script property alone will not detect that the U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana, gc=Lm) should not be mixed with Latin. See <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a> and <a href="https://www.unicode.org/reports/tr46/">TR46</a>. We only have to check only 4 such explicitly japanese-only PROLONGED SOUND MARKs, all other Lm modifiers may mix with all SCX.</p>
-<p>The list of allowed combining mark characters (with Common or Inherited scripts) in the C++26 TR31 profile is: Lm <code>Modifier_Letter</code>, Mc <code>Spacing_Mark</code>, Mn <code>Nonspacing_Mark</code>, Me <code>Enclosing_Mark</code>. Sk and Cf are not part of XIDs.</p>
+<p>The list of allowed combining mark characters (with Common or Inherited scripts) in the C26 TR31 profile is: Lm <code>Modifier_Letter</code>, Mc <code>Spacing_Mark</code>, Mn <code>Nonspacing_Mark</code>, Me <code>Enclosing_Mark</code>. Sk and Cf are not part of XIDs.</p>
 <p>67 matches for “XID_Continue # Lm” in buffer: DerivedCoreProperties.txt See <a href="#appendix-c---xid_continue-lm">16 “Appendix C”</a> for all.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER REVERSED GLOTTAL STOP</span>
@@ -374,8 +371,8 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CYRILLIC POKRYTIE</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
-<p>From these 67 Lm plus 513 M[cn] ranges filtering out the non-C++26 XID candidates, only #8 Identifier_Type = Recommended, Inclusion, non-confusable Technical, plus only #4.2 Recommended Scripts, plus only codepoints with multiple SCX entries, plus only codepoints which don’t decompose to NFC, leads only to the Lm characters, which can mix with all scripts. Not a single Mn or Mc codepoints is left.</p>
-<p>So some of the Common <code>XID_Continue</code> marks therefore cannot be detected with the SCX logic. But all of them do not combine with Latin and are already filtered by the C++26 Mixed Script profile. And all of the Combining Marks are caught by the NFC requirement.</p>
+<p>From these 67 Lm plus 513 M[cn] ranges filtering out the non-C26 XID candidates, only #8 Identifier_Type = Recommended, Inclusion, non-confusable Technical, plus only #4.2 Recommended Scripts, plus only codepoints with multiple SCX entries, plus only codepoints which don’t decompose to NFC, leads only to the Lm characters, which can mix with all scripts. Not a single Mn or Mc codepoints is left.</p>
+<p>So some of the Common <code>XID_Continue</code> marks therefore cannot be detected with the SCX logic. But all of them do not combine with Latin and are already filtered by the C26 Mixed Script profile. And all of the Combining Marks are caught by the NFC requirement.</p>
 <p>Most Lm Modifier Letters (besides the 4 Japanese PROLONGED SOUND MARKs) are freestanding base characters, which can be combined with any other letter.</p>
 <p>See <a href="https://www.unicode.org/reports/tr31/#Combining_Marks">TR31#2.1 Combining_Marks</a> and <a href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2 Modifier_Letters</a></p>
 <p>See also <a href="https://www.unicode.org/reports/tr24/#Common">TR24#5.1 Handling Characters with the Common Script Property</a> and <a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks">TR24#5.2 Handling Combining Marks</a>.</p>
@@ -421,14 +418,14 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <p>It is recommended to already exclude Limited Use and Excluded scripts from the initial list of identifier ranges, as this is the most common use-case, and shortens the common search paths. Only with the <code>#pragma Unicode ExcludedScript</code> search the full XID lists and the full scripts list.</p>
 <p>The TR39 Mixed Scripts profile alone does not prevent from all spoofing attacks, but the additional rules from <a href="#combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> are kept tiny.</p>
 <h1 id="contexts">11 Contexts</h1>
-<p>This is not discussed in any of the unicode security guidelines for identifiers. One could argue that a mixed-script profile is valid only for a single identifier, or it is valid for the whole source file document. And there needs to be a definition if before or after the preprocessor, and if to treat names in private structs, classes and local names in functions as seperate contexts.</p>
-<p>If valid for only a single identifier you could arbitralily mix up Cyrillic with Greek identifiers in a C++ namespace, and thus these identifiers would not be identifiable anymore, as both both can render to the very same glyphs. Thus we adopt the notion of identifier contexts.</p>
+<p>This is not discussed in any of the unicode security guidelines for identifiers. One could argue that a mixed-script profile is valid only for a single identifier, or it is valid for the whole source file document. And there needs to be a definition if before or after the preprocessor, and if to treat names in private structs and local names in functions as seperate contexts.</p>
+<p>If valid for only a single identifier you could arbitralily mix up Cyrillic with Greek identifiers in a C files, and thus these identifiers would not be identifiable anymore, as both both can render to the very same glyphs. Thus we adopt the notion of identifier contexts.</p>
 <p>With programming languages this is a source file, with objects files this is a module. For identifiers in object files see below <a href="#issues-with-binutils-linkers-exported-identifiers">13 Issues with binutils, linkers, exported identifiers</a>. For filesystems this would be a directory.</p>
 <p>For every source file we need to store a context with the list of already seen scripts and how many. The maximal number of scripts is 4, for the case of Japanese mixed with Latin. (<code>Katakana + Hiragana +</code> <code>Han + Latin</code>), thus we can save that list in a single 4-byte word, and the lookup and memory management is trivial.</p>
 <p>Since the compiler sees the identifiers after the preprocessor included all headers, the context definition is a bit blurry. Is the context for mixed scripts an original source file (before cpp) or the resulting file after inclusion of all files (after cpp). This is similar to the problem with lexical variables a couple of decades ago.</p>
 <ul>
 <li><p><strong>before-cpp</strong>: One could argue that the scope of a variable should be contained in a lexical block, which can be statically determined and safely enclosed. With identifiers that would mean that the preprocessor already should perform the TR31 lexer checks and TR39 security checks, and one could define Arabic headers using private arabic fields, and include another header with Cyrillic only names. This would allow confusables in the resulting object file, and source files would be easy to check with external tools. See also the <a href="#12-issues-with-binutils-linkers-exported-identifiers">binutils section 12</a> below.</p></li>
-<li><p><strong>private</strong>: Another argument would be that all exported names end up in the object files and library flat, which would support the seperation of private and public name contexts, where to perform the mixed-script checks. Private contexts (e.g. static structs, private class fields, local names in functions) should be seperated from the rest. This would prevent from confusables in struct/class fields/methods, and the rest is seperated by the checks for the public names.</p></li>
+<li><p><strong>private</strong>: Another argument would be that all exported names end up in the object files and library flat, which would support the seperation of private and public name contexts, where to perform the mixed-script checks. Private contexts (e.g. static structs fields or local names in functions) should be seperated from the rest. This would prevent from confusables in struct fields/methods, and the rest is seperated by the checks for the public names.</p></li>
 <li><p><strong>after-cpp</strong>: The third, strictest variant would define the context in the file after cpp. You would not be able to include a Cyrillic-only header, and you would not be able to use Cyrillic private fields. This would be the least surprising and most secure option. As long as the security risk lies ahead of us, one should go for the strictest option. Cyrillic header projects should be isolated and not used at all outside of non-cyrillic projects. I’m pointing the fingers at Cyrillic because it has the biggest number of confusables with Latin. Arabic headers e.g. are not all confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic speaker can identify and see differences in its names without long training. Same for CFK and the other major scripts.</p></li>
 </ul>
 <h1 id="implementations-and-strategies">12 Implementations and Strategies</h1>
@@ -438,7 +435,7 @@ Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
 <p>Rust has one also.</p>
 <h1 id="issues-with-binutils-linkers-exported-identifiers">13 Issues with binutils, linkers, exported identifiers</h1>
 <p>The crux with C and somewhat also C++ identifiers, is that they can be used with other earlier compilers or languages without any unicode security profile or restriction. ffi’s are very common, libraries or .def files even more, thanksfully unicode names not at all yet.</p>
-<p>binutils and linkers treat names as zero-terminated binary garbage, same as in most current filesystems. Identifiers are not identifiable there, and names are charset (=user) specific, whilst there are no header fields for the used charset (e.g. if SHIFT-JIS or UTF-8), nor are there any rules for name lookup (normalization). This is not solvable here (in C nor C++), only there or the gABI. Only in the Rust ecosystem there are proper unicode identifier rules, but Rust can link against C++/C. I haven’t detected any exported unicode names in the wild, they are only used in local symbols still. UTF-16 compilers such as MSVC do export their UNICODE names either in the local character set or as UTF-8. If used wildly, object files would not link anymore, as local character sets vary, and there is no character set standard defined.</p>
+<p>binutils and linkers treat names as zero-terminated binary garbage, same as in most current filesystems. Identifiers are not identifiable there, and names are charset (=user) specific, whilst there are no header fields for the used charset (e.g. if SHIFT-JIS or UTF-8), nor are there any rules for name lookup (normalization). This is not solvable here (in C), only there or the gABI. Only in the Rust ecosystem there are proper unicode identifier rules, but Rust can link against C. I haven’t detected any exported unicode names in the wild, they are only used in local symbols still. UTF-16 compilers such as MSVC do export their UNICODE names either in the local character set or as UTF-8. If used wildly, object files would not link anymore, as local character sets vary, and there is no character set standard defined.</p>
 <p>The C++/C working groups should urge the binutils/linker working groups to adopt a more precise specification how exported identifiers are represented in object files and libraries: UTF-8 or any charset, and how they are looked up: any normalization, NFC or not at all. My recommendation would be to interpret them as UTF-8, use NFC for the lookup, and reject all illegal UTF-8 identifiers. As long as there no unicode names in the wild this is still easy. There are also many object file producers in the wild, with possibly completely insecure unicode names in the future. notes sections are easily extendable.</p>
 <p>binutils <code>readelf -L -Ul</code> is currently broken displaying unicode identifiers. I have <a href="https://github.com/rurban/binutils-gdb/commits/users/rurban/patches">patches</a> to display them in the current multi-byte locale, and to add u8ident checks with <code>-L</code>. I haven’t found any violations so far in my used libraries, but a Debian/Fedora/FreeBSD mass-scan seems necessary.</p>
 <p>Even better would be for the C ABI’s to also adopt secure unicode identifiers, as linkers and FFI’s have the same unicode security problems as compilers, interpreters and filesystems. Otherwise they should at least clarifiy that their names/“symbols” are not identifiable, and implementation defined and their interpretation locale specific. (i.e. you cannot copy them across locales).</p>

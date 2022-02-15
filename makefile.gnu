@@ -61,9 +61,9 @@ SOLIB = libu8ident.so
 PCXX = P2528R0
 NC   = n2916
 PCURCXX = P2528R1
-NCURC   = n2916-new
+NCURC   = n2932
 DOCS = README.md NEWS NOTICE LICENSE doc/c11.md doc/$(PCXX).html doc/$(PCURCXX).html \
-	doc/$(PCXX).md doc/$(PCURCXX).md doc/$(NC).html doc/$(NC).md doc/$(NC).patch \
+	doc/$(PCXX).md doc/$(PCURCXX).md doc/$(NC).html doc/$(NC).md doc/$(NCURC).patch \
 	doc/$(NCURC).html doc/$(NCURC).md \
 	doc/tr31-bugs.md
 MAN3 = u8ident.3
@@ -342,9 +342,9 @@ docker-pdf: Dockerfile.pandoc
 	chown $$USER:$$USER doc/$(PCURCXX).pdf
 
 patch-c-doc:
-	patch -f doc/$(NCURC).md doc/$(NC).patch
+	patch -f doc/$(NCURC).md doc/$(NCURC).patch
 regen-c-patch:
-	-diff -bu doc/$(PCXX).md doc/$(NC).md >doc/$(NC).patch
+	-diff -bu doc/$(PCURCXX).md doc/$(NCURC).md >doc/$(NCURC).patch
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h

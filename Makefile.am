@@ -30,14 +30,14 @@ docdir = $(datadir)/libu8ident
 PCXX = P2528R0
 NC   = n2916
 PCURCXX = P2528R1
-NCURC   = n2916-new
+NCURC   = n2932
 PDF = doc/$(PCXX).pdf doc/$(PCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
-	   doc/c11.md doc/$(PCXX).md doc/$(PCURCXX).md doc/n2916.md doc/n2916.patch \
+	   doc/c11.md doc/$(PCXX).md doc/$(PCURCXX).md doc/$(NC).md doc/$(NCURC).patch \
 	   doc/tr31-bugs.md 
 if HAVE_PANDOC
 doc_DATA += $(PDF)
-html_DATA = doc/$(PCXX).html doc/$(PCURCXX).html doc/n2916.html
+html_DATA = doc/$(PCURCXX).html doc/$(NCURC).html
 doc_DATA += $(html_DATA)
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
@@ -175,12 +175,12 @@ docker-pdf: Dockerfile.pandoc
 	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/$(PCURCXX).pdf /doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 	chown $$USER:$$USER $(srcdir)/doc/$(PCURCXX).pdf
 
-doc/$(NCURC).md patch-c-doc: doc/$(NC).patch
-	cd $(srcdir) && patch -f doc/$(NCURC).md doc/$(NC).patch
-doc/$(NC).patch regen-c-patch: doc/$(PCXX).md doc/$(NC).md
-	-cd $(srcdir) && diff -bu doc/$(PCXX).md doc/$(NC).md >doc/$(NC).patch
+patch-c-doc: doc/$(NCURC).patch
+	cd $(srcdir) && patch -f doc/$(NCURC).md doc/$(NCURC).patch
+regen-c-patch: doc/$(PCURCXX).md doc/$(NCURC).md
+	-cd $(srcdir) && diff -bu doc/$(PCURCXX).md doc/$(NCURC).md >doc/$(NCURC).patch
 
-regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(PCURCXX).html
+regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(PCURCXX).html doc/$(PCURCXX).html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man \
 	pkg docs patch-c-doc regen-c-patch docker-html docker-pdf
