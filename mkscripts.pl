@@ -68,8 +68,8 @@ while (<$CONFUS>) {
         } else {
           warn $_;
         }
-      } elsif ($from !~ /^(037A|0381|0398|03B5|03B7|03B8|03B9|03D1|03F1|03F4)$/) {
-        # 10 allowed exceptions (which are not really that confusable)
+      } elsif ($from !~ /^(037A|0381|0398|03B5|03B7|03B8|03B9|03BD|03C3|03D1|03F1|03F4)$/) {
+        # 12 allowed exceptions (which are not really that confusable)
         $GCONFUS{hex($from)} = $comment;
       }
     }

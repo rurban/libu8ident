@@ -8216,7 +8216,7 @@ LOCAL const struct range_bool bidi_list[] = {
 
 // Greek-Latin confusables. See doc/P2538R0.md for SAFEC23
 #ifdef EXTERN_SCRIPTS
-extern const uint32_t greek_confus_list[62];
+extern const uint32_t greek_confus_list[60];
 #else
 LOCAL const uint32_t greek_confus_list[] = {
     0x0370, // ( Ͱ → Ⱶ ) GREEK CAPITAL LETTER HETA → LATIN CAPITAL LETTER HALF H
@@ -8249,10 +8249,8 @@ LOCAL const uint32_t greek_confus_list[] = {
     0x03B3, // ( γ → y ) GREEK SMALL LETTER GAMMA → LATIN SMALL LETTER Y
     0x03B4, // ( δ → ẟ ) GREEK SMALL LETTER DELTA → LATIN SMALL LETTER DELTA
     0x03BA, // ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA
-    0x03BD, // ( ν → v ) GREEK SMALL LETTER NU → LATIN SMALL LETTER V
     0x03BF, // ( ο → o ) GREEK SMALL LETTER OMICRON → LATIN SMALL LETTER O
     0x03C1, // ( ρ → p ) GREEK SMALL LETTER RHO → LATIN SMALL LETTER P
-    0x03C3, // ( σ → o ) GREEK SMALL LETTER SIGMA → LATIN SMALL LETTER O
     0x03C4, // ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T
     0x03C5, // ( υ → u ) GREEK SMALL LETTER UPSILON → LATIN SMALL LETTER U
     0x03C6, // ( φ → ɸ ) GREEK SMALL LETTER PHI → LATIN SMALL LETTER PHI
