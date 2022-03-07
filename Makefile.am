@@ -29,15 +29,15 @@ dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 PCXX = P2528R0
 NC   = n2916
-PCURCXX = P2528R1
+DCURCXX = D2528R1
 NCURC   = n2932
-PDF = doc/$(PCXX).pdf doc/$(PCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
+PDF = doc/$(PCXX).pdf doc/$(DCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
-	   doc/c11.md doc/$(PCXX).md doc/$(PCURCXX).md doc/$(NC).md doc/$(NCURC).patch \
+	   doc/c11.md doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).md doc/$(NCURC).patch \
 	   doc/tr31-bugs.md 
 if HAVE_PANDOC
 doc_DATA += $(PDF)
-html_DATA = doc/$(PCURCXX).html doc/$(NCURC).html
+html_DATA = doc/$(DCURCXX).html doc/$(NCURC).html
 doc_DATA += $(html_DATA)
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
@@ -147,12 +147,12 @@ doc/$(NC).pdf:
 	-test -d doc || mkdir doc
 	cp $(srcdir)/doc/$(NC).pdf $@
 
-doc/$(PCURCXX).html: $(srcdir)/doc/$(PCURCXX).md
+doc/$(DCURCXX).html: $(srcdir)/doc/$(DCURCXX).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/$(PCURCXX).md --metadata title="P258R1 - C++ Identifier Security using Unicode Standard Annex 39"
-doc/$(PCURCXX).pdf: $(srcdir)/doc/$(PCURCXX).md
+	$(PANDOC) -s -o $@ $(srcdir)/doc/$(DCURCXX).md --metadata title="D258R1 - C++ Identifier Security using Unicode Standard Annex 39"
+doc/$(DCURCXX).pdf: $(srcdir)/doc/$(DCURCXX).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(DCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/$(NCURC).html: $(srcdir)/doc/$(NCURC).md
 	-test -d doc || mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
@@ -169,18 +169,18 @@ Dockerfile.pandoc: $(srcdir)/makefile.gnu
 	echo "WORKDIR /home/user" >> Dockerfile.pandoc
 	docker build -t pandoc -f Dockerfile.pandoc .
 docker-html: Dockerfile.pandoc
-	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s -o /doc/$(PCURCXX).html /doc/$(PCURCXX).md
-	chown $$USER:$$USER $(srcdir)/doc/$(PCURCXX).html
+	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s -o /doc/$(DCURCXX).html /doc/$(DCURCXX).md
+	chown $$USER:$$USER $(srcdir)/doc/$(DCURCXX).html
 docker-pdf: Dockerfile.pandoc
-	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/$(PCURCXX).pdf /doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-	chown $$USER:$$USER $(srcdir)/doc/$(PCURCXX).pdf
+	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/$(DCURCXX).pdf /doc/$(DCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	chown $$USER:$$USER $(srcdir)/doc/$(DCURCXX).pdf
 
 patch-c-doc: doc/$(NCURC).patch
 	cd $(srcdir) && patch -f doc/$(NCURC).md doc/$(NCURC).patch
-regen-c-patch: doc/$(PCURCXX).md doc/$(NCURC).md
-	-cd $(srcdir) && diff -bu doc/$(PCURCXX).md doc/$(NCURC).md >doc/$(NCURC).patch
+regen-c-patch: doc/$(DCURCXX).md doc/$(NCURC).md
+	-cd $(srcdir) && diff -bu doc/$(DCURCXX).md doc/$(NCURC).md >doc/$(NCURC).patch
 
-regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(PCURCXX).html doc/$(PCURCXX).html
+regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(DCURCXX).html doc/$(DCURCXX).html
 
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man \
 	pkg docs patch-c-doc regen-c-patch docker-html docker-pdf

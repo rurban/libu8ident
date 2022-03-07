@@ -60,10 +60,10 @@ LIB = libu8ident.a
 SOLIB = libu8ident.so
 PCXX = P2528R0
 NC   = n2916
-PCURCXX = P2528R1
+DCURCXX = D2528R1
 NCURC   = n2932
-DOCS = README.md NEWS NOTICE LICENSE doc/c11.md doc/$(PCXX).html doc/$(PCURCXX).html \
-	doc/$(PCXX).md doc/$(PCURCXX).md doc/$(NC).html doc/$(NC).md doc/$(NCURC).patch \
+DOCS = README.md NEWS NOTICE LICENSE doc/c11.md doc/$(PCXX).html doc/$(DCURCXX).html \
+	doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).html doc/$(NC).md doc/$(NCURC).patch \
 	doc/$(NCURC).html doc/$(NCURC).md \
 	doc/tr31-bugs.md
 MAN3 = u8ident.3
@@ -124,7 +124,7 @@ endif
 endif
 endif
 
-most: $(LIB) $(SOLIB) u8idlint doc/$(PCURCXX).html
+most: $(LIB) $(SOLIB) u8idlint doc/$(DCURCXX).html
 
 all: mkc26 most test-texts test perf docs
 
@@ -316,12 +316,12 @@ regen-confus:
 
 docs: $(DOCS)
 # doc/P2528R0.* and doc/n2916.* are frozen
-html: doc/$(PCURCXX).html doc/$(NCURC).html
-pdf: doc/$(PCURCXX).pdf doc/$(NCURC).pdf
-doc/$(PCURCXX).html: doc/$(PCURCXX).md
-	-$(PANDOC) -s -o $@ doc/$(PCURCXX).md --metadata title="$(PCURCXX) - C++ Identifier Security using Unicode Standard Annex 39"
-doc/$(PCURCXX).pdf: doc/$(PCURCXX).md
-	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+html: doc/$(DCURCXX).html doc/$(NCURC).html
+pdf: doc/$(DCURCXX).pdf doc/$(NCURC).pdf
+doc/$(DCURCXX).html: doc/$(DCURCXX).md
+	-$(PANDOC) -s -o $@ doc/$(DCURCXX).md --metadata title="$(DCURCXX) - C++ Identifier Security using Unicode Standard Annex 39"
+doc/$(DCURCXX).pdf: doc/$(DCURCXX).md
+	-$(PANDOC) -s --pdf-engine=xelatex -o $@ doc/$(DCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
 doc/$(NCURC).html: doc/$(NCURC).md
 	-$(PANDOC) -s -o $@ doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
 doc/$(NCURC).pdf: doc/$(NCURC).md
@@ -335,16 +335,16 @@ Dockerfile.pandoc: makefile.gnu
 	echo "WORKDIR /home/user" >> Dockerfile.pandoc
 	docker build -t pandoc -f Dockerfile.pandoc .
 docker-html: Dockerfile.pandoc
-	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s -o /doc/$(PCURCXX).html /doc/$(PCURCXX).md
-	chown $$USER:$$USER doc/$(PCURCXX).html
+	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s -o /doc/$(DCURCXX).html /doc/$(DCURCXX).md
+	chown $$USER:$$USER doc/$(DCURCXX).html
 docker-pdf: Dockerfile.pandoc
-	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/$(PCURCXX).pdf /doc/$(PCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
-	chown $$USER:$$USER doc/$(PCURCXX).pdf
+	-docker run -u user -v `pwd`/doc:/doc -it pandoc pandoc -s --pdf-engine=xelatex -o /doc/$(DCURCXX).pdf /doc/$(DCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	chown $$USER:$$USER doc/$(DCURCXX).pdf
 
 patch-c-doc:
 	patch -f doc/$(NCURC).md doc/$(NCURC).patch
 regen-c-patch:
-	-diff -bu doc/$(PCURCXX).md doc/$(NCURC).md >doc/$(NCURC).patch
+	-diff -bu doc/$(DCURCXX).md doc/$(NCURC).md >doc/$(NCURC).patch
 
 clang-format:
 	clang-format -i *.c include/*.h scripts.h confus.h mark.h scripts16.h u8id*.h
