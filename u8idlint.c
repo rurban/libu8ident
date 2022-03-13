@@ -124,6 +124,7 @@ static const struct ext_xid {
   ALLOWED  - TR31 ID with only recommended scripts. Allowed IdentifierStatus.
   SAFEC26  - see c26++proposal XID minus exotic scripts, filtered by NFC and
              IdentifierType.
+  C23      - XID plus NFC requirement.
   C11      - the AltId ranges from the C11 standard
   ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
   ASCII    - only ASCII letters
@@ -132,8 +133,8 @@ static const struct ext_xid {
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
     {isALLOWED_start, isALLOWED_cont}, {isSAFEC26_start, isSAFEC26_cont},
-    {isC11_start, isC11_cont},         {isALLUTF8_start, isALLUTF8_cont},
-    {isASCII_start, isASCII_cont},
+    {isC23_start, isC23_cont},         {isC11_start, isC11_cont},
+    {isALLUTF8_start, isALLUTF8_cont}, {isASCII_start, isASCII_cont},
 };
 
 static enum u8id_options xid_opts(const enum xid_e xid) {
@@ -210,7 +211,7 @@ static void usage(int exitcode) {
   puts("    6      Unrestricted");
   puts("    c11_6  C11STD. Sets xid c11.");
   puts("    c26_4  SAFEC26 (i.e. 4 with Greek). Sets xid safec26.");
-  puts(" -x|--xid=ascii,allowed,safec26,id,xid,c11,allutf8     default: "
+  puts(" -x|--xid=ascii,allowed,safec26,id,xid,c11,c23,allutf8   default: "
        "allowed");
   puts("  TR31 set of identifiers:"); // sorted from most secure to least secure
   puts("    ascii     only ASCII letters, punctuations. plus numbers");
@@ -219,6 +220,7 @@ static void usage(int exitcode) {
   puts("    id        all letters. plus numbers, punctuations and combining "
        "marks");
   puts("    xid       stable id subset, no NFKC quirks");
+  puts("    c23       xid with NFC requirement from C23");
   puts("    c11       some AltId unicode ranges from C11");
   puts("    allutf8   allow all >128. e.g. php, nim, crystal");
   // see above for recognized extensions
@@ -516,6 +518,8 @@ static void option_xid(const char *optarg) {
     xid = ID;
   else if (strEQc(optarg, "xid") || strEQc(optarg, "XID"))
     xid = XID;
+  else if (strEQc(optarg, "c23") || strEQc(optarg, "C23"))
+    xid = C23;
   else if (strEQc(optarg, "c11") || strEQc(optarg, "C11"))
     xid = C11;
   else if (strEQc(optarg, "allutf8") || strEQc(optarg, "ALLUTF8"))
@@ -586,7 +590,7 @@ int main(int argc, char **argv) {
   static struct option long_options[] = {
       {"norm", 1, 0, 'n'},    // *nfc*,nfd,nfkc,nfkd
       {"profile", 1, 0, 'p'}, // 1,2,3,*4*,5,6,c26_4,c11_6
-      {"xid", 1, 0, 'x'},     // ascii,allowed,id,*xid*,safec26,c11,allutf8
+      {"xid", 1, 0, 'x'},     // ascii,allowed,id,*xid*,safec26,c11,c23,allutf8
       {"ext", 1, 0, 'e'},        {"recursive", 0, 0, 'r'},
       {"help", 0, 0, 0},         {"version", 0, 0, 0},
       {"quiet", 0, &quiet, 'q'}, {"verbose", 0, &verbose, 'v'},

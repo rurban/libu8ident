@@ -62,6 +62,7 @@ enum xid_e {
   ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
   ALLOWED, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
   SAFEC26, // practical XID with TR39 security measures, see P2528R1
+  C23,     // XID with NFC requirement from C23
   C11,     // the stable insecure AltId ranges from the C11 standard, Annex D
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal
   ASCII,   // only ASCII letters
@@ -70,10 +71,11 @@ enum xid_e {
 #define ID 1
 #define ALLOWED 2
 #define SAFEC26 3
-#define C11 4
-#define ALLUTF8 5
-#define ASCII 6
-#define NONE 7
+#define C23 4
+#define C11 5
+#define ALLUTF8 6
+#define ASCII 7
+#define NONE 8
 #define FIRST_XID_E XID
 #define LAST_XID_E ASCII
 
@@ -161,12 +163,20 @@ enum xid_e {
 #      define U8ID_TR31_DEFAULT U8ID_TR31_XID
 #    elif U8ID_TR31 == C11
 #      define U8ID_TR31_DEFAULT U8ID_TR31_C11
+#    elif U8ID_TR31 == C23
+#      define U8ID_TR31_DEFAULT U8ID_TR31_C23
 #    elif U8ID_TR31 == ALLUTF8
 #      define U8ID_TR31_DEFAULT U8ID_TR31_ALLUTF8
 #    endif
 #  endif
 #else
 #  define U8ID_TR31_DEFAULT U8ID_TR31_XID
+#endif
+
+#if defined U8ID_NORM && (U8ID_NORM != NFC)
+#  if (U8ID_TR31 == SAFEC26) || (U8ID_TR31 == C23)
+#    error "Invalid U8ID_NORM with U8ID_TR31"
+#  endif
 #endif
 
 #define U8ID_CTX_TRESH 5

@@ -47,6 +47,8 @@ bool isXID_start(const uint32_t cp);
 bool isXID_cont(const uint32_t cp);
 bool isC11_start(const uint32_t cp);
 bool isC11_cont(const uint32_t cp);
+bool isC23_start(const uint32_t cp);
+bool isC23_cont(const uint32_t cp);
 bool isALLUTF8_start(const uint32_t cp);
 bool isALLUTF8_cont(const uint32_t cp);
 

@@ -523,6 +523,36 @@ LOCAL bool u8ident_maybe_normalized(const uint32_t cp) {
   return true;
 }
 
+#ifndef DISABLE_CHECK_XID
+
+bool isC23_start(const uint32_t cp) {
+  bool ret = range_bool_search(cp, xid_start_list, ARRAY_SIZE(xid_start_list));
+  if (!ret)
+    return false;
+#if !defined U8ID_NORM || U8ID_NORM == NFC
+  // if member of NFC_N it's not
+  if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
+    return false;
+#endif
+  // if member of NFC_M we need to check further. if not a member it is.
+  return true;
+}
+
+bool isC23_cont(const uint32_t cp) {
+  bool ret = range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
+  if (!ret)
+    return false;
+#if !defined U8ID_NORM || U8ID_NORM == NFC
+  // if member of NFC_N it's not
+  if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
+    return false;
+#endif  
+  // if member of NFC_M we need to check further (in u8ident_check_buf). if not a member it is.
+  return true;
+}
+
+#endif
+
 // See also the Table 3. Unicode Script Property Values and ISO 15924 Codes
 // https://www.unicode.org/reports/tr24/tr24-32.html#Relation_To_ISO15924
 

@@ -77,6 +77,9 @@ void test_scripts_no_init(void) {
   assert(!isXID_start('0'));
   assert(!isALLOWED_start('0'));
   assert(!isC11_start('0'));
+#if !defined U8ID_NORM || U8ID_NORM == NFC
+  assert(!isC23_start('0'));
+#endif
   assert(!isSAFEC26_start('0'));
   assert(!isALLUTF8_start('0'));
   assert(!isASCII_start('0'));
@@ -84,6 +87,9 @@ void test_scripts_no_init(void) {
   assert(isXID_cont('0'));
   assert(isALLOWED_cont('0'));
   assert(isC11_cont('0'));
+#if !defined U8ID_NORM || U8ID_NORM == NFC
+  assert(isC23_cont('0'));
+#endif
   assert(isSAFEC26_cont('0'));
   assert(isALLUTF8_cont('0'));
   assert(isASCII_cont('0'));
@@ -91,6 +97,11 @@ void test_scripts_no_init(void) {
   assert(isALLOWED_cont(0x27));  // '
   assert(!isALLOWED_cont(0x26)); // &
   assert(isALLOWED_cont(0x40e)); // Ў
+
+#if !defined U8ID_NORM || U8ID_NORM == NFC
+  assert(isC23_cont(0x311)); // ̑
+#endif
+  
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
 #endif
   // check that no list elements can be merged
@@ -304,7 +315,8 @@ void test_norm_nfkc(void) {
 
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
-  if (u8ident_tr31() != U8ID_TR31_SAFEC26) { // which demands NFC already
+  if (u8ident_tr31() != U8ID_TR31_SAFEC26 &&
+      u8ident_tr31() != U8ID_TR31_C23) { // which demand NFC already
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
     assert(strEQc(norm, "Caf\xc3\xa9"));
     free(norm);
@@ -326,8 +338,8 @@ void test_norm_nfc(void) {
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFC, 0));
   testnorm("NFC", testids);
 
-  if (u8ident_tr31() !=
-      U8ID_TR31_SAFEC26) { // which demands NFC already, so fails on XID earlier
+  // which demands NFC already, so fails on XID earlier
+  if (u8ident_tr31() != U8ID_TR31_SAFEC26 && u8ident_tr31() != U8ID_TR31_C23) {
     char *norm = NULL;
     int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
@@ -449,12 +461,15 @@ void test_mixed_scripts(int xid_check) {
     U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
 #else
-  CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
+  CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+386
 #endif
 
   ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
   if (xid == U8ID_TR31_SAFEC26 && !is_profile_6())
     CHECK_RET(ret, U8ID_ERR_XID, 0);
+  // C23 cannot check XID alone with NFC_M, but fails NORM later.
+  else if (xid == U8ID_TR31_C23 && !is_profile_6())
+    CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else {
 #if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||             \
     U8ID_NORM == FCC
@@ -638,7 +653,7 @@ void test_combine() {
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   int tr31 = u8ident_tr31();
   // these have safe XIDs, disallowing combiners
-  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_SAFEC26)
+  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_SAFEC26 || tr31 == U8ID_TR31_C23)
     return;
   if (is_profile_6()) // this bypasses combiner checks
     return;
@@ -776,7 +791,7 @@ void test_medial(void) {
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else
     CHECK_RET(ret, U8ID_EOK, 0);
-  if (u8ident_tr31() == U8ID_TR31_SAFEC26)
+  if (u8ident_tr31() == U8ID_TR31_SAFEC26 || u8ident_tr31() == U8ID_TR31_C23)
     return; // FB8A is disallowed
   // medial at medial
   ret = u8ident_check((const uint8_t *)"\u06A2\uFB8A\uFB91\uFB51", NULL);
@@ -886,7 +901,7 @@ void test_confus(void) {
   }
   //
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_WARN_CONFUSABLE);
-  if (u8ident_tr31() != U8ID_TR31_SAFEC26) {
+  if (u8ident_tr31() != U8ID_TR31_SAFEC26 && u8ident_tr31() != U8ID_TR31_C23) {
     ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
     assert(!(ret & U8ID_EOK_WARN_CONFUS));
   }

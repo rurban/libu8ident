@@ -40,9 +40,10 @@ enum u8id_options {
                       // exotic scripts.
   U8ID_TR31_ALLOWED = 66, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
   U8ID_TR31_SAFEC26 = 67, // practical XID with TR39 security measures. see doc/P2528R1.md
-  U8ID_TR31_C11 = 68, // the stable insecure AltId ranges from the C11 standard, Annex D
-  U8ID_TR31_ALLUTF8 = 69, // allow all > 128, e.g. D, php, nim, crystal
-  U8ID_TR31_ASCII = 70, // only ASCII letters (as e.g. zig, j. older compilers)
+  U8ID_TR31_C23 = 68, // XID with NFC from the C23 standard
+  U8ID_TR31_C11 = 69, // the stable insecure AltId ranges from the C11 standard, Annex D
+  U8ID_TR31_ALLUTF8 = 70, // allow all > 128, e.g. D, php, nim, crystal
+  U8ID_TR31_ASCII = 71, // only ASCII letters (as e.g. zig, j. older compilers)
   // room for more tr31 profiles
 
   U8ID_FOLDCASE = 128,

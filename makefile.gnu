@@ -268,7 +268,7 @@ check-profiles: $(SRC) $(HEADER) $(ALLHDRS)
 	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
 check-tr31: $(SRC) $(HEADER) $(ALLHDRS)
-	for x in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
+	for x in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
             echo U8ID_TR31_$$x; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_TR31=$$x -I. -Iinclude test.c $(SRC) \
 	      -o test-xid-$$x && \
@@ -277,12 +277,16 @@ check-tr31: $(SRC) $(HEADER) $(ALLHDRS)
 check-all-combinations: $(SRC) $(HEADER) $(ALLHDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
 	  for p in 2 3 4 5 6 C11_6 C26_4; do \
-	    for x in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
-	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
-	      $(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
-		-Wfatal-errors test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c \
-	        -o test-profiles && \
-	      ./test-profiles || exit; \
+	    for x in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
+	      if [ $$n != NFC ] && [ $$p = C26_4 -o $$x = SAFEC26 -o $$x = C23 ]; then \
+		echo "skip -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
+              else \
+	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
+	        $(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
+		  -Wfatal-errors test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c \
+	          -o test-profiles && \
+	        ./test-profiles || exit; \
+	      fi; \
 	    done; \
 	  done; \
 	done; \

@@ -269,7 +269,7 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	done; \
 	rm test-profiles$(EXEEXT)
 check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
+	for n in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
 	    echo U8ID_TR31=$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_TR31=$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-tr31$(EXEEXT) && \
@@ -279,13 +279,17 @@ check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
 	  for p in 2 3 4 5 6 C11_6 C26_4; do \
-	    for x in ALLOWED SAFEC26 ID XID C11 ALLUTF8 NONE; do \
-	      echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
-	      $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
-		-Wfatal-errors $(srcdir)/test.c \
-		$(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
-		$(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
-	      ./test-profiles$(EXEEXT) || exit; \
+	    for x in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
+	      if [ $$n != NFC ] && [ $$p = C26_4 -o $$x = SAFEC26 -o $$x = C23 ]; then \
+		echo "skip -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
+              else \
+	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
+	        $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
+		  -Wfatal-errors $(srcdir)/test.c \
+		  $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
+		  $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
+	        ./test-profiles$(EXEEXT) || exit; \
+	      fi; \
 	    done; \
 	  done; \
 	done; \

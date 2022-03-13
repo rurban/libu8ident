@@ -45,6 +45,7 @@ LOCAL const char *u8ident_errstr(int errcode) {
                IdentifierStatus.
     SAFEC26  - see P2528R1. XID minus exotic scripts, filtered by NFC and
                IdentifierType.
+    C23      - XID plus NFC requirement. http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html
     C11      - the AltId ranges from the C11 standard
     ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
     ASCII    - only ASCII letters
@@ -54,8 +55,8 @@ LOCAL const char *u8ident_errstr(int errcode) {
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
     {isALLOWED_start, isALLOWED_cont}, {isSAFEC26_start, isSAFEC26_cont},
-    {isC11_start, isC11_cont},         {isALLUTF8_start, isALLUTF8_cont},
-    {isASCII_start, isASCII_cont},
+    {isC23_start, isC23_cont},         {isC11_start, isC11_cont},
+    {isALLUTF8_start, isALLUTF8_cont}, {isASCII_start, isASCII_cont},
 };
 #endif
 
@@ -194,6 +195,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       (unlikely(!isASCII_start(cp)))
 #  elif U8ID_TR31 == SAFEC26
       (unlikely(!isSAFEC26_start(cp)))
+#  elif U8ID_TR31 == C23
+      (unlikely(!isC23_start(cp)))
 #  elif U8ID_TR31 == C11
       (unlikely(!isC11_start(cp)))
 #  elif U8ID_TR31 == XID
