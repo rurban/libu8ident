@@ -38,19 +38,19 @@ Check options])
 # Recommended: --with-tr31=allowed or none
 AC_MSG_CHECKING([for --with-tr31=])
 AC_ARG_WITH([tr31],
-      [AS_HELP_STRING([--with-tr31={ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE}],
+      [AS_HELP_STRING([--with-tr31={ALLOWED,SAFEC26,ID,XID,C11,C23,ALLUTF8,NONE}],
       	[support only this TR31 identifier profile. @<:@default=xid@:>@
       	 Recommended: --with-tr31=allowed])],
       [case "${with_tr31}" in
-      ALLOWED|SAFEC26|ID|XID|C11|ALLUTF8) U8ID_TR31=${with_tr31}; AC_MSG_RESULT([$with_tr31]) ;;
+      ALLOWED|SAFEC26|ID|XID|C11|C23|ALLUTF8) U8ID_TR31=${with_tr31}; AC_MSG_RESULT([$with_tr31]) ;;
       NONE) CFLAGS="$CFLAGS -DDISABLE_U8ID_TR31"; AC_MSG_RESULT([$with_tr31]) ;;
-      *)    AC_MSG_RESULT([invalid ${with_tr31}: only ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE]) ;;
+      *)    AC_MSG_ERROR([invalid ${with_tr31}: only ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE]) ;;
       esac],
       [ U8ID_TR31=; AC_MSG_RESULT([none. support all (default). Recommended: ALLOWED]) ]
       )
 if test -n "$U8ID_TR31"; then
   CFLAGS="$CFLAGS -DU8ID_TR31=$U8ID_TR31"
-  dnl AC_DEFINE([U8IDP_TR31],[$U8ID_TR31],[Define to ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8 to support only this TR31 identifier charset])
+  dnl AC_DEFINE([U8IDP_TR31],[$U8ID_TR31],[Define to ALLOWED,SAFEC26,ID,XID,C11,C23,ALLUTF8 to support only this TR31 identifier charset])
 fi
 AC_SUBST([U8ID_TR31])
 
@@ -63,7 +63,7 @@ AC_ARG_WITH([profile],
 		 Recommended: --with-profile=4])],
 	[case "${with_profile}" in
 	2|3|4|5|6|C26_4|C11_6) U8ID_PROFILE=${with_profile}; AC_MSG_RESULT([$with_profile]) ;;
-	*)    AC_MSG_RESULT([invalid ${with_profile}: only 2,3,4,5,6,C26_4,C11_6]) ;;
+	*)    AC_MSG_ERROR([invalid ${with_profile}: only 2,3,4,5,6,C26_4,C11_6]) ;;
 	esac],
         [ U8ID_PROFILE=; AC_MSG_RESULT([none. support all (default). Recommended: 4]) ]
 	)
@@ -82,13 +82,18 @@ AC_ARG_WITH([norm],
 	[case "${with_norm}" in
 	NFKD|NFKC|NFC|NFD) U8ID_NORM=${with_norm}; AC_MSG_RESULT([$with_norm]) ;;
 	FCD|FCD)           U8ID_NORM=${with_norm}; AC_MSG_RESULT([$with_norm]) ;;
-	*)    AC_MSG_RESULT([invalid ${with_norm}: only NFC,NFKC,NFD,NFKD,FCC,FCD]) ;;
+	*)    AC_MSG_ERROR([invalid ${with_norm}: only NFC,NFKC,NFD,NFKD,FCC,FCD]) ;;
 	esac],
         [ U8ID_NORM=; AC_MSG_RESULT([none. support all (default). Recommended: NFC]) ]
 	)
 if test -n "$U8ID_NORM"; then
-  CFLAGS="$CFLAGS -DU8ID_NORM=$U8ID_NORM"
-  dnl AC_DEFINE([U8ID_NORM],[$U8ID_NORM],[Define to NF{K,}{C,D} to support only this Unicode normalization])
+  if test x$U8ID_NORM != xNFC && test x$U8ID_PROFILE = xC26_4 -o x$U8ID_TR31 = xSAFEC26 -o x$U8ID_TR31 = xC23
+  then
+    AC_MSG_ERROR([Profile $U8ID_PROFILE or TR31 $U8ID_TR31 requires NFC])
+  else
+    CFLAGS="$CFLAGS -DU8ID_NORM=$U8ID_NORM"
+    dnl AC_DEFINE([U8ID_NORM],[$U8ID_NORM],[Define to NF{K,}{C,D} to support only this Unicode normalization])
+  fi
 fi
 AC_SUBST([U8ID_NORM])
 
@@ -141,7 +146,7 @@ AC_ARG_WITH([croaring],
                 CROARING_PATH="\"${with_croaring}\""
                 AC_MSG_RESULT(["$with_croaring"])
              else
-                AC_MSG_RESULT([invalid ${with_profile} path])
+                AC_MSG_ERROR([invalid ${with_profile} path])
              fi
              ;;
 	esac],
