@@ -346,7 +346,6 @@ const struct sc_c26 safec26_start_list[] = {
     {0xFA21, 0xFA21, SC_Han, GC_Lo, NULL}, //  﨡
     {0xFA23, 0xFA24, SC_Han, GC_Lo, NULL}, //  﨣..﨤
     {0xFA27, 0xFA29, SC_Han, GC_Lo, NULL}, //  﨧..﨩
-    {0xFE73, 0xFE73, SC_Arabic, GC_Lo, NULL}, //  ﹳ
     {0x1B11F, 0x1B11F, SC_Hiragana, GC_Lo, NULL}, //  𛄟
     {0x1B121, 0x1B122, SC_Katakana, GC_Lo, NULL}, //  𛄡..𛄢
     {0x1B150, 0x1B152, SC_Hiragana, GC_Lo, NULL}, //  𛅐..𛅒
@@ -364,9 +363,9 @@ const struct sc_c26 safec26_start_list[] = {
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
 };
 #else
-extern const struct sc_c26 safec26_start_list[336];
+extern const struct sc_c26 safec26_start_list[335];
 #endif
-// 243 ranges, 93 singles, 95986 codepoints
+// 243 ranges, 92 singles, 95986 codepoints
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC
 // MEDIAL from XID_Start and !MARK. Split on GC and SCX
@@ -393,64 +392,11 @@ const struct sc_c26 safec26_cont_list[] = {
     {0x17E0, 0x17E9, SC_Khmer, GC_Nd, NULL}, //  ០..៩
     {0x203F, 0x2040, SC_Common, GC_Pc, NULL}, //  ‿..⁀
     {0xA9F0, 0xA9F9, SC_Myanmar, GC_Nd, NULL}, //  ꧰..꧹
-    {0xFB55, 0xFB55, SC_Arabic, GC_Lo, NULL}, //  ﭕ
-    {0xFB59, 0xFB59, SC_Arabic, GC_Lo, NULL}, //  ﭙ
-    {0xFB5D, 0xFB5D, SC_Arabic, GC_Lo, NULL}, //  ﭝ
-    {0xFB61, 0xFB61, SC_Arabic, GC_Lo, NULL}, //  ﭡ
-    {0xFB65, 0xFB65, SC_Arabic, GC_Lo, NULL}, //  ﭥ
-    {0xFB69, 0xFB69, SC_Arabic, GC_Lo, NULL}, //  ﭩ
-    {0xFB6D, 0xFB6D, SC_Arabic, GC_Lo, NULL}, //  ﭭ
-    {0xFB71, 0xFB71, SC_Arabic, GC_Lo, NULL}, //  ﭱ
-    {0xFB75, 0xFB75, SC_Arabic, GC_Lo, NULL}, //  ﭵ
-    {0xFB79, 0xFB79, SC_Arabic, GC_Lo, NULL}, //  ﭹ
-    {0xFB7D, 0xFB7D, SC_Arabic, GC_Lo, NULL}, //  ﭽ
-    {0xFB81, 0xFB81, SC_Arabic, GC_Lo, NULL}, //  ﮁ
-    {0xFB91, 0xFB91, SC_Arabic, GC_Lo, NULL}, //  ﮑ
-    {0xFB95, 0xFB95, SC_Arabic, GC_Lo, NULL}, //  ﮕ
-    {0xFB99, 0xFB99, SC_Arabic, GC_Lo, NULL}, //  ﮙ
-    {0xFB9D, 0xFB9D, SC_Arabic, GC_Lo, NULL}, //  ﮝ
-    {0xFBA3, 0xFBA3, SC_Arabic, GC_Lo, NULL}, //  ﮣ
-    {0xFBA9, 0xFBA9, SC_Arabic, GC_Lo, NULL}, //  ﮩ
-    {0xFBAD, 0xFBAD, SC_Arabic, GC_Lo, NULL}, //  ﮭ
-    {0xFBD6, 0xFBD6, SC_Arabic, GC_Lo, NULL}, //  ﯖ
-    {0xFBE7, 0xFBE7, SC_Arabic, GC_Lo, NULL}, //  ﯧ
-    {0xFBE9, 0xFBE9, SC_Arabic, GC_Lo, NULL}, //  ﯩ
-    {0xFBFF, 0xFBFF, SC_Arabic, GC_Lo, NULL}, //  ﯿ
-    {0xFCDF, 0xFCF4, SC_Arabic, GC_Lo, NULL}, //  ﳟ..ﳴ
-    {0xFD34, 0xFD3B, SC_Arabic, GC_Lo, NULL}, //  ﴴ..ﴻ
-    {0xFE77, 0xFE77, SC_Arabic, GC_Lo, NULL}, //  ﹷ
-    {0xFE79, 0xFE79, SC_Arabic, GC_Lo, NULL}, //  ﹹ
-    {0xFE7B, 0xFE7B, SC_Arabic, GC_Lo, NULL}, //  ﹻ
-    {0xFE7D, 0xFE7D, SC_Arabic, GC_Lo, NULL}, //  ﹽ
-    {0xFE7F, 0xFE7F, SC_Arabic, GC_Lo, NULL}, //  ﹿ
-    {0xFE8C, 0xFE8C, SC_Arabic, GC_Lo, NULL}, //  ﺌ
-    {0xFE92, 0xFE92, SC_Arabic, GC_Lo, NULL}, //  ﺒ
-    {0xFE98, 0xFE98, SC_Arabic, GC_Lo, NULL}, //  ﺘ
-    {0xFE9C, 0xFE9C, SC_Arabic, GC_Lo, NULL}, //  ﺜ
-    {0xFEA0, 0xFEA0, SC_Arabic, GC_Lo, NULL}, //  ﺠ
-    {0xFEA4, 0xFEA4, SC_Arabic, GC_Lo, NULL}, //  ﺤ
-    {0xFEA8, 0xFEA8, SC_Arabic, GC_Lo, NULL}, //  ﺨ
-    {0xFEB4, 0xFEB4, SC_Arabic, GC_Lo, NULL}, //  ﺴ
-    {0xFEB8, 0xFEB8, SC_Arabic, GC_Lo, NULL}, //  ﺸ
-    {0xFEBC, 0xFEBC, SC_Arabic, GC_Lo, NULL}, //  ﺼ
-    {0xFEC0, 0xFEC0, SC_Arabic, GC_Lo, NULL}, //  ﻀ
-    {0xFEC4, 0xFEC4, SC_Arabic, GC_Lo, NULL}, //  ﻄ
-    {0xFEC8, 0xFEC8, SC_Arabic, GC_Lo, NULL}, //  ﻈ
-    {0xFECC, 0xFECC, SC_Arabic, GC_Lo, NULL}, //  ﻌ
-    {0xFED0, 0xFED0, SC_Arabic, GC_Lo, NULL}, //  ﻐ
-    {0xFED4, 0xFED4, SC_Arabic, GC_Lo, NULL}, //  ﻔ
-    {0xFED8, 0xFED8, SC_Arabic, GC_Lo, NULL}, //  ﻘ
-    {0xFEDC, 0xFEDC, SC_Arabic, GC_Lo, NULL}, //  ﻜ
-    {0xFEE0, 0xFEE0, SC_Arabic, GC_Lo, NULL}, //  ﻠ
-    {0xFEE4, 0xFEE4, SC_Arabic, GC_Lo, NULL}, //  ﻤ
-    {0xFEE8, 0xFEE8, SC_Arabic, GC_Lo, NULL}, //  ﻨ
-    {0xFEEC, 0xFEEC, SC_Arabic, GC_Lo, NULL}, //  ﻬ
-    {0xFEF4, 0xFEF4, SC_Arabic, GC_Lo, NULL}, //  ﻴ
 };
 #else
-extern const struct sc_c26 safec26_cont_list[74];
+extern const struct sc_c26 safec26_cont_list[21];
 #endif
-// 22 ranges, 52 singles, 200 codepoints
+// 20 ranges, 1 singles, 172 codepoints
 
 
 //---------------------------------------------------
@@ -674,8 +620,16 @@ const struct sc_c26 safec26_excl_cont_list[] = {
     {0x11D50, 0x11D59, SC_Masaram_Gondi, GC_Nd, NULL}, //  (Excluded) 𑵐..𑵙
     {0x16AC0, 0x16AC9, SC_Tangsa, GC_Nd, NULL}, //  (Excluded) 𖫀..𖫉
     {0x16B50, 0x16B59, SC_Pahawh_Hmong, GC_Nd, NULL}, //  (Excluded) 𖭐..𖭙
-};
+}; // 16 ranges, 0 singles, 144 codepoints
 #else
 extern const struct sc_c26 safec26_excl_cont_list[16];
 #endif
-// 16 ranges, 0 singles, 144 codepoints
+
+// Shorter MEDIAL list for safec26.
+// safec26_start/cont + MEDIAL
+#ifndef EXTERN_SCRIPTS
+const struct range_bool safec26_medial_list[] = {
+}; // 0 ranges, 0 singles, 0 codepoints
+#else
+extern const struct range_bool safec26_medial_list[0];
+#endif

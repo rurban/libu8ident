@@ -38,6 +38,9 @@ Adjustments, but the tables DerivedCoreProperties and TR39 Identifier
 tables and thus all user parsers are wrong.
 <https://www.unicode.org/reports/tr31/#Specific_Character_Adjustments>
 
+For the proposed C++26/C26 standard no such medial characters are
+included.
+
 Confusable Technical IdTypes
 ----------------------------
 
@@ -56,3 +59,15 @@ guarantees.
 
 See <https://certitude.consulting/blog/en/invisible-backdoor/>
 for an exploit.
+
+Arabic Presentation Forms-A: U+FB50–U+FDFF and Forms-B: U+FE70–U+FEFF not as ID
+-------------------------------------------------------------------------------
+
+Forms-A contains a list of Arabic presentation forms encoded as
+characters primarily for compatibility reasons.  Forms-B are for
+compatibility with preexisting standards and legacy implementations
+that use these forms as character. Instead of these, letters from the
+Arabic block (U+0600..U+06FF) should be used for identifiers.  See
+<https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf#G37489> and
+<https://www.unicode.org/reports/tr53/>. The TR39 idtype of these
+should be changed to Obsolete.

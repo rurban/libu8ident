@@ -14,7 +14,7 @@
    * Reject illegal mark sequences (Lm, Mn, Mc) with mixed-scripts (SCX) as
      ill-formed.
 
-   See doc/c11.md and doc/P2528R1.md
+   See doc/c11.md and doc/D2528R1.md
 
    TODO:
    List of Lm chars in the resulting list, for P2528R0 7.3
@@ -98,6 +98,12 @@ static inline bool isExcludedIdtype(const uint32_t cp) {
 // disallow 0xFF00-0xFFEF, homoglyph with LATIN A-Z
 static inline bool isHalfwidthOrFullwidth(const uint32_t cp) {
   return (cp >= 0xFF00 && cp <= 0xFFEF);
+}
+
+// disallow Arabic Presentation Forms-A and B
+static inline bool isArabicPresentationForm(const uint32_t cp) {
+  return (cp >= 0xFB50 && cp <= 0xFDFF) ||
+         (cp >= 0xFE70 && cp <= 0xFEFF);
 }
 
 // uint8_t[10FFFF/8]
@@ -417,6 +423,7 @@ static void gen_c26_safe(void) {
           !u8ident_is_MARK(cp) &&
           !isSkipIdtype(cp) &&
           !isHalfwidthOrFullwidth(cp) &&
+          !isArabicPresentationForm(cp) &&
           !u8ident_is_MEDIAL(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
@@ -488,6 +495,7 @@ static void gen_c26_safe(void) {
       if (s < FIRST_EXCLUDED_SCRIPT &&
           !u8ident_is_MARK(cp) &&
           !isSkipIdtype(cp) &&
+          !isArabicPresentationForm(cp) &&
           !isHalfwidthOrFullwidth(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
@@ -510,7 +518,8 @@ static void gen_c26_safe(void) {
         continue;
       uint8_t s = u8ident_get_script(cp);
       if (s < FIRST_EXCLUDED_SCRIPT && u8ident_is_MEDIAL(cp) &&
-          !u8ident_is_MARK(cp) && !isHalfwidthOrFullwidth(cp)) {
+          !u8ident_is_MARK(cp) && !isHalfwidthOrFullwidth(cp) &&
+          !isArabicPresentationForm(cp)) {
         BITSET(c, cp);
       }
     }
@@ -551,7 +560,8 @@ static void gen_c26_safe(void) {
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
           !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
-          !isHalfwidthOrFullwidth(cp) && !u8ident_is_MEDIAL(cp)) {
+          !isHalfwidthOrFullwidth(cp) &&
+          !isArabicPresentationForm(cp) && !u8ident_is_MEDIAL(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -591,7 +601,7 @@ static void gen_c26_safe(void) {
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
           !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
-          !isHalfwidthOrFullwidth(cp)) {
+          !isHalfwidthOrFullwidth(cp) && !isArabicPresentationForm(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -613,7 +623,7 @@ static void gen_c26_safe(void) {
       uint8_t s = u8ident_get_script(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
           u8ident_is_MEDIAL(cp) && !u8ident_is_MARK(cp) &&
-          !isExcludedIdtype(cp) && !isHalfwidthOrFullwidth(cp)) {
+          !isExcludedIdtype(cp) && !isHalfwidthOrFullwidth(cp) && !isArabicPresentationForm(cp)) {
         BITSET(c, cp);
       }
     }
@@ -622,7 +632,9 @@ static void gen_c26_safe(void) {
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c26 safec26_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
-  fputs("};\n", f);
+  fputs("}; ", f);
+  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
+          stats.singles, stats.codepoints);
   fputs("#else\n", f);
   fprintf(f, "extern const struct sc_c26 safec26_excl_cont_list[%u];\n",
           stats.ranges + stats.singles);
@@ -630,8 +642,61 @@ static void gen_c26_safe(void) {
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
          "safec26_excl_cont_list", stats.ranges, stats.singles,
          stats.codepoints);
+  memset(&stats, 0, sizeof(stats));
+
+  // get safec26_medial. Empty for v14
+  memset(c, 0, sizeof(c));
+  for (size_t i = 0; i < ARRAY_SIZE(xid_start_list); i++) {
+    struct range_bool r = xid_start_list[i];
+    for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      if (BITGET(c, cp))
+        continue;
+      if (u8ident_is_MEDIAL(cp)) {
+        uint8_t s = u8ident_get_script(cp);
+        if (s < FIRST_LIMITED_USE_SCRIPT &&
+            !u8ident_is_MARK(cp) &&
+            !isExcludedIdtype(cp) &&
+            !isHalfwidthOrFullwidth(cp)) {
+          BITSET(c, cp);
+        }
+      }
+    }
+  }
+  for (size_t i = 0; i < ARRAY_SIZE(xid_cont_list); i++) {
+    struct range_bool r = xid_cont_list[i];
+    for (uint32_t cp = r.from; cp <= r.to; cp++) {
+      if (BITGET(c, cp))
+        continue;
+      if (u8ident_is_MEDIAL(cp)) {
+        uint8_t s = u8ident_get_script(cp);
+        if (s < FIRST_LIMITED_USE_SCRIPT &&
+            !u8ident_is_MARK(cp) &&
+            !isExcludedIdtype(cp) &&
+            !isArabicPresentationForm(cp) &&
+            !isHalfwidthOrFullwidth(cp)) {
+          BITSET(c, cp);
+        }
+      }
+    }
+  }
+  BITCLR(c, 0xB7);
+
+  fputs("\n// Shorter MEDIAL list for safec26.\n", f);
+  fputs("// safec26_start/cont + MEDIAL\n", f);
+  fputs("#ifndef EXTERN_SCRIPTS\n", f);
+  fputs("const struct range_bool safec26_medial_list[] = {\n", f);
+  emit_ranges(f, 0x27, c, false);
+  fputs("}; ", f);
   fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
+  fputs("#else\n", f);
+  fprintf(f, "extern const struct range_bool safec26_medial_list[%u];\n",
+          stats.ranges + stats.singles);
+  fputs("#endif\n", f);
+  printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
+         "safec26_medial_list", stats.ranges, stats.singles,
+         stats.codepoints);
+
   fclose(f);
 #ifdef HAVE_SYS_STAT_H
   chmod(header, 0444);
