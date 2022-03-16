@@ -235,6 +235,7 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <li>Fix a lot of not Allowed ID_Start ranges. safec26_start_list from 355 ranges, 115 singles, 99350 codepoints to 243 ranges, 93 singles, 95986 codepoints</li>
 <li>Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU to the Greek confusable exceptions in 19.1.</li>
 <li>Added wording feedback from the first SSRG discussion, and restructure the paragraphs a bit to be less technical, and make it more readable to non-Unicode experts.</li>
+<li>Added discussions of the gcc and clang-tidy -Whomoglyph approaches via confusables.</li>
 </ul>
 <h1 id="introduction">3 Introduction</h1>
 <p>In response to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, and in parallel to <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm">n2932</a> for C.</p>
@@ -278,7 +279,7 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <p>So far only Rust, cperl and Java follow a TR39 Unicode security guideline for identifiers, zig and J refused to support non-ASCII identifiers. Everbody else is vulnerable to potential security attacks and does allow non-identifiable identifiers. They should rename their identifiers to “symbols”.</p>
 <p>Links:</p>
 <ul>
-<li><a href="https://cwe.mitre.org/data/definitions/1007.html" class="uri">https://cwe.mitre.org/data/definitions/1007.html</a> (gcc CWE-1007 -Whomoglyph patch)</li>
+<li><a href="https://cwe.mitre.org/data/definitions/1007.html" class="uri">https://cwe.mitre.org/data/definitions/1007.html</a> (<em>The gcc CWE-1007 -Whomoglyph warning is linking to it.</em>)</li>
 <li><a href="https://websec.github.io/unicode-security-guide/visual-spoofing/" class="uri">https://websec.github.io/unicode-security-guide/visual-spoofing/</a></li>
 <li><a href="http://www.unicode.org/reports/tr31/" class="uri">http://www.unicode.org/reports/tr31/</a>, <a href="http://www.unicode.org/reports/tr36/" class="uri">http://www.unicode.org/reports/tr36/</a> and <a href="http://www.unicode.org/reports/tr39" class="uri">http://www.unicode.org/reports/tr39</a></li>
 <li><a href="https://twitter.com/zygoloid/status/1187150150835195905" class="uri">https://twitter.com/zygoloid/status/1187150150835195905</a>, <a href="https://github.com/golang/go/issues/20209" class="uri">https://github.com/golang/go/issues/20209</a>, <a href="https://twitter.com/jupenur/status/1244286243518713857" class="uri">https://twitter.com/jupenur/status/1244286243518713857</a></li>
@@ -286,7 +287,7 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <li><a href="https://github.com/rurban/libu8ident/tree/master/texts/" class="uri">https://github.com/rurban/libu8ident/tree/master/texts/</a> with *-sec*.c</li>
 </ul>
 <p><em>TODO approved: P2071R1 (size argument). java, rust example.</em></p>
-<h1 id="design">4 Design</h1>
+<h1 id="design">5 Design</h1>
 <p>First we are discussing two different approaches found in praxis:</p>
 <ol type="1">
 <li><a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4 Confusable_Detection</a>, vs.</li>
@@ -309,18 +310,18 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 </ul>
 <p>There were a few more design decisions made, over TR39 recommendations:</p>
 <ul>
-<li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters. The rationale is that the by far mostly used script is Greek, because of its mathematical symbols and physical constants actively used by C++ physicists. This is in fact the only usage of unicode identifiers in the wild. There is some overlap with Latin symbols, and in all cases where a Greek letter is confusable with a Latin one, the Latin one must be used. See <a href="#appendix-f---greek-confusables">19 Appendix F</a>.</li>
+<li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters. The rationale is that the by far mostly used script is Greek, because of its mathematical symbols and physical constants actively used by C++ physicists. This is in fact the only usage of unicode identifiers in the wild. There is some overlap with Latin symbols, and in all cases where a Greek letter is confusable with a Latin one, the Latin one must be used. See <a href="#18-appendix-f---greek-confusables">18 Appendix F</a>.</li>
 </ul>
-<p>TR39 recommends to forbid some sets of Limited Use scripts for identifiers, and recommends to only optionally allow some other Excluded scripts. See <a href="#5.2-script-restrictions">5.2 Script restrictions</a>.</p>
+<p>TR39 recommends to forbid some sets of Limited Use scripts for identifiers, and recommends to only optionally allow some other Excluded scripts. See <a href="#7.2-script-restrictions">7.2 Script restrictions</a>.</p>
 <p>Speed/Size summary:</p>
 <p>The mixed-script approach was also sucessfully used in a dynamic language, with much stricter performance restrictions than offline compilers or linters. There was no noticable compile-time performance degradation, as unicode identifiers are extremely rare, and the NFC check is by far slower than the mixed script and illegal combining mark checks. NFC needs 183K alone, the mixed script check with the TR31, medial and mark tables 131K in my unoptimized, generic implementation. C++26 can do a bit better, but this is good enough.</p>
-<h1 id="summary">5 Summary</h1>
+<h1 id="summary">6 Summary</h1>
 <p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a> correctly detected that Unicode identifiers are still not identifiable, and are prone to bidi- and homoglyph attacks. But it stated that implementing TR39 would be too hard. Having properly implemented the Unicode Security Guidelines for identifers for several years, plus pushed Rust to do so also, proves the contrary. TR39 would catch all known homoglyph and bidi identifier attacks.</p>
 <p>Further restriction of the TR31 profile as recommended by TR39 to only recommended scripts leads to smaller sets for identifiers, and implementation of a proper TR39 mixed script profile and identifier types fixes most of the known unicode security problems with identifiers. The only remaining problems are bidi overrides in strings or comments evading syntax, which cannot be handled with identifier restrictions, but tokenizer or preprocessor warnings, as recently added to gcc and clang. <code>#include filename</code> restrictions should be done also, but that is also out of the scope of this document, as the existing filesystems care much less about unicode security for identifiers than programming languages. Spoofing attacks on filenames are not yet seen in the wild, but will appear sooner or later, same as they appeared in browsers and email. Also names in C/C++ object files: linkers, .def files, ffi’s.</p>
 <p>Implementing TR39 mixed script detection per document (C++ Header and Source file) forbids insecure mixes of Greek and Cyrillic, dangerous Arabic RTL bidi attacks and confusables. You can still write in your language, but then only in commonly written languages, and not mixed with others. Identifiers are still identifiable.</p>
 <p>The question remains if TR39 security violations should be ill-formed (throw an compilation error or warning), or not. Since we do have the <code>-std=c++26</code> option, and the issues are security relevant, ill-formeded seems to be best. Implementations might choose to go for compiler warnings or linters or just toolchain implementations, i.e. editors and reviewer tools. The practical security problems are not severe and are easy to fix, as we had none in the years clang allowed insecure unicode, and there were no major known problems on the easier to attack dynamic languages. But gcc just added it now with gcc-10, so the impact might just come later. TR39 is considered stable and not a moving target. There were no impactful changes in the last 10 years.</p>
-<h1 id="what-will-this-proposal-change">5 What will this proposal change</h1>
-<h2 id="the-set-of-tr31-xid-characters-will-become-much-smaller">5.1 The set of TR31 XID characters will become much smaller</h2>
+<h1 id="what-will-this-proposal-change">7 What will this proposal change</h1>
+<h2 id="the-set-of-tr31-xid-characters-will-become-much-smaller">7.1 The set of TR31 XID characters will become much smaller</h2>
 <p>Restricting the <strong>Identifier Type</strong> plus the Recommended Scripts, will shrink the original XID set from 971267 codepoints to 99350 codepoints. The ranges expand from 36 to 426. (when split by scripts already, 25 splits happen). Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are now forbidden.</p>
 <p><code>ID_Start</code> consists of Lu + Ll + Lt + Lm + Lo + Nl, +<code>Other_ID_Start</code>, -<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code>,-<code>Median</code></p>
 <p>131899 codepoints</p>
@@ -328,8 +329,8 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <p>135072 codepoints (= ID_Start + 3173)</p>
 <p><code>XID_Start</code> and <code>XID_Continue</code> ensure that <code>isIdentifer(string)</code> then <code>isIdentifier(NFKx(string))</code> (<em>removing the NFKC quirks</em>)</p>
 <p><code>XID_Start</code>: 131876 codepoints, <code>XID_Continue</code>: 135053 codepoints (= <code>XID_Start</code> + 3173)</p>
-<p>See <a href="#appendix-a---c26xid_start">14 “Appendix A - C26XID_Start”</a> and <a href="#appendix-b---c26xid_continue">15 “Appendix B - C26XID_Continue”</a>.</p>
-<h2 id="script-restrictions">5.2 Script restrictions</h2>
+<p>See <a href="#13-appendix-a---c26xid_start">13 “Appendix A - C26XID_Start”</a> and <a href="#14-appendix-b---c26xid_continue">14 “Appendix B - C26XID_Continue”</a>.</p>
+<h2 id="script-restrictions">7.2 Script restrictions</h2>
 <p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html#xid_continue-does-not-include-layout-and-format-control-characters">P1949R7</a> for C++23 previously stated: <em>“This paper also does not propose excluding any scripts categorically, regardless of their status as historic or obsolete. Characters from Anatolian Hieroglyphs would be available for use, to the extent that anyone wishes to do so.”</em></p>
 <p><a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table 4</a> states: <em>“Some scripts are not in customary modern use, and thus implementations may want to exclude them from identifiers. These include historic and obsolete scripts, scripts used mostly liturgically, and regional scripts used only in very small communities or with very limited current usage. Some scripts also have unresolved architectural issues that make them currently unsuitable for identifiers. The scripts in Table 4, Excluded Scripts are recommended for exclusion from identifiers.”</em></p>
 <p>These Excluded Scripts are initially disallowed <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a> but can be optionally be allowed via a new <code>#pragma unicode ExcludedScript</code>:</p>
@@ -356,16 +357,16 @@ Hanifi_Rohingya Javanese Kayah_Li Lepcha Limbu Lisu Mandaic
 Meetei_Mayek Miao New_Tai_Lue Newa Nko Nyiakeng_Puachue_Hmong Ol_Chiki
 Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
 Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
-<p>This recommendation follows TR39, to recommended scripts only, Excluded and Limited Use not. For some years until Unicode 10 there was a “Aspirational Use Scripts” table, which included a subset of the optional Limited Use scripts to be allowed in identifiers. But _“this has not proven to be productive for the derivation of identifier-related classes used in security profiles_”.</p>
+<p>This recommendation follows TR39, to recommended scripts only, Excluded and Limited Use not. For some years until Unicode 10 there was a “Aspirational Use Scripts” table, which included a subset of the optional Limited Use scripts to be allowed in identifiers. But <em>“this has not proven to be productive for the derivation of identifier-related classes used in security profiles”</em>.</p>
 <p>Thus these scripts will stay allowed:</p>
 <pre><code>Common Inherited Latin Arabic Armenian Bengali Bopomofo Cyrillic
 Devanagari Ethiopic Georgian Greek Gujarati Gurmukhi Hangul Han Hebrew
 Hiragana Katakana Kannada Khmer Lao Malayalam Myanmar Oriya
 Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>Stability:</p>
-<p>Historically the most changes in latest unicode versions have been with adding to Emojis and Limited Use scripts. Thus the expected set of valid identifiers looks stable, when all the current TR31 bugs will be fixed. I have no idea about the TR30 confusables.txt bugs, as there is no categorization yet.</p>
+<p>Historically the most changes in latest unicode versions have been with adding to Emojis and Limited Use scripts. Thus the expected set of valid identifiers looks stable, when all the current TR31 bugs will be fixed. I have no idea about the TR39 confusables.txt bugs, as there is no categorization yet.</p>
 <p>The script property and its name are defined in <a href="https://www.unicode.org/reports/tr24/">TR24</a>. We use the long Unicode Script property value, not the abbrevated 4-letter short name, which maps somehow to the 4-letter <a href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924">ISO 15924 Codes</a>.</p>
-<h2 id="documents-with-identifiers-in-many-multiple-scriptslanguages-will-become-illegal">5.3 Documents with identifiers in many multiple scripts/languages will become illegal</h2>
+<h2 id="documents-with-identifiers-in-many-multiple-scriptslanguages-will-become-illegal">7.3 Documents with identifiers in many multiple scripts/languages will become illegal</h2>
 <p>C++26 (and C26) will follow the TR39 Security Profile 4 <strong>Moderately Restrictive</strong>, with an exception for Greek.</p>
 <ul>
 <li>All identifiers in a document qualify as Single Script, or</li>
@@ -378,18 +379,17 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
 <li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
 </ul>
-<p><em>TODO: Motivation (target audience)</em></p>
-<h2 id="mixed-script-runs-with-combining-marks-will-become-illegal">5.4 Mixed-script runs with combining marks will become illegal</h2>
-<p>C++26 will check for unlikely sequences of <strong>combining marks</strong>, and reject some. Combining Marks have no script property per se, but a variable list of allowed SCX scripts, which need to be checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
-<p>This section is technically security relevant, as over-long runs of combining marks may lead to overflow.</p>
-<p>See <a href="#scx-extensions">8.2 “SCX Extensions”</a> and <a href="#combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> below.</p>
+<h2 id="mixed-script-runs-with-combining-marks-will-become-illegal">7.4 Mixed-script runs with combining marks will become illegal</h2>
+<p>C++26 (and C26) will check for unlikely sequences of <strong>combining marks</strong>, and reject some. Combining Marks have no script property per se, but a variable list of allowed SCX scripts, which need to be checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
+<p>This section is technically security-relevant, as over-long runs of combining marks may lead to overflow in sequences.</p>
+<p>See <a href="#8.2-scx-extensions">8.2 “SCX Extensions”</a> and <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> below.</p>
 <h1 id="tr24-scripts-the-sc-and-scx-properties">8 TR24 Scripts, the SC and SCX properties</h1>
 <h2 id="sc">8.1 SC</h2>
 <p>C++ only needs to map unicode characters to a script property via a single byte. There are currently 161 scripts assigned, 32 of them are in common use as identifiers, hence called <strong>Recommended</strong> scripts. The rest is split up into 127-31 <strong>Excluded</strong> scripts, which are not in common use, and 161-127 <strong>Limited_Use</strong> scripts, which are not to be used in identifiers at all.</p>
 <p>Regarding the discriminatory aspect of Excluded Scripts from <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>. <em>“Some scripts are not in customary modern use, and thus implementations may want to exclude them from identifiers. These include historic and obsolete scripts, scripts used mostly liturgically, and regional scripts used only in very small communities or with very limited current usage. Some scripts also have unresolved architectural issues that make them currently unsuitable for identifiers. The scripts in Table 4, Excluded Scripts are recommended for exclusion from identifiers.”</em> Nevertheless an implementation might choose to allow some optionally via a new <code>#pragma unicode Script</code>.</p>
-<p>Regarding Limited Use scripts: TR31#2.4: _“Modern scripts that are in more limited use are listed in Table 7, Limited Use Scripts. To avoid security issues, some implementations may wish to disallow the limited-use scripts in identifiers. For more information on usage, see the Unicode Locale project <a href="http://cldr.unicode.org/">CLDR</a>.”</p>
+<p>Regarding Limited Use scripts: TR31#2.4: <em>“Modern scripts that are in more limited use are listed in Table 7, Limited Use Scripts. To avoid security issues, some implementations may wish to disallow the limited-use scripts in identifiers. For more information on usage, see the Unicode Locale project <a href="http://cldr.unicode.org/">CLDR</a>.”</em></p>
 <p>Regarding stability: New scripts are added on a yearly basis, but nothing was added to the stable set of recommended scripts. For a while there was a list of <strong>Aspirational</strong> scripts to be added eventually, but this list was abandoned with Unicode 10.0. Probably also because nobody but Java, cperl and Rust implemented its identifier profile by scripts, rather went with insecure identifiers.</p>
-<p>For error messages and an optional pragma to allow certain Exluded scripts, we use the long <strong>Script property value</strong>. Do not use the term “script name”, as this is ambigious and <a href="https://www.unicode.org/reports/tr24/#Script_Names">misused</a>. The Script Property Value is the titlecased name of the script from the UCD, with spaces replaced by underscores. They are defined in the yearly updated <a href="https://www.unicode.org/Public/UNIDATA/Scripts.txt">Scripts</a></p>
+<p>For error messages and an optional pragma to allow certain Exluded scripts, we use the long <strong>Script property value</strong>. Do not use the term “script name”, as this is ambigious and <a href="https://www.unicode.org/reports/tr24/#Script_Names">misused</a>. The Script Property Value is the titlecased name of the script from the UCD, with spaces replaced by underscores. They are defined in the yearly updated <a href="https://www.unicode.org/Public/UNIDATA/Scripts.txt">Scripts</a>.</p>
 <h2 id="scx-extensions">8.2 SCX Extensions</h2>
 <p>Not all characters are uniquely used in a single script only. Many are used in a variable numbers of scripts. These are assigned to the Common or Inherited script, and are exactly specified in the <a href="https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt">ScriptExtensions</a>, aka SCX. The SCX property is a list of possible scripts per character. This list is using the short 4-letter script property, which needs to be resolved via the <a href="https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt">PropValue</a> to its long script property value. (E.g. Syrc to Syriac)</p>
 <pre><code># Script_Extensions=Arab Syrc
@@ -411,17 +411,17 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <li>Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).</li>
 <li>Optionally forbid sequences of base character + nonspacing mark that look the same as or confusingly similar to the base character alone (because the nonspacing mark overlays a portion of the base character). An example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE.</li>
 </ul>
-<p>Since we disallow already most combining marks (at least the Latin ones) with the requirement of NFC <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, this set of cases is quite small.</p>
+<p>Since we disallow already most combining marks (at least the Latin ones) with the requirement of NFC in <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, this set of cases is quite small.</p>
 <p>Special-cases:</p>
 <p>Using the Script property alone will not detect that the U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana, gc=Lm) should not be mixed with Latin. See <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a> and <a href="https://www.unicode.org/reports/tr46/">TR46</a>. We only have to check only 4 such explicitly japanese-only PROLONGED SOUND MARKs, all other Lm modifiers may mix with all SCX.</p>
 <p>The list of allowed combining mark characters (with Common or Inherited scripts) in the C++26 TR31 profile is: Lm <code>Modifier_Letter</code>, Mc <code>Spacing_Mark</code>, Mn <code>Nonspacing_Mark</code>, Me <code>Enclosing_Mark</code>. Sk and Cf are not part of XIDs.</p>
-<p>67 matches for “XID_Continue # Lm” in buffer: DerivedCoreProperties.txt See <a href="#appendix-c---xid_continue-lm">16 “Appendix C”</a> for all.</p>
+<p>67 matches for “XID_Continue # Lm” in buffer: DerivedCoreProperties.txt See <a href="#15-appendix-c---xid_continue-lm">15 “Appendix C”</a> for all.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER REVERSED GLOTTAL STOP</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>02C6..02D1    ; XID_Continue # Lm  [12] MODIFIER LETTER CIRCUMFLEX ACCENT..</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER HALF TRIANGULAR</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
-<p>513 matches for “XID_Continue # M” in buffer: DerivedCoreProperties.txt See <a href="#appendix-d---xid_continue-m">17 “Appendix D”</a> for all.</p>
+<p>513 matches for “XID_Continue # M” in buffer: DerivedCoreProperties.txt See <a href="#16-appendix-d---xid_continue-m">16 “Appendix D”</a> for all.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LATIN SMALL LETTER X</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..</span>
@@ -434,14 +434,14 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>See also <a href="https://www.unicode.org/reports/tr24/#Common">TR24#5.1 Handling Characters with the Common Script Property</a> and <a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks">TR24#5.2 Handling Combining Marks</a>.</p>
 <h1 id="tr39-identifier-type">9 TR39 Identifier Type</h1>
 <p>TR39 recommends to disable some characters from recommended scripts: <em>“Some characters used with recommended scripts may still be problematic for identifiers, for example because they are part of extensions that are not in modern customary use, and thus implementations may want to exclude them from identifiers. These include characters for historic and obsolete orthographies, characters used mostly liturgically, and in orthographies for languages used only in very small communities or with very limited current or declining usage. Some characters also have architectural issues that may make them unsuitable for identifiers.”</em></p>
-<p>The <strong>Identifier Type</strong> property <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> recommendation should be mandatory, with the addition of the non-confusable <code>Technical</code> Identifier Type to be allowed.</p>
+<p>The <strong>Identifier Type</strong> property <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> recommendation should be mandatory, with the addition of the non-confusable <strong>Technical</strong> Identifier Type to be allowed.</p>
 <p>I.e. <code>Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,</code> <code>Deprecated, Not_Character</code> are not part of identifiers.</p>
 <p>Allowed are Recommended, Inclusion, and all non-confusable Technical TR39 Identifier Types.</p>
 <p>Note that several Technical Identifier_Type are confusable, but not marked as such. So far only the Latin letters U+1C0 ǀ, U+1C1 ǁ, U+1C3 ǃ which are confusable with operators.</p>
 <p>Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are forbidden, even if allowed in TR31. They are confusable with the Latin base alphabet A-Z.</p>
-<p>And there are 79 Technical ranges added to the original list of Recommended and Inclusion ID’s, with the confusables U+1C0..U+1C3 manually excluded.</p>
+<p>There are 79 Technical ranges added to the original list of Recommended and Inclusion ID’s, with the confusables U+1C0..U+1C3 manually excluded.</p>
 <pre><code>grep &#39;, U8ID_Technical&#39; scripts.h | egrep -v &#39;Not_XID|U8ID_Obsolete|U8ID_Exclusion&#39;</code></pre>
-<p>See <a href="#appendix-e---idtype-technical">18 Appendix E - IDType Technical</a>.</p>
+<p>See <a href="#17-appendix-e---idtype-technical">17 Appendix E - IDType Technical</a>.</p>
 <h1 id="tr39-mixed-scripts">10 TR39 Mixed Scripts</h1>
 <p>TR39 defines some security profiles for identifers to avoid the most common identifier insecurities, that identifiers will stay identifiable.</p>
 <p>We want to choose a variant of the <strong>Moderately Restrictive</strong> profile, with an exception for non-confusable Greek. I called this profile C26_4 or SAFEC26 in libu8ident.</p>
@@ -456,7 +456,7 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
 <li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
 </ul>
-<p>Greek alone is always allowed, as Cyrillic, but wherever we have a valid Latin letter which looks the same as the Greek counterpart, the Greek letter is forbidden, choose the Latin one instead. E.g. ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A. See <a href="#appendix-f---greek-confusables">19 Appendix F</a> for the generated list with 12 exceptions.</p>
+<p>Greek alone is always allowed, as Cyrillic, but wherever we have a valid Latin letter which looks the same as the Greek counterpart, the Greek letter is forbidden, choose the Latin one instead. E.g. ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A. See <a href="#18-appendix-f---greek-confusables">18 Appendix F</a> for the generated list with 12 exceptions.</p>
 <p>Thus it prevents Cyrillic mixed with Latin or any other script, but does allow any East-Asian CFK language, other common and widely used languages and Latin mixed with Greek, mainly used for its popular and actually used mathematical symbols. Many mathematical symbols already exists outside of Greek, but these are mainly used for operators in advanced programming languages, not as identifiers. See also <a href="http://xahlee.info/comp/unicode_math_operators.html" class="uri">http://xahlee.info/comp/unicode_math_operators.html</a> for a nice overview.</p>
 <p>E.g. here we have some:</p>
 <ul>
@@ -481,17 +481,17 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>TR39 also compiles a convenient <a href="https://www.unicode.org/Public/security/latest/IdentifierStatus.txt">IdentifierStatus</a> list. But all the math letters with Script=Common from U+2100 to U+2200 are restricted, as Greek is forbidden mixed with Latin in the original TR39 Moderately Restrictive profile. Most are allowed according to the TR31 and TR39 rules of SAFEC26, so we need to come up with our own list of <code>XID_Start/XID_Continue</code> codepoints, excluding the Limited Use and Excluded scripts. And if an implementation choses to allow Excluded scripts with more logic to allow only this script.</p>
 <p>Since the TR31 XID list also got the median positions wrong (for 98 Arabic codepoints), has some confusables with ops, and forgot about the Halfwidth and Fullwidth, U+FF00..U+FFEF confusables, we need to fixup and generate the XID lists by ourselves.</p>
 <p>It is recommended to already exclude Limited Use and Excluded scripts from the initial list of identifier ranges, as this is the most common use-case, and shortens the common search paths. Only with the <code>#pragma Unicode ExcludedScript</code> search the full XID lists and the full scripts list.</p>
-<p>The TR39 Mixed Scripts profile alone does not prevent from all spoofing attacks, but the additional rules from <a href="#combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> are kept tiny.</p>
+<p>The TR39 Mixed Scripts profile alone does not prevent from all spoofing attacks, but the additional rules from <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> are kept tiny.</p>
 <h1 id="contexts-scopes">11 Contexts (Scopes)</h1>
 <p>This is not discussed in any of the unicode security guidelines for identifiers. One could argue that a mixed-script profile is valid only for a single identifier, or it is valid for the whole source file document. And there needs to be a definition if before or after the preprocessor, and if to treat names in private structs, classes and local names in functions as seperate contexts.</p>
 <p>If valid for only a single identifier you could arbitralily mix up Cyrillic with Greek identifiers in a C++ namespace, and thus these identifiers would not be identifiable anymore, as both both can render to the very same glyphs. Thus we adopt the notion of identifier contexts.</p>
-<p>With programming languages this is a source file, with objects files this is a module. For identifiers in object files see below <a href="#issues-with-binutils-linkers-exported-identifiers">13 Issues with binutils, linkers, exported identifiers</a>. For filesystems this would be a directory.</p>
+<p>With programming languages this is a source file, with objects files this is a module. For identifiers in object files there are open issues with binutils, linkers, exported identifiers, encodings. For filesystems this would be a directory.</p>
 <p>For every source file we need to store a context with the list of already seen scripts and how many. The maximal number of scripts is 4, for the case of Japanese mixed with Latin. (<code>Katakana + Hiragana +</code> <code>Han + Latin</code>), thus we can save that list in a single 4-byte word, and the lookup and memory management is trivial.</p>
 <p>Since the compiler sees the identifiers after the preprocessor included all headers, the context definition is a bit blurry. Is the context for mixed scripts an original source file (before cpp) or the resulting file after inclusion of all files (after cpp). This is similar to the problem with lexical variables a couple of decades ago.</p>
 <ul>
-<li><p><strong>before-cpp</strong>: One could argue that the scope of a variable should be contained in a lexical block, which can be statically determined and safely enclosed. With identifiers that would mean that the preprocessor already should perform the TR31 lexer checks and TR39 security checks, and one could define Arabic headers using private arabic fields, and include another header with Cyrillic only names. This would allow confusables in the resulting object file, and source files would be easy to check with external tools. See also the <a href="#12-issues-with-binutils-linkers-exported-identifiers">binutils section 12</a> below.</p></li>
+<li><p><strong>before-cpp</strong>: One could argue that the scope of a variable should be contained in a lexical block, which can be statically determined and safely enclosed. With identifiers that would mean that the preprocessor already should perform the TR31 lexer checks and TR39 security checks, and one could define Arabic headers using private arabic fields, and include another header with Cyrillic only names. This would allow confusables in the resulting object file, and source files would be easy to check with external tools.</p></li>
 <li><p><strong>private/scoped</strong>: Another argument would be that all exported names end up in the object files and library flat, which would support the seperation of private and public name contexts, where to perform the mixed-script checks. Private contexts (e.g. static structs, private class fields, local names in functions) should be seperated from the rest. This would prevent from confusables in struct/class fields/methods, and the rest is seperated by the checks for the public names. Jabuk Jelinek favored this approach to the GCC -Whomoglyph PR answer: <a href="https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html" class="uri">https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html</a></p></li>
-<li><p><strong>after-cpp</strong>: The third, strictest variant would define the context in the file after cpp. You would not be able to include a Cyrillic-only header, and you would not be able to use Cyrillic private fields. This would be the least surprising and most secure option. As long as the security risk lies ahead of us, one should go for the strictest option. Cyrillic header projects should be isolated and not used at all outside of non-cyrillic projects. I’m pointing the fingers at Cyrillic because it has the biggest number of confusables with Latin. Arabic headers e.g. are not all confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic speaker can identify and see differences in its names without long training. Same for CFK and the other major scripts.</p></li>
+<li><p><strong>after-cpp</strong>: The third, strictest variant would define the context in the file after cpp. You would not be able to include a Cyrillic-only header, and you would not be able to use Cyrillic private fields. This would be the least surprising and most secure option. As long as the security risk lies ahead of us, one should go for the strictest option. Cyrillic header projects should be isolated and not used at all outside of non-cyrillic projects. I’m pointing the fingers at Cyrillic because it has the biggest number of confusables with Latin. Arabic headers e.g. are not all confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic speaker can identify and see differences in its names without long training. Same for CFK and the other recommended scripts.</p></li>
 </ul>
 <h1 id="implementations-and-strategies">12 Implementations and Strategies</h1>
 <p>I implemented for <a href="https://github.com/perl11/cperl">cperl</a>, a fork of perl5, the General Security profile “Moderately restrictive” (4) for identifiers in 2017, together with transparent normalization of NFC. This is a dynamic language with the need for fast tokenizing, and compilation. Still I did not see a need to restrict all source code identifiers to be already in NFC. Even with the added unicode checks and dynamic normalization the tokenizer is still faster than the simplier perl5 tokenizer.</p>
@@ -499,7 +499,7 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>Rust has a good implementation also.</p>
 <p>ICU has no implementation for TR39 checks (yet).</p>
 <p>gcc <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR 103027</a> implements the “skeleton” algorithm from <a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a> via a switch table for all decomposables and confusables, and a dynamic hashtable for the NFD expanded identifiers. There’s a lot of room of improvement there, e.g. with perfect hashes instead of a switch table for the huge and sparse tables, but they had no complaints on speed and size yet. Implementing the mixed-scripts approach in C++26/C26 for their -Whomoglyph warnings would be faster and smaller though.</p>
-<h1 id="appendix-a---c26xid_start">14 Appendix A - C26XID_Start</h1>
+<h1 id="appendix-a---c26xid_start">13 Appendix A - C26XID_Start</h1>
 <p>Created with mkc26 from libu8ident. <em>The SCX is modelled as if your compiler would allow static initialization of strings as {char,…,0}.</em></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> sc <span class="op">{</span></span>
@@ -856,7 +856,7 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb13-353"><a href="#cb13-353" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0x30000</span><span class="op">,</span> <span class="bn">0x3134A</span><span class="op">,</span> SC_Han<span class="op">,</span> GC_Lo<span class="op">,</span> NULL<span class="op">},</span> <span class="co">//  𰀀..𱍊</span></span>
 <span id="cb13-354"><a href="#cb13-354" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb13-355"><a href="#cb13-355" aria-hidden="true" tabindex="-1"></a><span class="co">// 243 ranges, 93 singles, 95986 codepoints</span></span></code></pre></div>
-<h1 id="appendix-b---c26xid_continue">15 Appendix B - C26XID_Continue</h1>
+<h1 id="appendix-b---c26xid_continue">14 Appendix B - C26XID_Continue</h1>
 <p>Created with mkc26 from libu8ident. <em>The SCX is modelled as if your compiler would allow static initialization of strings as {char,…,0}.</em></p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC,</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">// MEDIAL from XID_Start and !MARK. Split on GC and SCX</span></span>
@@ -939,9 +939,9 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEF4</span><span class="op">,</span> <span class="bn">0xFEF4</span><span class="op">,</span> SC_Arabic<span class="op">,</span> GC_Lo<span class="op">,</span> NULL<span class="op">},</span> <span class="co">//  ﻴ</span></span>
 <span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a><span class="co">// 22 ranges, 53 singles, 200 codepoints</span></span></code></pre></div>
-<h1 id="appendix-c---xid_continue-lm">16 Appendix C - XID_Continue # Lm</h1>
-<p>Needed for <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a> and <a href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2</a> blabla</p>
-<p><em>link to discussion, why Lm.</em></p>
+<h1 id="appendix-c---xid_continue-lm">15 Appendix C - XID_Continue # Lm</h1>
+<p>Needed for the combining marks special-cases in Section 8.3 <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 Combining marks script run detection for spoofing</a>, which is needed for <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a> and <a href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2</a> checks.</p>
+<p>Practically this list is not needed, as only the 4 Japanese PROLONGED SOUND MARKs need to be checked. All other Lm Modifier Letters are freestanding base characters, which can be combined with any other letter.</p>
 <p>67 matches for “XID_Continue # Lm” in buffer: DerivedCoreProperties.txt</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER REVERSED GLOTTAL STOP</span>
@@ -1040,8 +1040,8 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb15-95"><a href="#cb15-95" aria-hidden="true" tabindex="-1"></a>1E137..1E13D  ; XID_Continue # Lm   [7] NYIAKENG PUACHUE HMONG SIGN FOR PERSON..</span>
 <span id="cb15-96"><a href="#cb15-96" aria-hidden="true" tabindex="-1"></a>                                        NYIAKENG PUACHUE HMONG SYLLABLE LENGTHENER</span>
 <span id="cb15-97"><a href="#cb15-97" aria-hidden="true" tabindex="-1"></a>1E94B         ; XID_Continue # Lm       ADLAM NASALIZATION MARK</span></code></pre></div>
-<h1 id="appendix-d---xid_continue-m">17 Appendix D - XID_Continue # M</h1>
-<p>Needed for <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a> blabla</p>
+<h1 id="appendix-d---xid_continue-m">16 Appendix D - XID_Continue # M</h1>
+<p>Needed for the combining marks checks in Section 8.3 <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 Combining marks script run detection for spoofing</a>.</p>
 <p>513 matches for “XID_Continue # M” in buffer: DerivedCoreProperties.txt</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LATIN SMALL LETTER X</span>
@@ -1646,263 +1646,265 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb16-601"><a href="#cb16-601" aria-hidden="true" tabindex="-1"></a>                                        MENDE KIKAKUI COMBINING NUMBER MILLIONS</span>
 <span id="cb16-602"><a href="#cb16-602" aria-hidden="true" tabindex="-1"></a>1E944..1E94A  ; XID_Continue # Mn   [7] ADLAM ALIF LENGTHENER..ADLAM NUKTA</span>
 <span id="cb16-603"><a href="#cb16-603" aria-hidden="true" tabindex="-1"></a>E0100..E01EF  ; XID_Continue # Mn [240] VARIATION SELECTOR-17..-256</span></code></pre></div>
-<h1 id="appendix-e---idtype-technical">18 Appendix E - IDType Technical</h1>
-<p>Needed for Section 9 <a href="#tr39-identifier-type">TR39 Identifier Type</a>. List of Technical ID characters, added to the TR39 Recommended and Inclusion IDTypes. TR39#Table 1 <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type" class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a>. In guidance with TR39.</p>
+<h1 id="appendix-e---idtype-technical">17 Appendix E - IDType Technical</h1>
+<p>Needed for Section 9 <a href="#9-tr39-identifier-type">TR39 Identifier Type</a>. List of Technical ID characters, added to the TR39 Recommended and Inclusion IDTypes. TR39#Table 1 <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type" class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a>. In guidance with TR39.</p>
+<p>The confusables</p>
+<pre><code>01C0..01C3    ; Technical  # 1.1    [4] LATIN LETTER DENTAL CLICK..
+                                    RETROFLEX CLICK</code></pre>
+<p>are excluded here.</p>
 <pre><code>grep &#39; Technical &#39; IdentifierType.txt |
   egrep -v &#39;Not_XID|Obsolete|Exclusion|Uncommon_Use|Limited_Use&#39;</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>0180          ; Technical  # 1.1        LATIN SMALL LETTER B WITH STROKE</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>01C0..01C3    ; Technical  # 1.1    [4] LATIN LETTER DENTAL CLICK..</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                                        RETROFLEX CLICK</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>0234..0236    ; Technical  # 4.0    [3] LATIN SMALL LETTER L WITH CURL..</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                                        T WITH CURL</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>0250..0252    ; Technical  # 1.1    [3] LATIN SMALL LETTER TURNED A..ALPHA</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>0255          ; Technical  # 1.1        LATIN SMALL LETTER C WITH CURL</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>0258          ; Technical  # 1.1        LATIN SMALL LETTER REVERSED E</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>025A          ; Technical  # 1.1        LATIN SMALL LETTER SCHWA WITH HOOK</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>025C..0262    ; Technical  # 1.1    [7] LATIN SMALL LETTER REVERSED OPEN E..</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>                                        LATIN LETTER SMALL CAPITAL G</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>0264..0267    ; Technical  # 1.1    [4] LATIN SMALL LETTER RAMS HORN..</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER HENG WITH HOOK</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>026A..0271    ; Technical  # 1.1    [8] LATIN LETTER SMALL CAPITAL I..</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER M WITH HOOK</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>0273..0276    ; Technical  # 1.1    [4] LATIN SMALL LETTER N WITH RETROFLEX</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>                                        HOOK..LATIN LETTER SMALL CAPITAL OE</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>0278..027B    ; Technical  # 1.1    [4] LATIN SMALL LETTER PHI..</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER TURNED R WITH HOOK</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>027D..0288    ; Technical  # 1.1   [12] LATIN SMALL LETTER R WITH TAIL..</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER T WITH RETROFLEX HOOK</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>028A..0291    ; Technical  # 1.1    [8] LATIN SMALL LETTER UPSILON..</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER Z WITH CURL</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>0293..029D    ; Technical  # 1.1   [11] LATIN SMALL LETTER EZH WITH CURL..</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER J WITH CROSSED-TAIL</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>029F..02A8    ; Technical  # 1.1   [10] LATIN LETTER SMALL CAPITAL L..</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER TC DIGRAPH WITH CURL</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>02A9..02AD    ; Technical  # 3.0    [5] LATIN SMALL LETTER FENG DIGRAPH..</span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>                                        LATIN LETTER BIDENTAL PERCUSSIVE</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>02AE..02AF    ; Technical  # 4.0    [2] LATIN SMALL LETTER TURNED H WITH</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                                        FISHHOOK..AND TAIL</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>02B9..02BA    ; Technical  # 1.1    [2] MODIFIER LETTER PRIME..DOUBLE PRIME</span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>02BD..02C1    ; Technical  # 1.1    [5] MODIFIER LETTER REVERSED COMMA..</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER REVERSED GLOTTAL STOP</span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>02C6..02D1    ; Technical  # 1.1   [12] MODIFIER LETTER CIRCUMFLEX ACCENT..</span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER HALF TRIANGULAR COLON</span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>02EE          ; Technical  # 3.0        MODIFIER LETTER DOUBLE APOSTROPHE</span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>030E          ; Technical  # 1.1        COMBINING DOUBLE VERTICAL LINE ABOVE</span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>0312          ; Technical  # 1.1        COMBINING TURNED COMMA ABOVE</span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>0315          ; Technical  # 1.1        COMBINING COMMA ABOVE RIGHT</span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>0317..031A    ; Technical  # 1.1    [4] COMBINING ACUTE ACCENT BELOW..</span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LEFT ANGLE ABOVE</span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>031C..0320    ; Technical  # 1.1    [5] COMBINING LEFT HALF RING BELOW..</span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>                                        COMBINING MINUS SIGN BELOW</span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>0329..032C    ; Technical  # 1.1    [4] COMBINING VERTICAL LINE BELOW..</span>
-<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CARON BELOW</span>
-<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>032F          ; Technical  # 1.1        COMBINING INVERTED BREVE BELOW</span>
-<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>0333          ; Technical  # 1.1        COMBINING DOUBLE LOW LINE</span>
-<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>0337          ; Technical  # 1.1        COMBINING SHORT SOLIDUS OVERLAY</span>
-<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>033A..033F    ; Technical  # 1.1    [6] COMBINING INVERTED BRIDGE BELOW..</span>
-<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE OVERLINE</span>
-<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>0346..034E    ; Technical  # 3.0    [9] COMBINING BRIDGE ABOVE..</span>
-<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>                                        COMBINING UPWARDS ARROW BELOW</span>
-<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>0350..0357    ; Technical  # 4.0    [8] COMBINING RIGHT ARROWHEAD ABOVE..</span>
-<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>                                        HALF RING ABOVE</span>
-<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>0359..035C    ; Technical  # 4.1    [4] COMBINING ASTERISK BELOW..</span>
-<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE BREVE BELOW</span>
-<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>035D..035F    ; Technical  # 4.0    [3] COMBINING DOUBLE BREVE..MACRON BELOW</span>
-<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>0360..0361    ; Technical  # 1.1    [2] COMBINING DOUBLE TILDE..INVERTED BREVE</span>
-<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>0362          ; Technical  # 3.0        COMBINING DOUBLE RIGHTWARDS ARROW BELOW</span>
-<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>03CF          ; Technical  # 5.1        GREEK CAPITAL KAI SYMBOL</span>
-<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>03D7          ; Technical  # 3.0        GREEK KAI SYMBOL</span>
-<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>0560          ; Technical  # 11.0       ARMENIAN SMALL LETTER TURNED AYB</span>
-<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>0588          ; Technical  # 11.0       ARMENIAN SMALL LETTER YI WITH STROKE</span>
-<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>0953..0954    ; Technical  # 1.1    [2] DEVANAGARI GRAVE ACCENT..</span>
-<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>                                        DEVANAGARI ACUTE ACCENT</span>
-<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>0D81          ; Technical  # 13.0       SINHALA SIGN CANDRABINDU</span>
-<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a>0F18..0F19    ; Technical  # 2.0    [2] TIBETAN ASTROLOGICAL SIGN -KHYUD PA..</span>
-<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>                                        TIBETAN ASTROLOGICAL SIGN SDONG TSHUGS</span>
-<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a>17CE..17CF    ; Technical  # 3.0    [2] KHMER SIGN KAKABAT..</span>
-<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>                                        KHMER SIGN AHSDA</span>
-<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a>1ABF..1AC0    ; Technical  # 13.0   [2] COMBINING LATIN SMALL LETTER W BELOW..</span>
-<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a>                                        TURNED W BELOW</span>
-<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a>1D00..1D2B    ; Technical  # 4.0   [44] LATIN LETTER SMALL CAPITAL A..</span>
-<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>                                        CYRILLIC LETTER SMALL CAPITAL EL</span>
-<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a>1D2F          ; Technical  # 4.0        MODIFIER LETTER CAPITAL BARRED B</span>
-<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>1D3B          ; Technical  # 4.0        MODIFIER LETTER CAPITAL REVERSED N</span>
-<span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a>1D4E          ; Technical  # 4.0        MODIFIER LETTER SMALL TURNED I</span>
-<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a>1D6B          ; Technical  # 4.0        LATIN SMALL LETTER UE</span>
-<span id="cb18-80"><a href="#cb18-80" aria-hidden="true" tabindex="-1"></a>1D6C..1D77    ; Technical  # 4.1   [12] LATIN SMALL LETTER B WITH MIDDLE TILDE..</span>
-<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER TURNED G</span>
-<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a>1D79..1D9A    ; Technical  # 4.1   [34] LATIN SMALL LETTER INSULAR G..</span>
-<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a>                                        EZH WITH RETROFLEX HOOK</span>
-<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a>1DC4..1DCA    ; Technical  # 5.0    [7] COMBINING MACRON-ACUTE..</span>
-<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LATIN SMALL LETTER R BELOW</span>
-<span id="cb18-86"><a href="#cb18-86" aria-hidden="true" tabindex="-1"></a>1DCB..1DCD    ; Technical  # 5.1    [3] COMBINING BREVE-MACRON..</span>
-<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE CIRCUMFLEX ABOVE</span>
-<span id="cb18-88"><a href="#cb18-88" aria-hidden="true" tabindex="-1"></a>1DCF..1DD0    ; Technical  # 5.1    [2] COMBINING ZIGZAG BELOW..</span>
-<span id="cb18-89"><a href="#cb18-89" aria-hidden="true" tabindex="-1"></a>                                        COMBINING IS BELOW</span>
-<span id="cb18-90"><a href="#cb18-90" aria-hidden="true" tabindex="-1"></a>1DE7..1DF5    ; Technical  # 7.0   [15] COMBINING LATIN SMALL LETTER ALPHA..</span>
-<span id="cb18-91"><a href="#cb18-91" aria-hidden="true" tabindex="-1"></a>                                        COMBINING UP TACK ABOVE</span>
-<span id="cb18-92"><a href="#cb18-92" aria-hidden="true" tabindex="-1"></a>1DF6..1DF9    ; Technical  # 10.0   [4] COMBINING KAVYKA ABOVE RIGHT..</span>
-<span id="cb18-93"><a href="#cb18-93" aria-hidden="true" tabindex="-1"></a>                                        COMBINING WIDE INVERTED BRIDGE BELOW</span>
-<span id="cb18-94"><a href="#cb18-94" aria-hidden="true" tabindex="-1"></a>1DFB          ; Technical  # 9.0        COMBINING DELETION MARK</span>
-<span id="cb18-95"><a href="#cb18-95" aria-hidden="true" tabindex="-1"></a>1DFC          ; Technical  # 6.0        COMBINING DOUBLE INVERTED BREVE BELOW</span>
-<span id="cb18-96"><a href="#cb18-96" aria-hidden="true" tabindex="-1"></a>1DFD          ; Technical  # 5.2        COMBINING ALMOST EQUAL TO BELOW</span>
-<span id="cb18-97"><a href="#cb18-97" aria-hidden="true" tabindex="-1"></a>1DFE..1DFF    ; Technical  # 5.0    [2] COMBINING LEFT ARROWHEAD ABOVE..</span>
-<span id="cb18-98"><a href="#cb18-98" aria-hidden="true" tabindex="-1"></a>                                        COMBINING RIGHT ARROWHEAD AND DOWN</span>
-<span id="cb18-99"><a href="#cb18-99" aria-hidden="true" tabindex="-1"></a>                                        ARROWHEAD BELOW</span>
-<span id="cb18-100"><a href="#cb18-100" aria-hidden="true" tabindex="-1"></a>1E9C..1E9D    ; Technical  # 5.1    [2] LATIN SMALL LETTER LONG S WITH DIAGONAL</span>
-<span id="cb18-101"><a href="#cb18-101" aria-hidden="true" tabindex="-1"></a>                                        STROKE..WITH HIGH STROKE</span>
-<span id="cb18-102"><a href="#cb18-102" aria-hidden="true" tabindex="-1"></a>1E9F          ; Technical  # 5.1        LATIN SMALL LETTER DELTA</span>
-<span id="cb18-103"><a href="#cb18-103" aria-hidden="true" tabindex="-1"></a>1EFA..1EFF    ; Technical  # 5.1    [6] LATIN CAPITAL LETTER MIDDLE-WELSH LL..</span>
-<span id="cb18-104"><a href="#cb18-104" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER Y WITH LOOP</span>
-<span id="cb18-105"><a href="#cb18-105" aria-hidden="true" tabindex="-1"></a>203F..2040    ; Technical  # 1.1    [2] UNDERTIE..</span>
-<span id="cb18-106"><a href="#cb18-106" aria-hidden="true" tabindex="-1"></a>                                        CHARACTER TIE</span>
-<span id="cb18-107"><a href="#cb18-107" aria-hidden="true" tabindex="-1"></a>20D0..20DC    ; Technical  # 1.1   [13] COMBINING LEFT HARPOON ABOVE..</span>
-<span id="cb18-108"><a href="#cb18-108" aria-hidden="true" tabindex="-1"></a>                                        COMBINING FOUR DOTS ABOVE</span>
-<span id="cb18-109"><a href="#cb18-109" aria-hidden="true" tabindex="-1"></a>20E1          ; Technical  # 1.1        COMBINING LEFT RIGHT ARROW ABOVE</span>
-<span id="cb18-110"><a href="#cb18-110" aria-hidden="true" tabindex="-1"></a>20E5..20EA    ; Technical  # 3.2    [6] COMBINING REVERSE SOLIDUS OVERLAY..</span>
-<span id="cb18-111"><a href="#cb18-111" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LEFTWARDS ARROW OVERLAY</span>
-<span id="cb18-112"><a href="#cb18-112" aria-hidden="true" tabindex="-1"></a>20EB          ; Technical  # 4.1        COMBINING LONG DOUBLE SOLIDUS OVERLAY</span>
-<span id="cb18-113"><a href="#cb18-113" aria-hidden="true" tabindex="-1"></a>20EC..20EF    ; Technical  # 5.0    [4] COMBINING RIGHTWARDS HARPOON WITH BARB</span>
-<span id="cb18-114"><a href="#cb18-114" aria-hidden="true" tabindex="-1"></a>                                        DOWNWARDS..COMBINING RIGHT ARROW BELOW</span>
-<span id="cb18-115"><a href="#cb18-115" aria-hidden="true" tabindex="-1"></a>20F0          ; Technical  # 5.1        COMBINING ASTERISK ABOVE</span>
-<span id="cb18-116"><a href="#cb18-116" aria-hidden="true" tabindex="-1"></a>2118          ; Technical  # 1.1        SCRIPT CAPITAL P</span>
-<span id="cb18-117"><a href="#cb18-117" aria-hidden="true" tabindex="-1"></a>212E          ; Technical  # 1.1        ESTIMATED SYMBOL</span>
-<span id="cb18-118"><a href="#cb18-118" aria-hidden="true" tabindex="-1"></a>2C60..2C67    ; Technical  # 5.0    [8] LATIN CAPITAL LETTER L WITH DOUBLE BAR..</span>
-<span id="cb18-119"><a href="#cb18-119" aria-hidden="true" tabindex="-1"></a>                                        LATIN CAPITAL LETTER H WITH DESCENDER</span>
-<span id="cb18-120"><a href="#cb18-120" aria-hidden="true" tabindex="-1"></a>2C77          ; Technical  # 5.0        LATIN SMALL LETTER TAILLESS PHI</span>
-<span id="cb18-121"><a href="#cb18-121" aria-hidden="true" tabindex="-1"></a>2C78..2C7B    ; Technical  # 5.1    [4] LATIN SMALL LETTER E WITH NOTCH..</span>
-<span id="cb18-122"><a href="#cb18-122" aria-hidden="true" tabindex="-1"></a>                                        LATIN LETTER SMALL CAPITAL TURNED E</span>
-<span id="cb18-123"><a href="#cb18-123" aria-hidden="true" tabindex="-1"></a>3021..302D    ; Technical  # 1.1   [13] HANGZHOU NUMERAL ONE..</span>
-<span id="cb18-124"><a href="#cb18-124" aria-hidden="true" tabindex="-1"></a>                                        IDEOGRAPHIC ENTERING TONE MARK</span>
-<span id="cb18-125"><a href="#cb18-125" aria-hidden="true" tabindex="-1"></a>3031..3035    ; Technical  # 1.1    [5] VERTICAL KANA REPEAT MARK..</span>
-<span id="cb18-126"><a href="#cb18-126" aria-hidden="true" tabindex="-1"></a>                                        VERTICAL KANA REPEAT MARK LOWER HALF</span>
-<span id="cb18-127"><a href="#cb18-127" aria-hidden="true" tabindex="-1"></a>303B..303C    ; Technical  # 3.2    [2] VERTICAL IDEOGRAPHIC ITERATION MARK..</span>
-<span id="cb18-128"><a href="#cb18-128" aria-hidden="true" tabindex="-1"></a>                                        MASU MARK</span>
-<span id="cb18-129"><a href="#cb18-129" aria-hidden="true" tabindex="-1"></a>A78E          ; Technical  # 6.0        LATIN SMALL LETTER L WITH RETROFLEX HOOK</span>
-<span id="cb18-130"><a href="#cb18-130" aria-hidden="true" tabindex="-1"></a>                                        AND BELT</span>
-<span id="cb18-131"><a href="#cb18-131" aria-hidden="true" tabindex="-1"></a>A7AF          ; Technical  # 11.0       LATIN LETTER SMALL CAPITAL Q</span>
-<span id="cb18-132"><a href="#cb18-132" aria-hidden="true" tabindex="-1"></a>A7BA..A7BF    ; Technical  # 12.0   [6] LATIN CAPITAL LETTER GLOTTAL A..</span>
-<span id="cb18-133"><a href="#cb18-133" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER GLOTTAL U</span>
-<span id="cb18-134"><a href="#cb18-134" aria-hidden="true" tabindex="-1"></a>A7FA          ; Technical  # 6.0        LATIN LETTER SMALL CAPITAL TURNED M</span>
-<span id="cb18-135"><a href="#cb18-135" aria-hidden="true" tabindex="-1"></a>AB68          ; Technical  # 13.0       LATIN SMALL LETTER TURNED R WITH MIDDLE</span>
-<span id="cb18-136"><a href="#cb18-136" aria-hidden="true" tabindex="-1"></a>                                        TILDE</span>
-<span id="cb18-137"><a href="#cb18-137" aria-hidden="true" tabindex="-1"></a>FE20..FE23    ; Technical  # 1.1    [4] COMBINING LIGATURE LEFT HALF..</span>
-<span id="cb18-138"><a href="#cb18-138" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE TILDE RIGHT HALF</span>
-<span id="cb18-139"><a href="#cb18-139" aria-hidden="true" tabindex="-1"></a>FE24..FE26    ; Technical  # 5.1    [3] COMBINING MACRON LEFT HALF..</span>
-<span id="cb18-140"><a href="#cb18-140" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CONJOINING MACRON</span>
-<span id="cb18-141"><a href="#cb18-141" aria-hidden="true" tabindex="-1"></a>FE27..FE2D    ; Technical  # 7.0    [7] COMBINING LIGATURE LEFT HALF BELOW..</span>
-<span id="cb18-142"><a href="#cb18-142" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CONJOINING MACRON BELOW</span>
-<span id="cb18-143"><a href="#cb18-143" aria-hidden="true" tabindex="-1"></a>FE73          ; Technical  # 3.2        ARABIC TAIL FRAGMENT</span>
-<span id="cb18-144"><a href="#cb18-144" aria-hidden="true" tabindex="-1"></a>1CF00..1CF2D  ; Technical  # 14.0  [46] ZNAMENNY COMBINING MARK GORAZDO NIZKO S</span>
-<span id="cb18-145"><a href="#cb18-145" aria-hidden="true" tabindex="-1"></a>                                        KRYZHEM ON LEFT..KRYZH ON LEFT</span>
-<span id="cb18-146"><a href="#cb18-146" aria-hidden="true" tabindex="-1"></a>1CF30..1CF46  ; Technical  # 14.0  [23] ZNAMENNY COMBINING TONAL RANGE MARK</span>
-<span id="cb18-147"><a href="#cb18-147" aria-hidden="true" tabindex="-1"></a>                                        MRACHNO..PRIZNAK MODIFIER ROG</span>
-<span id="cb18-148"><a href="#cb18-148" aria-hidden="true" tabindex="-1"></a>1D165..1D169  ; Technical  # 3.1    [5] MUSICAL SYMBOL COMBINING STEM..TREMOLO-3</span>
-<span id="cb18-149"><a href="#cb18-149" aria-hidden="true" tabindex="-1"></a>1D16D..1D172  ; Technical  # 3.1    [6] MUSICAL SYMBOL COMBINING AUGMENTATION</span>
-<span id="cb18-150"><a href="#cb18-150" aria-hidden="true" tabindex="-1"></a>                                        DOT..MUSICAL SYMBOL COMBINING FLAG-5</span>
-<span id="cb18-151"><a href="#cb18-151" aria-hidden="true" tabindex="-1"></a>1D17B..1D182  ; Technical  # 3.1    [8] MUSICAL SYMBOL COMBINING ACCENT..LOURE</span>
-<span id="cb18-152"><a href="#cb18-152" aria-hidden="true" tabindex="-1"></a>1D185..1D18B  ; Technical  # 3.1    [7] MUSICAL SYMBOL COMBINING DOIT..</span>
-<span id="cb18-153"><a href="#cb18-153" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING TRIPLE TONGUE</span>
-<span id="cb18-154"><a href="#cb18-154" aria-hidden="true" tabindex="-1"></a>1D1AA..1D1AD  ; Technical  # 3.1    [4] MUSICAL SYMBOL COMBINING DOWN BOW..</span>
-<span id="cb18-155"><a href="#cb18-155" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING SNAP PIZZICATO</span></code></pre></div>
-<h1 id="appendix-f---greek-confusables">19 Appendix F - Greek Confusables</h1>
-<p>Needed for exclusion in the <a href="#tr39-mixed-scripts">9 TR39 Mixed Scripts</a> Greek rule. Where-ever we have a Greek letter confusable with Latin, and we already saw Latin, forbid the Greek letter in favor of the Latin letter. See TR39 <a href="https://www.unicode.org/Public/security/latest/confusables.txt">confusables</a>. Note that these confusables cannot be excluded upfront in the TR31 identifier parsing, as Greek alone is allowed.</p>
-<h2 id="exceptions">19.1 Exceptions</h2>
-<p>Allow these 12 Greek letters and symbols to be confusable with Latin: <code>037A, 0381, 0398, 03B5, 03B7, 03B8, 03B9, 03BD, 03C3, 03D1, 03F1, 03F4</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>0381 ; ( α → a ) GREEK SMALL LETTER ALPHA</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, COMBINING</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                  VERTICAL LINE BELOW</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>03BD ; ( ν → v ) GREEK SMALL LETTER NU → LATIN SMALL LETTER V</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA → LATIN SMALL LETTER O</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span></code></pre></div>
-<h2 id="confusables">19.2 Confusables</h2>
-<p>List of the Greek-Latin confusables: (Note: these include the exceptions above)</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>0180          ; Technical  # 1.1        LATIN SMALL LETTER B WITH STROKE</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>0234..0236    ; Technical  # 4.0    [3] LATIN SMALL LETTER L WITH CURL..</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                                        T WITH CURL</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>0250..0252    ; Technical  # 1.1    [3] LATIN SMALL LETTER TURNED A..ALPHA</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>0255          ; Technical  # 1.1        LATIN SMALL LETTER C WITH CURL</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>0258          ; Technical  # 1.1        LATIN SMALL LETTER REVERSED E</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>025A          ; Technical  # 1.1        LATIN SMALL LETTER SCHWA WITH HOOK</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>025C..0262    ; Technical  # 1.1    [7] LATIN SMALL LETTER REVERSED OPEN E..</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                                        LATIN LETTER SMALL CAPITAL G</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>0264..0267    ; Technical  # 1.1    [4] LATIN SMALL LETTER RAMS HORN..</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER HENG WITH HOOK</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>026A..0271    ; Technical  # 1.1    [8] LATIN LETTER SMALL CAPITAL I..</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER M WITH HOOK</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>0273..0276    ; Technical  # 1.1    [4] LATIN SMALL LETTER N WITH RETROFLEX</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                                        HOOK..LATIN LETTER SMALL CAPITAL OE</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>0278..027B    ; Technical  # 1.1    [4] LATIN SMALL LETTER PHI..</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER TURNED R WITH HOOK</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>027D..0288    ; Technical  # 1.1   [12] LATIN SMALL LETTER R WITH TAIL..</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER T WITH RETROFLEX HOOK</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>028A..0291    ; Technical  # 1.1    [8] LATIN SMALL LETTER UPSILON..</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER Z WITH CURL</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>0293..029D    ; Technical  # 1.1   [11] LATIN SMALL LETTER EZH WITH CURL..</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER J WITH CROSSED-TAIL</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>029F..02A8    ; Technical  # 1.1   [10] LATIN LETTER SMALL CAPITAL L..</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER TC DIGRAPH WITH CURL</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>02A9..02AD    ; Technical  # 3.0    [5] LATIN SMALL LETTER FENG DIGRAPH..</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>                                        LATIN LETTER BIDENTAL PERCUSSIVE</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>02AE..02AF    ; Technical  # 4.0    [2] LATIN SMALL LETTER TURNED H WITH</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>                                        FISHHOOK..AND TAIL</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>02B9..02BA    ; Technical  # 1.1    [2] MODIFIER LETTER PRIME..DOUBLE PRIME</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>02BD..02C1    ; Technical  # 1.1    [5] MODIFIER LETTER REVERSED COMMA..</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER REVERSED GLOTTAL STOP</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>02C6..02D1    ; Technical  # 1.1   [12] MODIFIER LETTER CIRCUMFLEX ACCENT..</span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER HALF TRIANGULAR COLON</span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>02EE          ; Technical  # 3.0        MODIFIER LETTER DOUBLE APOSTROPHE</span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>030E          ; Technical  # 1.1        COMBINING DOUBLE VERTICAL LINE ABOVE</span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>0312          ; Technical  # 1.1        COMBINING TURNED COMMA ABOVE</span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>0315          ; Technical  # 1.1        COMBINING COMMA ABOVE RIGHT</span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>0317..031A    ; Technical  # 1.1    [4] COMBINING ACUTE ACCENT BELOW..</span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LEFT ANGLE ABOVE</span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>031C..0320    ; Technical  # 1.1    [5] COMBINING LEFT HALF RING BELOW..</span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a>                                        COMBINING MINUS SIGN BELOW</span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a>0329..032C    ; Technical  # 1.1    [4] COMBINING VERTICAL LINE BELOW..</span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CARON BELOW</span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a>032F          ; Technical  # 1.1        COMBINING INVERTED BREVE BELOW</span>
+<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a>0333          ; Technical  # 1.1        COMBINING DOUBLE LOW LINE</span>
+<span id="cb19-47"><a href="#cb19-47" aria-hidden="true" tabindex="-1"></a>0337          ; Technical  # 1.1        COMBINING SHORT SOLIDUS OVERLAY</span>
+<span id="cb19-48"><a href="#cb19-48" aria-hidden="true" tabindex="-1"></a>033A..033F    ; Technical  # 1.1    [6] COMBINING INVERTED BRIDGE BELOW..</span>
+<span id="cb19-49"><a href="#cb19-49" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE OVERLINE</span>
+<span id="cb19-50"><a href="#cb19-50" aria-hidden="true" tabindex="-1"></a>0346..034E    ; Technical  # 3.0    [9] COMBINING BRIDGE ABOVE..</span>
+<span id="cb19-51"><a href="#cb19-51" aria-hidden="true" tabindex="-1"></a>                                        COMBINING UPWARDS ARROW BELOW</span>
+<span id="cb19-52"><a href="#cb19-52" aria-hidden="true" tabindex="-1"></a>0350..0357    ; Technical  # 4.0    [8] COMBINING RIGHT ARROWHEAD ABOVE..</span>
+<span id="cb19-53"><a href="#cb19-53" aria-hidden="true" tabindex="-1"></a>                                        HALF RING ABOVE</span>
+<span id="cb19-54"><a href="#cb19-54" aria-hidden="true" tabindex="-1"></a>0359..035C    ; Technical  # 4.1    [4] COMBINING ASTERISK BELOW..</span>
+<span id="cb19-55"><a href="#cb19-55" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE BREVE BELOW</span>
+<span id="cb19-56"><a href="#cb19-56" aria-hidden="true" tabindex="-1"></a>035D..035F    ; Technical  # 4.0    [3] COMBINING DOUBLE BREVE..MACRON BELOW</span>
+<span id="cb19-57"><a href="#cb19-57" aria-hidden="true" tabindex="-1"></a>0360..0361    ; Technical  # 1.1    [2] COMBINING DOUBLE TILDE..INVERTED BREVE</span>
+<span id="cb19-58"><a href="#cb19-58" aria-hidden="true" tabindex="-1"></a>0362          ; Technical  # 3.0        COMBINING DOUBLE RIGHTWARDS ARROW BELOW</span>
+<span id="cb19-59"><a href="#cb19-59" aria-hidden="true" tabindex="-1"></a>03CF          ; Technical  # 5.1        GREEK CAPITAL KAI SYMBOL</span>
+<span id="cb19-60"><a href="#cb19-60" aria-hidden="true" tabindex="-1"></a>03D7          ; Technical  # 3.0        GREEK KAI SYMBOL</span>
+<span id="cb19-61"><a href="#cb19-61" aria-hidden="true" tabindex="-1"></a>0560          ; Technical  # 11.0       ARMENIAN SMALL LETTER TURNED AYB</span>
+<span id="cb19-62"><a href="#cb19-62" aria-hidden="true" tabindex="-1"></a>0588          ; Technical  # 11.0       ARMENIAN SMALL LETTER YI WITH STROKE</span>
+<span id="cb19-63"><a href="#cb19-63" aria-hidden="true" tabindex="-1"></a>0953..0954    ; Technical  # 1.1    [2] DEVANAGARI GRAVE ACCENT..</span>
+<span id="cb19-64"><a href="#cb19-64" aria-hidden="true" tabindex="-1"></a>                                        DEVANAGARI ACUTE ACCENT</span>
+<span id="cb19-65"><a href="#cb19-65" aria-hidden="true" tabindex="-1"></a>0D81          ; Technical  # 13.0       SINHALA SIGN CANDRABINDU</span>
+<span id="cb19-66"><a href="#cb19-66" aria-hidden="true" tabindex="-1"></a>0F18..0F19    ; Technical  # 2.0    [2] TIBETAN ASTROLOGICAL SIGN -KHYUD PA..</span>
+<span id="cb19-67"><a href="#cb19-67" aria-hidden="true" tabindex="-1"></a>                                        TIBETAN ASTROLOGICAL SIGN SDONG TSHUGS</span>
+<span id="cb19-68"><a href="#cb19-68" aria-hidden="true" tabindex="-1"></a>17CE..17CF    ; Technical  # 3.0    [2] KHMER SIGN KAKABAT..</span>
+<span id="cb19-69"><a href="#cb19-69" aria-hidden="true" tabindex="-1"></a>                                        KHMER SIGN AHSDA</span>
+<span id="cb19-70"><a href="#cb19-70" aria-hidden="true" tabindex="-1"></a>1ABF..1AC0    ; Technical  # 13.0   [2] COMBINING LATIN SMALL LETTER W BELOW..</span>
+<span id="cb19-71"><a href="#cb19-71" aria-hidden="true" tabindex="-1"></a>                                        TURNED W BELOW</span>
+<span id="cb19-72"><a href="#cb19-72" aria-hidden="true" tabindex="-1"></a>1D00..1D2B    ; Technical  # 4.0   [44] LATIN LETTER SMALL CAPITAL A..</span>
+<span id="cb19-73"><a href="#cb19-73" aria-hidden="true" tabindex="-1"></a>                                        CYRILLIC LETTER SMALL CAPITAL EL</span>
+<span id="cb19-74"><a href="#cb19-74" aria-hidden="true" tabindex="-1"></a>1D2F          ; Technical  # 4.0        MODIFIER LETTER CAPITAL BARRED B</span>
+<span id="cb19-75"><a href="#cb19-75" aria-hidden="true" tabindex="-1"></a>1D3B          ; Technical  # 4.0        MODIFIER LETTER CAPITAL REVERSED N</span>
+<span id="cb19-76"><a href="#cb19-76" aria-hidden="true" tabindex="-1"></a>1D4E          ; Technical  # 4.0        MODIFIER LETTER SMALL TURNED I</span>
+<span id="cb19-77"><a href="#cb19-77" aria-hidden="true" tabindex="-1"></a>1D6B          ; Technical  # 4.0        LATIN SMALL LETTER UE</span>
+<span id="cb19-78"><a href="#cb19-78" aria-hidden="true" tabindex="-1"></a>1D6C..1D77    ; Technical  # 4.1   [12] LATIN SMALL LETTER B WITH MIDDLE TILDE..</span>
+<span id="cb19-79"><a href="#cb19-79" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER TURNED G</span>
+<span id="cb19-80"><a href="#cb19-80" aria-hidden="true" tabindex="-1"></a>1D79..1D9A    ; Technical  # 4.1   [34] LATIN SMALL LETTER INSULAR G..</span>
+<span id="cb19-81"><a href="#cb19-81" aria-hidden="true" tabindex="-1"></a>                                        EZH WITH RETROFLEX HOOK</span>
+<span id="cb19-82"><a href="#cb19-82" aria-hidden="true" tabindex="-1"></a>1DC4..1DCA    ; Technical  # 5.0    [7] COMBINING MACRON-ACUTE..</span>
+<span id="cb19-83"><a href="#cb19-83" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LATIN SMALL LETTER R BELOW</span>
+<span id="cb19-84"><a href="#cb19-84" aria-hidden="true" tabindex="-1"></a>1DCB..1DCD    ; Technical  # 5.1    [3] COMBINING BREVE-MACRON..</span>
+<span id="cb19-85"><a href="#cb19-85" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE CIRCUMFLEX ABOVE</span>
+<span id="cb19-86"><a href="#cb19-86" aria-hidden="true" tabindex="-1"></a>1DCF..1DD0    ; Technical  # 5.1    [2] COMBINING ZIGZAG BELOW..</span>
+<span id="cb19-87"><a href="#cb19-87" aria-hidden="true" tabindex="-1"></a>                                        COMBINING IS BELOW</span>
+<span id="cb19-88"><a href="#cb19-88" aria-hidden="true" tabindex="-1"></a>1DE7..1DF5    ; Technical  # 7.0   [15] COMBINING LATIN SMALL LETTER ALPHA..</span>
+<span id="cb19-89"><a href="#cb19-89" aria-hidden="true" tabindex="-1"></a>                                        COMBINING UP TACK ABOVE</span>
+<span id="cb19-90"><a href="#cb19-90" aria-hidden="true" tabindex="-1"></a>1DF6..1DF9    ; Technical  # 10.0   [4] COMBINING KAVYKA ABOVE RIGHT..</span>
+<span id="cb19-91"><a href="#cb19-91" aria-hidden="true" tabindex="-1"></a>                                        COMBINING WIDE INVERTED BRIDGE BELOW</span>
+<span id="cb19-92"><a href="#cb19-92" aria-hidden="true" tabindex="-1"></a>1DFB          ; Technical  # 9.0        COMBINING DELETION MARK</span>
+<span id="cb19-93"><a href="#cb19-93" aria-hidden="true" tabindex="-1"></a>1DFC          ; Technical  # 6.0        COMBINING DOUBLE INVERTED BREVE BELOW</span>
+<span id="cb19-94"><a href="#cb19-94" aria-hidden="true" tabindex="-1"></a>1DFD          ; Technical  # 5.2        COMBINING ALMOST EQUAL TO BELOW</span>
+<span id="cb19-95"><a href="#cb19-95" aria-hidden="true" tabindex="-1"></a>1DFE..1DFF    ; Technical  # 5.0    [2] COMBINING LEFT ARROWHEAD ABOVE..</span>
+<span id="cb19-96"><a href="#cb19-96" aria-hidden="true" tabindex="-1"></a>                                        COMBINING RIGHT ARROWHEAD AND DOWN</span>
+<span id="cb19-97"><a href="#cb19-97" aria-hidden="true" tabindex="-1"></a>                                        ARROWHEAD BELOW</span>
+<span id="cb19-98"><a href="#cb19-98" aria-hidden="true" tabindex="-1"></a>1E9C..1E9D    ; Technical  # 5.1    [2] LATIN SMALL LETTER LONG S WITH DIAGONAL</span>
+<span id="cb19-99"><a href="#cb19-99" aria-hidden="true" tabindex="-1"></a>                                        STROKE..WITH HIGH STROKE</span>
+<span id="cb19-100"><a href="#cb19-100" aria-hidden="true" tabindex="-1"></a>1E9F          ; Technical  # 5.1        LATIN SMALL LETTER DELTA</span>
+<span id="cb19-101"><a href="#cb19-101" aria-hidden="true" tabindex="-1"></a>1EFA..1EFF    ; Technical  # 5.1    [6] LATIN CAPITAL LETTER MIDDLE-WELSH LL..</span>
+<span id="cb19-102"><a href="#cb19-102" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER Y WITH LOOP</span>
+<span id="cb19-103"><a href="#cb19-103" aria-hidden="true" tabindex="-1"></a>203F..2040    ; Technical  # 1.1    [2] UNDERTIE..</span>
+<span id="cb19-104"><a href="#cb19-104" aria-hidden="true" tabindex="-1"></a>                                        CHARACTER TIE</span>
+<span id="cb19-105"><a href="#cb19-105" aria-hidden="true" tabindex="-1"></a>20D0..20DC    ; Technical  # 1.1   [13] COMBINING LEFT HARPOON ABOVE..</span>
+<span id="cb19-106"><a href="#cb19-106" aria-hidden="true" tabindex="-1"></a>                                        COMBINING FOUR DOTS ABOVE</span>
+<span id="cb19-107"><a href="#cb19-107" aria-hidden="true" tabindex="-1"></a>20E1          ; Technical  # 1.1        COMBINING LEFT RIGHT ARROW ABOVE</span>
+<span id="cb19-108"><a href="#cb19-108" aria-hidden="true" tabindex="-1"></a>20E5..20EA    ; Technical  # 3.2    [6] COMBINING REVERSE SOLIDUS OVERLAY..</span>
+<span id="cb19-109"><a href="#cb19-109" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LEFTWARDS ARROW OVERLAY</span>
+<span id="cb19-110"><a href="#cb19-110" aria-hidden="true" tabindex="-1"></a>20EB          ; Technical  # 4.1        COMBINING LONG DOUBLE SOLIDUS OVERLAY</span>
+<span id="cb19-111"><a href="#cb19-111" aria-hidden="true" tabindex="-1"></a>20EC..20EF    ; Technical  # 5.0    [4] COMBINING RIGHTWARDS HARPOON WITH BARB</span>
+<span id="cb19-112"><a href="#cb19-112" aria-hidden="true" tabindex="-1"></a>                                        DOWNWARDS..COMBINING RIGHT ARROW BELOW</span>
+<span id="cb19-113"><a href="#cb19-113" aria-hidden="true" tabindex="-1"></a>20F0          ; Technical  # 5.1        COMBINING ASTERISK ABOVE</span>
+<span id="cb19-114"><a href="#cb19-114" aria-hidden="true" tabindex="-1"></a>2118          ; Technical  # 1.1        SCRIPT CAPITAL P</span>
+<span id="cb19-115"><a href="#cb19-115" aria-hidden="true" tabindex="-1"></a>212E          ; Technical  # 1.1        ESTIMATED SYMBOL</span>
+<span id="cb19-116"><a href="#cb19-116" aria-hidden="true" tabindex="-1"></a>2C60..2C67    ; Technical  # 5.0    [8] LATIN CAPITAL LETTER L WITH DOUBLE BAR..</span>
+<span id="cb19-117"><a href="#cb19-117" aria-hidden="true" tabindex="-1"></a>                                        LATIN CAPITAL LETTER H WITH DESCENDER</span>
+<span id="cb19-118"><a href="#cb19-118" aria-hidden="true" tabindex="-1"></a>2C77          ; Technical  # 5.0        LATIN SMALL LETTER TAILLESS PHI</span>
+<span id="cb19-119"><a href="#cb19-119" aria-hidden="true" tabindex="-1"></a>2C78..2C7B    ; Technical  # 5.1    [4] LATIN SMALL LETTER E WITH NOTCH..</span>
+<span id="cb19-120"><a href="#cb19-120" aria-hidden="true" tabindex="-1"></a>                                        LATIN LETTER SMALL CAPITAL TURNED E</span>
+<span id="cb19-121"><a href="#cb19-121" aria-hidden="true" tabindex="-1"></a>3021..302D    ; Technical  # 1.1   [13] HANGZHOU NUMERAL ONE..</span>
+<span id="cb19-122"><a href="#cb19-122" aria-hidden="true" tabindex="-1"></a>                                        IDEOGRAPHIC ENTERING TONE MARK</span>
+<span id="cb19-123"><a href="#cb19-123" aria-hidden="true" tabindex="-1"></a>3031..3035    ; Technical  # 1.1    [5] VERTICAL KANA REPEAT MARK..</span>
+<span id="cb19-124"><a href="#cb19-124" aria-hidden="true" tabindex="-1"></a>                                        VERTICAL KANA REPEAT MARK LOWER HALF</span>
+<span id="cb19-125"><a href="#cb19-125" aria-hidden="true" tabindex="-1"></a>303B..303C    ; Technical  # 3.2    [2] VERTICAL IDEOGRAPHIC ITERATION MARK..</span>
+<span id="cb19-126"><a href="#cb19-126" aria-hidden="true" tabindex="-1"></a>                                        MASU MARK</span>
+<span id="cb19-127"><a href="#cb19-127" aria-hidden="true" tabindex="-1"></a>A78E          ; Technical  # 6.0        LATIN SMALL LETTER L WITH RETROFLEX HOOK</span>
+<span id="cb19-128"><a href="#cb19-128" aria-hidden="true" tabindex="-1"></a>                                        AND BELT</span>
+<span id="cb19-129"><a href="#cb19-129" aria-hidden="true" tabindex="-1"></a>A7AF          ; Technical  # 11.0       LATIN LETTER SMALL CAPITAL Q</span>
+<span id="cb19-130"><a href="#cb19-130" aria-hidden="true" tabindex="-1"></a>A7BA..A7BF    ; Technical  # 12.0   [6] LATIN CAPITAL LETTER GLOTTAL A..</span>
+<span id="cb19-131"><a href="#cb19-131" aria-hidden="true" tabindex="-1"></a>                                        LATIN SMALL LETTER GLOTTAL U</span>
+<span id="cb19-132"><a href="#cb19-132" aria-hidden="true" tabindex="-1"></a>A7FA          ; Technical  # 6.0        LATIN LETTER SMALL CAPITAL TURNED M</span>
+<span id="cb19-133"><a href="#cb19-133" aria-hidden="true" tabindex="-1"></a>AB68          ; Technical  # 13.0       LATIN SMALL LETTER TURNED R WITH MIDDLE</span>
+<span id="cb19-134"><a href="#cb19-134" aria-hidden="true" tabindex="-1"></a>                                        TILDE</span>
+<span id="cb19-135"><a href="#cb19-135" aria-hidden="true" tabindex="-1"></a>FE20..FE23    ; Technical  # 1.1    [4] COMBINING LIGATURE LEFT HALF..</span>
+<span id="cb19-136"><a href="#cb19-136" aria-hidden="true" tabindex="-1"></a>                                        COMBINING DOUBLE TILDE RIGHT HALF</span>
+<span id="cb19-137"><a href="#cb19-137" aria-hidden="true" tabindex="-1"></a>FE24..FE26    ; Technical  # 5.1    [3] COMBINING MACRON LEFT HALF..</span>
+<span id="cb19-138"><a href="#cb19-138" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CONJOINING MACRON</span>
+<span id="cb19-139"><a href="#cb19-139" aria-hidden="true" tabindex="-1"></a>FE27..FE2D    ; Technical  # 7.0    [7] COMBINING LIGATURE LEFT HALF BELOW..</span>
+<span id="cb19-140"><a href="#cb19-140" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CONJOINING MACRON BELOW</span>
+<span id="cb19-141"><a href="#cb19-141" aria-hidden="true" tabindex="-1"></a>FE73          ; Technical  # 3.2        ARABIC TAIL FRAGMENT</span>
+<span id="cb19-142"><a href="#cb19-142" aria-hidden="true" tabindex="-1"></a>1CF00..1CF2D  ; Technical  # 14.0  [46] ZNAMENNY COMBINING MARK GORAZDO NIZKO S</span>
+<span id="cb19-143"><a href="#cb19-143" aria-hidden="true" tabindex="-1"></a>                                        KRYZHEM ON LEFT..KRYZH ON LEFT</span>
+<span id="cb19-144"><a href="#cb19-144" aria-hidden="true" tabindex="-1"></a>1CF30..1CF46  ; Technical  # 14.0  [23] ZNAMENNY COMBINING TONAL RANGE MARK</span>
+<span id="cb19-145"><a href="#cb19-145" aria-hidden="true" tabindex="-1"></a>                                        MRACHNO..PRIZNAK MODIFIER ROG</span>
+<span id="cb19-146"><a href="#cb19-146" aria-hidden="true" tabindex="-1"></a>1D165..1D169  ; Technical  # 3.1    [5] MUSICAL SYMBOL COMBINING STEM..TREMOLO-3</span>
+<span id="cb19-147"><a href="#cb19-147" aria-hidden="true" tabindex="-1"></a>1D16D..1D172  ; Technical  # 3.1    [6] MUSICAL SYMBOL COMBINING AUGMENTATION</span>
+<span id="cb19-148"><a href="#cb19-148" aria-hidden="true" tabindex="-1"></a>                                        DOT..MUSICAL SYMBOL COMBINING FLAG-5</span>
+<span id="cb19-149"><a href="#cb19-149" aria-hidden="true" tabindex="-1"></a>1D17B..1D182  ; Technical  # 3.1    [8] MUSICAL SYMBOL COMBINING ACCENT..LOURE</span>
+<span id="cb19-150"><a href="#cb19-150" aria-hidden="true" tabindex="-1"></a>1D185..1D18B  ; Technical  # 3.1    [7] MUSICAL SYMBOL COMBINING DOIT..</span>
+<span id="cb19-151"><a href="#cb19-151" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING TRIPLE TONGUE</span>
+<span id="cb19-152"><a href="#cb19-152" aria-hidden="true" tabindex="-1"></a>1D1AA..1D1AD  ; Technical  # 3.1    [4] MUSICAL SYMBOL COMBINING DOWN BOW..</span>
+<span id="cb19-153"><a href="#cb19-153" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING SNAP PIZZICATO</span></code></pre></div>
+<h1 id="appendix-f---greek-confusables">18 Appendix F - Greek Confusables</h1>
+<p>Needed for exclusion in the Section 9 <a href="#tr39-mixed-scripts">TR39 Mixed Scripts</a> Greek rule. Where-ever we have a Greek letter confusable with Latin, and we already saw Latin, forbid the Greek letter in favor of the Latin letter. See TR39 <a href="https://www.unicode.org/Public/security/latest/confusables.txt">confusables</a>. Note that these confusables cannot be excluded upfront in the TR31 identifier parsing, as Greek alone is allowed.</p>
+<h2 id="exceptions">18.1 Exceptions</h2>
+<p>Allow these 12 Greek letters and symbols to be confusable with Latin: <code>037A, 0381, 0398, 03B5, 03B7, 03B8, 03B9, 03BD, 03C3, 03D1, 03F1, 03F4</code>. The confusables.txt list is extremely buggy.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>0381 ; ( α → a ) GREEK SMALL LETTER ALPHA</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, COMBINING</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                  VERTICAL LINE BELOW</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>03BD ; ( ν → v ) GREEK SMALL LETTER NU → LATIN SMALL LETTER V</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA → LATIN SMALL LETTER O</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span></code></pre></div>
+<h2 id="confusables">18.2 Confusables</h2>
+<p>List of all the Greek-Latin confusables: Note, these still include the exceptions above.</p>
 <pre><code>grep GREEK confusables.txt | grep LETTER | grep LATIN</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>03B1 ; ( α → a ) GREEK SMALL LETTER ALPHA → LATIN SMALL LETTER A</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>0391 ; ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>1D217; ( 𝈗 → Ɐ ) GREEK VOCAL NOTATION SYMBOL-24 → LATIN CAPITAL LETTER TURNED A</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>0392 ; ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>03F2 ; ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>03F9 ; ( Ϲ → C ) GREEK CAPITAL LUNATE SIGMA SYMBOL → LATIN CAPITAL LETTER C</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON → LATIN SMALL LETTER C WITH BAR</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>03F5 ; ( ϵ → ꞓ ) GREEK LUNATE EPSILON SYMBOL → LATIN SMALL LETTER C WITH BAR</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>037D ; ( ͽ → ꜿ ) GREEK SMALL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN SMALL</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED C WITH DOT</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>03FF ; ( Ͽ → Ꜿ ) GREEK CAPITAL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN CAPITAL</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED C WITH DOT</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>03B4 ; ( δ → ẟ ) GREEK SMALL LETTER DELTA → LATIN SMALL LETTER DELTA</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>0395 ; ( Ε → E ) GREEK CAPITAL LETTER EPSILON → LATIN CAPITAL LETTER E</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>1D221; ( 𝈡 → Ɛ ) GREEK INSTRUMENTAL NOTATION SYMBOL-7 → LATIN CAPITAL LETTER</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>                  OPEN E</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>1D213; ( 𝈓 → F ) GREEK VOCAL NOTATION SYMBOL-20 → LATIN CAPITAL LETTER F</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>03DC ; ( Ϝ → F ) GREEK LETTER DIGAMMA → LATIN CAPITAL LETTER F</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>1D230; ( 𝈰 → ꟻ ) GREEK INSTRUMENTAL NOTATION SYMBOL-30 → LATIN EPIGRAPHIC</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED F</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>0397 ; ( Η → H ) GREEK CAPITAL LETTER ETA → LATIN CAPITAL LETTER H</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>0370 ; ( Ͱ → Ⱶ ) GREEK CAPITAL LETTER HETA → LATIN CAPITAL LETTER HALF H</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>1FBE ; ( ι → i ) GREEK PROSGEGRAMMENI → LATIN SMALL LETTER I</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>03F3 ; ( ϳ → j ) GREEK LETTER YOT → LATIN SMALL LETTER J</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>037F ; ( Ϳ → J ) GREEK CAPITAL LETTER YOT → LATIN CAPITAL LETTER J</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER K</span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>0399 ; ( Ι → l ) GREEK CAPITAL LETTER IOTA → LATIN SMALL LETTER L</span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>1D22A; ( 𝈪 → L ) GREEK INSTRUMENTAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER L</span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>039C ; ( Μ → M ) GREEK CAPITAL LETTER MU → LATIN CAPITAL LETTER M</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>03FA ; ( Ϻ → M ) GREEK CAPITAL LETTER SAN → LATIN CAPITAL LETTER M</span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>039D ; ( Ν → N ) GREEK CAPITAL LETTER NU → LATIN CAPITAL LETTER N</span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, ...</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>0377 ; ( ͷ → ᴎ ) GREEK SMALL LETTER PAMPHYLIAN DIGAMMA → LATIN LETTER SMALL</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>                  CAPITAL REVERSED N</span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>03BF ; ( ο → o ) GREEK SMALL LETTER OMICRON → LATIN SMALL LETTER O</span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>039F ; ( Ο → O ) GREEK CAPITAL LETTER OMICRON → LATIN CAPITAL LETTER O</span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>1D21A; ( 𝈚 → O̵ ) GREEK VOCAL NOTATION SYMBOL-52 → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>037B ; ( ͻ → ɔ ) GREEK SMALL REVERSED LUNATE SIGMA SYMBOL → LATIN SMALL</span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>                  LETTER OPEN O</span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>03FD ; ( Ͻ → Ɔ ) GREEK CAPITAL REVERSED LUNATE SIGMA SYMBOL → LATIN CAPITAL</span>
-<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>                  LETTER OPEN O</span>
-<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>03C1 ; ( ρ → p ) GREEK SMALL LETTER RHO → LATIN SMALL LETTER P</span>
-<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P</span>
-<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>03A1 ; ( Ρ → P ) GREEK CAPITAL LETTER RHO → LATIN CAPITAL LETTER P</span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>1D29 ; ( ᴩ → ᴘ ) GREEK LETTER SMALL CAPITAL RHO → LATIN LETTER SMALL CAPITAL P</span>
-<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>03C6 ; ( φ → ɸ ) GREEK SMALL LETTER PHI → LATIN SMALL LETTER PHI</span>
-<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>03D5 ; ( ϕ → ɸ ) GREEK PHI SYMBOL → LATIN SMALL LETTER PHI</span>
-<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA</span>
-<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>03F0 ; ( ϰ → ĸ ) GREEK KAPPA SYMBOL → LATIN SMALL LETTER KRA</span>
-<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>1D26 ; ( ᴦ → r ) GREEK LETTER SMALL CAPITAL GAMMA → LATIN SMALL LETTER R</span>
-<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>1D216; ( 𝈖 → R ) GREEK VOCAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER R</span>
-<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>2129 ; ( ℩ → ɿ ) TURNED GREEK SMALL LETTER IOTA → LATIN SMALL LETTER</span>
-<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>                 REVERSED R WITH FISHHOOK</span>
-<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER SHARP S</span>
-<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>03D0 ; ( ϐ → ß ) GREEK BETA SYMBOL → LATIN SMALL LETTER SHARP S</span>
-<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER ESH</span>
-<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>03A4 ; ( Τ → T ) GREEK CAPITAL LETTER TAU → LATIN CAPITAL LETTER T</span>
-<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a>03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T</span>
-<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>03C5 ; ( υ → u ) GREEK SMALL LETTER UPSILON → LATIN SMALL LETTER U</span>
-<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>1D20D; ( 𝈍 → V ) GREEK VOCAL NOTATION SYMBOL-14 → LATIN CAPITAL LETTER V</span>
-<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>1D27 ; ( ᴧ → ʌ ) GREEK LETTER SMALL CAPITAL LAMDA → LATIN SMALL LETTER TURNED V</span>
-<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>039B ; ( Λ → Ʌ ) GREEK CAPITAL LETTER LAMDA → LATIN CAPITAL LETTER TURNED V</span>
-<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>03A7 ; ( Χ → X ) GREEK CAPITAL LETTER CHI → LATIN CAPITAL LETTER X</span>
-<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>03B3 ; ( γ → y ) GREEK SMALL LETTER GAMMA → LATIN SMALL LETTER Y</span>
-<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>03A5 ; ( Υ → Y ) GREEK CAPITAL LETTER UPSILON → LATIN CAPITAL LETTER Y</span>
-<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>03D2 ; ( ϒ → Y ) GREEK UPSILON WITH HOOK SYMBOL → LATIN CAPITAL LETTER Y</span>
-<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a>0396 ; ( Ζ → Z ) GREEK CAPITAL LETTER ZETA → LATIN CAPITAL LETTER Z</span>
-<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a>03F8 ; ( ϸ → þ ) GREEK SMALL LETTER SHO → LATIN SMALL LETTER THORN</span>
-<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a>03F7 ; ( Ϸ → Þ ) GREEK CAPITAL LETTER SHO → LATIN CAPITAL LETTER THORN</span>
-<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a>03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI</span>
-<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a>03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA</span></code></pre></div>
-<h1 id="references">20 References</h1>
+<div class="sourceCode" id="cb22"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>03B1 ; ( α → a ) GREEK SMALL LETTER ALPHA → LATIN SMALL LETTER A</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>0391 ; ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>1D217; ( 𝈗 → Ɐ ) GREEK VOCAL NOTATION SYMBOL-24 → LATIN CAPITAL LETTER TURNED A</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>0392 ; ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>03F2 ; ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>03F9 ; ( Ϲ → C ) GREEK CAPITAL LUNATE SIGMA SYMBOL → LATIN CAPITAL LETTER C</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON → LATIN SMALL LETTER C WITH BAR</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>03F5 ; ( ϵ → ꞓ ) GREEK LUNATE EPSILON SYMBOL → LATIN SMALL LETTER C WITH BAR</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>037D ; ( ͽ → ꜿ ) GREEK SMALL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN SMALL</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED C WITH DOT</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>03FF ; ( Ͽ → Ꜿ ) GREEK CAPITAL REVERSED DOTTED LUNATE SIGMA SYMBOL → LATIN CAPITAL</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED C WITH DOT</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>03B4 ; ( δ → ẟ ) GREEK SMALL LETTER DELTA → LATIN SMALL LETTER DELTA</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>0395 ; ( Ε → E ) GREEK CAPITAL LETTER EPSILON → LATIN CAPITAL LETTER E</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>1D221; ( 𝈡 → Ɛ ) GREEK INSTRUMENTAL NOTATION SYMBOL-7 → LATIN CAPITAL LETTER</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>                  OPEN E</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>1D213; ( 𝈓 → F ) GREEK VOCAL NOTATION SYMBOL-20 → LATIN CAPITAL LETTER F</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>03DC ; ( Ϝ → F ) GREEK LETTER DIGAMMA → LATIN CAPITAL LETTER F</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>1D230; ( 𝈰 → ꟻ ) GREEK INSTRUMENTAL NOTATION SYMBOL-30 → LATIN EPIGRAPHIC</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>                  LETTER REVERSED F</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>0397 ; ( Η → H ) GREEK CAPITAL LETTER ETA → LATIN CAPITAL LETTER H</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>0370 ; ( Ͱ → Ⱶ ) GREEK CAPITAL LETTER HETA → LATIN CAPITAL LETTER HALF H</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>03B9 ; ( ι → i ) GREEK SMALL LETTER IOTA → LATIN SMALL LETTER I</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>1FBE ; ( ι → i ) GREEK PROSGEGRAMMENI → LATIN SMALL LETTER I</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>03F3 ; ( ϳ → j ) GREEK LETTER YOT → LATIN SMALL LETTER J</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>037F ; ( Ϳ → J ) GREEK CAPITAL LETTER YOT → LATIN CAPITAL LETTER J</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER K</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>0399 ; ( Ι → l ) GREEK CAPITAL LETTER IOTA → LATIN SMALL LETTER L</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>1D22A; ( 𝈪 → L ) GREEK INSTRUMENTAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER L</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>039C ; ( Μ → M ) GREEK CAPITAL LETTER MU → LATIN CAPITAL LETTER M</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>03FA ; ( Ϻ → M ) GREEK CAPITAL LETTER SAN → LATIN CAPITAL LETTER M</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>039D ; ( Ν → N ) GREEK CAPITAL LETTER NU → LATIN CAPITAL LETTER N</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>03B7 ; ( η → n̩ ) GREEK SMALL LETTER ETA → LATIN SMALL LETTER N, ...</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>0377 ; ( ͷ → ᴎ ) GREEK SMALL LETTER PAMPHYLIAN DIGAMMA → LATIN LETTER SMALL</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>                  CAPITAL REVERSED N</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>03BF ; ( ο → o ) GREEK SMALL LETTER OMICRON → LATIN SMALL LETTER O</span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>039F ; ( Ο → O ) GREEK CAPITAL LETTER OMICRON → LATIN CAPITAL LETTER O</span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>1D21A; ( 𝈚 → O̵ ) GREEK VOCAL NOTATION SYMBOL-52 → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>03B8 ; ( θ → O̵ ) GREEK SMALL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>03D1 ; ( ϑ → O̵ ) GREEK THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a>03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a>037B ; ( ͻ → ɔ ) GREEK SMALL REVERSED LUNATE SIGMA SYMBOL → LATIN SMALL</span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a>                  LETTER OPEN O</span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a>03FD ; ( Ͻ → Ɔ ) GREEK CAPITAL REVERSED LUNATE SIGMA SYMBOL → LATIN CAPITAL</span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a>                  LETTER OPEN O</span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a>03C1 ; ( ρ → p ) GREEK SMALL LETTER RHO → LATIN SMALL LETTER P</span>
+<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a>03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P</span>
+<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a>03A1 ; ( Ρ → P ) GREEK CAPITAL LETTER RHO → LATIN CAPITAL LETTER P</span>
+<span id="cb22-51"><a href="#cb22-51" aria-hidden="true" tabindex="-1"></a>1D29 ; ( ᴩ → ᴘ ) GREEK LETTER SMALL CAPITAL RHO → LATIN LETTER SMALL CAPITAL P</span>
+<span id="cb22-52"><a href="#cb22-52" aria-hidden="true" tabindex="-1"></a>03C6 ; ( φ → ɸ ) GREEK SMALL LETTER PHI → LATIN SMALL LETTER PHI</span>
+<span id="cb22-53"><a href="#cb22-53" aria-hidden="true" tabindex="-1"></a>03D5 ; ( ϕ → ɸ ) GREEK PHI SYMBOL → LATIN SMALL LETTER PHI</span>
+<span id="cb22-54"><a href="#cb22-54" aria-hidden="true" tabindex="-1"></a>03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA</span>
+<span id="cb22-55"><a href="#cb22-55" aria-hidden="true" tabindex="-1"></a>03F0 ; ( ϰ → ĸ ) GREEK KAPPA SYMBOL → LATIN SMALL LETTER KRA</span>
+<span id="cb22-56"><a href="#cb22-56" aria-hidden="true" tabindex="-1"></a>1D26 ; ( ᴦ → r ) GREEK LETTER SMALL CAPITAL GAMMA → LATIN SMALL LETTER R</span>
+<span id="cb22-57"><a href="#cb22-57" aria-hidden="true" tabindex="-1"></a>1D216; ( 𝈖 → R ) GREEK VOCAL NOTATION SYMBOL-23 → LATIN CAPITAL LETTER R</span>
+<span id="cb22-58"><a href="#cb22-58" aria-hidden="true" tabindex="-1"></a>2129 ; ( ℩ → ɿ ) TURNED GREEK SMALL LETTER IOTA → LATIN SMALL LETTER</span>
+<span id="cb22-59"><a href="#cb22-59" aria-hidden="true" tabindex="-1"></a>                 REVERSED R WITH FISHHOOK</span>
+<span id="cb22-60"><a href="#cb22-60" aria-hidden="true" tabindex="-1"></a>03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER SHARP S</span>
+<span id="cb22-61"><a href="#cb22-61" aria-hidden="true" tabindex="-1"></a>03D0 ; ( ϐ → ß ) GREEK BETA SYMBOL → LATIN SMALL LETTER SHARP S</span>
+<span id="cb22-62"><a href="#cb22-62" aria-hidden="true" tabindex="-1"></a>03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER ESH</span>
+<span id="cb22-63"><a href="#cb22-63" aria-hidden="true" tabindex="-1"></a>03A4 ; ( Τ → T ) GREEK CAPITAL LETTER TAU → LATIN CAPITAL LETTER T</span>
+<span id="cb22-64"><a href="#cb22-64" aria-hidden="true" tabindex="-1"></a>03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T</span>
+<span id="cb22-65"><a href="#cb22-65" aria-hidden="true" tabindex="-1"></a>03C5 ; ( υ → u ) GREEK SMALL LETTER UPSILON → LATIN SMALL LETTER U</span>
+<span id="cb22-66"><a href="#cb22-66" aria-hidden="true" tabindex="-1"></a>1D20D; ( 𝈍 → V ) GREEK VOCAL NOTATION SYMBOL-14 → LATIN CAPITAL LETTER V</span>
+<span id="cb22-67"><a href="#cb22-67" aria-hidden="true" tabindex="-1"></a>1D27 ; ( ᴧ → ʌ ) GREEK LETTER SMALL CAPITAL LAMDA → LATIN SMALL LETTER TURNED V</span>
+<span id="cb22-68"><a href="#cb22-68" aria-hidden="true" tabindex="-1"></a>039B ; ( Λ → Ʌ ) GREEK CAPITAL LETTER LAMDA → LATIN CAPITAL LETTER TURNED V</span>
+<span id="cb22-69"><a href="#cb22-69" aria-hidden="true" tabindex="-1"></a>03A7 ; ( Χ → X ) GREEK CAPITAL LETTER CHI → LATIN CAPITAL LETTER X</span>
+<span id="cb22-70"><a href="#cb22-70" aria-hidden="true" tabindex="-1"></a>03B3 ; ( γ → y ) GREEK SMALL LETTER GAMMA → LATIN SMALL LETTER Y</span>
+<span id="cb22-71"><a href="#cb22-71" aria-hidden="true" tabindex="-1"></a>03A5 ; ( Υ → Y ) GREEK CAPITAL LETTER UPSILON → LATIN CAPITAL LETTER Y</span>
+<span id="cb22-72"><a href="#cb22-72" aria-hidden="true" tabindex="-1"></a>03D2 ; ( ϒ → Y ) GREEK UPSILON WITH HOOK SYMBOL → LATIN CAPITAL LETTER Y</span>
+<span id="cb22-73"><a href="#cb22-73" aria-hidden="true" tabindex="-1"></a>0396 ; ( Ζ → Z ) GREEK CAPITAL LETTER ZETA → LATIN CAPITAL LETTER Z</span>
+<span id="cb22-74"><a href="#cb22-74" aria-hidden="true" tabindex="-1"></a>03F8 ; ( ϸ → þ ) GREEK SMALL LETTER SHO → LATIN SMALL LETTER THORN</span>
+<span id="cb22-75"><a href="#cb22-75" aria-hidden="true" tabindex="-1"></a>03F7 ; ( Ϸ → Þ ) GREEK CAPITAL LETTER SHO → LATIN CAPITAL LETTER THORN</span>
+<span id="cb22-76"><a href="#cb22-76" aria-hidden="true" tabindex="-1"></a>03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI</span>
+<span id="cb22-77"><a href="#cb22-77" aria-hidden="true" tabindex="-1"></a>03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA</span></code></pre></div>
+<h1 id="references">19 References</h1>
 <ul>
 <li><p>[AltId] Unicode Standard Annex.</p>
 <p><a href="http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax</a></p></li>
