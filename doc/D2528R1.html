@@ -234,6 +234,8 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <li>Disallow non-confusable <code>Technical</code> U+1C0..U+1C3</li>
 <li>Fix a lot of not Allowed ID_Start ranges. safec26_start_list from 355 ranges, 115 singles, 99350 codepoints to 243 ranges, 93 singles, 95986 codepoints</li>
 <li>Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU to the Greek confusable exceptions in 19.1.</li>
+<li>Added Appendix G - Medial.</li>
+<li>Change U+B7 Catalan MIDDLE DOT from Inclusion to Uncommon Use.</li>
 <li>Added wording feedback from the first SSRG discussion, and restructure the paragraphs a bit to be less technical, and make it more readable to non-Unicode experts.</li>
 <li>Added discussions of the gcc and clang-tidy -Whomoglyph approaches via confusables.</li>
 </ul>
@@ -244,7 +246,7 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <li>Comply to a variant of the <a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a> Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without its confusables with Latin,</li>
 <li>Disallow all Limited Use <a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts">TR31#Table_7</a> and Excluded scripts <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>,</li>
 <li>Only allow <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> Recommended, Inclusion, Technical Identifier Type properties,</li>
-<li>Honor the Median position in Arabic words,</li>
+<li>Honor the Medial position in (mostly Arabic) words,</li>
 <li>Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with mixed-scripts (SCX) <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a>, if they are not already addressed by the NFC requirement from C++23, as of <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a>.</li>
 </ul>
 <p>Optionally:</p>
@@ -286,12 +288,12 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <li><a href="https://certitude.consulting/blog/en/invisible-backdoor/" class="uri">https://certitude.consulting/blog/en/invisible-backdoor/</a></li>
 <li><a href="https://github.com/rurban/libu8ident/tree/master/texts/" class="uri">https://github.com/rurban/libu8ident/tree/master/texts/</a> with *-sec*.c</li>
 </ul>
-<p><em>TODO approved: P2071R1 (size argument). java, rust example.</em></p>
 <h1 id="design">5 Design</h1>
 <p>First we are discussing two different approaches found in praxis:</p>
 <ol type="1">
-<li><a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4 Confusable_Detection</a>, vs.</li>
-<li><a href="http://www.unicode.org/reports/tr39/#Mixed_Script_Detection">TR39#5.1 Mixed_Script_Detection</a>.</li>
+<li><p><a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4 Confusable_Detection</a>,</p>
+<p>vs.</p></li>
+<li><p><a href="http://www.unicode.org/reports/tr39/#Mixed_Script_Detection">TR39#5.1 Mixed_Script_Detection</a>.</p></li>
 </ol>
 <p>TR39 lists some options how to implement a security mechanism for identifiers. In praxis there are three successful usages of the mixed-script approach in java, cperl and rust, as specified here. No other language implemented TR39 since and uses it. Python tried the confusables approach optionally, and gcc and clang-tidy is trying it out now. See <a href="#12-implementations-and-strategies">12 Implementations and Strategies</a>.</p>
 <p>GCC has a new <strong>-Whomoglyph</strong> warning patch at <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR 103027</a> (see also my github for an updated version). It implements the “skeleton” algorithm from <a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a> so that every new identifier is mapped to a “skeleton”, and if the skeleton is already in use by a different identifier, issue a <code>-Whomoglyph</code> diagnostic. It uses the <code>security/confusables.txt</code> table to determine which characters are confusable. It uses two NFD lookups per identifier, which are relatively cheap compared to NFC, mandatory since C23 and C++23, but much more expensive than the mixed script approach which uses only a single range-lookup in most cases.</p>
@@ -323,13 +325,14 @@ Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
 <h1 id="what-will-this-proposal-change">7 What will this proposal change</h1>
 <h2 id="the-set-of-tr31-xid-characters-will-become-much-smaller">7.1 The set of TR31 XID characters will become much smaller</h2>
 <p>Restricting the <strong>Identifier Type</strong> plus the Recommended Scripts, will shrink the original XID set from 971267 codepoints to 99350 codepoints. The ranges expand from 36 to 426. (when split by scripts already, 25 splits happen). Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are now forbidden.</p>
-<p><code>ID_Start</code> consists of Lu + Ll + Lt + Lm + Lo + Nl, +<code>Other_ID_Start</code>, -<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code>,-<code>Median</code></p>
+<p><code>ID_Start</code> consists of Lu + Ll + Lt + Lm + Lo + Nl, +<code>Other_ID_Start</code>, -<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code>,-<code>Medial</code></p>
 <p>131899 codepoints</p>
-<p><code>ID_Continue</code> consists of <code>ID_Start</code>, + Mn + Mc + Nd + Pc, +<code>Other_ID_Continue</code>, +<code>Median</code>, -<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code>.</p>
+<p><code>ID_Continue</code> consists of <code>ID_Start</code>, + Mn + Mc + Nd + Pc, +<code>Other_ID_Continue</code>, +<code>Medial</code>, -<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code>.</p>
 <p>135072 codepoints (= ID_Start + 3173)</p>
 <p><code>XID_Start</code> and <code>XID_Continue</code> ensure that <code>isIdentifer(string)</code> then <code>isIdentifier(NFKx(string))</code> (<em>removing the NFKC quirks</em>)</p>
 <p><code>XID_Start</code>: 131876 codepoints, <code>XID_Continue</code>: 135053 codepoints (= <code>XID_Start</code> + 3173)</p>
 <p>See <a href="#13-appendix-a---c26xid_start">13 “Appendix A - C26XID_Start”</a> and <a href="#14-appendix-b---c26xid_continue">14 “Appendix B - C26XID_Continue”</a>.</p>
+<p>For the medial positions see Section 19 <a href="#19-appendix-g---medial">Appendix G - Medial</a>. They are not allowed as first nor as last character in a word.</p>
 <h2 id="script-restrictions">7.2 Script restrictions</h2>
 <p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html#xid_continue-does-not-include-layout-and-format-control-characters">P1949R7</a> for C++23 previously stated: <em>“This paper also does not propose excluding any scripts categorically, regardless of their status as historic or obsolete. Characters from Anatolian Hieroglyphs would be available for use, to the extent that anyone wishes to do so.”</em></p>
 <p><a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table 4</a> states: <em>“Some scripts are not in customary modern use, and thus implementations may want to exclude them from identifiers. These include historic and obsolete scripts, scripts used mostly liturgically, and regional scripts used only in very small communities or with very limited current usage. Some scripts also have unresolved architectural issues that make them currently unsuitable for identifiers. The scripts in Table 4, Excluded Scripts are recommended for exclusion from identifiers.”</em></p>
@@ -379,6 +382,7 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
 <li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
 </ul>
+<p>See Section 10 <a href="#10-tr39-mixed-scripts">TR39 Mixed Scripts</a>.</p>
 <h2 id="mixed-script-runs-with-combining-marks-will-become-illegal">7.4 Mixed-script runs with combining marks will become illegal</h2>
 <p>C++26 (and C26) will check for unlikely sequences of <strong>combining marks</strong>, and reject some. Combining Marks have no script property per se, but a variable list of allowed SCX scripts, which need to be checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
 <p>This section is technically security-relevant, as over-long runs of combining marks may lead to overflow in sequences.</p>
@@ -443,20 +447,20 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <pre><code>grep &#39;, U8ID_Technical&#39; scripts.h | egrep -v &#39;Not_XID|U8ID_Obsolete|U8ID_Exclusion&#39;</code></pre>
 <p>See <a href="#17-appendix-e---idtype-technical">17 Appendix E - IDType Technical</a>.</p>
 <h1 id="tr39-mixed-scripts">10 TR39 Mixed Scripts</h1>
-<p>TR39 defines some security profiles for identifers to avoid the most common identifier insecurities, that identifiers will stay identifiable.</p>
+<p>[TR39#5.2] defines some security profiles for identifers to avoid the most common identifier insecurities, that identifiers will stay identifiable.</p>
 <p>We want to choose a variant of the <strong>Moderately Restrictive</strong> profile, with an exception for non-confusable Greek. I called this profile C26_4 or SAFEC26 in libu8ident.</p>
 <ul>
 <li>All identifiers in a document qualify as Single Script, or</li>
 <li>All identifiers in a document are covered by any of the following sets of scripts, according to the definition in Mixed Scripts:
 <ul>
-<li>Latin + Han + Hiragana + Katakana (Japanese)</li>
-<li>Latin + Han + Bopomofo (Chinese)</li>
+<li>Latin + Han + Hiragana + Katakana (Japanese),</li>
+<li>Latin + Han + Bopomofo (Chinese),</li>
 <li>Latin + Han + Hangul (Korean), or</li>
 </ul></li>
 <li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
 <li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
 </ul>
-<p>Greek alone is always allowed, as Cyrillic, but wherever we have a valid Latin letter which looks the same as the Greek counterpart, the Greek letter is forbidden, choose the Latin one instead. E.g. ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A. See <a href="#18-appendix-f---greek-confusables">18 Appendix F</a> for the generated list with 12 exceptions.</p>
+<p>Greek alone is always allowed, as Cyrillic, but wherever we have a valid Latin letter which looks the same as the Greek counterpart, the Greek letter is forbidden, choose the Latin one instead. E.g. ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A. See Section <a href="#18-appendix-f---greek-confusables">18 Appendix F</a> for the generated list with 12 exceptions.</p>
 <p>Thus it prevents Cyrillic mixed with Latin or any other script, but does allow any East-Asian CFK language, other common and widely used languages and Latin mixed with Greek, mainly used for its popular and actually used mathematical symbols. Many mathematical symbols already exists outside of Greek, but these are mainly used for operators in advanced programming languages, not as identifiers. See also <a href="http://xahlee.info/comp/unicode_math_operators.html" class="uri">http://xahlee.info/comp/unicode_math_operators.html</a> for a nice overview.</p>
 <p>E.g. here we have some:</p>
 <ul>
@@ -488,11 +492,11 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>With programming languages this is a source file, with objects files this is a module. For identifiers in object files there are open issues with binutils, linkers, exported identifiers, encodings. For filesystems this would be a directory.</p>
 <p>For every source file we need to store a context with the list of already seen scripts and how many. The maximal number of scripts is 4, for the case of Japanese mixed with Latin. (<code>Katakana + Hiragana +</code> <code>Han + Latin</code>), thus we can save that list in a single 4-byte word, and the lookup and memory management is trivial.</p>
 <p>Since the compiler sees the identifiers after the preprocessor included all headers, the context definition is a bit blurry. Is the context for mixed scripts an original source file (before cpp) or the resulting file after inclusion of all files (after cpp). This is similar to the problem with lexical variables a couple of decades ago.</p>
-<ul>
+<ol type="1">
 <li><p><strong>before-cpp</strong>: One could argue that the scope of a variable should be contained in a lexical block, which can be statically determined and safely enclosed. With identifiers that would mean that the preprocessor already should perform the TR31 lexer checks and TR39 security checks, and one could define Arabic headers using private arabic fields, and include another header with Cyrillic only names. This would allow confusables in the resulting object file, and source files would be easy to check with external tools.</p></li>
 <li><p><strong>private/scoped</strong>: Another argument would be that all exported names end up in the object files and library flat, which would support the seperation of private and public name contexts, where to perform the mixed-script checks. Private contexts (e.g. static structs, private class fields, local names in functions) should be seperated from the rest. This would prevent from confusables in struct/class fields/methods, and the rest is seperated by the checks for the public names. Jabuk Jelinek favored this approach to the GCC -Whomoglyph PR answer: <a href="https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html" class="uri">https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html</a></p></li>
 <li><p><strong>after-cpp</strong>: The third, strictest variant would define the context in the file after cpp. You would not be able to include a Cyrillic-only header, and you would not be able to use Cyrillic private fields. This would be the least surprising and most secure option. As long as the security risk lies ahead of us, one should go for the strictest option. Cyrillic header projects should be isolated and not used at all outside of non-cyrillic projects. I’m pointing the fingers at Cyrillic because it has the biggest number of confusables with Latin. Arabic headers e.g. are not all confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic speaker can identify and see differences in its names without long training. Same for CFK and the other recommended scripts.</p></li>
-</ul>
+</ol>
 <h1 id="implementations-and-strategies">12 Implementations and Strategies</h1>
 <p>I implemented for <a href="https://github.com/perl11/cperl">cperl</a>, a fork of perl5, the General Security profile “Moderately restrictive” (4) for identifiers in 2017, together with transparent normalization of NFC. This is a dynamic language with the need for fast tokenizing, and compilation. Still I did not see a need to restrict all source code identifiers to be already in NFC. Even with the added unicode checks and dynamic normalization the tokenizer is still faster than the simplier perl5 tokenizer.</p>
 <p>Then when GCC went to full insecure identifiers I implemented the more general <a href="https://github.com/rurban/libu8ident">libu8ident</a> library, which can be used with all known TR39 identifier type profiles, the mixed-script security profiles, TR31 XID character sets and all TR15 normalizations. There I tested various performance strategies of the unicode lookups. Tested was CRoaring, which was only useful for sets of single codepoints, the list of confusables. Most of the needed lists were best structured as binary-search in range pairs. Most of them were fastest with special-casing the codepoints below U+128 with a simple linear search. Binary search in an Eytzinger layout was not convincibly faster, neither hybrid searches by 1. splitting up ranges from single codepoints, nor 2. seperating 16bit from 32bit codepoints. Perfect hashes for singular lookup are used in some similar implementations, esp. for confusables and the normalization check. I’m still working on the perfect hashes approach (the new perl5 unicode tables, PostgresQL PerfectHash.pm, nbperf, gperf).</p>
@@ -1904,54 +1908,201 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb22-75"><a href="#cb22-75" aria-hidden="true" tabindex="-1"></a>03F7 ; ( Ϸ → Þ ) GREEK CAPITAL LETTER SHO → LATIN CAPITAL LETTER THORN</span>
 <span id="cb22-76"><a href="#cb22-76" aria-hidden="true" tabindex="-1"></a>03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI</span>
 <span id="cb22-77"><a href="#cb22-77" aria-hidden="true" tabindex="-1"></a>03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA</span></code></pre></div>
-<h1 id="references">19 References</h1>
-<ul>
-<li><p>[AltId] Unicode Standard Annex.</p>
-<p><a href="http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax</a></p></li>
-<li><p>[DefId] Unicode Standard Annex.</p>
-<p><a href="http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax</a></p></li>
-<li><p>[ISO 15924 Codes] TR24 Unicode Script Property Values and ISO 15924 Codes.</p>
-<p><a href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924" class="uri">https://www.unicode.org/reports/tr24/#Relation_To_ISO15924</a></p></li>
-<li><p>[libu8ident] Reini Urban. 2020. unicode security guidelines for identifiers</p>
-<p><a href="https://github.com/rurban/libu8ident/" class="uri">https://github.com/rurban/libu8ident/</a></p></li>
-<li><p>[N3146] Clark Nelson. 2010. Recommendations for extended identifier characters for C and C++.</p>
-<p><a href="https://wg21.link/n3146" class="uri">https://wg21.link/n3146</a></p></li>
-<li><p>[P1949] Steve Downey et al. 2021. C++ Identifier Syntax using Unicode Standard Annex 31</p>
-<p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html" class="uri">http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html</a></p></li>
-<li><p>[TR15] Ken Whistler. Unicode Normalization Forms.</p>
-<p><a href="http://www.unicode.org/reports/tr15" class="uri">http://www.unicode.org/reports/tr15</a></p></li>
-<li><p>[TR24] Ken Whistler. Unicode Script Property.</p>
-<p><a href="https://www.unicode.org/reports/tr24/#Common" class="uri">https://www.unicode.org/reports/tr24/#Common</a></p></li>
-<li><p>[TR24#5.1] Handling Characters with the Common Script Property</p>
-<p><a href="https://www.unicode.org/reports/tr24/#Common" class="uri">https://www.unicode.org/reports/tr24/#Common</a></p></li>
-<li><p>[TR24#5.2] Handling Combining Marks</p>
-<p><a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks" class="uri">https://www.unicode.org/reports/tr24/#Nonspacing_Marks</a></p></li>
-<li><p>[TR31] Mark Davis. Unicode Identifier and Pattern Syntax.</p>
-<p><a href="http://www.unicode.org/reports/tr31" class="uri">http://www.unicode.org/reports/tr31</a></p></li>
-<li><p>[TR31#2.1] Combining Marks</p>
-<p><a href="https://www.unicode.org/reports/tr31/#Combining_Marks" class="uri">https://www.unicode.org/reports/tr31/#Combining_Marks</a></p></li>
-<li><p>[TR31#2.2] Modifier Letters</p>
-<p><a href="https://www.unicode.org/reports/tr31/#Modifier_Letters" class="uri">https://www.unicode.org/reports/tr31/#Modifier_Letters</a></p></li>
-<li><p>[TR31#Table 4] Table Candidate Characters for Exclusion from Identifiers</p>
-<p><a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers" class="uri">https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers</a></p></li>
-<li><p>[TR31#Table 7] Limited Use Scripts</p>
-<p><a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts" class="uri">http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts</a></p></li>
-<li><p>[TR36] Mark Davis and Michel Suignard. Unicode Security Considerations.</p>
-<p><a href="http://www.unicode.org/reports/tr36" class="uri">http://www.unicode.org/reports/tr36</a></p></li>
-<li><p>[TR39] Mark Davis and Michel Suignard. Unicode Security Mechanisms.</p>
-<p><a href="http://www.unicode.org/reports/tr36" class="uri">http://www.unicode.org/reports/tr36</a></p></li>
-<li><p>[TR39#Table 1] Identifier Status and Type Table 1</p>
-<p><a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type" class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a></p></li>
-<li><p>[TR39#4] Confusable Detection</p>
-<p>&lt;https://www.unicode.org/reports/tr39/#Confusable Detection&gt;</p></li>
-<li><p>[TR39#5.2] Mixed-Scripts Restriction-Level Detection</p>
-<p><a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection" class="uri">https://www.unicode.org/reports/tr39/#Restriction_Level_Detection</a></p></li>
-<li><p>[TR39#5.4] Optional Detection</p>
-<p><a href="https://www.unicode.org/reports/tr39/#Optional_Detection" class="uri">https://www.unicode.org/reports/tr39/#Optional_Detection</a></p></li>
-<li><p>[TR44] Ken Whistler and Laurențiu Iancu. Unicode Character Database.</p>
-<p><a href="http://www.unicode.org/reports/tr44" class="uri">http://www.unicode.org/reports/tr44</a></p></li>
-<li><p>[TR46] Mark Davis and Michel Suignard. Unicode IDNA Compatibility Processing.</p>
-<p><a href="http://www.unicode.org/reports/tr46" class="uri">http://www.unicode.org/reports/tr46</a></p></li>
-</ul>
+<h2 id="appendix-g---medial">19 Appendix G - Medial</h2>
+<p>List of all the medial letter and mark ranges. These characters are treated wrongly in all programming languages I checked. In the UCD Standard some are wrongly in <code>XID_Start</code>, but must be treated as <code>XID_Continue</code>, with a special check that they must not be in the final position of an identifier.</p>
+<pre><code>grep &quot;; XID_Start &quot; DerivedCoreProperties.txt | grep MEDIAL</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>FE77          ; XID_Start # Lo       ARABIC FATHA MEDIAL FORM</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>FE79          ; XID_Start # Lo       ARABIC DAMMA MEDIAL FORM</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>FE7B          ; XID_Start # Lo       ARABIC KASRA MEDIAL FORM</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>FE7D          ; XID_Start # Lo       ARABIC SHADDA MEDIAL FORM</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>FE7F..FEFC    ; XID_Start # Lo [126] ARABIC SUKUN MEDIAL FORM</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                                     ..ARABIC LIGATURE LAM WITH ALEF FINAL FORM</span></code></pre></div>
+<p>From FE7F..FEFC not all are MEDIAL though.</p>
+<pre><code>grep &quot;;&lt;medial&gt;&quot; UnicodeData.txt | grep &quot;;Lo;&quot;</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>FE7F;ARABIC SUKUN MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0640 0652;;;;N;</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>FE8C;ARABIC LETTER YEH WITH HAMZA ABOVE MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0626;;;;N;</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>FE92;ARABIC LETTER BEH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0628;;;;N;</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>FE98;ARABIC LETTER TEH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 062A;;;;N;</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>FE9C;ARABIC LETTER THEH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 062B;;;;N;</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>FEA0;ARABIC LETTER JEEM MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 062C;;;;N;</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>FEA4;ARABIC LETTER HAH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 062D;;;;N;</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>FEA8;ARABIC LETTER KHAH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 062E;;;;N;</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>FEB4;ARABIC LETTER SEEN MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0633;;;;N;</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>FEB8;ARABIC LETTER SHEEN MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0634;;;;N;</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>FEBC;ARABIC LETTER SAD MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0635;;;;N;</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>FEC0;ARABIC LETTER DAD MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0636;;;;N;</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>FEC4;ARABIC LETTER TAH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0637;;;;N;</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>FEC8;ARABIC LETTER ZAH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0638;;;;N;</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>FECC;ARABIC LETTER AIN MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0639;;;;N;</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>FED0;ARABIC LETTER GHAIN MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 063A;;;;N;</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>FED4;ARABIC LETTER FEH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0641;;;;N;</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>FED8;ARABIC LETTER QAF MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0642;;;;N;</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>FEDC;ARABIC LETTER KAF MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0643;;;;N;</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>FEE0;ARABIC LETTER LAM MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0644;;;;N;</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>FEE4;ARABIC LETTER MEEM MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0645;;;;N;</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>FEE8;ARABIC LETTER NOON MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0646;;;;N;</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>FEEC;ARABIC LETTER HEH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 0647;;;;N;</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>FEF4;ARABIC LETTER YEH MEDIAL FORM;Lo;0;AL;&lt;medial&gt; 064A;;;;N;</span></code></pre></div>
+<p>The ones which are correctly in XID_Continue:</p>
+<pre><code>grep &quot;; XID_Continue &quot; DerivedCoreProperties.txt | grep MEDIAL</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>103B..103C    ; XID_Continue # Mc   [2] MYANMAR CONSONANT SIGN MEDIAL YA</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                                        ..MYANMAR CONSONANT SIGN MEDIAL RA</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>103D..103E    ; XID_Continue # Mn   [2] MYANMAR CONSONANT SIGN MEDIAL WA</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                                        ..MYANMAR CONSONANT SIGN MEDIAL HA</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>105E..1060    ; XID_Continue # Mn   [3] MYANMAR CONSONANT SIGN MON MEDIAL NA</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>                                        ..MYANMAR CONSONANT SIGN MON MEDIAL LA</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>1082          ; XID_Continue # Mn       MYANMAR CONSONANT SIGN SHAN MEDIAL WA</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>1A55          ; XID_Continue # Mc       TAI THAM CONSONANT SIGN MEDIAL RA</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>1A56          ; XID_Continue # Mn       TAI THAM CONSONANT SIGN MEDIAL LA</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>FE77          ; XID_Continue # Lo       ARABIC FATHA MEDIAL FORM</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>FE79          ; XID_Continue # Lo       ARABIC DAMMA MEDIAL FORM</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>FE7B          ; XID_Continue # Lo       ARABIC KASRA MEDIAL FORM</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>FE7D          ; XID_Continue # Lo       ARABIC SHADDA MEDIAL FORM</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>FE7F..FEFC    ; XID_Continue # Lo [126] ARABIC SUKUN MEDIAL FORM</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>                                        ..ARABIC LIGATURE LAM WITH ALEF FINAL FORM</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>1171D..1171F  ; XID_Continue # Mn   [3] AHOM CONSONANT SIGN MEDIAL LA</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>                                        ..AHOM CONSONANT SIGN MEDIAL LIGATING RA</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>11940         ; XID_Continue # Mc       DIVES AKURU MEDIAL YA</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>11942         ; XID_Continue # Mc       DIVES AKURU MEDIAL RA</span></code></pre></div>
+<p>Then see also <a href="https://www.unicode.org/reports/tr31/#Table_Optional_Medial" class="uri">https://www.unicode.org/reports/tr31/#Table_Optional_Medial</a>, even they are mostly not part of any TR31 XID set. For us relevant is only the Catalan U+B7 MIDDLE DOT, which is an identifier in the Latin script. There is no Catalan script (yet), so we cannot disallow that via our mixed script check. Hence we explicitly disallow the ‘·’ U+B7 MIDDLE DOT and punish all our Catalan programmers for security reasons, disallowing their single charaacter contribution to identifiers. See <a href="https://en.wikipedia.org/wiki/Catalan_orthography#Punt_volat_(middot)" class="uri">https://en.wikipedia.org/wiki/Catalan_orthography#Punt_volat_(middot)</a></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>00B7          ; XID_Continue # Po    MIDDLE DOT</span></code></pre></div>
+<p>So a <code>medial.h</code> header would look like as follows, constructed for all the allowed MEDIAL XID’s, plus U+B7.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> range_bool <span class="op">{</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint32_t</span> from<span class="op">;</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint32_t</span> to<span class="op">;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> range_bool medial_list<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">//{0xB7, 0xB7},     // · CATALAN MIDDLE DOT:Po Uncommon_Use</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0x58A</span><span class="op">,</span> <span class="bn">0x58A</span><span class="op">},</span>     <span class="co">// ֊ HEBREW POINT HOLAM HASER FOR VAV;Mn</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0x5F4</span><span class="op">,</span> <span class="bn">0x5F4</span><span class="op">},</span>     <span class="co">// ״ HEBREW PUNCTUATION GERSHAYIM;Po</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xF0B</span><span class="op">,</span> <span class="bn">0xF0B</span><span class="op">},</span>     <span class="co">// ་ TIBETAN MARK INTERSYLLABIC TSHEG;Po</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB55</span><span class="op">,</span> <span class="bn">0xFB55</span><span class="op">},</span>   <span class="co">// ﭕ</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB59</span><span class="op">,</span> <span class="bn">0xFB59</span><span class="op">},</span>   <span class="co">// ﭙ</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB5D</span><span class="op">,</span> <span class="bn">0xFB5D</span><span class="op">},</span>   <span class="co">// ﭝ</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB61</span><span class="op">,</span> <span class="bn">0xFB61</span><span class="op">},</span>   <span class="co">// ﭡ</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB65</span><span class="op">,</span> <span class="bn">0xFB65</span><span class="op">},</span>   <span class="co">// ﭥ</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB69</span><span class="op">,</span> <span class="bn">0xFB69</span><span class="op">},</span>   <span class="co">// ﭩ</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB6D</span><span class="op">,</span> <span class="bn">0xFB6D</span><span class="op">},</span>   <span class="co">// ﭭ</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB71</span><span class="op">,</span> <span class="bn">0xFB71</span><span class="op">},</span>   <span class="co">// ﭱ</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB75</span><span class="op">,</span> <span class="bn">0xFB75</span><span class="op">},</span>   <span class="co">// ﭵ</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB79</span><span class="op">,</span> <span class="bn">0xFB79</span><span class="op">},</span>   <span class="co">// ﭹ</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB7D</span><span class="op">,</span> <span class="bn">0xFB7D</span><span class="op">},</span>   <span class="co">// ﭽ</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB81</span><span class="op">,</span> <span class="bn">0xFB81</span><span class="op">},</span>   <span class="co">// ﮁ</span></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB91</span><span class="op">,</span> <span class="bn">0xFB91</span><span class="op">},</span>   <span class="co">// ﮑ</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB95</span><span class="op">,</span> <span class="bn">0xFB95</span><span class="op">},</span>   <span class="co">// ﮕ</span></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB99</span><span class="op">,</span> <span class="bn">0xFB99</span><span class="op">},</span>   <span class="co">// ﮙ</span></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFB9D</span><span class="op">,</span> <span class="bn">0xFB9D</span><span class="op">},</span>   <span class="co">// ﮝ</span></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFBA3</span><span class="op">,</span> <span class="bn">0xFBA3</span><span class="op">},</span>   <span class="co">// ﮣ</span></span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFBA9</span><span class="op">,</span> <span class="bn">0xFBA9</span><span class="op">},</span>   <span class="co">// ﮩ</span></span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFBAD</span><span class="op">,</span> <span class="bn">0xFBAD</span><span class="op">},</span>   <span class="co">// ﮭ</span></span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFBD6</span><span class="op">,</span> <span class="bn">0xFBD6</span><span class="op">},</span>   <span class="co">// ﯖ</span></span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFBE7</span><span class="op">,</span> <span class="bn">0xFBE7</span><span class="op">},</span>   <span class="co">// ﯧ</span></span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFBE9</span><span class="op">,</span> <span class="bn">0xFBE9</span><span class="op">},</span>   <span class="co">// ﯩ</span></span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFBFF</span><span class="op">,</span> <span class="bn">0xFBFF</span><span class="op">},</span>   <span class="co">// ﯿ</span></span>
+<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFCDF</span><span class="op">,</span> <span class="bn">0xFCF4</span><span class="op">},</span>   <span class="co">// ﳟ..ﳴ</span></span>
+<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFD34</span><span class="op">,</span> <span class="bn">0xFD3B</span><span class="op">},</span>   <span class="co">// ﴴ..ﴻ</span></span>
+<span id="cb30-36"><a href="#cb30-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE77</span><span class="op">,</span> <span class="bn">0xFE77</span><span class="op">},</span>   <span class="co">// ﹷ</span></span>
+<span id="cb30-37"><a href="#cb30-37" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE79</span><span class="op">,</span> <span class="bn">0xFE79</span><span class="op">},</span>   <span class="co">// ﹹ</span></span>
+<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE7B</span><span class="op">,</span> <span class="bn">0xFE7B</span><span class="op">},</span>   <span class="co">// ﹻ</span></span>
+<span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE7D</span><span class="op">,</span> <span class="bn">0xFE7D</span><span class="op">},</span>   <span class="co">// ﹽ</span></span>
+<span id="cb30-40"><a href="#cb30-40" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE7F</span><span class="op">,</span> <span class="bn">0xFE7F</span><span class="op">},</span>   <span class="co">// ﹿ</span></span>
+<span id="cb30-41"><a href="#cb30-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE8C</span><span class="op">,</span> <span class="bn">0xFE8C</span><span class="op">},</span>   <span class="co">// ﺌ</span></span>
+<span id="cb30-42"><a href="#cb30-42" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE92</span><span class="op">,</span> <span class="bn">0xFE92</span><span class="op">},</span>   <span class="co">// ﺒ</span></span>
+<span id="cb30-43"><a href="#cb30-43" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE98</span><span class="op">,</span> <span class="bn">0xFE98</span><span class="op">},</span>   <span class="co">// ﺘ</span></span>
+<span id="cb30-44"><a href="#cb30-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFE9C</span><span class="op">,</span> <span class="bn">0xFE9C</span><span class="op">},</span>   <span class="co">// ﺜ</span></span>
+<span id="cb30-45"><a href="#cb30-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEA0</span><span class="op">,</span> <span class="bn">0xFEA0</span><span class="op">},</span>   <span class="co">// ﺠ</span></span>
+<span id="cb30-46"><a href="#cb30-46" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEA4</span><span class="op">,</span> <span class="bn">0xFEA4</span><span class="op">},</span>   <span class="co">// ﺤ</span></span>
+<span id="cb30-47"><a href="#cb30-47" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEA8</span><span class="op">,</span> <span class="bn">0xFEA8</span><span class="op">},</span>   <span class="co">// ﺨ</span></span>
+<span id="cb30-48"><a href="#cb30-48" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEB4</span><span class="op">,</span> <span class="bn">0xFEB4</span><span class="op">},</span>   <span class="co">// ﺴ</span></span>
+<span id="cb30-49"><a href="#cb30-49" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEB8</span><span class="op">,</span> <span class="bn">0xFEB8</span><span class="op">},</span>   <span class="co">// ﺸ</span></span>
+<span id="cb30-50"><a href="#cb30-50" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEBC</span><span class="op">,</span> <span class="bn">0xFEBC</span><span class="op">},</span>   <span class="co">// ﺼ</span></span>
+<span id="cb30-51"><a href="#cb30-51" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEC0</span><span class="op">,</span> <span class="bn">0xFEC0</span><span class="op">},</span>   <span class="co">// ﻀ</span></span>
+<span id="cb30-52"><a href="#cb30-52" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEC4</span><span class="op">,</span> <span class="bn">0xFEC4</span><span class="op">},</span>   <span class="co">// ﻄ</span></span>
+<span id="cb30-53"><a href="#cb30-53" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEC8</span><span class="op">,</span> <span class="bn">0xFEC8</span><span class="op">},</span>   <span class="co">// ﻈ</span></span>
+<span id="cb30-54"><a href="#cb30-54" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFECC</span><span class="op">,</span> <span class="bn">0xFECC</span><span class="op">},</span>   <span class="co">// ﻌ</span></span>
+<span id="cb30-55"><a href="#cb30-55" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFED0</span><span class="op">,</span> <span class="bn">0xFED0</span><span class="op">},</span>   <span class="co">// ﻐ</span></span>
+<span id="cb30-56"><a href="#cb30-56" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFED4</span><span class="op">,</span> <span class="bn">0xFED4</span><span class="op">},</span>   <span class="co">// ﻔ</span></span>
+<span id="cb30-57"><a href="#cb30-57" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFED8</span><span class="op">,</span> <span class="bn">0xFED8</span><span class="op">},</span>   <span class="co">// ﻘ</span></span>
+<span id="cb30-58"><a href="#cb30-58" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEDC</span><span class="op">,</span> <span class="bn">0xFEDC</span><span class="op">},</span>   <span class="co">// ﻜ</span></span>
+<span id="cb30-59"><a href="#cb30-59" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEE0</span><span class="op">,</span> <span class="bn">0xFEE0</span><span class="op">},</span>   <span class="co">// ﻠ</span></span>
+<span id="cb30-60"><a href="#cb30-60" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEE4</span><span class="op">,</span> <span class="bn">0xFEE4</span><span class="op">},</span>   <span class="co">// ﻤ</span></span>
+<span id="cb30-61"><a href="#cb30-61" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEE8</span><span class="op">,</span> <span class="bn">0xFEE8</span><span class="op">},</span>   <span class="co">// ﻨ</span></span>
+<span id="cb30-62"><a href="#cb30-62" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEEC</span><span class="op">,</span> <span class="bn">0xFEEC</span><span class="op">},</span>   <span class="co">// ﻬ</span></span>
+<span id="cb30-63"><a href="#cb30-63" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xFEF4</span><span class="op">,</span> <span class="bn">0xFEF4</span><span class="op">},</span>   <span class="co">// ﻴ</span></span>
+<span id="cb30-64"><a href="#cb30-64" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<h1 id="references">20 References</h1>
+<dl>
+<dt>[AltId] Unicode Standard Annex</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax</a></p>
+</dd>
+<dt>[DefId] Unicode Standard Annex.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax</a></p>
+</dd>
+<dt>[ISO 15924 Codes] TR24 Unicode Script Property Values and ISO 15924 Codes.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924" class="uri">https://www.unicode.org/reports/tr24/#Relation_To_ISO15924</a></p>
+</dd>
+<dt>[libu8ident] Reini Urban. 2020. Unicode security guidelines for identifiers.</dt>
+<dd><p><a href="https://github.com/rurban/libu8ident/" class="uri">https://github.com/rurban/libu8ident/</a></p>
+</dd>
+</dl>
+<p>[N3146] Clark Nelson. 2010. Recommendations for extended identifier characters for C and C++.</p>
+<p>: <a href="https://wg21.link/n3146" class="uri">https://wg21.link/n3146</a></p>
+<p>[P1949] Steve Downey et al. 2021. C++ Identifier Syntax using Unicode Standard Annex 31.</p>
+<p>: <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html" class="uri">http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html</a></p>
+<dl>
+<dt>[TR15] Ken Whistler. Unicode Normalization Forms.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr15" class="uri">http://www.unicode.org/reports/tr15</a></p>
+</dd>
+<dt>[TR24] Ken Whistler. Unicode Script Property.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr24/#Common" class="uri">https://www.unicode.org/reports/tr24/#Common</a></p>
+</dd>
+<dt>[TR24#5.1] Handling Characters with the Common Script Property.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr24/#Common" class="uri">https://www.unicode.org/reports/tr24/#Common</a></p>
+</dd>
+<dt>[TR24#5.2] Handling Combining Marks.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks" class="uri">https://www.unicode.org/reports/tr24/#Nonspacing_Marks</a></p>
+</dd>
+<dt>[TR31] Mark Davis. Unicode Identifier and Pattern Syntax.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr31" class="uri">http://www.unicode.org/reports/tr31</a></p>
+</dd>
+<dt>[TR31#2.1] Combining Marks.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr31/#Combining_Marks" class="uri">https://www.unicode.org/reports/tr31/#Combining_Marks</a></p>
+</dd>
+<dt>[TR31#2.2] Modifier Letters.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr31/#Modifier_Letters" class="uri">https://www.unicode.org/reports/tr31/#Modifier_Letters</a></p>
+</dd>
+<dt>[TR31#Table 4] Table Candidate Characters for Exclusion from Identifiers.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers" class="uri">https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers</a></p>
+</dd>
+<dt>[TR31#Table 7] Limited Use Scripts.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts" class="uri">http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts</a></p>
+</dd>
+<dt>[TR36] Mark Davis and Michel Suignard. Unicode Security Considerations.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr36" class="uri">http://www.unicode.org/reports/tr36</a></p>
+</dd>
+<dt>[TR39] Mark Davis and Michel Suignard. Unicode Security Mechanisms.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr36" class="uri">http://www.unicode.org/reports/tr36</a></p>
+</dd>
+</dl>
+<p>[TR39#Table 1] Identifier Status and Type Table 1.</p>
+<p><a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type" class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a></p>
+<dl>
+<dt>[TR39#4] Confusable Detection.</dt>
+<dd><p>&lt;https://www.unicode.org/reports/tr39/#Confusable Detection&gt;</p>
+</dd>
+<dt>[TR39#5.2] Mixed-Scripts Restriction-Level Detection.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection" class="uri">https://www.unicode.org/reports/tr39/#Restriction_Level_Detection</a></p>
+</dd>
+<dt>[TR39#5.4] Optional Detection.</dt>
+<dd><p><a href="https://www.unicode.org/reports/tr39/#Optional_Detection" class="uri">https://www.unicode.org/reports/tr39/#Optional_Detection</a></p>
+</dd>
+<dt>[TR44] Ken Whistler and Laurențiu Iancu. Unicode Character Database.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr44" class="uri">http://www.unicode.org/reports/tr44</a></p>
+</dd>
+<dt>[TR46] Mark Davis and Michel Suignard. Unicode IDNA Compatibility Processing.</dt>
+<dd><p><a href="http://www.unicode.org/reports/tr46" class="uri">http://www.unicode.org/reports/tr46</a></p>
+</dd>
+</dl>
 </body>
 </html>

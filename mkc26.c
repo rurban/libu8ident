@@ -515,6 +515,10 @@ static void gen_c26_safe(void) {
       }
     }
   }
+  // Clear the unused catalan B7 MIDDLE DOT, another TR39 bug.
+  // This should have an Uncommon_Use Type, not Inclusion.
+  // https://en.wikipedia.org/wiki/Catalan_orthography#Punt_volat_(middot)
+  BITCLR(c, 0xB7);
 
   fputs(
       "\n// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, "

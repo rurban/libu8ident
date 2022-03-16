@@ -43,7 +43,7 @@ close $UCD;
 push @M, [0x27, 0x27]; # APOSTROPHE
 push @M, [0x2D, 0x2E]; # HYPHEN-MINUS..FULL-STOP
 push @M, [0x3A, 0x3A]; # COLON
-push @M, [0xB7, 0xB7]; # MIDDLE DOT
+push @M, [0xB7, 0xB7]; # MIDDLE DOT. disallowed in SAFEC26
 push @M, [0x58A, 0x58A]; # ARMENIAN HYPHEN
 push @M, [0x5F4, 0x5F4]; # HEBREW PUNCTUATION GERSHAYIM
 push @M, [0xF0B, 0xF0B]; # TIBETAN MARK INTERSYLLABIC TSHEG

@@ -374,7 +374,6 @@ extern const struct sc_c26 safec26_start_list[336];
 const struct sc_c26 safec26_cont_list[] = {
     {0x30, 0x39, SC_Common, GC_Nd, NULL}, //  0..9
     {0x5F, 0x5F, SC_Common, GC_Pc, NULL}, //  _
-    {0xB7, 0xB7, SC_Common, GC_Po, NULL}, //  ·
     {0x660, 0x669, SC_Arabic, GC_Nd, "\x03\x1c\x7d"}, //Arabic,Thaana,Yezidi //  ٠..٩
     {0x6F0, 0x6F9, SC_Arabic, GC_Nd, NULL}, //  ۰..۹
     {0x966, 0x96F, SC_Devanagari, GC_Nd, "\x08\x31\x3f\x48"}, //Devanagari,Dogra,Kaithi,Mahajani //  ०..९
@@ -449,9 +448,9 @@ const struct sc_c26 safec26_cont_list[] = {
     {0xFEF4, 0xFEF4, SC_Arabic, GC_Lo, NULL}, //  ﻴ
 };
 #else
-extern const struct sc_c26 safec26_cont_list[75];
+extern const struct sc_c26 safec26_cont_list[74];
 #endif
-// 22 ranges, 53 singles, 200 codepoints
+// 22 ranges, 52 singles, 200 codepoints
 
 
 //---------------------------------------------------
