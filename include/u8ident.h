@@ -188,8 +188,12 @@ enum u8id_errors {
   i.e. U+30, U+31, U+49, U+60
 */
 EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
-EXTERN enum u8id_errors u8ident_check_buf(const char *buf, int len,
+EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
                                           char **outnorm);
+
+/* A different check strategy via confusables.txt only.
+*/
+EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len);
 
 /* returns the failing codepoint, which failed in the last check. */
 EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t ctx);

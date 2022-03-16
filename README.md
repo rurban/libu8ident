@@ -221,6 +221,28 @@ Recommended is Level 4, the **Moderately Restrictive level** or its
 improved **C26_4** variant. It is always easier to widen restrictions
 than narrow them.
 
+Confusables
+-----------
+
+An alternative API is to check only against the list of TR39
+`security/confusables.txt`.  This is comparable to the Minimally
+Restrictive security profile.  The list of confusables is manually
+mantained and consists of pairs of codepoints which are visually
+confusable with other codepoints. It is described in [TR39 Section
+4](http://www.unicode.org/reports/tr39/#Confusable_Detection), with
+the "skeleton" algorithm, and implemented via the API `enum
+u8id_errors u8ident_check_confusables(const char *buf, const int len)`
+It uses a NFD lookup and three hash lookups per identifier, thus it is
+very slow. NFD is relatively cheap compared to NFC, mandatory since
+C23 and C++23, but much more expensive than the mixed script approach
+which uses only a single range-lookup in most cases.
+
+Also the default confusables list is extremely buggy. It needs at
+least 7 manual exceptions for the ASCII range, 12 exceptions for
+Greek, and I didn't check any others scripts. python and clang-tidy
+were very unsuccessful with this approach, compared to java, rust and
+cperl with the mixed-script approach.
+
 configure options
 -----------------
 

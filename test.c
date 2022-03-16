@@ -933,6 +933,30 @@ void test_confus(void) {
 }
 #endif
 
+void test_htable(void) {
+  struct htable *htab = new_htab(16);
+  assert(!find_htab(htab, "0"));
+  add_htab(htab, "0", "1");
+  assert(find_htab(htab, "0"));
+  assert(!find_htab(htab, "1"));
+
+  for (int i=1; i<1000; i++) {
+    char s[14];
+    snprintf(s, 13, "%u", i);
+    add_htab(htab, s, "x");
+    assert(find_htab(htab, s));
+  }
+
+  free_htab(htab);
+}
+
+void test_confusables(void) {
+  int ret = u8ident_check_confusables("check", sizeof("check") - 1);
+  assert(ret == 0);
+  ret = u8ident_check_confusables("check", sizeof("check") - 1);
+  assert(ret == U8ID_ERR_CONFUS);
+}
+
 int main(int argc, char **argv) {
   int i = 1;
   const int norm = (argc > i && strEQc(argv[i], "norm") && i++);
@@ -942,7 +966,7 @@ int main(int argc, char **argv) {
 #endif
   const int scx = (argc > i && strEQc(argv[i], "scx") && i++);
   const int combine = (argc > i && strEQc(argv[i], "combine") && i++);
-
+  
   if (argc == 1) {
     test_scripts_no_init();
     test_init();
@@ -954,6 +978,14 @@ int main(int argc, char **argv) {
   }
   if (combine) {
     test_combine();
+    return 0;
+  }
+  if (argc > i && strEQc(argv[i], "htable")) {
+    test_htable();
+    return 0;
+  }
+  if (argc > i && strEQc(argv[i], "confusables")) {
+    test_confusables();
     return 0;
   }
   if (norm || argc == 1) {
@@ -1003,6 +1035,8 @@ int main(int argc, char **argv) {
 #ifdef HAVE_CONFUS
   test_confus();
 #endif
+  test_htable();
+  test_confusables();
 
   u8ident_free();
   return 0;

@@ -21,8 +21,8 @@ PANDOC := pandoc
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 HDRS = u8id_private.h u8id_gc.h scripts.h $(NORMHDRS) hangul.h \
-       mark.h medial.h unic11.h scripts16.h
-SRC = u8ident.c u8idscr.c u8idnorm.c
+       mark.h medial.h unic11.h scripts16.h htable.h
+SRC = u8ident.c u8idscr.c u8idnorm.c htable.c
 ifeq (${HAVE_CONFUS}, 1)
 SRC += u8idroar.c
 HDRS += u8idroar.h confus.h
@@ -283,7 +283,7 @@ check-all-combinations: $(SRC) $(HEADER) $(ALLHDRS)
               else \
 	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
 	        $(CC) $(CFLAGS_DBG) $(DEFINES) -I. -Iinclude -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
-		  -Wfatal-errors test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c \
+		  -Wfatal-errors test.c $(SRC) \
 	          -o test-profiles && \
 	        ./test-profiles || exit; \
 	      fi; \

@@ -390,8 +390,8 @@ static int _decomp_s(char *restrict dest, size_t dmax, const uint32_t cp,
  *    remaining 869 non-mark and non-hangul normalizables.  Hangul has some
  *    special normalization logic.
  */
-static int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
-                            size_t *restrict lenp, const bool iscompat) {
+int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
+                     size_t *restrict lenp, const bool iscompat) {
   size_t orig_dmax;
   const char *overlap_bumper;
   uint32_t cp;

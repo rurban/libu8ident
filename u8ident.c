@@ -18,6 +18,8 @@ unsigned s_u8id_options = U8ID_TR31_DEFAULT;
 enum u8id_norm s_u8id_norm = U8ID_NORM_DEFAULT;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
+int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
+                     size_t *restrict lenp, const bool iscompat);
 
 LOCAL const char *u8ident_errstr(int errcode) {
   static const char *const _str[] = {
@@ -535,4 +537,51 @@ norm:
 
 EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
   return u8ident_check_buf((char *)string, strlen((char *)string), outnorm);
+}
+
+#define ERR_NOSPACE -2
+
+/* The other primitive variant without mixed-sripts checks. */
+EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len) {
+  int ret = U8ID_EOK;
+  struct ctx_t *ctx = u8ident_ctx();
+  size_t dmax = len;
+  size_t destlen;
+  char *nfd = NULL;
+  char *found;
+  int err;
+
+  if (!ctx->htab) {
+    ctx->htab = new_htab(16);
+    ctx->htab1 = new_htab(16);
+  } else {
+    if (find_htab(ctx->htab, buf)) // already handled
+      return U8ID_EOK;
+  }
+
+  // convert to NFD
+  while ((err = u8id_decompose_s(nfd, dmax, (char *)buf, &destlen, false)) == ERR_NOSPACE) {
+    dmax *= 2;
+    nfd = realloc(nfd, dmax);
+    memset(nfd, 0, dmax);
+  };
+  if (!nfd) {
+    nfd = (char*)buf;
+  } // else {
+    // TODO already seen? check all idents
+    //}
+
+  add_htab(ctx->htab, buf, nfd);
+  if ((found = find_htab(ctx->htab1, nfd))) {
+    // check the result for diagnostics
+    int diff = strcmp(found, nfd);
+    if (diff < 0 && -diff < len)
+      ctx->last_cp = nfd[-diff];
+    else if (diff < len)
+      ctx->last_cp = nfd[diff];
+    return U8ID_ERR_CONFUS;
+  } else {
+    add_htab(ctx->htab1, nfd, buf);
+  }
+  return ret;
 }

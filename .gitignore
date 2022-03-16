@@ -18,6 +18,7 @@ u8ident.o
 u8idnorm.o
 u8idscr.o
 u8idroar.o
+htable.o
 /test
 /test-asan
 /test-texts

@@ -22,6 +22,7 @@
 #include "u8id_private.h"
 #include <u8ident.h>
 
+#include "htable.h"
 #include "u8id_gc.h"
 #include "scripts.h"
 #ifndef HAVE_CROARING
@@ -42,6 +43,8 @@
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
 
 extern unsigned s_u8id_options;
+//extern struct htable *htab, *htab1;
+
 // not yet thread-safe
 struct ctx_t ctx[U8ID_CTX_TRESH] = {0}; // pre-allocate 5 contexts
 static u8id_ctx_t i_ctx = 0;
@@ -381,6 +384,13 @@ EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
   if (i <= i_ctx) {
     if (ctxp[i].count > 8)
       free(ctxp[i].u8p);
+    if (ctxp[i].htab) {
+      free_htab(ctxp[i].htab);
+      free_htab(ctxp[i].htab1);
+    }
+    free(ctxp[i].htab);
+    free(ctxp[i].htab1);
+#endif
     memset(&ctxp[i], 0, sizeof(u8id_ctx_t));
     if (i > 0)
       i_ctx = i - 1; // switch to the previous context
