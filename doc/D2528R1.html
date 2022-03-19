@@ -218,7 +218,7 @@
 <pre><code>C++ Identifier Security using Unicode Standard Annex 39
 
 Document #: D2538R1
-Date:       2022-03-16
+Date:       2022-03-19
 Project:    Programming Language C++
 Audience:   SG-16 EWG CWG
 Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;
@@ -503,7 +503,8 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>Then when GCC went to full insecure identifiers I implemented the more general <a href="https://github.com/rurban/libu8ident">libu8ident</a> library, which can be used with all known TR39 identifier type profiles, the mixed-script security profiles, TR31 XID character sets and all TR15 normalizations. There I tested various performance strategies of the unicode lookups. Tested was CRoaring, which was only useful for sets of single codepoints, the list of confusables. Most of the needed lists were best structured as binary-search in range pairs. Most of them were fastest with special-casing the codepoints below U+128 with a simple linear search. Binary search in an Eytzinger layout was not convincibly faster, neither hybrid searches by 1. splitting up ranges from single codepoints, nor 2. seperating 16bit from 32bit codepoints. Perfect hashes for singular lookup are used in some similar implementations, esp. for confusables and the normalization check. I’m still working on the perfect hashes approach (the new perl5 unicode tables, PostgresQL PerfectHash.pm, nbperf, gperf).</p>
 <p>Rust has a good implementation also.</p>
 <p>ICU has no implementation for TR39 checks (yet).</p>
-<p>gcc <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR 103027</a> implements the “skeleton” algorithm from <a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a> via a switch table for all decomposables and confusables, and two extra dynamic hashtables for the NFD expanded identifiers. There’s a lot of room of improvement there, e.g. with perfect hashes instead of a switch table for the huge and sparse tables, but they had no complaints on speed and size yet. Implementing the mixed-scripts approach in C++26/C26 for their -Whomoglyph warnings would be much faster and smaller though.</p>
+<p>gcc <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR 103027</a> implements the “skeleton” algorithm from <a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a> via a switch table (!) for all decomposables and confusables, and two extra dynamic hashtables for the NFD expanded identifiers. There’s a lot of room of improvement there, e.g. with perfect hashes instead of a switch table for the huge and sparse tables, but they had no complaints on speed and size yet. Implementing the mixed-scripts approach in C++26/C26 for their -Whomoglyph warnings would be much faster and smaller though.</p>
+<p>Also gcc and all other major compilers don’t optimize large constant sparse case arrays to perfect hashes yet, so their switch/case lookups are linear, not constant. See e.g. <a href="https://programming.sirrida.de/hashsuper.pdf" class="uri">https://programming.sirrida.de/hashsuper.pdf</a>.</p>
 <h1 id="appendix-a---c26xid_start">13 Appendix A - C26XID_Start</h1>
 <p>Created with mkc26 from libu8ident. <em>The SCX is modelled as if your compiler would allow static initialization of strings as {char,…,0}.</em></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -1856,7 +1857,7 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb22-76"><a href="#cb22-76" aria-hidden="true" tabindex="-1"></a>03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI</span>
 <span id="cb22-77"><a href="#cb22-77" aria-hidden="true" tabindex="-1"></a>03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA</span></code></pre></div>
 <h2 id="appendix-g---medial">19 Appendix G - Medial</h2>
-<p>List of all the medial letter and mark ranges. These characters are treated wrongly in all programming languages I checked. In the UCD Standard some are wrongly in <code>XID_Start</code>, but must be treated as <code>XID_Continue</code>, with a special check that they must not be in the final position of an identifier.</p>
+<p>List of all the medial letter and mark ranges. These characters are treated wrongly in all programming languages I checked. In the UCD Standard some are wrongly in <code>XID_Start</code>, but must be treated as <code>XID_Continue</code>, with a special check that they must not be in the final position of an identifier. Here we prove that for C++26 we don’t need to check for medial positions, because we restrict our TR31 set.</p>
 <pre><code>grep &quot;; XID_Start &quot; DerivedCoreProperties.txt | grep MEDIAL</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>FE77          ; XID_Start # Lo       ARABIC FATHA MEDIAL FORM</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>FE79          ; XID_Start # Lo       ARABIC DAMMA MEDIAL FORM</span>
