@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include "u8id_private.h"
 #include <u8ident.h>
@@ -12,14 +13,19 @@
 #ifdef HAVE_CROARING
 #  include "u8idroar.h"
 #endif
+#ifdef HAVE_CONFUS
+#  include "gconfus.h"
+#endif
 
 // defaults to U8ID_PROFILE_4, U8ID_NFC, U8ID_TR31_XID
 unsigned s_u8id_options = U8ID_TR31_DEFAULT;
 enum u8id_norm s_u8id_norm = U8ID_NORM_DEFAULT;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_DEFAULT;
 unsigned s_maxlen = 1024;
+#ifdef HAVE_CONFUS
 int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
                      size_t *restrict lenp, const bool iscompat);
+#endif
 
 LOCAL const char *u8ident_errstr(int errcode) {
   static const char *const _str[] = {
@@ -543,45 +549,82 @@ EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
 
 /* The other primitive variant without mixed-sripts checks. */
 EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len) {
+#ifndef HAVE_CONFUS
+  return -1;
+#else
   int ret = U8ID_EOK;
   struct ctx_t *ctx = u8ident_ctx();
-  size_t dmax = len;
-  size_t destlen;
-  char *nfd = NULL;
+  char *nfc = NULL;
   char *found;
-  int err;
 
+  if (!len)
+    return U8ID_EOK;
   if (!ctx->htab) {
     ctx->htab = new_htab(16);
     ctx->htab1 = new_htab(16);
   } else {
-    if (find_htab(ctx->htab, buf)) // already handled
+    if (find_htab(ctx->htab, buf)) { // already handled
+      //fprintf(stderr, "already seen %s\n", buf);
       return U8ID_EOK;
+    }
   }
 
-  // convert to NFD
-  while ((err = u8id_decompose_s(nfd, dmax, (char *)buf, &destlen, false)) == ERR_NOSPACE) {
-    dmax *= 2;
-    nfd = realloc(nfd, dmax);
-    memset(nfd, 0, dmax);
-  };
-  if (!nfd) {
-    nfd = (char*)buf;
-  } // else {
-    // TODO already seen? check all idents
-    //}
+  // convert to NFC
+  enum u8id_norm norm = s_u8id_norm;
+  s_u8id_norm = U8ID_NFC;
+  nfc = u8ident_normalize(buf, len);
+  if (!nfc)
+    return U8ID_EOK_NORM;
+  {
+    char *s = (char *)buf;
+    const char *e = &buf[len];
+    // lookup the codepoints in confusables
+    bool found_gperf = false;
+    size_t nfcsz = len * 2;
+    char *confus = calloc(nfcsz, 1);
+    do {
+      char *os = s;
+      uint32_t cp = dec_utf8(&s);
+      char tostr[6];
+      snprintf(tostr, 6, "%05X", cp);
+      const struct confus_gperf *gperf = in_word_set(tostr, 5);
+      if (gperf) {
+        size_t l = strlen(confus) + strlen(gperf->u8nfc);
+        if (l > nfcsz) {
+          confus = realloc(confus, l);
+          nfcsz = l;
+        }
+        strcat(confus, gperf->u8nfc);
+        found_gperf = true;
+      } else {
+        strncat(confus, os, s - os);
+      }
+    } while (s <= e);
+    if (found_gperf) {
+      free (nfc);
+      nfc = u8ident_normalize(confus, strlen(confus));
+      //fprintf(stderr, "confus: nfc %s (%s) -> %s\n", buf, confus, nfc);
+    }
+    free (confus);
+  }
+  s_u8id_norm = norm;
 
-  add_htab(ctx->htab, buf, nfd);
-  if ((found = find_htab(ctx->htab1, nfd))) {
-    // check the result for diagnostics
-    int diff = strcmp(found, nfd);
+  add_htab(ctx->htab, buf, nfc);
+  if ((found = find_htab(ctx->htab1, nfc))) {
+    //fprintf(stderr, "found confus %s -> %s\n", buf, found);
+    // add the result for diagnostics
+    int diff = strcmp(found, buf);
     if (diff < 0 && -diff < len)
-      ctx->last_cp = nfd[-diff];
+      ctx->last_cp = nfc[-diff];
     else if (diff < len)
-      ctx->last_cp = nfd[diff];
+      ctx->last_cp = nfc[diff];
+    free (nfc);
     return U8ID_ERR_CONFUS;
   } else {
-    add_htab(ctx->htab1, nfd, buf);
+    //fprintf(stderr, "first use of %s -> %s\n", nfc, buf);
+    add_htab(ctx->htab1, nfc, buf); // first use
   }
+  free (nfc);
   return ret;
+#endif
 }

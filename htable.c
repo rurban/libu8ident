@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <assert.h>
 #include "htable.h"
 
@@ -56,8 +57,10 @@ void add_htab(struct htable *htab, const char *key, const char *value) {
   uint32_t oh = h;
   assert(key);
   if (fill_htab(htab) > 0.75f) {
+    struct htable *ht2;
   resize:
-    struct htable *ht2 = new_htab(htab->cap * 2);
+    ht2 = new_htab(htab->cap * 2);
+    //fprintf(stderr, "resize %p[%lu] to %lu\n", htab, htab->size, htab->cap * 2);
     for (unsigned i=0; i < htab->cap; i++) {
       if (htab->keys[h]) {
         add_htab(ht2, htab->keys[h], htab->values[h]);
@@ -76,6 +79,7 @@ void add_htab(struct htable *htab, const char *key, const char *value) {
       goto resize;
   }
   if (!htab->keys[h]) { // found a free slot
+    //fprintf(stderr, "add %s key to %p[%lu]\n", key, htab, htab->size+1);
     htab->keys[h] = strdup(key);
     htab->values[h] = strdup(value);
     htab->size++;
@@ -97,5 +101,7 @@ char * find_htab(struct htable *htab, const char *key) {
     if (h == oh)
       return false;
   }
+  //if (htab->keys[h])
+  //  fprintf(stderr, "find %s -> %s in %p[%lu]\n", htab->keys[h], htab->values[h], htab, htab->size);
   return htab->keys[h] ? htab->values[h] : NULL;
 }

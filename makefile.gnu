@@ -6,6 +6,7 @@ CC := cc
 CFLAGS := -Wall -Wextra
 AR := ar
 RANLIB := ranlib
+GPERF := gperf
 # dnf install rubygem-ronn-ng
 RONN := ronn
 # Maintainer only
@@ -21,7 +22,7 @@ PANDOC := pandoc
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 HDRS = u8id_private.h u8id_gc.h scripts.h $(NORMHDRS) hangul.h \
-       mark.h medial.h unic11.h scripts16.h htable.h
+       mark.h medial.h unic11.h scripts16.h htable.h gconfus.h
 SRC = u8ident.c u8idscr.c u8idnorm.c htable.c
 ifeq (${HAVE_CONFUS}, 1)
 SRC += u8idroar.c
@@ -152,8 +153,12 @@ $(SOLIB): $(SRC) $(HEADER) $(ALLHDRS)
 
 scripts.h scripts16.h: mkscripts.pl # Scripts.txt ScriptExtensions.txt DerivedNormalizationProps.txt
 	$(PERL) mkscripts.pl
+gconfus.h.in: mkconfus.pl # confusables.txt
+	$(PERL) mkconfus.pl -c
 confus.h: mkconfus.pl mkroar.c # confusables.txt
 	$(PERL) mkconfus.pl -c
+gconfus.h: gconfus.h.in
+	$(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp
 confus_croar.h: mkroar.c mkconfus.pl
 	$(PERL) mkconfus.pl -c
 mark.h: mkmark.pl # UnicodeData.txt

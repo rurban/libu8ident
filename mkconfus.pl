@@ -7,7 +7,7 @@
 # with mkconfus.pl -c.
 # perf needs mkconfus.pl without -c to generate all headers.
 #
-# Note that this is just a binary-search in an unoptimized,
+# Note that the first array is just a binary-search in an unoptimized,
 # uncompressed array, without any values.  It might be smaller and
 # faster with gperf or cbitset/croaring.
 
@@ -15,6 +15,9 @@ use vars qw($c);
 use strict;
 use Config;
 use utf8;
+use Encode ();
+use B 'cstring';
+use Unicode::Normalize;
 
 my $confus = "confusables.txt";
 for ($confus) {
@@ -31,11 +34,21 @@ while (<$CONF>) {
     if (/^# For documentation and/) { $started++; }
     next unless $started;
   } else {
-    if (/^([0-9A-F]{4,5}) ;\s+([0-9A-F]{4,5}) ;/) {
+    if (/^([0-9A-F]{4,5}) ;\t([0-9A-F]{4,5}) ;/) {
       my ($from, $to1) = (hex($1), hex($2));
       push @CONF, [$from, $to1];
     }
-    elsif (/^([0-9A-F]{4,5}) ;\s+([0-9A-F]{4,5}\s+){1,4} ;/) {
+    elsif (/^([0-9A-F]{4,5}) ;\t([0-9A-F]{4,5} [0-9A-F]{4,5} );\t/) {
+      my ($from, $ids) = (hex($1), $2);
+      my @ids = map{ hex $_ } split(' ',$ids);
+      push @CONF, [$from, @ids];
+    }
+    elsif (/^([0-9A-F]{4,5}) ;\t([0-9A-F]{4,5} [0-9A-F]{4,5} [0-9A-F]{4,5} );\t/) {
+      my ($from, $ids) = (hex($1), $2);
+      my @ids = map{ hex $_ } split(' ',$ids);
+      push @CONF, [$from, @ids];
+    }
+    elsif (/^([0-9A-F]{4,5}) ;\t([0-9A-F]{4,5} [0-9A-F]{4,5} [0-9A-F]{4,5} [0-9A-F]{4,5} );\t/) {
       my ($from, $ids) = (hex($1), $2);
       my @ids = map{ hex $_ } split(' ',$ids);
       push @CONF, [$from, @ids];
@@ -44,6 +57,7 @@ while (<$CONF>) {
 }
 close $CONF;
 @CONF = sort {$a->[0] <=> $b->[0]} @CONF;
+printf "%u confusables\n", scalar @CONF;
 
 my $ofile1 = "confus.h";
 chmod 0644, $ofile1 if -e $ofile1;
@@ -59,7 +73,7 @@ print $H1 <<"EOF";
 */
 #include <stdint.h>
 
-/* Sorted set of all confusables,
+/* Sorted set of all confusables without mapping,
    from https://www.unicode.org/Public/security/latest/confusables.txt
  */
 #ifndef EXTERN_SCRIPTS
@@ -69,7 +83,7 @@ EOF
 
 my $ofile = "gconfus.h.in";
 chmod 0644, $ofile if -e $ofile;
-open my $H, ">", $ofile or die "writing $ofile $!";
+open my $H, ">:utf8", $ofile or die "writing $ofile $!";
 print $H <<"EOF";
 %{/* ex: set ro ft=c: -*- mode: c; buffer-read-only: t -*- */
 /* libu8ident - Check unicode security guidelines for identifiers.
@@ -94,30 +108,38 @@ print $H <<"EOF";
 #  define SIZE_TYPE size_t
 #endif
 
+/* FIXME gperf to accept uint32_t keys.
+   key is "%05X" of the unicode codepoint, fixed length 5.
+   u8nfc is the rhs of confusables, already decomposed into NFC and encoded as UTF-8.
+ */
 %}
 %7bit
 %language=ANSI-C
 %struct-type
 %readonly-tables
-%pic
+%null-strings
 
-struct _confus_gperf {uint32_t key; uint32_t *values};
+struct confus_gperf { const char *const name; const char *const u8nfc; };
 
 %%
 EOF
 my $i = 0;
+my $enc = Encode::find_encoding("UTF-8");
 for my $c (@CONF) {
-  my $u = chr $c->[0];
-  printf $H1 "    0x%04X,\t// %s\n", $c->[0], $u;
   if (@$c == 2) {
-    printf $H "0x%05X,\t{0x%05X,0}\n", $c->[0], $c->[1];
+    printf $H1 "    0x%04X,\t/* %s -> %s */\n", $c->[0], chr $c->[0], chr $c->[1];
+    printf $H "%05X,\t%s\n", $c->[0], B::cstring NFC(chr $c->[1]);
   } else {
-    printf $H "0x%05X,\t{", $c->[0];
+    printf $H1 "    0x%04X,\t/* %s -> ", $c->[0], chr $c->[0];
+    printf $H "%05X,\t", $c->[0];
     pop @$c;
+    my $nfd = "";
     for (@$c) {
-      printf $H "0x%05X,", $_;
+      printf $H1 "%s", chr $_;
+      $nfd .= NFC(chr $_);
     }
-    printf $H "0}\n";
+    printf $H1 " */\n";
+    printf $H "%s\n", B::cstring $nfd;
   }
   $i++;
 }

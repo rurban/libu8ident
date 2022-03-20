@@ -46,7 +46,6 @@ build-aux/config.guess
 build-aux/config.sub
 configure
 build-aux/depcomp
-build-aux/gconfus.h.in
 build-aux/install-sh
 build-aux/ltmain.sh
 build-aux/missing
@@ -57,7 +56,7 @@ roaring.h
 u8ident.3
 mkroar
 perf
-gconfus.h.in
+gconfus.h
 allowed_croar.h
 nfc_croar.h
 nfd_croar.h

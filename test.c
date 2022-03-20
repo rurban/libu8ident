@@ -948,12 +948,14 @@ void test_htable(void) {
   }
 
   free_htab(htab);
+  free(htab);
 }
 
 void test_confusables(void) {
-  int ret = u8ident_check_confusables("check", sizeof("check") - 1);
+  int ret = u8ident_check_confusables("checkO", sizeof("check") - 1);
   assert(ret == 0);
-  ret = u8ident_check_confusables("check", sizeof("check") - 1);
+  // Cyrillic c U+441, һ U+4bb, е U+435
+  ret = u8ident_check_confusables("сһесk0", sizeof("сһесk") - 1);
   assert(ret == U8ID_ERR_CONFUS);
 }
 
@@ -982,10 +984,12 @@ int main(int argc, char **argv) {
   }
   if (argc > i && strEQc(argv[i], "htable")) {
     test_htable();
+    u8ident_free();
     return 0;
   }
   if (argc > i && strEQc(argv[i], "confusables")) {
     test_confusables();
+    u8ident_free();
     return 0;
   }
   if (norm || argc == 1) {
