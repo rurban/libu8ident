@@ -3,12 +3,18 @@ PERL = @PERL@
 WGET = @WGET@
 RONN = @RONN@
 PANDOC = @PANDOC@
+GPERF = @GPERF@
 WARN_CFLAGS = @WARN_CFLAGS@
 CROARING_PATH = @CROARING_PATH@
 AM_CFLAGS = -I$(srcdir)/include -I$(builddir) -I$(srcdir) $(WARN_CFLAGS)
 lib_LTLIBRARIES = libu8ident.la
 include_HEADERS = include/u8ident.h
+c_sources = $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c
 libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
+if HAVE_CONFUS
+c_sources += $(srcdir)/htable.c
+libu8ident_la_SOURCES += htable.c
+endif
 if HAVE_CROARING
 AM_CFLAGS += -I$(CROARING_PATH)
 libu8ident_la_SOURCES += u8idroar.c
@@ -18,7 +24,7 @@ libu8ident_la_LDFLAGS = \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
 bin_PROGRAMS = u8idlint
-u8idlint_SOURCES = u8idlint.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
+u8idlint_SOURCES = u8idlint.c $(libu8ident_la_SOURCES)
 u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 u8idlint_LDADD = $(u8idlint_LIBS)
 
@@ -42,7 +48,7 @@ doc_DATA += $(html_DATA)
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h medial.h unic11.h unic26.h scripts16.h
+	confus_croar.h mark.h medial.h unic11.h unic26.h scripts16.h gconfus.h htable.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
 	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
 	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -78,14 +84,19 @@ EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.
 
 $(srcdir)/scripts.h: $(srcdir)/mkscripts.pl
 	cd $(srcdir) && $(PERL) mkscripts.pl
-$(srcdir)/confus.h: $(srcdir)/mkconfus.pl
-	cd $(srcdir) && $(PERL) mkconfus.pl
+$(srcdir)/confus.h: $(srcdir)/mkconfus.pl # confusables.txt
+	-cd $(srcdir) && $(PERL) mkconfus.pl -c
+$(srcdir)/gconfus.h.in: $(srcdir)/mkconfus.pl # confusables.txt
+	-cd $(srcdir) && $(PERL) mkconfus.pl -c
 $(srcdir)/mark.h: $(srcdir)/mkmark.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkmark.pl
 $(srcdir)/medial.h: $(srcdir)/mkmedial.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkmedial.pl
-$(srcdir)/u8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
+$(srcdir)/su8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkgc.pl
+$(srcdir)/gconfus.h: $(srcdir)/gconfus.h.in
+	-if test -n "$(GPERF)"; then cd $(srcdir) && $(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp; fi
+
 # emacs flymake-mode
 check-syntax:
 	test -n "$(CHK_SOURCES)" && \
@@ -114,21 +125,21 @@ regen-norm: Unicode-Normalize un8ifcan.h
 	  cd - && cp Unicode-Normalize/un8if*.h .
 # Download some UCD files and create scripts.h
 regen-scripts:
-	$(WGET) -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
-	$(WGET) -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
-	$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
-	$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
-	$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
-	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
-	$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
+	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
+	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
+	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
+	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
+	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
+	-$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
+	-$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
 	$(PERL) mkscripts.pl
 	$(PERL) mkgc.pl
 	$(PERL) mkmark.pl
 	-$(MAKE) unic26.h
 # Download some UCD files and create confus.h
 regen-confus:
-	$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
-	$(PERL) mkconfus.pl
+	-$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
+	-$(PERL) mkconfus.pl
 docs: $(doc_DATA) $(PDF)
 	-test -d doc || mkdir doc
 pdf: $(PDF)
@@ -188,20 +199,24 @@ regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(DCU
 EXTRA_PROGRAMS = mkc26 test test-texts example
 TESTS = test example
 if !HAVE_WINDOWS
+EXTRA_PROGRAMS += test_asan
 TESTS += test-texts.test u8idlint.test
 endif
-test_SOURCES = test.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
+test_SOURCES = test.c $(libu8ident_la_SOURCES)
 test_CFLAGS = $(AM_CFLAGS)
-test_texts_SOURCES = test-texts.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
+test_texts_SOURCES = test-texts.c $(libu8ident_la_SOURCES)
 test_texts_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_LDADD = $(u8idlint_LIBS)
-mkc26_SOURCES = mkc26.c u8ident.c u8idnorm.c u8idscr.c u8idroar.c
+mkc26_SOURCES = mkc26.c $(libu8ident_la_SOURCES)
 mkc26_CFLAGS = $(AM_CFLAGS)
 example_SOURCES = example.c
 example_LDADD = libu8ident.la
+test_asan_CFLAGS = $(AM_CFLAGS) -g -fsanitize=address
+test_asan_SOURCES = test.c $(libu8ident_la_SOURCES)
 
 if HAVE_CROARING
-test_LDADD = u8idroar.lo
+# test_LDADD = u8idroar.lo
+# TODO perf also requires mkconfus.pl without -c
 EXTRA_PROGRAMS += perf
 perf_CFLAGS = $(AM_CFLAGS) -DPERF_TEST
 perf_SOURCES = perf.c u8idroar.c
@@ -209,11 +224,14 @@ perf_LDADD = u8idroar.lo
 endif
 TESTS_ENVIRONMENT = U8IDTEST_TEXTS='@top_srcdir@/texts'
 
+
 test-texts.test: test-texts$(EXEEXT)
 
 if !HAVE_CROARING
 perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
+mkroar: mkroar.c
+	@echo "ERROR mkroar requires roaring.c (--with-croaring)"
 endif
 
 c11-all.h unic26.h: mkc26$(EXEEXT) scripts.h mark.h medial.h
@@ -233,11 +251,8 @@ check-all: check check-norms check-profiles check-tr31
 check-extra: check-all check-mdl check-all-combinations
 endif
 
-check-asan: test.c $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -g -fsanitize=address \
-	  $(srcdir)/test.c $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c \
-	  -o test-asan$(EXEEXT)
-	if ./test-asan$(EXEEXT); then rm test-asan$(EXEEXT); else exit; fi
+check-asan: test_asan
+	if ./test_asan$(EXEEXT); then rm test_asan$(EXEEXT); else exit; fi
 
 # Check coverage and sizes for all --with-norm configure combinations
 # e.g. amd64-gcc:   NFKC 217K, NFC+FCC 182K, NFD 113K, NFD 78K, FCD 52K
@@ -250,7 +265,7 @@ check-norms:
 		-c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
 	  ls -gGh u8idnorm.o; \
 	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-norm$(EXEEXT) && \
+	      $(c_sources) -o test-norm$(EXEEXT) && \
 	  ./test-norm$(EXEEXT) norm || exit; \
 	done; \
 	rm test-norm$(EXEEXT)
@@ -258,13 +273,13 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6 C11_6 C26_4; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
+	      $(c_sources) -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
 	done
 	for n in SAFEC26 C11STD; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
+	      $(c_sources) -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
 	done; \
 	rm test-profiles$(EXEEXT)
@@ -272,7 +287,7 @@ check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
 	    echo U8ID_TR31=$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_TR31=$${n} -Wfatal-errors $(srcdir)/test.c \
-	      $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c -o test-tr31$(EXEEXT) && \
+	      $(c_sources) -o test-tr31$(EXEEXT) && \
 	    ./test-tr31$(EXEEXT) xid || exit; \
 	done; \
 	rm test-tr31$(EXEEXT)
@@ -286,8 +301,7 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
 	        $(COMPILE) -DU8ID_PROFILE=$$p -DU8ID_NORM=$$n -DU8ID_TR31=$$x \
 		  -Wfatal-errors $(srcdir)/test.c \
-		  $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c \
-		  $(srcdir)/u8idroar.c -o test-profiles$(EXEEXT) && \
+		  $(c_sources) -o test-profiles$(EXEEXT) && \
 	        ./test-profiles$(EXEEXT) || exit; \
 	      fi; \
 	    done; \
@@ -325,9 +339,10 @@ dist-hook:
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C26_4,C11_6,SAFEC26,C11STD}$(EXEEXT) \
-	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) per$(EXEEXT) \
+	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) perf$(EXEEXT) \
 	     texts.tst mkc26$(EXEEXT) example$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst test-texts.test
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst \
+	     test-texts.test doc/$(NCURC).pdf
 distclean-compile:
 	-rm -f *.tab.c
 	-rm -rf .deps

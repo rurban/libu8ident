@@ -550,6 +550,9 @@ EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
 /* The other primitive variant without mixed-sripts checks. */
 EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len) {
 #ifndef HAVE_CONFUS
+  (void)buf;
+  (void)len;
+  fprintf(stderr, "Unsupported u8ident_check_confusables(), need --enable-confus\n");
   return -1;
 #else
   int ret = U8ID_EOK;

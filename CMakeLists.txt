@@ -72,7 +72,7 @@ option(BUILD_SHARED_LIBS "shared libu8ident library" ON)
 option(U8ID_NORM "force a single normalization: NFC,NFKC,NFD,NFKD,FCC,FCD" OFF)
 option(U8ID_PROFILE "force a single profile: 2-6,C26_4,C11_6" OFF)
 option(U8ID_TR31 "force TR31 charset: ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE" OFF)
-option(HAVE_CONFUS "add confus.h set" OFF)
+option(HAVE_CONFUS "add confusables API" OFF)
 option(HAVE_CROARING "use CRoaring bitsets" ON)
 
 if (HAVE_CONFUS)

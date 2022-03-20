@@ -243,6 +243,9 @@ Greek, and I didn't check any others scripts. python and clang-tidy
 were very unsuccessful with this approach, compared to java, rust and
 cperl with the mixed-script approach.
 
+The confusables API needs to be enabled with the `--enable-confus` resp.
+cmake `-DHAVE_CONFUS=ON` options.
+
 configure options
 -----------------
 
@@ -306,6 +309,8 @@ configure options
   at run-time.
 
 * `--enable-confus`
+
+By default the confusables API is disabled.
 
 * `--with-croaring[=path-to-CRoaring]`
 

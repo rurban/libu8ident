@@ -224,6 +224,7 @@ AC_CHECK_TOOLS([RONN], [ronn])
 AC_CHECK_TOOLS([PERL], [cperl perl])
 AC_CHECK_TOOLS([PANDOC], [pandoc])
 AM_CONDITIONAL([HAVE_PANDOC], [test -n "$PANDOC"])
+AC_CHECK_TOOLS([GPERF], [gperf])
 
 AC_MSG_NOTICE([Check header files])
 # ===============================================

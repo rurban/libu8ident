@@ -931,7 +931,6 @@ void test_confus(void) {
   u8ident_roar_free();
 #  endif
 }
-#endif
 
 void test_htable(void) {
   struct htable *htab = new_htab(16);
@@ -952,12 +951,17 @@ void test_htable(void) {
 }
 
 void test_confusables(void) {
+  // requires generic or NFC
+#if !defined U8ID_NORM || U8ID_NORM == NFC
   int ret = u8ident_check_confusables("checkO", sizeof("check") - 1);
   assert(ret == 0);
   // Cyrillic c U+441, һ U+4bb, е U+435
   ret = u8ident_check_confusables("сһесk0", sizeof("сһесk") - 1);
   assert(ret == U8ID_ERR_CONFUS);
+#endif
 }
+
+#endif
 
 int main(int argc, char **argv) {
   int i = 1;
@@ -982,6 +986,8 @@ int main(int argc, char **argv) {
     test_combine();
     return 0;
   }
+
+#ifdef HAVE_CONFUS
   if (argc > i && strEQc(argv[i], "htable")) {
     test_htable();
     u8ident_free();
@@ -992,6 +998,8 @@ int main(int argc, char **argv) {
     u8ident_free();
     return 0;
   }
+#endif
+
   if (norm || argc == 1) {
 #if !defined U8ID_NORM || U8ID_NORM == NFKC
     test_norm_nfkc();
@@ -1038,9 +1046,9 @@ int main(int argc, char **argv) {
 
 #ifdef HAVE_CONFUS
   test_confus();
-#endif
   test_htable();
   test_confusables();
+#endif
 
   u8ident_free();
   return 0;

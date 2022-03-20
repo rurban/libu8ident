@@ -22,11 +22,11 @@ PANDOC := pandoc
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 HDRS = u8id_private.h u8id_gc.h scripts.h $(NORMHDRS) hangul.h \
-       mark.h medial.h unic11.h scripts16.h htable.h gconfus.h
-SRC = u8ident.c u8idscr.c u8idnorm.c htable.c
+       mark.h medial.h unic11.h scripts16.h htable.h
+SRC = u8ident.c u8idscr.c u8idnorm.c
 ifeq (${HAVE_CONFUS}, 1)
-SRC += u8idroar.c
-HDRS += u8idroar.h confus.h
+SRC += u8idroar.c htable.c
+HDRS += u8idroar.h confus.h gconfus.h
 DEFINES += -DHAVE_CONFUS
 endif
 ifneq (,$(wildcard /usr/include/sys/stat.h))
@@ -167,7 +167,7 @@ u8id_gc.h: mkgc.pl # UnicodeData.txt
 	$(PERL) mkgc.pl
 medial.h: mkmedial.pl # UnicodeData.txt
 	$(PERL) mkmedial.pl
-allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl
+allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl FORCE
 	$(PERL) mkconfus.pl
 
 u8idlint: u8idlint.c unic26.h unic11.h $(LIB)
@@ -246,7 +246,7 @@ clean:
 	       perf mkroar mkc26 u8idlint example \
 	       test test-texts test-asan test-tr31 \
 	       test-prof{2,3,4,5,6,C26_4,C11_6,SAFEC26,C11STD} \
-	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}
+	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD} \
 
 # Maintainer-only
 # Check coverage and sizes for all configure combinations
