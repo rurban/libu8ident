@@ -361,11 +361,10 @@ const struct sc_c26 safec26_start_list[] = {
     {0x2B820, 0x2CEA1, SC_Han, GC_Lo, NULL}, //  𫠠..𬺡
     {0x2CEB0, 0x2EBE0, SC_Han, GC_Lo, NULL}, //  𬺰..𮯠
     {0x30000, 0x3134A, SC_Han, GC_Lo, NULL}, //  𰀀..𱍊
-};
+}; // 243 ranges, 92 singles, 95986 codepoints
 #else
 extern const struct sc_c26 safec26_start_list[335];
 #endif
-// 243 ranges, 92 singles, 95986 codepoints
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC
 // MEDIAL from XID_Start and !MARK. Split on GC and SCX
@@ -392,11 +391,10 @@ const struct sc_c26 safec26_cont_list[] = {
     {0x17E0, 0x17E9, SC_Khmer, GC_Nd, NULL}, //  ០..៩
     {0x203F, 0x2040, SC_Common, GC_Pc, NULL}, //  ‿..⁀
     {0xA9F0, 0xA9F9, SC_Myanmar, GC_Nd, NULL}, //  ꧰..꧹
-};
+}; // 20 ranges, 1 singles, 172 codepoints
 #else
 extern const struct sc_c26 safec26_cont_list[21];
 #endif
-// 20 ranges, 1 singles, 172 codepoints
 
 
 //---------------------------------------------------
@@ -595,11 +593,10 @@ const struct sc_c26 safec26_excl_start_list[] = {
     {0x1BC90, 0x1BC99, SC_Duployan, GC_Lo, NULL}, //  (Excluded) 𛲐..𛲙
     {0x1E290, 0x1E2AD, SC_Toto, GC_Lo, NULL}, //  (Excluded) 𞊐..𞊭
     {0x1E800, 0x1E8C4, SC_Mende_Kikakui, GC_Lo, NULL}, //  (Excluded) 𞠀..𞣄
-};
+}; // 158 ranges, 33 singles, 14926 codepoints
 #else
 extern const struct sc_c26 safec26_excl_start_list[191];
 #endif
-// 158 ranges, 33 singles, 14926 codepoints
 
 // Only excluded scripts, XID_Continue,!XID_Start, more IDTypes, NFC and !MARK
 #ifndef EXTERN_SCRIPTS

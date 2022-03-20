@@ -50,7 +50,7 @@ static const struct range_bool c11_start_list[] = {
     {0xC0000, 0xCFFFD}, // (null) (Limited) 󀀀..󏿽
     {0xD0000, 0xDFFFD}, // (null) (Limited) 󐀀..󟿽
     {0xE0000, 0xEFFFD}, // (null) (Limited) 󠀀..󯿽
-};// 36 ranges, 1 singles, 971267 codepoints
+}; // 36 ranges, 1 singles, 971267 codepoints
 static const struct range_bool c11_cont_list[] = {
     {'$', '$'},
     {'0', '9'},
@@ -58,4 +58,4 @@ static const struct range_bool c11_cont_list[] = {
     {0x1DC0, 0x1DFF}, // Inherited ᷀..᷿
     {0x20D0, 0x20FF}, // Inherited ⃐..⃿
     {0xFE20, 0xFE2F}, // Inherited ︠..︯
-};// 4 ranges, 0 singles, 236 codepoints
+}; // 4 ranges, 0 singles, 236 codepoints

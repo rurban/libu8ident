@@ -370,11 +370,10 @@ static void gen_c11_all(void) {
       "    // {0x0100, 0x02FF}, // Latin, 2B0-2FF: Modifiers (2EA Bopomofo)\n",
       f);
   emit_ranges(f, 0xff, u, false);
-  fputs("};", f);
+  fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
+          stats.singles, stats.codepoints);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "c11_start_list",
          stats.ranges, stats.singles, stats.codepoints);
-  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
-          stats.singles, stats.codepoints);
 
   memset(u, 0, sizeof(u));
   memset(&stats, 0, sizeof(stats));
@@ -389,11 +388,10 @@ static void gen_c11_all(void) {
         "    {'0', '9'},\n",
         f);
   emit_ranges(f, 0xff, u, false);
-  fputs("};", f);
+  fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
+          stats.singles, stats.codepoints);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "c11_cont_list",
          stats.ranges, stats.singles, stats.codepoints);
-  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
-          stats.singles, stats.codepoints);
   fclose(f);
 #ifdef HAVE_SYS_STAT_H
   chmod(header, 0444);
@@ -473,15 +471,14 @@ static void gen_c26_safe(void) {
         "    {'a', 'z', SC_Latin, GC_Ll, NULL},\n", // 61-7a
         f);
   emit_ranges(f, 0x7b, u, true);
-  fputs("};\n", f);
+  fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
+          stats.singles, stats.codepoints);
   fputs("#else\n", f);
   fprintf(f, "extern const struct sc_c26 safec26_start_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec26_start_list",
          stats.ranges, stats.singles, stats.codepoints);
-  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
-          stats.singles, stats.codepoints);
 
   memset(&stats, 0, sizeof(stats));
   static uint8_t c[0x10ffff >> 3];
@@ -537,15 +534,14 @@ static void gen_c26_safe(void) {
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c26 safec26_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
-  fputs("};\n", f);
+  fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
+          stats.singles, stats.codepoints);
   fputs("#else\n", f);
   fprintf(f, "extern const struct sc_c26 safec26_cont_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec26_cont_list",
          stats.ranges, stats.singles, stats.codepoints);
-  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
-          stats.singles, stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
   // now more scripts
@@ -576,7 +572,8 @@ static void gen_c26_safe(void) {
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c26 safec26_excl_start_list[] = {\n", f);
   emit_ranges(f, 0x7a, u, true);
-  fputs("};\n", f);
+  fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
+          stats.singles, stats.codepoints);
   fputs("#else\n", f);
   fprintf(f, "extern const struct sc_c26 safec26_excl_start_list[%u];\n",
           stats.ranges + stats.singles);
@@ -584,8 +581,6 @@ static void gen_c26_safe(void) {
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
          "safec26_excl_start_list", stats.ranges, stats.singles,
          stats.codepoints);
-  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
-          stats.singles, stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
   fputs(
@@ -632,8 +627,7 @@ static void gen_c26_safe(void) {
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_c26 safec26_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
-  fputs("}; ", f);
-  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
+  fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fputs("#else\n", f);
   fprintf(f, "extern const struct sc_c26 safec26_excl_cont_list[%u];\n",
@@ -681,13 +675,12 @@ static void gen_c26_safe(void) {
   }
   BITCLR(c, 0xB7);
 
-  fputs("\n// Shorter MEDIAL list for safec26.\n", f);
+  fputs("\n// Currently empty MEDIAL list for safec26.\n", f);
   fputs("// safec26_start/cont + MEDIAL\n", f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct range_bool safec26_medial_list[] = {\n", f);
   emit_ranges(f, 0x27, c, false);
-  fputs("}; ", f);
-  fprintf(f, "// %u ranges, %u singles, %u codepoints\n", stats.ranges,
+  fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fputs("#else\n", f);
   fprintf(f, "extern const struct range_bool safec26_medial_list[%u];\n",
