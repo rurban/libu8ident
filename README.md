@@ -56,7 +56,9 @@ where `environmentǃ` is an identifier, because the `ǃ` is the
 U+1C3 "LATIN LETTER ALVEOLAR CLICK", a Technical, Lo identifier,
 completely flipping the logic. A safe TR31 ID set recommended by TR39 would
 have forbidden that. Such ID confusables with operators are U+1C0 ǀ, U+1C1 ǁ,
-U+1C3 ǃ
+U+1C3 ǃ. TR31 XID's have a lot of insecure confusables, such as the Halfwidth
+and Fullwidth Forms, U+FF00..U+FFEF, the Arabic Presentation Forms-A: U+FB50–U+FDFF
+and Arabic Presentation Forms-B: U+FE70–U+FEFF. TR39 recommends only a subset.
 
 There's now even a [Unicode taskforce](https://www.unicode.org/L2/L2022/22007-avoiding-spoof.pdf),
 because of the <https://trojansource.codes> CVE's, even when they were about
@@ -89,16 +91,17 @@ ranges. All the UCD ID\_Start and XID\_Start properties incorrectly list
 them there, and not in X?ID\_Continue btw.
 
 **u8idlint** has its own tokenizer, which can be configured with the
-**--xid** options: **ASCII, SAFEC26, ALLOWED, ID, XID, C11** and
+**--xid** options: **ASCII, SAFEC26, ALLOWED, C23, ID, XID, C11** and
 **ALLUTF8**. (sorted from most secure to most insecure).  ASCII
-ignores all utf8 word boundaries, ALLOWED, allows only TR39
-IdentifierStatus Allowed characters. ID allows all letters, plus
-numbers, punctuation and marks, including all exotic scripts. XID is
-ID plus some special exceptions to avoid the NFKC quirks, because NFKC
-has a lot of confusable mappings and no roundtrips. C11 uses the C11
-standard insecure DefId unicode ranges.  SAFEC26 is the optimized
-proposal for the C26 charset, ALLUTF8 allows all unicode characters as
-letters > 127, as in php, D, nim or crystal.
+ignores all utf8 word boundaries. SAFEC26 is the optimized proposal
+for the C26 charset. ALLOWED, allows only TR39 IdentifierStatus
+Allowed characters. C23 is from the upcoming C23 standard with NFC and
+a maximal sequence length. ID allows all letters, plus numbers,
+punctuation and marks, including all exotic scripts. XID is ID plus
+some special exceptions to avoid the NFKC quirks, because NFKC has a
+lot of confusable mappings and no roundtrips. C11 uses the C11
+standard insecure DefId unicode ranges.  ALLUTF8 allows all unicode
+characters as letters > 127, as in php, D, nim or crystal.
 
 Normalization
 -------------
@@ -347,7 +350,7 @@ enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
     U8ID_TR31_XID = 64,     // without NFKC quirks, labelled stable
     U8ID_TR31_ID = 65,      // The usual tr31 variants
     U8ID_TR31_ALLOWED = 66, // The UCD IdentifierStatus.txt (default)
-    U8ID_TR31_SAFEC26 = 67, // XID without Limited_Use and Excluded Scripts
+    U8ID_TR31_SAFEC26 = 67, // safer XID's, without Limited_Use and Excluded Scripts
     U8ID_TR31_C23 = 68,     // XID with NFC from the C23 standard
     U8ID_TR31_C11 = 69,     // stable insecure AltId ranges from C11 Annex D
     U8ID_TR31_ALLUTF8 = 70, // allow all > 128, e.g. D, php, nim, crystal
