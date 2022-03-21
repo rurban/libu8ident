@@ -897,7 +897,9 @@ void test_confus(void) {
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     const uint32_t cp = confusables[i];
     assert(u8ident_is_confusable(cp));
-    assert(bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32));
+    uint32_t *x = (uint32_t *)bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32);
+    assert(x);
+    assert(*x == cp);
   }
   //
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_WARN_CONFUSABLE);
@@ -953,10 +955,13 @@ void test_htable(void) {
 void test_confusables(void) {
   // requires generic or NFC
 #if !defined U8ID_NORM || U8ID_NORM == NFC
-  int ret = u8ident_check_confusables("checkO", sizeof("check") - 1);
+  int ret = u8ident_check_confusables("check", sizeof("check") - 1);
   assert(ret == 0);
   // Cyrillic c U+441, һ U+4bb, е U+435
-  ret = u8ident_check_confusables("сһесk0", sizeof("сһесk") - 1);
+  ret = u8ident_check_confusables("сһесk", sizeof("сһесk") - 1);
+  assert(ret == U8ID_ERR_CONFUS);
+  // Latin c, Cyrillic һ U+4bb, е U+435
+  ret = u8ident_check_confusables("cһесk", sizeof("cһесk") - 1);
   assert(ret == U8ID_ERR_CONFUS);
 #endif
 }

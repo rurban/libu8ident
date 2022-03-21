@@ -26,6 +26,11 @@ for ($confus) {
   }
 }
 
+# fixup wrong pairs. these are not really confusable
+my %confbugs = map { $_ => 1 } qw(0022 0025 0030 0031 0049 006D 007C
+				  0251 028B 028F
+				  03BD 03C3 03D1 03F1 03F4
+				  0561 0570 0575 0584);
 my (@CONF, @ucd_version, $started);
 open my $CONF, "<", $confus or die "$confus $!";
 while (<$CONF>) {
@@ -53,6 +58,9 @@ while (<$CONF>) {
       my @ids = map{ hex $_ } split(' ',$ids);
       push @CONF, [$from, @ids];
     }
+    if (exists $confbugs{$1}) {
+      $CONF[$#CONF] = [ @{$CONF[$#CONF]}, "//" ];
+    }
   }
 }
 close $CONF;
@@ -75,6 +83,7 @@ print $H1 <<"EOF";
 
 /* Sorted set of all confusables without mapping,
    from https://www.unicode.org/Public/security/latest/confusables.txt
+   Some confusables are outcommented.
  */
 #ifndef EXTERN_SCRIPTS
 const uint32_t confusables[] = {
@@ -111,6 +120,7 @@ print $H <<"EOF";
 /* FIXME gperf to accept uint32_t keys.
    key is "%05X" of the unicode codepoint, fixed length 5.
    u8nfc is the rhs of confusables, already decomposed into NFC and encoded as UTF-8.
+   Some confusables are outcommented.
  */
 %}
 %7bit
@@ -127,12 +137,24 @@ my $i = 0;
 my $enc = Encode::find_encoding("UTF-8");
 for my $c (@CONF) {
   if (@$c == 2) {
+    printf $H "#-- %s -> %s\n", chr $c->[0], chr $c->[1];
     printf $H1 "    0x%04X,\t/* %s -> %s */\n", $c->[0], chr $c->[0], chr $c->[1];
     printf $H "%05X,\t%s\n", $c->[0], B::cstring NFC(chr $c->[1]);
+    $i++;
   } else {
-    printf $H1 "    0x%04X,\t/* %s -> ", $c->[0], chr $c->[0];
-    printf $H "%05X,\t", $c->[0];
-    pop @$c;
+    my $f = shift @$c;
+    my $j = @$c - 1;
+    if ($c->[$j] eq "//") {
+      printf $H1 "//";
+      pop @$c;
+      printf $H "#-- %s -> %s\n", chr $f, join('', map {chr $_} @$c);
+      printf $H "# ";
+    } else {
+      printf $H "#-- %s -> %s\n", chr $f, join('', map {chr $_} @$c);
+      $i++;
+    }
+    printf $H1 "    0x%04X,\t/* %s -> ", $f, chr $f;
+    printf $H "%05X,\t", $f;
     my $nfd = "";
     for (@$c) {
       printf $H1 "%s", chr $_;
@@ -141,7 +163,6 @@ for my $c (@CONF) {
     printf $H1 " */\n";
     printf $H "%s\n", B::cstring $nfd;
   }
-  $i++;
 }
 
 print $H <<'EOF';
