@@ -191,7 +191,11 @@ EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
 EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
                                           char **outnorm);
 
-/* A different check strategy via confusables.txt only.
+/* A different, but much less reliable check strategy via
+   confusables.txt only, described in TR 39, Section 4, the skeleton
+   algorithm. Each identifier is stored in two dynamic hash tables,
+   and for each confusable match, normalized to NFC, the first
+   wins. Only with `--enable-confus / -DHAVE_CONFUS`.
 */
 EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len);
 

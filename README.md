@@ -227,11 +227,12 @@ Confusables
 An alternative API is to check only against the list of TR39
 `security/confusables.txt`.  This is comparable to the Minimally
 Restrictive security profile.  The list of confusables is manually
-mantained and consists of pairs of codepoints which are visually
+maintained and consists of pairs of codepoints which are visually
 confusable with other codepoints. It is described in [TR39 Section
 4](http://www.unicode.org/reports/tr39/#Confusable_Detection), with
 the "skeleton" algorithm, and implemented via the API `enum
-u8id_errors u8ident_check_confusables(const char *buf, const int len)`
+u8id_errors u8ident_check_confusables(const char *buf, const int len)`.
+
 It uses a NFD lookup and three hash lookups per identifier, thus it is
 very slow. NFD is relatively cheap compared to NFC, mandatory since
 C23 and C++23, but much more expensive than the mixed script approach
@@ -467,6 +468,10 @@ Return values (`enum u8id_errors`):
 
 Note that we explicitly allow the Latin confusables: 0 1 I ` |
 i.e. U+30, U+31, U+49, U+60, U+7C
+
+`enum u8id_errors u8ident_check_confusables(const char *buf, const int len)`
+
+A different, but much less reliable check strategy via confusables.txt only, described in TR 39, Section 4, the skeleton algorithm. Each identifier is stored in two dynamic hash tables, and for each confusable match, normalized to NFC, the first wins. Only with `--enable-confus / -DHAVE_CONFUS`.
 
 `char * u8ident_normalize (const char* buf, int len)`
 
