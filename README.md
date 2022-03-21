@@ -240,8 +240,7 @@ configure options
     Inclusion, Technical Identifer_Type) and NFC.
 
   + **C23** selects the XID properties from the C23 standard, plus the NFC
-  requirement from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
-  and limited sequence size from [N2828](https://thephd.dev/_vendor/future_cxx/papers/C%20-%20Unicode%20Sequences%20More%20Than%2021%20Bits%20are%20a%20Constraint%20Violation.html).
+  requirement from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html).
 
   + **ID** selects the standard `ID_Start`/`ID_Continue`
     properties. `ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +
