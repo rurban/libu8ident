@@ -677,14 +677,16 @@ static void gen_c26_safe(void) {
 
   fputs("\n// Currently empty MEDIAL list for safec26.\n", f);
   fputs("// safec26_start/cont + MEDIAL\n", f);
-  fputs("#ifndef EXTERN_SCRIPTS\n", f);
+  fputs("#if 0\n", f);
+  fputs("#  ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct range_bool safec26_medial_list[] = {\n", f);
   emit_ranges(f, 0x27, c, false);
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
-  fputs("#else\n", f);
+  fputs("#  else\n", f);
   fprintf(f, "extern const struct range_bool safec26_medial_list[%u];\n",
           stats.ranges + stats.singles);
+  fputs("#  endif\n", f);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
          "safec26_medial_list", stats.ranges, stats.singles,

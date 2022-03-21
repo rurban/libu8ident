@@ -622,11 +622,13 @@ const struct sc_c26 safec26_excl_cont_list[] = {
 extern const struct sc_c26 safec26_excl_cont_list[16];
 #endif
 
-// Shorter MEDIAL list for safec26.
+// Currently empty MEDIAL list for safec26.
 // safec26_start/cont + MEDIAL
-#ifndef EXTERN_SCRIPTS
+#if 0
+#  ifndef EXTERN_SCRIPTS
 const struct range_bool safec26_medial_list[] = {
 }; // 0 ranges, 0 singles, 0 codepoints
-#else
+#  else
 extern const struct range_bool safec26_medial_list[0];
+#  endif
 #endif
