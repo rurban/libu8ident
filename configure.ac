@@ -44,7 +44,7 @@ AC_ARG_WITH([tr31],
       [case "${with_tr31}" in
       ALLOWED|SAFEC26|ID|XID|C11|C23|ALLUTF8) U8ID_TR31=${with_tr31}; AC_MSG_RESULT([$with_tr31]) ;;
       NONE) CFLAGS="$CFLAGS -DDISABLE_U8ID_TR31"; AC_MSG_RESULT([$with_tr31]) ;;
-      *)    AC_MSG_ERROR([invalid ${with_tr31}: only ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE]) ;;
+      *)    AC_MSG_ERROR([invalid ${with_tr31}: only ALLOWED,SAFEC26,ID,XID,C11,C23,ALLUTF8,NONE]) ;;
       esac],
       [ U8ID_TR31=; AC_MSG_RESULT([none. support all (default). Recommended: ALLOWED]) ]
       )

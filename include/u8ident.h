@@ -39,8 +39,8 @@ enum u8id_options {
   U8ID_TR31_ID = 65,  // all letters, plus numbers, punctuation and marks. With
                       // exotic scripts.
   U8ID_TR31_ALLOWED = 66, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
-  U8ID_TR31_SAFEC26 = 67, // practical XID with TR39 security measures. see doc/P2528R1.md
-  U8ID_TR31_C23 = 68, // XID with NFC from the C23 standard
+  U8ID_TR31_SAFEC26 = 67, // practical XID with TR39 security measures. see doc/D2528R1.md
+  U8ID_TR31_C23 = 68, // XID with NFC from the upcoming C23 standard (P1949, N2828).
   U8ID_TR31_C11 = 69, // the stable insecure AltId ranges from the C11 standard, Annex D
   U8ID_TR31_ALLUTF8 = 70, // allow all > 128, e.g. D, php, nim, crystal
   U8ID_TR31_ASCII = 71, // only ASCII letters (as e.g. zig, j. older compilers)

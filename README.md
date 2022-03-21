@@ -196,14 +196,13 @@ This is the recommended profile, don't fall into the unicode identifier trap.
 `c26_4`. **SAFEC26**
 
 * We also provide a special profile, called **`U8ID_PROFILE_C26_4`**,
-  also defined by `-DU8ID_PROFILE_SAFEC26`. This is an extended Moderate
-  Profile (4), plus allowing some Greek with Latin, plus only allowing secure
-  identifiers.
-* `U8ID_PROFILE_C26_4` aka `U8ID_PROFILE_SAFEC26` is the secure
+  also defined by `-DU8ID_PROFILE_SAFEC26`. This is an extended
+  Moderate Profile (4), plus allowing some Greek with Latin, plus only
+  allowing secure identifiers. `U8ID_PROFILE_C26_4` is the secure
   extension over C11, disallowing the restricted and limited_use
   scripts and identifiers, arbitrary rtl and ltr overrides, and all
-  the insecure mixed scripts combinations.  See `unic26.h`,
-  and the C23++ proposal [P2528R1](doc/P2528R1.md).
+  the insecure mixed scripts combinations.  See `unic26.h`, and the
+  C++26 paper [D2528R1](doc/D2528R1.md).
 
 `c11_6`. **C11STD**
 
@@ -222,7 +221,7 @@ than narrow them.
 configure options
 -----------------
 
-* `--with-tr31=ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE`. Default: empty
+* `--with-tr31=ALLOWED,SAFEC26,C23,ID,XID,C11,ALLUTF8,NONE`. Default: empty
   (select at run-time, ALLOWED is the default)
 
   This hardcodes the identifer charset, which is normally defined by
@@ -231,20 +230,27 @@ configure options
 
   + **ALLOWED** sets the most secure
   [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
+  from TR39.
 
-  + **SAFEC26** is a practical subset of the XID charset, with only
-    the recommended scripts, Skipped Ids (only the TR39#1 Recommended,
+  + **SAFEC26** is a practical safe subset of the TR31 XID charset, with only
+    the recommended TR39 scripts, Skipped IDs (only the TR39#1 Recommended,
     Inclusion, Technical Identifer_Type) and NFC.
+
+  + **C23** selects the XID properties from the C23 standard, plus the NFC
+  requirement from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
+  and limited sequence size from [N2828](https://thephd.dev/_vendor/future_cxx/papers/C%20-%20Unicode%20Sequences%20More%20Than%2021%20Bits%20are%20a%20Constraint%20Violation.html).
 
   + **ID** selects the standard `ID_Start`/`ID_Continue`
     properties. `ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +
     `Other_ID_Start`, -`Pattern_Syntax`, -`Pattern_White_Space`.
     `ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc, +
     `Other_ID_Continue`, -`Pattern_Syntax`, - `Pattern_White_Space`.
+     Note that this is broken for medial positions.
 
   + **XID** selects the stable `XID_Start` and `XID_Continue`
     properties, which ensure that `isIdentifer(string)` then
     `isIdentifier(NFKx(string))` (_removing the NFKC quirks_).
+    Note that this is broken for medial positions.
 
   + **C11** selects the AltID range from the C11 standard, which is
     highly insecure.
@@ -270,7 +276,7 @@ configure options
   be changed later at run-time.
 
 * `--with-norm=NFC,NFD,NFKC,NFKD,FCC,FCD`. Default: empty
-  (select at run-time, NFC is the default)
+  (select at run-time, NFC is the default). FCC and FCD are broken still.
 
   This hardcodes a normalization method, which cannot be changed later
   at run-time.
@@ -295,7 +301,7 @@ e.g codesizes for u8idnorm.o with -Os
 default: 365K with -g on amd64-gcc
 
 For `-DU8ID_PROFILE_SAFEC26` see above. `c26_4` is also called
-**SAFEC26**, previously SAFEC26, `c11_6` is the std insecure C11 profile.
+**SAFEC26**, previously SAFEC23, `c11_6` is the std insecure C11 profile.
 
 With `confus` enabled, the confusable API is added.
 With `croaring` the confus API is about twice as fast, and needs half the size.
@@ -305,7 +311,7 @@ See the likewise **cmake** options:
 * `-DBUILD_SHARED_LIBS=ON,OFF`
 * `-DU8ID_NORM=NFC,NFKC,NFD,NFKD`
 * `-DU8ID_PROFILE=2,3,4,5,6,C26_4,C11_6`
-* `-DU8ID_TR31=ALLOWED,SAFEC26,ID,XID,C11,ALLUTF8,NONE`
+* `-DU8ID_TR31=ALLOWED,SAFEC26,C23,ID,XID,C11,ALLUTF8,NONE`
 * `-DHAVE_CONFUS=ON`
 * `-DHAVE_CROARING=ON`
 
@@ -342,9 +348,10 @@ enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
     U8ID_TR31_ID = 65,      // The usual tr31 variants
     U8ID_TR31_ALLOWED = 66, // The UCD IdentifierStatus.txt (default)
     U8ID_TR31_SAFEC26 = 67, // XID without Limited_Use and Excluded Scripts
-    U8ID_TR31_C11 = 68,     // See C11 Annex D for the ranges
-    U8ID_TR31_ALLUTF8 = 69, // allow all > 128, e.g. D, php, nim, crystal
-    U8ID_TR31_ASCII = 70,   // only ASCII letters (as e.g. zig, j. older compilers)
+    U8ID_TR31_C23 = 68,     // XID with NFC from the C23 standard
+    U8ID_TR31_C11 = 69,     // stable insecure AltId ranges from C11 Annex D
+    U8ID_TR31_ALLUTF8 = 70, // allow all > 128, e.g. D, php, nim, crystal
+    U8ID_TR31_ASCII = 71,   // only ASCII letters (as e.g. zig, j. older compilers)
     // room for more tr31 profiles
 
     U8ID_FOLDCASE = 128,         // optional for case-insensitive idents. case-folded
