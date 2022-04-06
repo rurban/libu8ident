@@ -471,7 +471,11 @@ i.e. U+30, U+31, U+49, U+60, U+7C
 
 `enum u8id_errors u8ident_check_confusables(const char *buf, const int len)`
 
-A different, but much less reliable check strategy via confusables.txt only, described in TR 39, Section 4, the skeleton algorithm. Each identifier is stored in two dynamic hash tables, and for each confusable match, normalized to NFC, the first wins. Only with `--enable-confus / -DHAVE_CONFUS`.
+A different, but much less reliable check strategy via confusables.txt
+only, described in TR 39, Section 4, the skeleton algorithm. Each
+identifier is stored in two dynamic hash tables, and for each
+confusable match, normalized to NFC, the first wins. Only with
+`--enable-confus / -DHAVE_CONFUS`.
 
 `char * u8ident_normalize (const char* buf, int len)`
 
@@ -605,6 +609,9 @@ TODO
   not exported (ie. unusable from the shared library)
 
 * **FCD**: This normalization is broken.
+
+* **gperf** for integer keys: Check perfect hash performance for some
+  sparse tables, such as i.e. confusables. See my gperf intkeys branch on [gitlab](https://gitlab.com/rurban/gperf/commits/intkeys).
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
 
