@@ -71,3 +71,6 @@ Arabic block (U+0600..U+06FF) should be used for identifiers.  See
 <https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf#G37489> and
 <https://www.unicode.org/reports/tr53/>. The TR39 idtype of these
 should be changed to Obsolete.
+
+----
+Last checked against DerivedCoreProperties-15.0.0d1.txt from 2022-04-26
