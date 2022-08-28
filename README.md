@@ -221,6 +221,19 @@ Recommended is Level 4, the **Moderately Restrictive level** or its
 improved **C26_4** variant. It is always easier to widen restrictions
 than narrow them.
 
+Non-spacing Combining marks
+---------------------------
+
+* Forbid starting combining marks.
+* Forbid sequences of the same nonspacing mark. (TR39#5.4)
+* Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me). (TR39#5.4)
+* Forbid sequences of base character + nonspacing mark that look the
+  same as or confusingly similar to the base character alone (because
+  the nonspacing mark overlays a portion of the base character). An
+  example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE. (TR39#5.5)
+* Forbid non-spacing marks with base chars already including the non-spacing
+  mark, like Ä with DIAERESIS. (TR39#5.5)
+
 Confusables
 -----------
 

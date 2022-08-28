@@ -10,6 +10,7 @@
 #include "u8id_private.h"
 #include <u8ident.h>
 #include "u8idscr.h"
+#include "mark.h"
 #ifdef HAVE_CROARING
 #  include "u8idroar.h"
 #endif
@@ -163,6 +164,31 @@ bool in_SCX(const enum u8id_sc scr, const char *scx) {
   return false;
 }
 
+/* TR39#5.5 "Forbid sequences of base character + nonspacing mark that look the
+   same as or confusingly similar to the base character alone", like i + DOT ABOVE  */
+/* Also forbid non-spacing marks with base chars already including the non-spacing
+   mark, like Ä with DIAERESIS.
+ */
+bool nsm_check(const uint32_t base_cp, const uint32_t cp) {
+  if (cp == 0x301 && base_cp == 'i')
+    return false;
+  for (int i = 0; i < NSM_LAST; i++) {
+    uint32_t *s;
+    const uint32_t *l = nsm_letters[i];
+    if (l[0] != cp || !l[0])
+      continue;
+    s = (uint32_t*)&l[1];
+    // TODO binary search, not linear.
+    // but we dont have the size yet, and it might be overkill.
+    while (*s && base_cp >= *s) {
+      if (base_cp == *s++)
+        return false;
+    }
+    break;
+  }
+  return true;
+}
+
 /* Two variants to check if this identifier is valid. The second avoids
    allocating a fresh string from the parsed input.
 */
@@ -186,7 +212,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
                  "Invalid tr31_funcs[] size");
 #  endif
 #endif
-  uint32_t prev_cp = 0;
+  uint32_t prev_cp = 0, base_cp = 0;
   int seq_mn = 0;
   uint32_t cp = dec_utf8(&s);
 
@@ -335,6 +361,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             // or gc=Me)"
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
+          } else if (!nsm_check(base_cp, cp)) {
+            // TR39#5.5 "Forbid sequences of base character + nonspacing mark that look the
+            // same as or confusingly similar to the base character alone"
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
           }
         } else { // not Mn|Mc
           seq_mn = 0;
@@ -353,6 +384,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           // scx = (char *)this_scx->scx; // for errors
         }
       }
+    } else {
+      base_cp = cp;
     }
 
 #if defined U8ID_PROFILE && U8ID_PROFILE == 5
@@ -470,6 +503,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       return U8ID_ERR_CONFUS;
     } else if (scr != SC_Common && scr != SC_Inherited) {
       basesc = scr;
+      base_cp = cp;
     } else {
       // Check illegal runs.
       // is_MARK(cp) is too slow, and we need the full GC for all cases
@@ -491,6 +525,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           } else if (++seq_mn > 4) {
             // TR39#5.4 "Forbid sequences of more than 4 nonspacing marks (gc=Mn
             // or gc=Me)"
+            ctx->last_cp = cp;
+            return U8ID_ERR_COMBINE;
+          } else if (!nsm_check(base_cp, cp)) {
+            // TR39#5.5 "Forbid sequences of base character + nonspacing mark that look the
+            // same as or confusingly similar to the base character alone"
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
           }

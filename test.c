@@ -681,6 +681,18 @@ void test_combine() {
     // Disallow more then 4 combiners (Inherited, Recommended, Mn)
     ret = u8ident_check((const uint8_t *)"a\u0300\u0301\u0302\u0303\u0304", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+
+    // Disallow i with DOT ABOVE
+    ret = u8ident_check((const uint8_t *)"i\u0301", NULL);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+
+    // Disallow Ä with DIAERESIS
+    ret = u8ident_check((const uint8_t *)"Ä\u0308", NULL);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+
+    // Disallow Å with RING ABOVE
+    ret = u8ident_check((const uint8_t *)"Å\u030a", NULL);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
   }
 #endif
 

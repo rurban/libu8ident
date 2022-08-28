@@ -5,6 +5,10 @@ libu8ident 0.3 - 2022-??
 
 Change is_greek_latin_confus violations with C26_4 to return ERR_CONFUS,
 not ERR_SCRIPTS (GH #12).
+Add more combining marks checks (GH #7): TR39#5.5 "Forbid sequences of base character
++ nonspacing mark that look the same as or confusingly similar to the base character
+alone". Also forbid non-spacing marks with base chars already including the non-spacing
+mark, like Ä with DIAERESIS.
 
 libu8ident 0.2 - 2022-02-12:
 
