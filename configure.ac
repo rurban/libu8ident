@@ -244,21 +244,23 @@ AC_CHECK_HEADERS([stdlib.h	\
                   libgen.h	\
                   uniwbrk.h     \
                   ])
-AC_CHECK_LIB([unistring],[u8_wordbreaks],
-  [have_libunistring=yes;
-   u8idlint_LIBS=-lunistring;
+AC_SEARCH_LIBS([u8_wordbreaks],[unistring],
+  [AC_DEFINE([HAVE_U8_WORDBREAKS], [1], [Define to 1 if you have the `u8_wordbreaks' function.])
+   u8idlint_LIBS=$ac_cv_search_u8_wordbreaks
    AC_SUBST([u8idlint_LIBS])
+   AC_SUBST([HAVE_U8_WORDBREAKS])
    ],
   [if pkg-config --exists libunistring; then
-    have_libunistring=yes;
+    AC_DEFINE([HAVE_U8_WORDBREAKS], [1], [Define to 1 if you have the `u8_wordbreaks' function.])
     U8IDLINT_CFLAGS=`pkg-config libunistring --cflags`
     u8idlint_LIBS=`pkg-config libunistring --libs`
     AC_SUBST([U8IDLINT_CFLAGS])
     AC_SUBST([u8idlint_LIBS])
+    AC_SUBST([HAVE_U8_WORDBREAKS])
   else
     AC_MSG_WARN([libunistring for u8idlint not found])
   fi])
-AM_CONDITIONAL([HAVE_LIBUNISTRING], [test x$have_libunistring = xyes])
+AM_CONDITIONAL([HAVE_LIBUNISTRING], [test x$HAVE_U8_WORDBREAKS = x1])
 
 AC_MSG_NOTICE([Check typedefs, structures, and compiler characteristics])
 # ===============================================

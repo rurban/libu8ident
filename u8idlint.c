@@ -33,7 +33,7 @@
 #endif
 
 #include "u8ident.h"
-#if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
+#if defined HAVE_UNIWBRK_H && defined HAVE_U8_WORDBREAKS
 #  include "uniwbrk.h"
 #endif
 #include "u8idscr.h"
@@ -266,7 +266,7 @@ int testfile(const char *dir, const char *fname) {
   int err = 0;
   char path[256];
   static char line[1024] = {0};
-#if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
+#if defined HAVE_UNIWBRK_H && defined HAVE_U8_WORDBREAKS
   static char brks[1024] = {0};
 #endif
   static char _word[1024] = {0};
@@ -331,7 +331,7 @@ int testfile(const char *dir, const char *fname) {
     bool skip = false;
     ln++;
     *word = '\0';
-#if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
+#if defined HAVE_UNIWBRK_H && defined HAVE_U8_WORDBREAKS
     u8_wordbreaks((uint8_t *)s, strlen(s), brks);
 #endif
     while (*s) {
@@ -353,7 +353,7 @@ int testfile(const char *dir, const char *fname) {
         force_break = true;
         skip = true;
       }
-#if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
+#if defined HAVE_UNIWBRK_H && defined HAVE_U8_WORDBREAKS
       if (verbose > 1 && force_break != brks[s - olds])
         fprintf(stderr, "WARN: %sbreak at U+%X \n", force_break ? "" : "no ",
                 cp);
