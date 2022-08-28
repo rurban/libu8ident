@@ -34,9 +34,9 @@ char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 static inline bool is_profile_6(void) {
   return u8ident_profile() == 6 || u8ident_profile() == C11_6;
 }
-static inline bool is_profile_4(void) {
-  return u8ident_profile() == 4 || u8ident_profile() == C26_4;
-}
+//static inline bool is_profile_4(void) {
+//  return u8ident_profile() == 4 || u8ident_profile() == C26_4;
+//}
 
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
@@ -534,10 +534,12 @@ void test_mixed_scripts(int xid_check) {
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #endif
 
-  // U+37B Greek, U+985 Bengali
+  // U+37B Greek, U+985 Bengali. 37B confusable with latin
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C26_4
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#elif U8ID_PROFILE == C26_4
+  CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // multi-scripts allowed in 5 and 6
 #endif
@@ -855,7 +857,7 @@ void test_greek(void) {
     ret = u8ident_check((const uint8_t *)"θ", NULL); // U+38B not confus
     CHECK_RET(ret, U8ID_EOK, 0);
     ret = u8ident_check((const uint8_t *)"Α", NULL); // U+391 confus
-    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+    CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
   } else if (u8ident_profile() < 5) {
     ret = u8ident_check((const uint8_t *)"θ", NULL);
     CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);

@@ -436,7 +436,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
             // only not confusables
             if (u8ident_is_greek_latin_confus(cp)) {
               ctx->last_cp = cp;
-              return U8ID_ERR_SCRIPTS;
+              return U8ID_ERR_CONFUS;
             }
             goto ok;
           }
@@ -467,7 +467,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
     } else if (s_u8id_profile == U8ID_PROFILE_C26_4 && scr == SC_Greek &&
                has_latin && u8ident_is_greek_latin_confus(cp)) {
       ctx->last_cp = cp;
-      return U8ID_ERR_SCRIPTS;
+      return U8ID_ERR_CONFUS;
     } else if (scr != SC_Common && scr != SC_Inherited) {
       basesc = scr;
     } else {
