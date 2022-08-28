@@ -25,7 +25,7 @@ libu8ident_la_LDFLAGS = \
 	$(LDFLAGS) $(AM_LDFLAGS)
 bin_PROGRAMS = u8idlint
 u8idlint_SOURCES = u8idlint.c $(libu8ident_la_SOURCES)
-u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
+u8idlint_CFLAGS = $(CFLAGS) $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 u8idlint_LDADD = $(u8idlint_LIBS)
 EXTRA_HEADERS = c11-safe.h unic26.h
 
@@ -60,7 +60,7 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/chinese-trad-1.txt  texts/igbo-1.txt       texts/marathi-1.txt    texts/turkish-1.txt \
 	texts/cyrillic-1.txt      texts/japanese-1.txt   texts/myanmar-1.txt    texts/urdu-1.txt \
 	texts/english-1.txt       texts/japanese-2.txt   texts/odia-1.txt       texts/vietnamese-1.txt \
-	texts/arabic-1.c          texts/math-1.c \
+	texts/arabic-1.c          texts/math-1.c         texts/math-2.cc \
 	texts/bidi-sec-1.c        texts/bidi-sec-2.c     texts/bidi-sec-3.c     texts/bidi-sec-4.cc \
 	texts/homo-1.c            texts/homo-sec-1.c     texts/homo-sec-2.c \
 	texts/nfc-1.c             texts/nfkc-1.c \
