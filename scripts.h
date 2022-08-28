@@ -8214,7 +8214,8 @@ LOCAL const struct range_bool bidi_list[] = {
 };
 #endif
 
-// Greek-Latin confusables. See doc/P2538R0.md for SAFEC23
+// Greek-Latin confusables. See doc/P2538R0.md (Appendix F - Greek Confusables)
+// for SAFEC26
 #ifdef EXTERN_SCRIPTS
 extern const uint32_t greek_confus_list[60];
 #else

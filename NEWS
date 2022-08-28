@@ -1,6 +1,11 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022 Reini Urban
 
+libu8ident 0.3 - 2022-??
+
+Change is_greek_latin_confus violations with C26_4 to return ERR_CONFUS,
+not ERR_SCRIPTS (GH #12).
+
 libu8ident 0.2 - 2022-02-12:
 
 Bump SOLIB MAJOR to 1

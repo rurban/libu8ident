@@ -12,7 +12,7 @@
 # * More uax31_d1, uax31_r1, uax31_r1b.
 #   xid is relevant for NFKC languages (ie python 3), the rest should use id_{start,cont} or
 #   better allowed_id, which keeps only recommended scripts.
-# * An optimized all-in-one start/cont list for SAFEC23, without Excluded and Limited_Use scripts,
+# * An optimized all-in-one start/cont list for SAFEC26, without Excluded and Limited_Use scripts,
 #   with only allowing NFC, with SC and SCX combined. This should be default without
 #   user-added scripts (#pragma unicode Braille). Then you need to fallback to the slow lists.
 # * More statistics, to check against perf results. E.g. why croaring or eytzinger is not good enough.
@@ -50,7 +50,7 @@ for ($idtype, $idstat, $confus) {
 my (@ucd_version, $from, $to, $sc, $oldto, $oldsc,
     @SC, @SCR, @SCRF, @SCXR, %SC, %scripts, %GC, $id);
 my ($started, @IDTYPES, @ALLOWED, @IDSTART, @IDCONT, @XIDSTART, @XIDCONT,
-    @SAFEC23START, @SAFEC23CONT, %GCONFUS, @GCONFUS);
+    @SAFEC26START, @SAFEC26CONT, %GCONFUS, @GCONFUS);
 
 open my $CONFUS, "<", $confus or die "$confus $!";
 while (<$CONFUS>) {
@@ -547,7 +547,7 @@ for (@SCXR) {
 #  @SCRF = merge(\@SCRF, \@single_scx);
 #}
 
-# We'd need optimized SAFEC23 start/cont lists, with enforced
+# We'd need optimized SAFEC26 start/cont lists, with enforced
 # NFC. i.e. disallow scripts, and combining marks which do not compose
 # to NFC. Combine SC with SCX.  This is done in mkc23.c, not here.
 my $scripts_h = "scripts.h";
@@ -1304,7 +1304,7 @@ LOCAL const struct range_bool bidi_list[] = {
 };
 #endif
 
-// Greek-Latin confusables. See doc/P2538R0.md for SAFEC23
+// Greek-Latin confusables. See doc/P2538R0.md (Appendix F - Greek Confusables) for SAFEC26
 #ifdef EXTERN_SCRIPTS
 extern const uint32_t greek_confus_list[%u];
 #else
