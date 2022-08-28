@@ -1,6 +1,6 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2022 Reini Urban
-   SPDX-License-Identifier: Apache-2.0
+   SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
    A simple open-addressing string hash table for the confusables check.
    No deletions needed.

@@ -1,6 +1,6 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2021 Reini Urban
-   SPDX-License-Identifier: Apache-2.0
+   SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
    generate roaring bitmaps for some sets.
 */

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # libu8ident - Check unicode security guidelines for identifiers.
 # Copyright 2022 Reini Urban
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 #
 # Create medial.h, letters in MEDIAL position
 
@@ -64,7 +64,7 @@ print $H <<'EOF';
 /* ex: set ro ft=c: -*- mode: c; buffer-read-only: t -*- */
 /* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2022 Reini Urban
-   SPDX-License-Identifier: Apache-2.0
+   SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
    UCD Medial Letters and Forms, not at Start and not at End of a word.
    Includes MEDIAL and https://www.unicode.org/reports/tr31/#Table_Optional_Medial

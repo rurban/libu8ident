@@ -1,6 +1,6 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2014, 2021 Reini Urban
-   SPDX-License-Identifier: Apache-2.0
+   SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
    See https://www.unicode.org/reports/tr15/tr15-51.html
 

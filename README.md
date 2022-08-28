@@ -265,7 +265,7 @@ configure options
     the recommended TR39 scripts, Skipped IDs (only the TR39#1 Recommended,
     Inclusion, Technical Identifer_Type) and NFC.
 
-  + **C23** selects the XID properties from the C23 standard, plus the NFC
+  + **C23** selects the XID properties from the C23 standard, with the NFC
   requirement from [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html).
 
   + **ID** selects the standard `ID_Start`/`ID_Continue`
@@ -273,12 +273,12 @@ configure options
     `Other_ID_Start`, -`Pattern_Syntax`, -`Pattern_White_Space`.
     `ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc, +
     `Other_ID_Continue`, -`Pattern_Syntax`, - `Pattern_White_Space`.
-     Note that this is broken for medial positions.
+     Note that this is broken for medial positions and insecure.
 
   + **XID** selects the stable `XID_Start` and `XID_Continue`
     properties, which ensure that `isIdentifer(string)` then
     `isIdentifier(NFKx(string))` (_removing the NFKC quirks_).
-    Note that this is broken for medial positions.
+    Note that this is broken for medial positions and insecure.
 
   + **C11** selects the AltID range from the C11 standard, which is
     highly insecure.
@@ -577,6 +577,15 @@ configurations, such as a new **c11** profile a single header and
 optimized lookup method should be implemented, combining the script,
 xid and decomposition in it. This would replace the ~6 lookups per
 codepoint.
+
+LICENSE
+-------
+
+Copyright (c) 2021,2022, Reini Urban. All rights reserved.
+
+This software is dual-licensed under either the Apache-2.0 license or the 
+GPL-2.0 or later. See the LICENSE file.
+
 
 TODO
 ----
