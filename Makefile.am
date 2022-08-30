@@ -25,7 +25,7 @@ libu8ident_la_LDFLAGS = \
 	$(LDFLAGS) $(AM_LDFLAGS)
 bin_PROGRAMS = u8idlint
 u8idlint_SOURCES = u8idlint.c $(libu8ident_la_SOURCES)
-u8idlint_CFLAGS = $(CFLAGS) $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
+u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 u8idlint_LDADD = $(u8idlint_LIBS)
 EXTRA_HEADERS = c11-safe.h unic26.h
 

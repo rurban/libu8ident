@@ -188,6 +188,7 @@ fi
 AC_SUBST(HAVE_C11)
 AC_CACHE_CHECK([if compiling with clang], [ax_cv_cc_target_clang],
 [
+    saved_CFLAGS="$CFLAGS"
     CFLAGS="$TARGET_CFLAGS"
     AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([], [[
@@ -195,7 +196,9 @@ AC_CACHE_CHECK([if compiling with clang], [ax_cv_cc_target_clang],
 #error "is clang"
 #endif
         ]])],
-        [ax_cv_cc_target_clang=no], [ax_cv_cc_target_clang=yes])])
+        [ax_cv_cc_target_clang=no], [ax_cv_cc_target_clang=yes])
+    CFLAGS="$saved_CFLAGS"
+    ])
 
 # clang has no broken return-local-addr detection
 if test x$ac_cv_c_compiler_gnu = xyes -a $ax_cv_cc_target_clang = xno; then

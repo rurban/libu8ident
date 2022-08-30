@@ -15,6 +15,7 @@ jobs:
           -
           - -march=native -Wall -Wextra -O2
           - -march=native -O3 -flto
+          - -march=native -O2 -fsanitize=address,undefined -fno-omit-frame-pointer
           - -m32
         CC:
           - gcc
