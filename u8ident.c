@@ -296,8 +296,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 #endif
 
     scr = (enum u8id_sc)u8ident_get_script(cp);
-    // disallow Excluded
-    if (unlikely(scr >= FIRST_EXCLUDED_SCRIPT &&
+    // disallow Limited Use scripts
+    if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
                  s_u8id_profile != U8ID_PROFILE_6 &&
                  s_u8id_profile != U8ID_PROFILE_C11_6)) {
       ctx->last_cp = cp;

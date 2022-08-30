@@ -585,10 +585,10 @@ void test_mixed_scripts_with_ctx(void) {
 #endif
 
   ctx = u8ident_new_ctx(); // new ctx
-  ret = u8ident_check((const uint8_t *)"\xf0\x91\x8c\x81", NULL);
-  if (tr31 == U8ID_TR31_ALLOWED) {
+  ret = u8ident_check((const uint8_t *)"\u0710", NULL);
+  if (tr31 != U8ID_TR31_ALLOWED && tr31 != U8ID_TR31_SAFEC26) {
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C26_4
-    CHECK_RET(ret, U8ID_ERR_SCRIPT, ctx); // U+11301 Grantha is excluded
+    CHECK_RET(ret, U8ID_ERR_SCRIPT, ctx); // U+0710 Syriac is limited use
 #else
     CHECK_RET(ret, U8ID_EOK, ctx); // 6 allows even these
 #endif
@@ -673,7 +673,8 @@ void test_combine() {
   CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
 #ifndef DISABLE_CHECK_XID
-  if (u8ident_profile() != 5) {
+  int prof = u8ident_profile();
+  if (prof != 5) {
     // Disallow equal combiners (Inherited, Recommended, Mn)
     ret = u8ident_check((const uint8_t *)"a\u0300\u0300", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
@@ -699,6 +700,15 @@ void test_combine() {
     // Disallow Å with RING ABOVE
     ret = u8ident_check((const uint8_t *)"Å\u030a", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+
+#if !defined U8ID_PROFILE || U8ID_PROFILE == 8
+    // U8ID_TR31_SAFEC26 disallows combiners at all
+    u8ident_init(U8ID_PROFILE_C26_4, U8ID_NORM_DEFAULT, 0);
+    // \UXXXXXXXXX letter support
+    u8ident_add_script(SC_Yezidi); // EXCLUDED_SCRIPT only addable with profile 6
+    ret = u8ident_check((const uint8_t *)"\U00010EB0\u0307", NULL);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0); // FIXME
+#endif
   }
 #endif
 
