@@ -229,7 +229,7 @@ Standard Annex 39</h1>
 <pre><code>C++ Identifier Security using Unicode Standard Annex 39 v2
 
 Document #: D2538R1
-Date:       2022-08-30
+Date:       2022-08-31
 Project:    Programming Language C++
 Audience:   SG-16 EWG CWG
 Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
@@ -749,8 +749,8 @@ gc=Me).</li>
 <li>Optionally forbid sequences of base character + nonspacing mark that
 look the same as or confusingly similar to the base character alone
 (because the nonspacing mark overlays a portion of the base character).
-An example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT
-ABOVE.</li>
+Examples are U+0069 LOWERCASE LETTER I or U+0131 LATIN SMALL LETTER
+DOTLESS I combined with U+0307 COMBINING DOT ABOVE.</li>
 <li>Optionally forbid non-spacing marks with base chars already
 including the non-spacing mark, like Ä with DIAERESIS.</li>
 </ul>
@@ -810,14 +810,19 @@ Modifier_Letters</a></p>
 <p>Most of the Combining Marks are caught by the NFC requirement from
 C++23 (P1949r7), but some optional checks for gc=Mn against base chars
 still might be added:</p>
-<p>Forbid U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE as a
-special-case.</p>
-<p>Forbid non-spacing marks with base chars already including the
-non-spacing mark. There are currently 82 non-spacing marks, e.g. GRAVE,
-DOT ABOVE, … most of them in the U+0300-U+0341 range, but some also in
-U+20D0-U+20E1 and U+3099-U+309A. From these there exist 24 letters which
-already include those non-spacing marks. See <a
-href="#appendix-h---letters-with-non-spacing-marks">Appendix H</a>.</p>
+<ul>
+<li><p>Forbid U+0069 LOWERCASE LETTER I or the DOTLESS letters i and j
+combined with U+0307 COMBINING DOT ABOVE as special-cases.</p></li>
+<li><p>Forbid non-spacing marks with base chars already including the
+non-spacing mark. They would be rendered either indistuinguishable or
+with the combining mark doubled. There are currently 82 non-spacing
+marks, e.g. GRAVE, DOT ABOVE, … most of them in the U+0300-U+0341 range,
+but some also in U+20D0-U+20E1 and U+3099-U+309A ranges. From these
+there exist 31 with a list of letters which already include those
+non-spacing marks. See <a
+href="#appendix-h---letters-with-non-spacing-marks">Appendix
+H</a>.</p></li>
+</ul>
 <p>See also <a
 href="https://www.unicode.org/reports/tr24/#Common">TR24#5.1 Handling
 Characters with the Common Script Property</a> and <a
@@ -2528,7 +2533,7 @@ isolated, nor final positions in the Arabic presentation forms.</p>
 <h1 id="appendix-h---letters-with-non-spacing-marks">20 Appendix H -
 Letters with non-spacing marks</h1>
 <p>From all 82 non-spacing marks, the list of letters already including
-its 29 non-spacing marks:</p>
+its 31 non-spacing marks:</p>
 <ul>
 <li><p>NSM: GRAVE 0300</p>
 <p>00C0, 00C8, 00CC, 00D2, 00D9, 00E0, 00E8, 00EC 00F2, 00F9, 01DB,
@@ -2574,17 +2579,18 @@ its 29 non-spacing marks:</p>
 <p>“ĂăĔĕĞğĬĭŎŏŬŭЎЙйўӁӂӐӑӖӗḜḝẶặᾰᾸῐῘῠῨ”</p></li>
 <li><p>NSM: DOT ABOVE 0307</p>
 <p>010A, 010B, 0116, 0117, 0120, 0121, 0130, 017B 017C, 0226, 0227,
-022E, 022F, 1E02, 1E03, 1E0A 1E0B, 1E1E, 1E1F, 1E22, 1E23, 1E40, 1E41,
-1E44 1E45, 1E56, 1E57, 1E58, 1E59, 1E60, 1E61, 1E64 1E65, 1E66, 1E67,
-1E68, 1E69, 1E6A, 1E6B, 1E86 1E87, 1E8A, 1E8B, 1E8E, 1E8F, 1E9B</p>
-<p>“ĊċĖėĠġİŻżȦȧȮȯḂḃḊḋḞḟḢḣṀṁṄṅṖṗṘṙṠṡṤṥṦṧṨṩṪṫẆẇẊẋẎẏẛ”</p></li>
+022E, 022F, 06A7, 06AC, 06B6 06BF, 06CF, 0762, 0765, 087A, 1DA1, 1E02,
+1E03 1E0A, 1E0B, 1E1E, 1E1F, 1E22, 1E23, 1E40, 1E41 1E44, 1E45, 1E56,
+1E57, 1E58, 1E59, 1E60, 1E61 1E64, 1E65, 1E66, 1E67, 1E68, 1E69, 1E6A,
+1E6B 1E86, 1E87, 1E8A, 1E8B, 1E8E, 1E8F, 1E9B, 312E 10798, 10EB0</p>
+<p>“ĊċĖėĠġİŻżȦȧȮȯڧڬڶڿۏݢݥࡺᶡḂḃḊḋḞḟḢḣṀṁṄṅṖṗṘṙṠṡṤṥṦṧṨṩṪṫẆẇẊẋẎẏẛㄮ𐞘𐺰”</p></li>
 <li><p>NSM: DIAERESIS 0308</p>
 <p>00C4, 00CB, 00CF, 00D6, 00DC, 00E4, 00EB, 00EF 00F6, 00FC, 00FF,
 0178, 03AA, 03AB, 03CA, 03CB 03D4, 0401, 0407, 0451, 0457, 04D2, 04D3,
 04DA 04DB, 04DC, 04DD, 04DE, 04DF, 04E4, 04E5, 04E6 04E7, 04EA, 04EB,
-04EC, 04ED, 04F0, 04F1, 04F4 04F5, 04F8, 04F9, 1E26, 1E27, 1E4E, 1E4F,
-1E7A 1E7B, 1E84, 1E85, 1E8C, 1E8D, 1E97</p>
-<p>“ÄËÏÖÜäëïöüÿŸΪΫϊϋϔЁЇёїӒӓӚӛӜӝӞӟӤӥӦӧӪӫӬӭӰӱӴӵӸӹḦḧṎṏṺṻẄẅẌẍẗ”</p></li>
+04EC, 04ED, 04F0, 04F1, 04F4 04F5, 04F8, 04F9, 1DF2, 1DF3, 1DF4, 1E26,
+1E27 1E4E, 1E4F, 1E7A, 1E7B, 1E84, 1E85, 1E8C, 1E8D 1E97</p>
+<p>“ÄËÏÖÜäëïöüÿŸΪΫϊϋϔЁЇёїӒӓӚӛӜӝӞӟӤӥӦӧӪӫӬӭӰӱӴӵӸӹᷲᷳᷴḦḧṎṏṺṻẄẅẌẍẗ”</p></li>
 <li><p>NSM: HOOK ABOVE 0309</p>
 <p>1EA2, 1EA3, 1EA8, 1EA9, 1EB2, 1EB3, 1EBA, 1EBB 1EC2, 1EC3, 1EC8,
 1EC9, 1ECE, 1ECF, 1ED4, 1ED5 1EDE, 1EDF, 1EE6, 1EE7, 1EEC, 1EED, 1EF6,
@@ -2622,11 +2628,12 @@ its 29 non-spacing marks:</p>
 <p>01A0, 01A1, 01AF, 01B0</p>
 <p>“ƠơƯư”</p></li>
 <li><p>NSM: DOT BELOW 0323</p>
-<p>1E04, 1E05, 1E0C, 1E0D, 1E24, 1E25, 1E32, 1E33 1E36, 1E37, 1E42,
-1E43, 1E46, 1E47, 1E5A, 1E5B 1E62, 1E63, 1E6C, 1E6D, 1E7E, 1E7F, 1E88,
-1E89 1E92, 1E93, 1EA0, 1EA1, 1EB8, 1EB9, 1ECA, 1ECB 1ECC, 1ECD, 1EE2,
-1EE3, 1EE4, 1EE5, 1EF0, 1EF1 1EF4, 1EF5</p>
-<p>“ḄḅḌḍḤḥḲḳḶḷṂṃṆṇṚṛṢṣṬṭṾṿẈẉẒẓẠạẸẹỊịỌọỢợỤụỰựỴỵ”</p></li>
+<p>068A, 0694, 06A3, 06B9, 06FA, 06FB, 06FC, 0766 088B, 08A5, 08B4,
+1E04, 1E05, 1E0C, 1E0D, 1E24 1E25, 1E32, 1E33, 1E36, 1E37, 1E42, 1E43,
+1E46 1E47, 1E5A, 1E5B, 1E62, 1E63, 1E6C, 1E6D, 1E7E 1E7F, 1E88, 1E89,
+1E92, 1E93, 1EA0, 1EA1, 1EB8 1EB9, 1ECA, 1ECB, 1ECC, 1ECD, 1EE2, 1EE3,
+1EE4 1EE5, 1EF0, 1EF1, 1EF4, 1EF5, 1BC26</p>
+<p>“ڊڔڣڹۺۻۼݦࢋࢥࢴḄḅḌḍḤḥḲḳḶḷṂṃṆṇṚṛṢṣṬṭṾṿẈẉẒẓẠạẸẹỊịỌọỢợỤụỰựỴỵ𛰦”</p></li>
 <li><p>NSM: DOUBLE DOT BELOW 0324</p>
 <p>1E72, 1E73</p>
 <p>“Ṳṳ”</p></li>
@@ -2657,6 +2664,13 @@ its 29 non-spacing marks:</p>
 <p>1E06, 1E07, 1E0E, 1E0F, 1E34, 1E35, 1E3A, 1E3B 1E48, 1E49, 1E5E,
 1E5F, 1E6E, 1E6F, 1E94, 1E95 1E96</p>
 <p>“ḆḇḎḏḴḵḺḻṈṉṞṟṮṯẔẕẖ”</p></li>
+<li><p>NSM: THREE DOTS ABOVE 20DB</p>
+<p>063F, 0685, 069E, 069F, 06A0, 06A8, 06B4, 06B7 06BD, 0763, 08A7,
+08C3, 08C4, 08C5</p>
+<p>“ؿڅڞڟڠڨڴڷڽݣࢧࣃࣄࣅ”</p></li>
+<li><p>NSM: FOUR DOTS ABOVE 20DC</p>
+<p>0690, 0699, 075C</p>
+<p>“ڐڙݜ”</p></li>
 <li><p>NSM: KATAKANA-HIRAGANA VOICED SOUND MARK 3099</p>
 <p>304C, 304E, 3050, 3052, 3054, 3056, 3058, 305A 305C, 305E, 3060,
 3062, 3065, 3067, 3069, 3070 3073, 3076, 3079, 307C, 3094, 309E, 30AC,

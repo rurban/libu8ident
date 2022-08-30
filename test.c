@@ -682,10 +682,16 @@ void test_combine() {
     ret = u8ident_check((const uint8_t *)"a\u0300\u0301\u0302\u0303\u0304", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
+    // Special cases DOT ABOVE:
     // Disallow i with DOT ABOVE
-    ret = u8ident_check((const uint8_t *)"i\u0301", NULL);
+    ret = u8ident_check((const uint8_t *)"i\u0307", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
+    // Disallow DOTLESS I with DOT ABOVE
+    ret = u8ident_check((const uint8_t *)"ı\u0307", NULL);
+    CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
+
+    // Regular nsm_letters[] cases:
     // Disallow Ä with DIAERESIS
     ret = u8ident_check((const uint8_t *)"Ä\u0308", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);

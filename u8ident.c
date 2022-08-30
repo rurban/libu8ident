@@ -170,8 +170,18 @@ bool in_SCX(const enum u8id_sc scr, const char *scx) {
    mark, like Ä with DIAERESIS.
  */
 bool nsm_check(const uint32_t base_cp, const uint32_t cp) {
-  if (cp == 0x301 && base_cp == 'i')
+  if (cp == 0x307 && (base_cp == 'i' || base_cp == 0x131 // dotless i
+                      || base_cp == 0x237                // dotless j
+                      || base_cp == 0x25F                // dotless j with stroke
+                      || base_cp == 0x284                // dotless j with stroke and hook
+                      || base_cp == 0x1DA1               // dotless j with stroke
+                      || base_cp == 0x10798              // dotless i
+                      || base_cp == 0x1D6A4              // dotless j
+                      || base_cp == 0x1D645))            // dotless j
     return false;
+  // Todo: check the 10 different STROKE Mn's: SHORT BAR OVERLAY, LONG BAR OVERLAY,
+  // LIGHT CENTRALIZATION STROKE BELOW, STRONG CENTRALIZATION STROKE BELOW, ...
+
   for (unsigned i = 0; i < ARRAY_SIZE(nsm_letters); i++) {
     const struct nsm_ws *l = &nsm_letters[i];
     if (l->nsm > cp)

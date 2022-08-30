@@ -48,7 +48,7 @@ seek($UCD,0,0);
 while (<$UCD>) {
   my @l = split ';';
   my $name = $l[1];
-  # Also accept "xxxx;HIRAGANA LETTER PA;Lo;0;L;306F 309A;"
+  # Check "HIRAGANA LETTER PA;Lo;0;L;306F 309A;" NFD expansion
   if ($l[2] =~ /^L/ && $l[5] =~ / /) {
     for my $r (@NSM) {
       my $nsm = $r->[0];
@@ -63,6 +63,32 @@ while (<$UCD>) {
       }
     }
   }
+  # but also check names with NSM's, e.g. LATIN SMALL LETTER Q WITH HOOK
+  # without any NFD expansion. => DOT ABOVE, DIAERESIS, DOT BELOW, THREE DOTS ABOVE,
+  # FOUR DOTS ABOVE.
+  elsif ($name =~ /LETTER .+ WITH .+/) {
+    for my $r (@NSM) {
+      my $nsm = $r->[0];
+      if ($name =~ /LETTER .+ WITH \Q$nsm\E$/) {
+        my $cp = hex $l[0];
+        if (exists $NSM{$nsm}) {
+          push @{$NSM{$nsm}}, $cp;
+        } else {
+          $NSM{$nsm} = [ $cp ];
+        }
+      }
+    }
+  }
+  # plus all the DOTLESS i and j letters, but not arabic BEH, NOON, FEH, QAF
+  if ($name =~ /LETTER .+ DOTLESS [IJ]/) {
+    my $nsm = 'DOT ABOVE';
+    my $cp = hex $l[0];
+    #if (exists $NSM{$nsm}) {
+    push @{$NSM{$nsm}}, $cp;
+    #} else {
+    #  $NSM{$nsm} = [ $cp ];
+    #}
+  }
 }
 close $UCD;
 # delete empty NSM's
@@ -72,7 +98,7 @@ for my $r (@NSM) {
   if (exists $NSM{$r->[0]}) {
     push @N, $r;
   } else {
-    warn "skip empty $r->[0]\n";
+    warn "skip empty $r->[0] ",sprintf("%04X",$r->[1]),"\n";
   }
 }
 @NSM = @N;
@@ -160,16 +186,26 @@ for my $r (@NSM) {
   printf $H "    { ";
   if ($NSM{$nsm}) {
     my $u = "";
-    printf $H "0x%04X,  /* NSM: %s %X */\n      ", $r->[1], $nsm, $r->[1];
-    printf $DOC "- NSM: %s %04X\n\n    ", $nsm, $r->[1];
+    if ($r->[1] >= 0x10000) {
+      printf $H "0x%05X,  /* NSM: %s %X */\n      ", $r->[1], $nsm, $r->[1];
+      printf $DOC "- NSM: %s %05X\n\n    ", $nsm, $r->[1];
+    } else {
+      printf $H "0x%04X,  /* NSM: %s %X */\n      ", $r->[1], $nsm, $r->[1];
+      printf $DOC "- NSM: %s %04X\n\n    ", $nsm, $r->[1];
+    }
     printf $H "L\"";
     my $i = 0;
     my @L = @{$NSM{$nsm}};
     for (@L) {
       if ($_ != 0) {
         $u .= chr ($_);
-        printf $H "\\u%04X", $_;
-        printf $DOC "%04X", $_;
+        if ($_ >= 0x10000) {
+          printf $H "\\U%08X", $_;
+          printf $DOC "%05X", $_;
+        } else {
+          printf $H "\\u%04X", $_;
+          printf $DOC "%04X", $_;
+        }
         if (@L == $i + 1) {
             print $DOC "\n";
         } else {
