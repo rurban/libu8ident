@@ -161,16 +161,20 @@ doc/$(NC).pdf:
 
 doc/$(DCURCXX).html: $(srcdir)/doc/$(DCURCXX).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/$(DCURCXX).md --metadata title="D258R1 - C++ Identifier Security using Unicode Standard Annex 39"
+	$(PANDOC) -s -o $@ $(srcdir)/doc/$(DCURCXX).md --metadata title="$(DCURCXX) - C++ Identifier Security using Unicode Standard Annex 39"
+	-cp $@ $(srcdir)/$@
 doc/$(DCURCXX).pdf: $(srcdir)/doc/$(DCURCXX).md
 	-test -d doc || mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(DCURCXX).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono"
+	-cp $@ $(srcdir)/$@
 doc/$(NCURC).html: $(srcdir)/doc/$(NCURC).md
 	-test -d doc || mkdir doc
 	$(PANDOC) -s -o $@ $(srcdir)/doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
+	-cp $@ $(srcdir)/$@
 doc/$(NCURC).pdf: $(srcdir)/doc/$(NCURC).md
 	-test -d doc || mkdir doc
 	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(NC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
+	-cp $@ $(srcdir)/$@
 endif
 
 Dockerfile.pandoc: $(srcdir)/makefile.gnu
