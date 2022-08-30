@@ -172,19 +172,14 @@ bool in_SCX(const enum u8id_sc scr, const char *scx) {
 bool nsm_check(const uint32_t base_cp, const uint32_t cp) {
   if (cp == 0x301 && base_cp == 'i')
     return false;
-  for (int i = 0; i < NSM_LAST; i++) {
-    uint32_t *s;
-    const uint32_t *l = nsm_letters[i];
-    if (l[0] != cp || !l[0])
+  for (unsigned i = 0; i < ARRAY_SIZE(nsm_letters); i++) {
+    const struct nsm_ws *l = &nsm_letters[i];
+    if (l->nsm > cp)
+      break;
+    if (l->nsm != cp)
       continue;
-    s = (uint32_t*)&l[1];
-    // TODO binary search, not linear.
-    // but we dont have the size yet, and it might be overkill.
-    while (*s && base_cp >= *s) {
-      if (base_cp == *s++)
-        return false;
-    }
-    break;
+    if (wcschr(l->letters, (wchar_t)base_cp))
+      return false;
   }
   return true;
 }

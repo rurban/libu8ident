@@ -817,7 +817,7 @@ non-spacing mark. There are currently 82 non-spacing marks, e.g. GRAVE,
 DOT ABOVE, … most of them in the U+0300-U+0341 range, but some also in
 U+20D0-U+20E1 and U+3099-U+309A. From these there exist 24 letters which
 already include those non-spacing marks. See <a
-href="#appendix-h---letters-with-non-spacing-marks">Appendix H</a></p>
+href="#appendix-h---letters-with-non-spacing-marks">Appendix H</a>.</p>
 <p>See also <a
 href="https://www.unicode.org/reports/tr24/#Common">TR24#5.1 Handling
 Characters with the Common Script Property</a> and <a
@@ -2459,7 +2459,7 @@ class="sourceCode txt"><code class="sourceCode default"><span id="cb22-1"><a hre
 <span id="cb22-75"><a href="#cb22-75" aria-hidden="true" tabindex="-1"></a>03F7 ; ( Ϸ → Þ ) GREEK CAPITAL LETTER SHO → LATIN CAPITAL LETTER THORN</span>
 <span id="cb22-76"><a href="#cb22-76" aria-hidden="true" tabindex="-1"></a>03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI</span>
 <span id="cb22-77"><a href="#cb22-77" aria-hidden="true" tabindex="-1"></a>03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA</span></code></pre></div>
-<h2 id="appendix-g---medial">19 Appendix G - Medial</h2>
+<h1 id="appendix-g---medial">19 Appendix G - Medial</h1>
 <p>List of all the medial letter and mark ranges. These characters are
 treated wrongly in all programming languages I checked. In the UCD
 Standard some are wrongly in <code>XID_Start</code>, but must be treated
@@ -2525,137 +2525,149 @@ Script), and the Latin U+A78F (Uncommon Use).</p>
 class="sourceCode txt"><code class="sourceCode default"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>00B7          ; XID_Continue # Po    MIDDLE DOT</span></code></pre></div>
 <p>So there is no medial character to consider, also no initial,
 isolated, nor final positions in the Arabic presentation forms.</p>
-<h2 id="appendix-h---letters-with-non-spacing-marks">20 Appendix H -
-Letters with non-spacing marks</h2>
-<p>List of letters already including its non-spacing mark:</p>
-<p>NSM: GRAVE 300</p>
-<pre><code>  0xc0, 0xc8, 0xcc, 0xd2, 0xd9, 0xe0, 0xe8, 0xec, 0xf2, 0xf9,
-  0x1f8, 0x1f9, 0x400, 0x40d, 0x450, 0x45d, 0x1e80, 0x1e81, 0x1ef2,
-  0x1ef3</code></pre>
-<p>NSM: ACUTE 301</p>
-<pre><code>  0xc1, 0xc9, 0xcd, 0xd3, 0xda, 0xdd, 0xe1, 0xe9, 0xed, 0xf3,
-  0xfa, 0xfd, 0x106, 0x107, 0x139, 0x13a, 0x143, 0x144, 0x154, 0x155,
-  0x15a, 0x15b, 0x179, 0x17a, 0x1f4, 0x1f5, 0x1fc, 0x1fd, 0x1e30,
-  0x1e31, 0x1e3e, 0x1e3f, 0x1e54, 0x1e55, 0x1e82, 0x1e83</code></pre>
-<p>NSM: CIRCUMFLEX 302</p>
-<pre><code>  0xc2, 0xca, 0xce, 0xd4, 0xdb, 0xe2, 0xea, 0xee, 0xf4, 0xfb,
-  0x108, 0x109, 0x11c, 0x11d, 0x124, 0x125, 0x134, 0x135, 0x15c,
-  0x15d, 0x174, 0x175, 0x176, 0x177, 0x1e90, 0x1e91</code></pre>
-<p>NSM: TILDE 303</p>
-<pre><code>  0xc3, 0xd1, 0xd5, 0xe3, 0xf1, 0xf5, 0x128, 0x129, 0x168, 0x169,
-  0x1e7c, 0x1e7d, 0x1ebc, 0x1ebd, 0x1ef8, 0x1ef9</code></pre>
-<p>NSM: MACRON 304</p>
-<pre><code>  0x100, 0x101, 0x112, 0x113, 0x12a, 0x12b, 0x14c, 0x14d, 0x16a,
-  0x16b, 0x1e2, 0x1e3, 0x232, 0x233, 0x4e2, 0x4e3, 0x4ee, 0x4ef,
-  0x1e20, 0x1e21, 0x1fb1, 0x1fb9, 0x1fd1, 0x1fd9, 0x1fe1, 0x1fe9</code></pre>
-<p>NSM: OVERSCORE 305</p>
-<pre><code>  None</code></pre>
-<p>NSM: BREVE 306</p>
-<pre><code>  0x102, 0x103, 0x114, 0x115, 0x11e, 0x11f, 0x12c, 0x12d, 0x14e,
-  0x14f, 0x16c, 0x16d, 0x4c1, 0x4c2, 0x4d0, 0x4d1, 0x4d6, 0x4d7</code></pre>
-<p>NSM: DOT ABOVE 307</p>
-<pre><code>  0x10a, 0x10b, 0x116, 0x117, 0x120, 0x121, 0x130, 0x17b, 0x17c,
-  0x226, 0x227, 0x22e, 0x22f, 0x6a7, 0x6ac, 0x6b6, 0x6bf, 0x6cf,
-  0x762, 0x765, 0x87a, 0x1e02, 0x1e03, 0x1e0a, 0x1e0b, 0x1e1e, 0x1e1f,
-  0x1e22, 0x1e23, 0x1e40, 0x1e41, 0x1e44, 0x1e45, 0x1e56, 0x1e57, 0x1e58,
-  0x1e59, 0x1e60, 0x1e61, 0x1e6a, 0x1e6b, 0x1e86, 0x1e87, 0x1e8a, 0x1e8b,
-  0x1e8e, 0x1e8f, 0x1e9b, 0x312e, 0x10eb0</code></pre>
-<p>NSM: DIAERESIS 308</p>
-<pre><code>  0xc4, 0xcb, 0xcf, 0xd6, 0xdc, 0xe4, 0xeb, 0xef, 0xf6, 0xfc,
-  0xff, 0x178, 0x4d2, 0x4d3, 0x4da, 0x4db, 0x4dc, 0x4dd, 0x4de, 0x4df,
-  0x4e4, 0x4e5, 0x4e6, 0x4e7, 0x4ea, 0x4eb, 0x4ec, 0x4ed, 0x4f0, 0x4f1,
-  0x4f4, 0x4f5, 0x4f8, 0x4f9, 0x1df2, 0x1df3, 0x1df4, 0x1e26, 0x1e27,
-  0x1e84, 0x1e85, 0x1e8c, 0x1e8d, 0x1e97</code></pre>
-<p>NSM: HOOK ABOVE 309</p>
-<pre><code>  0x1ea2, 0x1ea3, 0x1eba, 0x1ebb, 0x1ec8, 0x1ec9, 0x1ece, 0x1ecf, 0x1ee6,
-  0x1ee7, 0x1ef6, 0x1ef7</code></pre>
-<p>NSM: RING ABOVE 30a</p>
-<pre><code>  0xc5, 0xe5, 0x16e, 0x16f, 0x1e98, 0x1e99</code></pre>
-<p>NSM: DOUBLE ACUTE 30b</p>
-<pre><code>  0x150, 0x151, 0x170, 0x171, 0x4f2, 0x4f3
-  </code></pre>
-<p>NSM: HACEK 30c NSM: VERTICAL LINE ABOVE 30d NSM: DOUBLE VERTICAL LINE
-ABOVE 30e</p>
-<pre><code>  None
-  </code></pre>
-<p>NSM: DOUBLE GRAVE 30f</p>
-<pre><code>  0x200, 0x201, 0x204, 0x205, 0x208, 0x209, 0x20c, 0x20d, 0x210, 0x211,
-  0x214, 0x215</code></pre>
-<p>NSM: CANDRABINDU 310</p>
-<pre><code>  None</code></pre>
-<p>NSM: INVERTED BREVE 311</p>
-<pre><code>  0x202, 0x203, 0x206, 0x207, 0x20a, 0x20b, 0x20e, 0x20f, 0x212, 0x213,
-  0x216, 0x217</code></pre>
-<p>NSM: TURNED COMMA ABOVE 312 NSM: COMMA ABOVE 313</p>
-<pre><code>Todo</code></pre>
-<p>NSM: REVERSED COMMA ABOVE 314</p>
-<pre><code>Todo</code></pre>
-<p>NSM: COMMA ABOVE RIGHT 315 NSM: GRAVE BELOW 316 NSM: ACUTE BELOW 317
-NSM: LEFT TACK BELOW 318 NSM: RIGHT TACK BELOW 319 NSM: LEFT ANGLE ABOVE
-31a</p>
-<pre><code>None</code></pre>
-<p>NSM: HORN 31b</p>
-<pre><code>  0x1a0, 0x1a1, 0x1af, 0x1b0</code></pre>
-<p>NSM: LEFT HALF RING BELOW 31c NSM: UP TACK BELOW 31d NSM: DOWN TACK
-BELOW 31e NSM: PLUS SIGN BELOW 31f NSM: MINUS SIGN BELOW 320 NSM:
-PALATALIZED HOOK BELOW 321 NSM: RETROFLEX HOOK BELOW 322</p>
-<pre><code>  None</code></pre>
-<p>NSM: DOT BELOW 323</p>
-<pre><code>  0x68a, 0x694, 0x6a3, 0x6b9, 0x6fa, 0x6fb, 0x6fc, 0x766, 0x88b,
-  0x8a5, 0x8b4, 0x1e04, 0x1e05, 0x1e0c, 0x1e0d, 0x1e24, 0x1e25,
-  0x1e32, 0x1e33, 0x1e36, 0x1e37, 0x1e42, 0x1e43, 0x1e46, 0x1e47,
-  0x1e5a, 0x1e5b, 0x1e62, 0x1e63, 0x1e6c, 0x1e6d, 0x1e7e, 0x1e7f,
-  0x1e88, 0x1e89, 0x1e92, 0x1e93, 0x1ea0, 0x1ea1, 0x1eb8, 0x1eb9,
-  0x1eca, 0x1ecb, 0x1ecc, 0x1ecd, 0x1ee4, 0x1ee5, 0x1ef4, 0x1ef5,
-  0x1bc26</code></pre>
-<p>NSM: DOUBLE DOT BELOW 324</p>
-<pre><code>  None</code></pre>
-<p>NSM: RING BELOW 325</p>
-<pre><code>  0x1e00, 0x1e01</code></pre>
-<p>NSM: COMMA BELOW 326</p>
-<pre><code>  0x218, 0x219, 0x21a, 0x21b</code></pre>
-<p>NSM: CEDILLA 327</p>
-<pre><code>  0xc7, 0xe7, 0x122, 0x123, 0x136, 0x137, 0x13b, 0x13c, 0x145, 0x146,
-  0x156, 0x157, 0x15e, 0x15f, 0x162, 0x163, 0x228, 0x229, 0x1e10,
-  0x1e11, 0x1e28, 0x1e29</code></pre>
-<p>NSM: OGONEK 328</p>
-<pre><code>  0x104, 0x105, 0x118, 0x119, 0x12e, 0x12f, 0x172, 0x173, 0x1ea, 0x1eb</code></pre>
-<p>NSM: VERTICAL LINE BELOW 329 NSM: BRIDGE BELOW 32a NSM: INVERTED
-DOUBLE ARCH BELOW 32b NSM: HACEK BELOW 32c</p>
-<pre><code>  None</code></pre>
-<p>NSM: CIRCUMFLEX BELOW 32d</p>
-<pre><code>  0x1e12, 0x1e13, 0x1e18, 0x1e19, 0x1e3c, 0x1e3d, 0x1e4a, 0x1e4b,
-  0x1e70, 0x1e71, 0x1e76, 0x1e77</code></pre>
-<p>NSM: BREVE BELOW 32e</p>
-<pre><code>  0x1e2a, 0x1e2b</code></pre>
-<p>NSM: INVERTED BREVE BELOW 32f</p>
-<pre><code>  None</code></pre>
-<p>NSM: TILDE BELOW 330</p>
-<pre><code>  0x1e1a, 0x1e1b, 0x1e2c, 0x1e2d, 0x1e74, 0x1e75</code></pre>
-<p>NSM: MACRON BELOW 331 NSM: UNDERSCORE 332 NSM: DOUBLE UNDERSCORE 333
-NSM: TILDE OVERLAY 334 NSM: SHORT BAR OVERLAY 335 NSM: LONG BAR OVERLAY
-336 NSM: SHORT SLASH OVERLAY 337 NSM: LONG SLASH OVERLAY 338 NSM: RIGHT
-HALF RING BELOW 339 NSM: INVERTED BRIDGE BELOW 33a NSM: SQUARE BELOW 33b
-NSM: SEAGULL BELOW 33c NSM: X ABOVE 33d NSM: VERTICAL TILDE 33e NSM:
-DOUBLE OVERSCORE 33f NSM: GRAVE TONE MARK 340 NSM: ACUTE TONE MARK 341
-NSM: LEFT HARPOON ABOVE 20d0 NSM: RIGHT HARPOON ABOVE 20d1 NSM: LONG
-VERTICAL BAR OVERLAY 20d2 NSM: SHORT VERTICAL BAR OVERLAY 20d3 NSM:
-ANTICLOCKWISE ARROW ABOVE 20d4 NSM: CLOCKWISE ARROW ABOVE 20d5 NSM: LEFT
-ARROW ABOVE 20d6 NSM: RIGHT ARROW ABOVE 20d7 NSM: RING OVERLAY 20d8 NSM:
-CLOCKWISE RING OVERLAY 20d9 NSM: ANTICLOCKWISE RING OVERLAY 20da</p>
-<pre><code>  None</code></pre>
-<p>NSM: THREE DOTS ABOVE 20db</p>
-<pre><code>  0x63f, 0x685, 0x69e, 0x69f, 0x6a0, 0x6a8, 0x6b4, 0x6b7, 0x6bd,
-  0x763, 0x8a7, 0x8c3, 0x8c4, 0x8c5</code></pre>
-<p>NSM: FOUR DOTS ABOVE 20dc</p>
-<pre><code>  0x690, 0x699, 0x75c</code></pre>
-<p>NSM: LEFT RIGHT ARROW ABOVE 20e1</p>
-<pre><code>  None
-  </code></pre>
-<p>NSM: KATAKANA-HIRAGANA VOICED SOUND MARK 3099</p>
-<pre><code>  Todo</code></pre>
-<p>NSM: KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK 309a</p>
-<pre><code>  Todo</code></pre>
+<h1 id="appendix-h---letters-with-non-spacing-marks">20 Appendix H -
+Letters with non-spacing marks</h1>
+<p>From all 82 non-spacing marks, the list of letters already including
+its 29 non-spacing marks:</p>
+<ul>
+<li><p>NSM: GRAVE 0300</p>
+<p>00C0, 00C8, 00CC, 00D2, 00D9, 00E0, 00E8, 00EC 00F2, 00F9, 01DB,
+01DC, 01F8, 01F9, 0400, 040D 0450, 045D, 1E14, 1E15, 1E50, 1E51, 1E80,
+1E81 1EA6, 1EA7, 1EB0, 1EB1, 1EC0, 1EC1, 1ED2, 1ED3 1EDC, 1EDD, 1EEA,
+1EEB, 1EF2, 1EF3, 1F02, 1F03 1F0A, 1F0B, 1F12, 1F13, 1F1A, 1F1B, 1F22,
+1F23 1F2A, 1F2B, 1F32, 1F33, 1F3A, 1F3B, 1F42, 1F43 1F4A, 1F4B, 1F52,
+1F53, 1F5B, 1F62, 1F63, 1F6A 1F6B, 1F70, 1F72, 1F74, 1F76, 1F78, 1F7A,
+1F7C 1FBA, 1FC8, 1FCA, 1FD2, 1FDA, 1FE2, 1FEA, 1FF8 1FFA</p>
+<p>“ÀÈÌÒÙàèìòùǛǜǸǹЀЍѐѝḔḕṐṑẀẁẦầẰằỀềỒồỜờỪừỲỳἂἃἊἋἒἓἚἛἢἣἪἫἲἳἺἻὂὃὊὋὒὓὛὢὣὪὫὰὲὴὶὸὺὼᾺῈῊῒῚῢῪῸῺ”</p></li>
+<li><p>NSM: ACUTE 0301</p>
+<p>00C1, 00C9, 00CD, 00D3, 00DA, 00DD, 00E1, 00E9 00ED, 00F3, 00FA,
+00FD, 0106, 0107, 0139, 013A 0143, 0144, 0154, 0155, 015A, 015B, 0179,
+017A 01D7, 01D8, 01F4, 01F5, 01FA, 01FB, 01FC, 01FD 01FE, 01FF, 0386,
+0388, 0389, 038A, 038C, 038E 038F, 0390, 03AC, 03AD, 03AE, 03AF, 03B0,
+03CC 03CD, 03CE, 03D3, 0403, 040C, 0453, 045C, 1E08 1E09, 1E16, 1E17,
+1E2E, 1E2F, 1E30, 1E31, 1E3E 1E3F, 1E4C, 1E4D, 1E52, 1E53, 1E54, 1E55,
+1E78 1E79, 1E82, 1E83, 1EA4, 1EA5, 1EAE, 1EAF, 1EBE 1EBF, 1ED0, 1ED1,
+1EDA, 1EDB, 1EE8, 1EE9, 1F04 1F05, 1F0C, 1F0D, 1F14, 1F15, 1F1C, 1F1D,
+1F24 1F25, 1F2C, 1F2D, 1F34, 1F35, 1F3C, 1F3D, 1F44 1F45, 1F4C, 1F4D,
+1F54, 1F55, 1F5D, 1F64, 1F65 1F6C, 1F6D</p>
+<p>“ÁÉÍÓÚÝáéíóúýĆćĹĺŃńŔŕŚśŹźǗǘǴǵǺǻǼǽǾǿΆΈΉΊΌΎΏΐάέήίΰόύώϓЃЌѓќḈḉḖḗḮḯḰḱḾḿṌṍṒṓṔṕṸṹẂẃẤấẮắẾếỐốỚớỨứἄἅἌἍἔἕἜἝἤἥἬἭἴἵἼἽὄὅὌὍὔὕὝὤὥὬὭ”</p></li>
+<li><p>NSM: CIRCUMFLEX 0302</p>
+<p>00C2, 00CA, 00CE, 00D4, 00DB, 00E2, 00EA, 00EE 00F4, 00FB, 0108,
+0109, 011C, 011D, 0124, 0125 0134, 0135, 015C, 015D, 0174, 0175, 0176,
+0177 1E90, 1E91, 1EAC, 1EAD, 1EC6, 1EC7, 1ED8, 1ED9</p>
+<p>“ÂÊÎÔÛâêîôûĈĉĜĝĤĥĴĵŜŝŴŵŶŷẐẑẬậỆệỘộ”</p></li>
+<li><p>NSM: TILDE 0303</p>
+<p>00C3, 00D1, 00D5, 00E3, 00F1, 00F5, 0128, 0129 0168, 0169, 1E7C,
+1E7D, 1EAA, 1EAB, 1EB4, 1EB5 1EBC, 1EBD, 1EC4, 1EC5, 1ED6, 1ED7, 1EE0,
+1EE1 1EEE, 1EEF, 1EF8, 1EF9</p>
+<p>“ÃÑÕãñõĨĩŨũṼṽẪẫẴẵẼẽỄễỖỗỠỡỮữỸỹ”</p></li>
+<li><p>NSM: MACRON 0304</p>
+<p>0100, 0101, 0112, 0113, 012A, 012B, 014C, 014D 016A, 016B, 01D5,
+01D6, 01DE, 01DF, 01E0, 01E1 01E2, 01E3, 01EC, 01ED, 022A, 022B, 022C,
+022D 0230, 0231, 0232, 0233, 04E2, 04E3, 04EE, 04EF 1E20, 1E21, 1E38,
+1E39, 1E5C, 1E5D, 1FB1, 1FB9 1FD1, 1FD9, 1FE1, 1FE9</p>
+<p>“ĀāĒēĪīŌōŪūǕǖǞǟǠǡǢǣǬǭȪȫȬȭȰȱȲȳӢӣӮӯḠḡḸḹṜṝᾱᾹῑῙῡῩ”</p></li>
+<li><p>NSM: BREVE 0306</p>
+<p>0102, 0103, 0114, 0115, 011E, 011F, 012C, 012D 014E, 014F, 016C,
+016D, 040E, 0419, 0439, 045E 04C1, 04C2, 04D0, 04D1, 04D6, 04D7, 1E1C,
+1E1D 1EB6, 1EB7, 1FB0, 1FB8, 1FD0, 1FD8, 1FE0, 1FE8</p>
+<p>“ĂăĔĕĞğĬĭŎŏŬŭЎЙйўӁӂӐӑӖӗḜḝẶặᾰᾸῐῘῠῨ”</p></li>
+<li><p>NSM: DOT ABOVE 0307</p>
+<p>010A, 010B, 0116, 0117, 0120, 0121, 0130, 017B 017C, 0226, 0227,
+022E, 022F, 1E02, 1E03, 1E0A 1E0B, 1E1E, 1E1F, 1E22, 1E23, 1E40, 1E41,
+1E44 1E45, 1E56, 1E57, 1E58, 1E59, 1E60, 1E61, 1E64 1E65, 1E66, 1E67,
+1E68, 1E69, 1E6A, 1E6B, 1E86 1E87, 1E8A, 1E8B, 1E8E, 1E8F, 1E9B</p>
+<p>“ĊċĖėĠġİŻżȦȧȮȯḂḃḊḋḞḟḢḣṀṁṄṅṖṗṘṙṠṡṤṥṦṧṨṩṪṫẆẇẊẋẎẏẛ”</p></li>
+<li><p>NSM: DIAERESIS 0308</p>
+<p>00C4, 00CB, 00CF, 00D6, 00DC, 00E4, 00EB, 00EF 00F6, 00FC, 00FF,
+0178, 03AA, 03AB, 03CA, 03CB 03D4, 0401, 0407, 0451, 0457, 04D2, 04D3,
+04DA 04DB, 04DC, 04DD, 04DE, 04DF, 04E4, 04E5, 04E6 04E7, 04EA, 04EB,
+04EC, 04ED, 04F0, 04F1, 04F4 04F5, 04F8, 04F9, 1E26, 1E27, 1E4E, 1E4F,
+1E7A 1E7B, 1E84, 1E85, 1E8C, 1E8D, 1E97</p>
+<p>“ÄËÏÖÜäëïöüÿŸΪΫϊϋϔЁЇёїӒӓӚӛӜӝӞӟӤӥӦӧӪӫӬӭӰӱӴӵӸӹḦḧṎṏṺṻẄẅẌẍẗ”</p></li>
+<li><p>NSM: HOOK ABOVE 0309</p>
+<p>1EA2, 1EA3, 1EA8, 1EA9, 1EB2, 1EB3, 1EBA, 1EBB 1EC2, 1EC3, 1EC8,
+1EC9, 1ECE, 1ECF, 1ED4, 1ED5 1EDE, 1EDF, 1EE6, 1EE7, 1EEC, 1EED, 1EF6,
+1EF7</p>
+<p>“ẢảẨẩẲẳẺẻỂểỈỉỎỏỔổỞởỦủỬửỶỷ”</p></li>
+<li><p>NSM: RING ABOVE 030A</p>
+<p>00C5, 00E5, 016E, 016F, 1E98, 1E99</p>
+<p>“ÅåŮůẘẙ”</p></li>
+<li><p>NSM: DOUBLE ACUTE 030B</p>
+<p>0150, 0151, 0170, 0171, 04F2, 04F3</p>
+<p>“ŐőŰűӲӳ”</p></li>
+<li><p>NSM: HACEK 030C</p>
+<p>010C, 010D, 010E, 010F, 011A, 011B, 013D, 013E 0147, 0148, 0158,
+0159, 0160, 0161, 0164, 0165 017D, 017E, 01CD, 01CE, 01CF, 01D0, 01D1,
+01D2 01D3, 01D4, 01D9, 01DA, 01E6, 01E7, 01E8, 01E9 01EE, 01EF, 01F0,
+021E, 021F</p>
+<p>“ČčĎďĚěĽľŇňŘřŠšŤťŽžǍǎǏǐǑǒǓǔǙǚǦǧǨǩǮǯǰȞȟ”</p></li>
+<li><p>NSM: DOUBLE GRAVE 030F</p>
+<p>0200, 0201, 0204, 0205, 0208, 0209, 020C, 020D 0210, 0211, 0214,
+0215, 0476, 0477</p>
+<p>“ȀȁȄȅȈȉȌȍȐȑȔȕѶѷ”</p></li>
+<li><p>NSM: INVERTED BREVE 0311</p>
+<p>0202, 0203, 0206, 0207, 020A, 020B, 020E, 020F 0212, 0213, 0216,
+0217</p>
+<p>“ȂȃȆȇȊȋȎȏȒȓȖȗ”</p></li>
+<li><p>NSM: COMMA ABOVE 0313</p>
+<p>1F00, 1F08, 1F10, 1F18, 1F20, 1F28, 1F30, 1F38 1F40, 1F48, 1F50,
+1F60, 1F68, 1FE4</p>
+<p>“ἀἈἐἘἠἨἰἸὀὈὐὠὨῤ”</p></li>
+<li><p>NSM: REVERSED COMMA ABOVE 0314</p>
+<p>1F01, 1F09, 1F11, 1F19, 1F21, 1F29, 1F31, 1F39 1F41, 1F49, 1F51,
+1F59, 1F61, 1F69, 1FE5, 1FEC</p>
+<p>“ἁἉἑἙἡἩἱἹὁὉὑὙὡὩῥῬ”</p></li>
+<li><p>NSM: HORN 031B</p>
+<p>01A0, 01A1, 01AF, 01B0</p>
+<p>“ƠơƯư”</p></li>
+<li><p>NSM: DOT BELOW 0323</p>
+<p>1E04, 1E05, 1E0C, 1E0D, 1E24, 1E25, 1E32, 1E33 1E36, 1E37, 1E42,
+1E43, 1E46, 1E47, 1E5A, 1E5B 1E62, 1E63, 1E6C, 1E6D, 1E7E, 1E7F, 1E88,
+1E89 1E92, 1E93, 1EA0, 1EA1, 1EB8, 1EB9, 1ECA, 1ECB 1ECC, 1ECD, 1EE2,
+1EE3, 1EE4, 1EE5, 1EF0, 1EF1 1EF4, 1EF5</p>
+<p>“ḄḅḌḍḤḥḲḳḶḷṂṃṆṇṚṛṢṣṬṭṾṿẈẉẒẓẠạẸẹỊịỌọỢợỤụỰựỴỵ”</p></li>
+<li><p>NSM: DOUBLE DOT BELOW 0324</p>
+<p>1E72, 1E73</p>
+<p>“Ṳṳ”</p></li>
+<li><p>NSM: RING BELOW 0325</p>
+<p>1E00, 1E01</p>
+<p>“Ḁḁ”</p></li>
+<li><p>NSM: COMMA BELOW 0326</p>
+<p>0218, 0219, 021A, 021B</p>
+<p>“ȘșȚț”</p></li>
+<li><p>NSM: CEDILLA 0327</p>
+<p>00C7, 00E7, 0122, 0123, 0136, 0137, 013B, 013C 0145, 0146, 0156,
+0157, 015E, 015F, 0162, 0163 0228, 0229, 1E10, 1E11, 1E28, 1E29</p>
+<p>“ÇçĢģĶķĻļŅņŖŗŞşŢţȨȩḐḑḨḩ”</p></li>
+<li><p>NSM: OGONEK 0328</p>
+<p>0104, 0105, 0118, 0119, 012E, 012F, 0172, 0173 01EA, 01EB</p>
+<p>“ĄąĘęĮįŲųǪǫ”</p></li>
+<li><p>NSM: CIRCUMFLEX BELOW 032D</p>
+<p>1E12, 1E13, 1E18, 1E19, 1E3C, 1E3D, 1E4A, 1E4B 1E70, 1E71, 1E76,
+1E77</p>
+<p>“ḒḓḘḙḼḽṊṋṰṱṶṷ”</p></li>
+<li><p>NSM: BREVE BELOW 032E</p>
+<p>1E2A, 1E2B</p>
+<p>“Ḫḫ”</p></li>
+<li><p>NSM: TILDE BELOW 0330</p>
+<p>1E1A, 1E1B, 1E2C, 1E2D, 1E74, 1E75</p>
+<p>“ḚḛḬḭṴṵ”</p></li>
+<li><p>NSM: MACRON BELOW 0331</p>
+<p>1E06, 1E07, 1E0E, 1E0F, 1E34, 1E35, 1E3A, 1E3B 1E48, 1E49, 1E5E,
+1E5F, 1E6E, 1E6F, 1E94, 1E95 1E96</p>
+<p>“ḆḇḎḏḴḵḺḻṈṉṞṟṮṯẔẕẖ”</p></li>
+<li><p>NSM: KATAKANA-HIRAGANA VOICED SOUND MARK 3099</p>
+<p>304C, 304E, 3050, 3052, 3054, 3056, 3058, 305A 305C, 305E, 3060,
+3062, 3065, 3067, 3069, 3070 3073, 3076, 3079, 307C, 3094, 309E, 30AC,
+30AE 30B0, 30B2, 30B4, 30B6, 30B8, 30BA, 30BC, 30BE 30C0, 30C2, 30C5,
+30C7, 30C9, 30D0, 30D3, 30D6 30D9, 30DC, 30F4, 30F7, 30F8, 30F9, 30FA,
+30FE FF9E</p>
+<p>“がぎぐげござじずぜぞだぢづでどばびぶべぼゔゞガギグゲゴザジズゼゾダヂヅデドバビブベボヴヷヸヹヺヾﾞ”</p></li>
+<li><p>NSM: KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK 309A</p>
+<p>3071, 3074, 3077, 307A, 307D, 30D1, 30D4, 30D7 30DA, 30DD, FF9F</p>
+<p>“ぱぴぷぺぽパピプペポﾟ”</p></li>
+</ul>
 <h1 id="references">21 References</h1>
 <dl>
 <dt>[AltId] Unicode Standard Annex</dt>

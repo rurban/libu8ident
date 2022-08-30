@@ -596,9 +596,8 @@ LICENSE
 
 Copyright (c) 2021,2022, Reini Urban. All rights reserved.
 
-This software is dual-licensed under either the Apache-2.0 license or the 
+This software is dual-licensed under either the Apache-2.0 license or the
 GPL-2.0 or later. See the LICENSE file.
-
 
 TODO
 ----
