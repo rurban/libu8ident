@@ -30,8 +30,10 @@ jobs:
     - run: make V=1
     - run: make V=1 check || (cat test-suite.log; false)
     - run: make V=1 check-all
-    - if: matrix.CFLAGS == '' && matrix.CC == 'clang'
-      run: make distcheck && make check-all-combinations
+    - if: matrix.CFLAGS == '' && matrix.CC == 'gcc'
+      run: make distcheck
+    - if: contains(matrix.CFLAGS, '-Wall -Wextra -O2') && matrix.CC == 'clang'
+      run: make check-all-combinations
     - name: Prep-Release
       if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
       run: make dist pkg && echo ${{ github.sha }} > Release.txt; sha256sum libu8ident-*-x86_64-pc-linux-gnu.tar.gz > linux.sha256
