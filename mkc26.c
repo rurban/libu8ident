@@ -173,7 +173,7 @@ static unsigned first_scx_change(const uint32_t from, const uint32_t to) {
 }
 
 void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
-  unsigned from = start;
+  unsigned from = (unsigned)start;
   bool on = BITGET(u, from);
   uint8_t s = u8ident_get_script(start);
   uint8_t s1 = s;
@@ -337,7 +337,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
 static void gen_c11_all(void) {
   // uint8_t o = 0, s;
   const char *header = "c11-all.h";
-  uint8_t u[0x10ffff >> 3];
+  uint8_t u[0x110000 >> 3];
   memset(u, 0, sizeof(u));
   memset(&stats, 0, sizeof(stats));
   for (size_t i = 0; i < ARRAY_SIZE(c11_start_list); i++) {
@@ -408,7 +408,7 @@ static void gen_c26_safe(void) {
 #endif
   FILE *f = fopen(header, "w");
   int nfc = 0;
-  static uint8_t u[0x10ffff >> 3];
+  static uint8_t u[0x110000 >> 3];
   char tmp[32];
   memset(u, 0, sizeof(u));
   memset(&stats, 0, sizeof(stats));

@@ -896,7 +896,7 @@ EXTERN char *u8ident_normalize(const char *src, int len) {
     free(dest);
     return NULL;
   }
-  return dest;
 #  endif // !(NFD or NFKD)
 #endif   // !FCD
+  return dest;
 }

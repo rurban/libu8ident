@@ -178,12 +178,12 @@ doc/$(NCURC).pdf: $(srcdir)/doc/$(NCURC).md
 endif
 
 Dockerfile.pandoc: $(srcdir)/makefile.gnu
-	echo "FROM fedora:35" >Dockerfile.pandoc
+	echo "FROM fedora:36" >Dockerfile.pandoc
 	echo "RUN yum -y install pandoc texlive-xetex dejavu-sans-mono-fonts dejavu-serif-fonts dejavu-sans-fonts" >> Dockerfile.pandoc
 	echo "RUN useradd --no-log-init -U user -u 1000 -m" >> Dockerfile.pandoc
 	echo "USER user" >> Dockerfile.pandoc
 	echo "WORKDIR /home/user" >> Dockerfile.pandoc
-	docker build -t pandoc -f Dockerfile.pandoc .
+	docker build -t pandoc -f Dockerfile.pandoc $(srcdir)
 docker-html: Dockerfile.pandoc
 	-docker run -u user -v $(abs_srcdir)/doc:/doc -it pandoc pandoc -s -o /doc/$(DCURCXX).html /doc/$(DCURCXX).md
 	chown $$USER:$$USER $(srcdir)/doc/$(DCURCXX).html
