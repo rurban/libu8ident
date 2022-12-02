@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>D2528R1 - C++ Identifier Security using Unicode Standard Annex 39</title>
+  <title>nXXXX - C Identifier Security using Unicode Standard Annex 39 v3</title>
   <style>
     html {
       line-height: 1.5;
@@ -223,33 +223,41 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">D2528R1 - C++ Identifier Security using Unicode
-Standard Annex 39</h1>
+<h1 class="title">nXXXX - C Identifier Security using Unicode Standard
+Annex 39 v3</h1>
 </header>
-<pre><code>C++ Identifier Security using Unicode Standard Annex 39 v2
+<pre><code>nXXXX - C Identifier Security using Unicode Standard Annex 39 v3
 
-Document #: D2538R1
 Date:       2022-12-02
-Project:    Programming Language C++
-Audience:   SG-16 EWG CWG
+Project:    Programming Language C
+Audience:   WG14
+            SG-16
 Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
 <h1 id="abstract">1 Abstract</h1>
 <p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of
-C++26.</p>
+C26.</p>
 <p>Unicode identifiers bury a small risk for homoglyph attacks getting
 into source code. Compilers are not confused, but reviewers and
 programmers are as it’s impossible to detect such attacks without
 special tooling, preferably the compiler as the source of truth. And
 essentially confusable identifiers are not identifiable anymore.</p>
 <h1 id="changes">2 Changes</h1>
-<p>From R0:</p>
+<p>From <a
+href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2916.htm">n2916</a>
+2022-01-22:</p>
 <ul>
-<li>Add internal links.</li>
-<li>Rename C23 to C26, it’s too late for C++23.</li>
+<li>Rename C23 to C26, it’s too late for C23, at least for C++23.</li>
 <li>Disallow non-confusable <code>Technical</code> U+1C0..U+1C3</li>
 <li>Fix a lot of not Allowed ID_Start ranges. safec26_start_list from
 355 ranges, 115 singles, 99350 codepoints to 243 ranges, 93 singles,
 95986 codepoints</li>
+<li>Inserted chapter <a href="#motivation">4 Motivation</a> with links
+to spoofs.</li>
+</ul>
+<p>From <a
+href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm">n2932</a>
+2022-02-15:</p>
+<ul>
 <li>Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU
 to the Greek confusable exceptions in 19.1.</li>
 <li>Added Appendix G - Medial.</li>
@@ -267,12 +275,12 @@ Appendix H with the list of affected letters.</li>
 </ul>
 <h1 id="introduction">3 Introduction</h1>
 <p>In response to <a
-href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>,
+href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2836.pdf">N2836</a>,
 and in parallel to <a
-href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm">n2932</a>
-for C.</p>
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/d2528r1.html">D2528R1</a>
+for C++.</p>
 <p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of
-C++26.</p>
+C26.</p>
 <ul>
 <li>Comply to a variant of the <a
 href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a>
@@ -638,7 +646,7 @@ href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924">ISO
 id="documents-with-identifiers-in-many-multiple-scriptslanguages-will-become-illegal">7.3
 Documents with identifiers in many multiple scripts/languages will
 become illegal</h2>
-<p>C++26 (and C26) will follow the TR39 Security Profile 4
+<p>C26 (and C++26) will follow the TR39 Security Profile 4
 <strong>Moderately Restrictive</strong>, with an exception for
 Greek.</p>
 <ul>
@@ -973,13 +981,12 @@ tiny.</p>
 identifiers. One could argue that a mixed-script profile is valid only
 for a single identifier, or it is valid for the whole source file
 document. And there needs to be a definition if before or after the
-preprocessor, and if to treat names in private structs, classes and
-local names in functions as seperate contexts.</p>
+preprocessor, and if to treat names in private structs and local names
+in functions as seperate contexts.</p>
 <p>If valid for only a single identifier you could arbitralily mix up
-Cyrillic with Greek identifiers in a C++ namespace, and thus these
-identifiers would not be identifiable anymore, as both both can render
-to the very same glyphs. Thus we adopt the notion of identifier
-contexts.</p>
+Cyrillic with Greek identifiers in a C files, and thus these identifiers
+would not be identifiable anymore, as both both can render to the very
+same glyphs. Thus we adopt the notion of identifier contexts.</p>
 <p>With programming languages this is a source file, with objects files
 this is a module. For identifiers in object files there are open issues
 with binutils, linkers, exported identifiers, encodings. For filesystems
@@ -1008,11 +1015,10 @@ would be easy to check with external tools.</p></li>
 all exported names end up in the object files and library flat, which
 would support the seperation of private and public name contexts, where
 to perform the mixed-script checks. Private contexts (e.g. static
-structs, private class fields, local names in functions) should be
-seperated from the rest. This would prevent from confusables in
-struct/class fields/methods, and the rest is seperated by the checks for
-the public names. Jabuk Jelinek favored this approach to the GCC
--Whomoglyph PR answer: <a
+structs fields or local names in functions) should be seperated from the
+rest. This would prevent from confusables in struct fields/methods, and
+the rest is seperated by the checks for the public names. Jabuk Jelinek
+favored this approach to the GCC -Whomoglyph PR answer: <a
 href="https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html"
 class="uri">https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html</a></p></li>
 <li><p><strong>after-cpp</strong>: The third, strictest variant would

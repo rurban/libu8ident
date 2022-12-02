@@ -35,9 +35,9 @@ dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
 PCXX = P2528R0
-NC   = n2916
+NC   = n2932
 DCURCXX = D2528R1
-NCURC   = n2932
+NCURC   = nXXXX
 PDF = doc/$(PCXX).pdf doc/$(DCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
 	   doc/c11.md doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).md doc/$(NCURC).patch \
@@ -169,11 +169,11 @@ doc/$(DCURCXX).pdf: $(srcdir)/doc/$(DCURCXX).md
 	-cp $@ $(srcdir)/$@
 doc/$(NCURC).html: $(srcdir)/doc/$(NCURC).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s -o $@ $(srcdir)/doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
+	$(PANDOC) -s -o $@ $(srcdir)/doc/$(NCURC).md --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v3"
 	-cp $@ $(srcdir)/$@
 doc/$(NCURC).pdf: $(srcdir)/doc/$(NCURC).md
 	-test -d doc || mkdir doc
-	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(NC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v2"
+	$(PANDOC) -s --pdf-engine=xelatex -o $@ $(srcdir)/doc/$(NC).md --variable mainfont="DejaVu Serif" --variable sansfont="DejaVu Sans" --variable monofont="DejaVu Sans Mono" --metadata title="$(NCURC) - C Identifier Security using Unicode Standard Annex 39 v3"
 	-cp $@ $(srcdir)/$@
 endif
 

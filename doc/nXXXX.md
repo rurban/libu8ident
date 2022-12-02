@@ -1,15 +1,15 @@
-    C++ Identifier Security using Unicode Standard Annex 39 v2
+    nXXXX - C Identifier Security using Unicode Standard Annex 39 v3
 
-    Document #: D2538R1
     Date:       2022-12-02
-    Project:    Programming Language C++
-    Audience:   SG-16 EWG CWG
+    Project:    Programming Language C
+    Audience:   WG14
+                SG-16
     Reply-to:   Reini Urban <reini.urban@gmail.com>
 
 1 Abstract
 ==========
 
-Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++26.
+Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C26.
 
 Unicode identifiers bury a small risk for homoglyph attacks getting
 into source code. Compilers are not confused, but reviewers and
@@ -20,14 +20,17 @@ And essentially confusable identifiers are not identifiable anymore.
 2 Changes
 =========
 
-From R0:
+From [n2916](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2916.htm) 2022-01-22:
 
-* Add internal links.
-* Rename C23 to C26, it's too late for C++23.
+* Rename C23 to C26, it's too late for C23, at least for C++23.
 * Disallow non-confusable `Technical` U+1C0..U+1C3
 * Fix a lot of not Allowed ID_Start ranges. safec26_start_list
   from 355 ranges, 115 singles, 99350 codepoints
   to 243 ranges, 93 singles, 95986 codepoints
+* Inserted chapter [4 Motivation](#motivation) with links to spoofs.
+
+From [n2932](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm) 2022-02-15:
+
 * Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU
   to the Greek confusable exceptions in 19.1.
 * Added Appendix G - Medial.
@@ -47,11 +50,12 @@ From R0:
 ==============
 
 In response to
-[P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html),
+[N2836](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2836.pdf),
 and in parallel to
-[n2932](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm) for C.
+[D2528R1](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/d2528r1.html)
+for C++.
 
-Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C++26.
+Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C26.
 
 * Comply to a variant of the [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
   Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without
@@ -435,7 +439,7 @@ Codes](https://www.unicode.org/reports/tr24/#Relation_To_ISO15924).
 7.3 Documents with identifiers in many multiple scripts/languages will become illegal
 -------------------------------------------------------------------------------------
 
-C++26 (and C26) will follow the TR39 Security Profile 4 **Moderately
+C26 (and C++26) will follow the TR39 Security Profile 4 **Moderately
 Restrictive**, with an exception for Greek.
 
 * All identifiers in a document qualify as Single Script, or
@@ -809,11 +813,11 @@ This is not discussed in any of the unicode security guidelines for
 identifiers.  One could argue that a mixed-script profile is valid
 only for a single identifier, or it is valid for the whole source file
 document. And there needs to be a definition if before or after the
-preprocessor, and if to treat names in private structs, classes and
-local names in functions as seperate contexts.
+preprocessor, and if to treat names in private structs and local names
+in functions as seperate contexts.
 
 If valid for only a single identifier you could arbitralily mix up
-Cyrillic with Greek identifiers in a C++ namespace, and thus these
+Cyrillic with Greek identifiers in a C files, and thus these
 identifiers would not be identifiable anymore, as both both can render
 to the very same glyphs. Thus we adopt the notion of identifier
 contexts.
@@ -848,11 +852,10 @@ ago.
 2. **private/scoped**: Another argument would be that all exported names end
   up in the object files and library flat, which would support the
   seperation of private and public name contexts, where to perform the
-  mixed-script checks. Private contexts (e.g. static structs, private
-  class fields, local names in functions) should be seperated from the
-  rest.  This would prevent from confusables in struct/class
-  fields/methods, and the rest is seperated by the checks for the
-  public names.
+  mixed-script checks. Private contexts (e.g. static structs fields or
+  local names in functions) should be seperated from the rest.  This
+  would prevent from confusables in struct fields/methods, and the
+  rest is seperated by the checks for the public names.
   Jabuk Jelinek favored this approach to the GCC -Whomoglyph PR answer:
   <https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html>
 
