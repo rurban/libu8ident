@@ -94,7 +94,7 @@ struct gc {
 };
 
 #ifdef EXTERN_SCRIPTS
-extern const struct gc gc_list[2913];
+extern const struct gc gc_list[2941];
 #else
 const struct gc gc_list[] = {
     // clang-format off
@@ -719,7 +719,7 @@ const struct gc gc_list[] = {
     {0x531, 0x558, GC_Lu},	// Ա..՘
     {0x559, 0x559, GC_Lm},	// ՙ
     {0x55A, 0x55F, GC_Po},	// ..
-    {0x560, 0x588, GC_Ll},	// ..
+    {0x560, 0x588, GC_Ll},	// ՠ..ֈ
     {0x589, 0x589, GC_Po},	// 
     {0x58A, 0x58C, GC_Pd},	// ..
     {0x58D, 0x58E, GC_So},	// ..
@@ -940,7 +940,8 @@ const struct gc gc_list[] = {
     {0xCDD, 0xCE1, GC_Lo},	// ..
     {0xCE2, 0xCE5, GC_Mn},	// ..
     {0xCE6, 0xCF0, GC_Nd},	// ೦..೰
-    {0xCF1, 0xCFF, GC_Lo},	// ೱ..೿
+    {0xCF1, 0xCF2, GC_Lo},	// ೱ..ೲ
+    {0xCF3, 0xCFF, GC_Mc},	// ..
     {0xD00, 0xD01, GC_Mn},	// ..
     {0xD02, 0xD03, GC_Mc},	// ..
     {0xD04, 0xD3A, GC_Lo},	// ..
@@ -1214,7 +1215,7 @@ const struct gc gc_list[] = {
     {0x1C78, 0x1C7D, GC_Lm},	// ᱸ..ᱽ
     {0x1C7E, 0x1C7F, GC_Po},	// ..
     {0x1C80, 0x1C8F, GC_Ll},	// ᲀ..᲏
-    {0x1C90, 0x1CBF, GC_Lu},	// ..
+    {0x1C90, 0x1CBF, GC_Lu},	// Ა..Ჿ
     {0x1CC0, 0x1CCF, GC_Po},	// ..
     {0x1CD0, 0x1CD2, GC_Mn},	// ..
     {0x1CD3, 0x1CD3, GC_Po},	// 
@@ -1228,7 +1229,7 @@ const struct gc gc_list[] = {
     {0x1CF5, 0x1CF6, GC_Lo},	// ᳵ..ᳶ
     {0x1CF7, 0x1CF7, GC_Mc},	// 
     {0x1CF8, 0x1CF9, GC_Mn},	// ..
-    {0x1CFA, 0x1CFF, GC_Lo},	// ..
+    {0x1CFA, 0x1CFF, GC_Lo},	// ᳺ..᳿
     {0x1D00, 0x1D2B, GC_Ll},	// ᴀ..ᴫ
     {0x1D2C, 0x1D6A, GC_Lm},	// ᴬ..ᵪ
     {0x1D6B, 0x1D77, GC_Ll},	// ᵫ..ᵷ
@@ -2220,24 +2221,24 @@ const struct gc gc_list[] = {
     {0xA7A8, 0xA7A8, GC_Lu},	// Ꞩ
     {0xA7A9, 0xA7A9, GC_Ll},	// ꞩ
     {0xA7AA, 0xA7AE, GC_Lu},	// Ɦ..Ɪ
-    {0xA7AF, 0xA7AF, GC_Ll},	// 
+    {0xA7AF, 0xA7AF, GC_Ll},	// ꞯ
     {0xA7B0, 0xA7B4, GC_Lu},	// Ʞ..Ꞵ
     {0xA7B5, 0xA7B5, GC_Ll},	// ꞵ
     {0xA7B6, 0xA7B6, GC_Lu},	// Ꞷ
     {0xA7B7, 0xA7B7, GC_Ll},	// ꞷ
-    {0xA7B8, 0xA7B8, GC_Lu},	// 
-    {0xA7B9, 0xA7B9, GC_Ll},	// 
-    {0xA7BA, 0xA7BA, GC_Lu},	// 
-    {0xA7BB, 0xA7BB, GC_Ll},	// 
-    {0xA7BC, 0xA7BC, GC_Lu},	// 
-    {0xA7BD, 0xA7BD, GC_Ll},	// 
-    {0xA7BE, 0xA7BE, GC_Lu},	// 
-    {0xA7BF, 0xA7BF, GC_Ll},	// 
+    {0xA7B8, 0xA7B8, GC_Lu},	// Ꞹ
+    {0xA7B9, 0xA7B9, GC_Ll},	// ꞹ
+    {0xA7BA, 0xA7BA, GC_Lu},	// Ꞻ
+    {0xA7BB, 0xA7BB, GC_Ll},	// ꞻ
+    {0xA7BC, 0xA7BC, GC_Lu},	// Ꞽ
+    {0xA7BD, 0xA7BD, GC_Ll},	// ꞽ
+    {0xA7BE, 0xA7BE, GC_Lu},	// Ꞿ
+    {0xA7BF, 0xA7BF, GC_Ll},	// ꞿ
     {0xA7C0, 0xA7C0, GC_Lu},	// 
     {0xA7C1, 0xA7C1, GC_Ll},	// 
-    {0xA7C2, 0xA7C2, GC_Lu},	// 
-    {0xA7C3, 0xA7C3, GC_Ll},	// 
-    {0xA7C4, 0xA7C7, GC_Lu},	// ..
+    {0xA7C2, 0xA7C2, GC_Lu},	// Ꟃ
+    {0xA7C3, 0xA7C3, GC_Ll},	// ꟃ
+    {0xA7C4, 0xA7C7, GC_Lu},	// Ꞔ..Ꟈ
     {0xA7C8, 0xA7C8, GC_Ll},	// 
     {0xA7C9, 0xA7C9, GC_Lu},	// 
     {0xA7CA, 0xA7CF, GC_Ll},	// ..
@@ -2573,16 +2574,18 @@ const struct gc gc_list[] = {
     {0x10C80, 0x10CBF, GC_Lu},	// 𐲀..𐲿
     {0x10CC0, 0x10CF9, GC_Ll},	// 𐳀..𐳹
     {0x10CFA, 0x10CFF, GC_No},	// ..
-    {0x10D00, 0x10D23, GC_Lo},	// ..
+    {0x10D00, 0x10D23, GC_Lo},	// 𐴀..𐴣
     {0x10D24, 0x10D2F, GC_Mn},	// ..
-    {0x10D30, 0x10E5F, GC_Nd},	// ..
+    {0x10D30, 0x10E5F, GC_Nd},	// 𐴰..𐹟
     {0x10E60, 0x10E7F, GC_No},	// ..
     {0x10E80, 0x10EAA, GC_Lo},	// ..
     {0x10EAB, 0x10EAC, GC_Mn},	// ..
     {0x10EAD, 0x10EAF, GC_Pd},	// ..
-    {0x10EB0, 0x10F1C, GC_Lo},	// ..
+    {0x10EB0, 0x10EFC, GC_Lo},	// ..
+    {0x10EFD, 0x10EFF, GC_Mn},	// ..
+    {0x10F00, 0x10F1C, GC_Lo},	// 𐼀..𐼜
     {0x10F1D, 0x10F26, GC_No},	// ..
-    {0x10F27, 0x10F45, GC_Lo},	// ..
+    {0x10F27, 0x10F45, GC_Lo},	// 𐼧..𐽅
     {0x10F46, 0x10F50, GC_Mn},	// ..
     {0x10F51, 0x10F54, GC_No},	// ..
     {0x10F55, 0x10F6F, GC_Po},	// ..
@@ -2591,7 +2594,7 @@ const struct gc gc_list[] = {
     {0x10F86, 0x10FAF, GC_Po},	// ..
     {0x10FB0, 0x10FC4, GC_Lo},	// ..
     {0x10FC5, 0x10FDF, GC_No},	// ..
-    {0x10FE0, 0x10FFF, GC_Lo},	// ..
+    {0x10FE0, 0x10FFF, GC_Lo},	// 𐿠..𐿿
     {0x11000, 0x11000, GC_Mc},	// 
     {0x11001, 0x11001, GC_Mn},	// 
     {0x11002, 0x11002, GC_Mc},	// 
@@ -2625,7 +2628,7 @@ const struct gc gc_list[] = {
     {0x1112D, 0x11135, GC_Mn},	// ..
     {0x11136, 0x1113F, GC_Nd},	// 𑄶..𑄿
     {0x11140, 0x11143, GC_Po},	// ..
-    {0x11144, 0x11144, GC_Lo},	// 
+    {0x11144, 0x11144, GC_Lo},	// 𑅄
     {0x11145, 0x11146, GC_Mc},	// ..
     {0x11147, 0x11172, GC_Lo},	// ..
     {0x11173, 0x11173, GC_Mn},	// 
@@ -2657,7 +2660,9 @@ const struct gc gc_list[] = {
     {0x11235, 0x11235, GC_Mc},	// 
     {0x11236, 0x11237, GC_Mn},	// ..
     {0x11238, 0x1123D, GC_Po},	// ..
-    {0x1123E, 0x1127F, GC_Mn},	// ..
+    {0x1123E, 0x1123E, GC_Mn},	// 
+    {0x1123F, 0x11240, GC_Lo},	// ..
+    {0x11241, 0x1127F, GC_Mn},	// ..
     {0x11280, 0x112A8, GC_Lo},	// 𑊀..𑊨
     {0x112A9, 0x112AF, GC_Po},	// ..
     {0x112B0, 0x112DE, GC_Lo},	// 𑊰..𑋞
@@ -2690,7 +2695,7 @@ const struct gc gc_list[] = {
     {0x11450, 0x11459, GC_Nd},	// 𑑐..𑑙
     {0x1145A, 0x1145D, GC_Po},	// ..
     {0x1145E, 0x1145E, GC_Mn},	// 
-    {0x1145F, 0x114AF, GC_Lo},	// ..
+    {0x1145F, 0x114AF, GC_Lo},	// 𑑟..𑒯
     {0x114B0, 0x114B2, GC_Mc},	// ..
     {0x114B3, 0x114B8, GC_Mn},	// ..
     {0x114B9, 0x114B9, GC_Mc},	// 
@@ -2732,7 +2737,7 @@ const struct gc gc_list[] = {
     {0x116B0, 0x116B5, GC_Mn},	// ..
     {0x116B6, 0x116B6, GC_Mc},	// 
     {0x116B7, 0x116B7, GC_Mn},	// 
-    {0x116B8, 0x116B8, GC_Lo},	// 
+    {0x116B8, 0x116B8, GC_Lo},	// 𑚸
     {0x116B9, 0x116BF, GC_Po},	// ..
     {0x116C0, 0x116FF, GC_Nd},	// 𑛀..𑛿
     {0x11700, 0x1171C, GC_Lo},	// 𑜀..𑜜
@@ -2767,14 +2772,14 @@ const struct gc gc_list[] = {
     {0x11943, 0x11943, GC_Mn},	// 
     {0x11944, 0x1194F, GC_Po},	// ..
     {0x11950, 0x1199F, GC_Nd},	// ..
-    {0x119A0, 0x119D0, GC_Lo},	// ..
+    {0x119A0, 0x119D0, GC_Lo},	// 𑦠..𑧐
     {0x119D1, 0x119D3, GC_Mc},	// ..
     {0x119D4, 0x119DB, GC_Mn},	// ..
     {0x119DC, 0x119DF, GC_Mc},	// ..
     {0x119E0, 0x119E0, GC_Mn},	// 
-    {0x119E1, 0x119E1, GC_Lo},	// 
+    {0x119E1, 0x119E1, GC_Lo},	// 𑧡
     {0x119E2, 0x119E2, GC_Po},	// 
-    {0x119E3, 0x119E3, GC_Lo},	// 
+    {0x119E3, 0x119E3, GC_Lo},	// 𑧣
     {0x119E4, 0x119FF, GC_Mc},	// ..
     {0x11A00, 0x11A00, GC_Lo},	// 𑨀
     {0x11A01, 0x11A0A, GC_Mn},	// ..
@@ -2794,9 +2799,11 @@ const struct gc gc_list[] = {
     {0x11A97, 0x11A97, GC_Mc},	// 
     {0x11A98, 0x11A99, GC_Mn},	// ..
     {0x11A9A, 0x11A9C, GC_Po},	// ..
-    {0x11A9D, 0x11A9D, GC_Lo},	// 
+    {0x11A9D, 0x11A9D, GC_Lo},	// 𑪝
     {0x11A9E, 0x11AAF, GC_Po},	// ..
-    {0x11AB0, 0x11C2E, GC_Lo},	// ..
+    {0x11AB0, 0x11AFF, GC_Lo},	// ..
+    {0x11B00, 0x11BFF, GC_Po},	// ..
+    {0x11C00, 0x11C2E, GC_Lo},	// 𑰀..𑰮
     {0x11C2F, 0x11C2F, GC_Mc},	// 
     {0x11C30, 0x11C3D, GC_Mn},	// ..
     {0x11C3E, 0x11C3E, GC_Mc},	// 
@@ -2819,19 +2826,31 @@ const struct gc gc_list[] = {
     {0x11D46, 0x11D46, GC_Lo},	// 𑵆
     {0x11D47, 0x11D4F, GC_Mn},	// ..
     {0x11D50, 0x11D5F, GC_Nd},	// 𑵐..𑵟
-    {0x11D60, 0x11D89, GC_Lo},	// ..
+    {0x11D60, 0x11D89, GC_Lo},	// 𑵠..𑶉
     {0x11D8A, 0x11D8F, GC_Mc},	// ..
     {0x11D90, 0x11D92, GC_Mn},	// ..
     {0x11D93, 0x11D94, GC_Mc},	// ..
     {0x11D95, 0x11D95, GC_Mn},	// 
     {0x11D96, 0x11D96, GC_Mc},	// 
     {0x11D97, 0x11D97, GC_Mn},	// 
-    {0x11D98, 0x11D9F, GC_Lo},	// ..
-    {0x11DA0, 0x11EDF, GC_Nd},	// ..
-    {0x11EE0, 0x11EF2, GC_Lo},	// ..
+    {0x11D98, 0x11D9F, GC_Lo},	// 𑶘..𑶟
+    {0x11DA0, 0x11EDF, GC_Nd},	// 𑶠..𑻟
+    {0x11EE0, 0x11EF2, GC_Lo},	// 𑻠..𑻲
     {0x11EF3, 0x11EF4, GC_Mn},	// ..
     {0x11EF5, 0x11EF6, GC_Mc},	// ..
-    {0x11EF7, 0x11FAF, GC_Po},	// ..
+    {0x11EF7, 0x11EFF, GC_Po},	// ..
+    {0x11F00, 0x11F01, GC_Mn},	// ..
+    {0x11F02, 0x11F02, GC_Lo},	// 
+    {0x11F03, 0x11F03, GC_Mc},	// 
+    {0x11F04, 0x11F33, GC_Lo},	// ..
+    {0x11F34, 0x11F35, GC_Mc},	// ..
+    {0x11F36, 0x11F3D, GC_Mn},	// ..
+    {0x11F3E, 0x11F3F, GC_Mc},	// ..
+    {0x11F40, 0x11F40, GC_Mn},	// 
+    {0x11F41, 0x11F41, GC_Mc},	// 
+    {0x11F42, 0x11F42, GC_Mn},	// 
+    {0x11F43, 0x11F4F, GC_Po},	// ..
+    {0x11F50, 0x11FAF, GC_Nd},	// ..
     {0x11FB0, 0x11FBF, GC_Lo},	// ..
     {0x11FC0, 0x11FD4, GC_No},	// ..
     {0x11FD5, 0x11FDC, GC_So},	// ..
@@ -2844,7 +2863,10 @@ const struct gc gc_list[] = {
     {0x12480, 0x12FF0, GC_Lo},	// 𒒀..𒿰
     {0x12FF1, 0x12FFF, GC_Po},	// ..
     {0x13000, 0x1342F, GC_Lo},	// 𓀀..𓐯
-    {0x13430, 0x143FF, GC_Cf},	// ..
+    {0x13430, 0x1343F, GC_Cf},	// ..
+    {0x13440, 0x13440, GC_Mn},	// 
+    {0x13441, 0x13446, GC_Lo},	// ..
+    {0x13447, 0x143FF, GC_Mn},	// ..
     {0x14400, 0x16A5F, GC_Lo},	// 𔐀..𖩟
     {0x16A60, 0x16A6D, GC_Nd},	// 𖩠..𖩭
     {0x16A6E, 0x16A6F, GC_Po},	// ..
@@ -2863,8 +2885,8 @@ const struct gc gc_list[] = {
     {0x16B50, 0x16B5A, GC_Nd},	// 𖭐..𖭚
     {0x16B5B, 0x16B62, GC_No},	// ..
     {0x16B63, 0x16E3F, GC_Lo},	// 𖭣..𖸿
-    {0x16E40, 0x16E5F, GC_Lu},	// ..
-    {0x16E60, 0x16E7F, GC_Ll},	// ..
+    {0x16E40, 0x16E5F, GC_Lu},	// 𖹀..𖹟
+    {0x16E60, 0x16E7F, GC_Ll},	// 𖹠..𖹿
     {0x16E80, 0x16E96, GC_No},	// ..
     {0x16E97, 0x16EFF, GC_Po},	// ..
     {0x16F00, 0x16F4E, GC_Lo},	// 𖼀..𖽎
@@ -2874,7 +2896,7 @@ const struct gc gc_list[] = {
     {0x16F8F, 0x16F92, GC_Mn},	// ..
     {0x16F93, 0x16FE1, GC_Lm},	// 𖾓..𖿡
     {0x16FE2, 0x16FE2, GC_Po},	// 
-    {0x16FE3, 0x16FE3, GC_Lm},	// 
+    {0x16FE3, 0x16FE3, GC_Lm},	// 𖿣
     {0x16FE4, 0x16FEF, GC_Mn},	// ..
     {0x16FF0, 0x16FFF, GC_Mc},	// ..
     {0x17000, 0x1AFEF, GC_Lo},	// 𗀀..𚿯
@@ -2898,8 +2920,8 @@ const struct gc gc_list[] = {
     {0x1D1AA, 0x1D1AD, GC_Mn},	// ..
     {0x1D1AE, 0x1D241, GC_So},	// ..
     {0x1D242, 0x1D244, GC_Mn},	// ..
-    {0x1D245, 0x1D2DF, GC_So},	// ..
-    {0x1D2E0, 0x1D2FF, GC_No},	// ..
+    {0x1D245, 0x1D2BF, GC_So},	// ..
+    {0x1D2C0, 0x1D2FF, GC_No},	// ..
     {0x1D300, 0x1D35F, GC_So},	// ..
     {0x1D360, 0x1D3FF, GC_No},	// ..
     {0x1D400, 0x1D419, GC_Lu},	// 𝐀..𝐙
@@ -2970,26 +2992,32 @@ const struct gc gc_list[] = {
     {0x1DF00, 0x1DF09, GC_Ll},	// ..
     {0x1DF0A, 0x1DF0A, GC_Lo},	// 
     {0x1DF0B, 0x1DFFF, GC_Ll},	// ..
-    {0x1E000, 0x1E0FF, GC_Mn},	// ..
-    {0x1E100, 0x1E12F, GC_Lo},	// ..
+    {0x1E000, 0x1E02F, GC_Mn},	// ..
+    {0x1E030, 0x1E08E, GC_Lm},	// ..
+    {0x1E08F, 0x1E0FF, GC_Mn},	// ..
+    {0x1E100, 0x1E12F, GC_Lo},	// 𞄀..𞄯
     {0x1E130, 0x1E136, GC_Mn},	// ..
-    {0x1E137, 0x1E13F, GC_Lm},	// ..
-    {0x1E140, 0x1E14D, GC_Nd},	// ..
-    {0x1E14E, 0x1E14E, GC_Lo},	// 
+    {0x1E137, 0x1E13F, GC_Lm},	// 𞄷..𞄿
+    {0x1E140, 0x1E14D, GC_Nd},	// 𞅀..𞅍
+    {0x1E14E, 0x1E14E, GC_Lo},	// 𞅎
     {0x1E14F, 0x1E28F, GC_So},	// ..
     {0x1E290, 0x1E2AD, GC_Lo},	// ..
     {0x1E2AE, 0x1E2BF, GC_Mn},	// ..
-    {0x1E2C0, 0x1E2EB, GC_Lo},	// ..
+    {0x1E2C0, 0x1E2EB, GC_Lo},	// 𞋀..𞋫
     {0x1E2EC, 0x1E2EF, GC_Mn},	// ..
-    {0x1E2F0, 0x1E2FE, GC_Nd},	// ..
-    {0x1E2FF, 0x1E7DF, GC_Sc},	// ..
+    {0x1E2F0, 0x1E2FE, GC_Nd},	// 𞋰..𞋾
+    {0x1E2FF, 0x1E4CF, GC_Sc},	// ..
+    {0x1E4D0, 0x1E4EA, GC_Lo},	// ..
+    {0x1E4EB, 0x1E4EB, GC_Lm},	// 
+    {0x1E4EC, 0x1E4EF, GC_Mn},	// ..
+    {0x1E4F0, 0x1E7DF, GC_Nd},	// ..
     {0x1E7E0, 0x1E8C6, GC_Lo},	// ..
     {0x1E8C7, 0x1E8CF, GC_No},	// ..
     {0x1E8D0, 0x1E8FF, GC_Mn},	// ..
     {0x1E900, 0x1E921, GC_Lu},	// 𞤀..𞤡
     {0x1E922, 0x1E943, GC_Ll},	// 𞤢..𞥃
     {0x1E944, 0x1E94A, GC_Mn},	// ..
-    {0x1E94B, 0x1E94F, GC_Lm},	// ..
+    {0x1E94B, 0x1E94F, GC_Lm},	// 𞥋..𞥏
     {0x1E950, 0x1E95D, GC_Nd},	// 𞥐..𞥝
     {0x1E95E, 0x1EC70, GC_Po},	// ..
     {0x1EC71, 0x1ECAB, GC_No},	// ..

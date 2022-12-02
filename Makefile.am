@@ -114,12 +114,12 @@ $(dist_man1_MANS) regen-man: $(bin_PROGRAMS)
 
 # Create the normalization headers via a current perl
 Unicode-Normalize: un8ifcan.h
-	if test -d Unicode-Normalize; then \
-	  cd Unicode-Normalize && git pull --rebase && cd ..; \
+	if test -d $(srcdir)/Unicode-Normalize; then \
+	  cd $(srcdir)/Unicode-Normalize && git pull --rebase && cd ..; \
 	else \
 	  git clone https://github.com/rurban/Unicode-Normalize; fi
 regen-norm: Unicode-Normalize un8ifcan.h
-	cd Unicode-Normalize && \
+	cd $(srcdir)/Unicode-Normalize && \
 	  $(PERL) Makefile.PL && \
 	  make && \
 	  $(PERL) mkheader -ind -std && \
