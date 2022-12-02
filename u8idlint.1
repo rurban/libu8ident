@@ -40,8 +40,11 @@ Unrestricted
 c11_6
 C11STD. Sets xid c11.
 .TP
-c26_4
-SAFEC26 (i.e. 4 with Greek). Sets xid safec26.
+tr55
+TR55 case\-sensitive.
+.IP
+tr55\-ci TR55 case\-insensitive.
+c26_4   SAFEC26 (i.e. 4 with Greek). Sets xid safec26.
 .TP
 \fB\-x\fR|\-\-xid=ascii,allowed,safec26,id,xid,c11,c23,allutf8
 default: allowed
@@ -74,6 +77,8 @@ allow all >128. e.g. php, nim, crystal
 .TP
 \fB\-e\fR|\-\-ext=.c
 only this file extension
+.HP
+\fB\-i\fR|\-\-case\-insensitive
 .HP
 \fB\-r\fR|\-\-recursive
 .HP

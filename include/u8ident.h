@@ -29,6 +29,8 @@ enum u8id_profile {
   U8ID_PROFILE_C11_6 = 7, // The C11 std
   // PROFILE_4 + Greek with only Allowed ID's ("SAFEC26")
   U8ID_PROFILE_C26_4 = 8,
+  U8ID_PROFILE_TR55 = 9,
+  U8ID_PROFILE_TR55_CI = 10,
 };
 enum u8id_options {
   // clang-format off

@@ -121,6 +121,7 @@ static const struct ext_xid {
   XID      - ID minus NFKC quirks.
   ID       - all letters, plus numbers, punctuation and marks. With exotic
              scripts.
+  TR55-CI  - TR55 case-insensitive
   ALLOWED  - TR31 ID with only recommended scripts. Allowed IdentifierStatus.
   SAFEC26  - see c26++proposal XID minus exotic scripts, filtered by NFC and
              IdentifierType.
@@ -203,14 +204,16 @@ static void usage(int exitcode) {
   puts("  set to nfkd by default for python");
   puts(" -p|--profile=1,2,3,4,5,6,c26_4,c11_6        default: c26_4");
   puts("  TR39 unicode mixed-script security profile for identifiers:");
-  puts("    1      ASCII. Sets xid ascii.");
-  puts("    2      Single script");
-  puts("    3      Highly Restrictive");
-  puts("    4      Moderately Restrictive");
-  puts("    5      Minimally Restrictive");
-  puts("    6      Unrestricted");
-  puts("    c11_6  C11STD. Sets xid c11.");
-  puts("    c26_4  SAFEC26 (i.e. 4 with Greek). Sets xid safec26.");
+  puts("    1       ASCII. Sets xid ascii.");
+  puts("    2       Single script");
+  puts("    3       Highly Restrictive");
+  puts("    4       Moderately Restrictive");
+  puts("    5       Minimally Restrictive");
+  puts("    6       Unrestricted");
+  puts("    c11_6   C11STD. Sets xid c11.");
+  puts("    tr55    TR55 case-sensitive.");
+  puts("    tr55-ci TR55 case-insensitive.");
+  puts("    c26_4   SAFEC26 (i.e. 4 with Greek). Sets xid safec26.");
   puts(" -x|--xid=ascii,allowed,safec26,id,xid,c11,c23,allutf8   default: "
        "allowed");
   puts("  TR31 set of identifiers:"); // sorted from most secure to least secure
@@ -225,6 +228,7 @@ static void usage(int exitcode) {
   puts("    allutf8   allow all >128. e.g. php, nim, crystal");
   // see above for recognized extensions
   puts(" -e|--ext=.c                        only this file extension");
+  puts(" -i|--case-insensitive");
   puts(" -r|--recursive");
   puts(" -v|--verbose");
   puts(" -q|--quiet");
@@ -555,6 +559,10 @@ static void option_profile(const char *optarg) {
   } else if (strEQc(optarg, "c11_6") || strEQc(optarg, "C11_6") ||
              strEQc(optarg, "C11")) {
     profile = U8ID_PROFILE_C11_6;
+  } else if (strEQc(optarg, "tr55") || strEQc(optarg, "TR55")) {
+    profile = U8ID_PROFILE_TR55;
+  } else if (strEQc(optarg, "tr55-ci") || strEQc(optarg, "TR55-CI")) {
+    profile = U8ID_PROFILE_TR55_CI;
   } else {
     fprintf(stderr, "Invalid --profile %s\n", optarg);
     usage(1);
@@ -589,7 +597,7 @@ int main(int argc, char **argv) {
   int option_index = 0;
   static struct option long_options[] = {
       {"norm", 1, 0, 'n'},    // *nfc*,nfd,nfkc,nfkd
-      {"profile", 1, 0, 'p'}, // 1,2,3,*4*,5,6,c26_4,c11_6
+      {"profile", 1, 0, 'p'}, // 1,2,3,*4*,5,6,c26_4,c11_6,tr55,tr55_ci
       {"xid", 1, 0, 'x'},     // ascii,allowed,id,*xid*,safec26,c11,c23,allutf8
       {"ext", 1, 0, 'e'},        {"recursive", 0, 0, 'r'},
       {"help", 0, 0, 0},         {"version", 0, 0, 0},
@@ -622,15 +630,22 @@ int main(int argc, char **argv) {
     case 'p':
       opt_profile = true;
       option_profile(optarg);
-      if (profile == U8ID_PROFILE_1 && !opt_xid)
+      if (profile == U8ID_PROFILE_1 && !opt_xid) {
         opt_xid = ASCII;
-      if (profile == U8ID_PROFILE_C26_4 && !opt_xid) {
+      } else if (profile == U8ID_PROFILE_C26_4 && !opt_xid) {
         xid = SAFEC26;
         u8idopts |= U8ID_TR31_SAFEC26;
-      }
-      if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
+      } else if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
         xid = C11;
         u8idopts |= U8ID_TR31_C11;
+      } else if (profile == U8ID_PROFILE_TR55 && !norm) {
+        norm = NFC;
+        xid = SAFEC26;
+        u8idopts |= U8ID_TR31_SAFEC26;
+      } else if (profile == U8ID_PROFILE_TR55_CI && !norm) {
+        norm = NFKC;
+        xid = SAFEC26;
+        u8idopts |= U8ID_TR31_SAFEC26 | U8ID_FOLDCASE;
       }
       break;
     case 'x': // ascii,allowed,id,xid,safec26,c11,allutf8
@@ -711,15 +726,22 @@ int main(int argc, char **argv) {
         (strEQc(argv[i], "--profile") || strEQc(argv[i], "-p"))) {
       opt_profile = true;
       option_profile(argv[i] + 1);
-      if (profile == U8ID_PROFILE_1 && !opt_xid)
+      if (profile == U8ID_PROFILE_1 && !opt_xid) {
         opt_xid = ASCII;
-      if (profile == U8ID_PROFILE_C26_4 && !opt_xid) {
+      } else if (profile == U8ID_PROFILE_C26_4 && !opt_xid) {
         xid = SAFEC26;
         u8idopts |= U8ID_TR31_SAFEC26;
-      }
-      if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
+      } else if (profile == U8ID_PROFILE_C11_6 && !opt_xid) {
         xid = C11;
         u8idopts |= U8ID_TR31_C11;
+      } else if (profile == U8ID_PROFILE_TR55 && !norm) {
+        norm = NFC;
+        xid = SAFEC26;
+        u8idopts |= U8ID_TR31_SAFEC26;
+      } else if (profile == U8ID_PROFILE_TR55_CI && !norm) {
+        norm = NFKC;
+        xid = SAFEC26;
+        u8idopts |= U8ID_TR31_SAFEC26 | U8ID_FOLDCASE;
       }
       i += 2;
     }
