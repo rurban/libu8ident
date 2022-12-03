@@ -1,7 +1,7 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022 Reini Urban
 
-libu8ident 0.3 - 2022-??
+libu8ident 0.3 - 2022-12-03
 
 Fixed a bug with excluded scripts which are only now addable.
 Change is_greek_latin_confus violations with C26_4 to return ERR_CONFUS,
@@ -10,6 +10,12 @@ Add more combining marks checks (GH #7): TR39#5.5 "Forbid sequences of base char
 + nonspacing mark that look the same as or confusingly similar to the base character
 alone". Also forbid non-spacing marks with base chars already including the
 non-spacing mark, like Ä with DIAERESIS.
+Update to Unicode version 15.0.0:
+  - 11 new mark ranges.
+  - 2 new Excluded scripts: Kawi, Nag Mundari.
+  - The zero width joiner (ZWJ) and zero width non-joiner (ZWNJ) changed to IdStatus
+    Restricted.
+  - More id and xid chars
 
 libu8ident 0.2 - 2022-02-12:
 
