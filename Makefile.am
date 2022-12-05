@@ -40,7 +40,8 @@ DCURCXX = D2528R1
 NCURC   = nXXXX
 PDF = doc/$(PCXX).pdf doc/$(DCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
-	   doc/c11.md doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).md doc/$(NCURC).patch \
+	   doc/c11.md doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).md \
+	   doc/$(NCURC).md doc/$(NCURC).patch \
 	   doc/tr31-bugs.md 
 if HAVE_PANDOC
 doc_DATA += $(PDF)
