@@ -25,6 +25,10 @@
 #define TRUE true
 #define FALSE false
 
+#if !defined U8ID_NORM || (U8ID_NORM != FCD)
+char tmp_stack[128];
+#endif
+
 //#pragma message "U8ID_NORM="_XSTR(U8ID_NORM)
 //#pragma message "U8ID_NORM_DEFAULT="_XSTR(U8ID_NORM_DEFAULT)
 //#if !defined U8ID_NORM || U8ID_NORM == NFKD
@@ -817,7 +821,6 @@ GCC_DIAG_IGNORE(-Wreturn-local-addr)
 // clang-format on
 EXTERN char *u8ident_normalize(const char *src, int len) {
 #if !defined U8ID_NORM || U8ID_NORM != FCD
-  char tmp_stack[128];
   char *tmp_ptr;
   char *tmp = NULL;
   size_t tmp_size;
