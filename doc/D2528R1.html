@@ -21,7 +21,7 @@
       padding-top: 50px;
       padding-bottom: 50px;
       hyphens: auto;
-      word-wrap: break-word;
+      overflow-wrap: break-word;
       text-rendering: optimizeLegibility;
       font-kerning: normal;
     }
@@ -29,6 +29,9 @@
       body {
         font-size: 0.9em;
         padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
       }
     }
     @media print {
@@ -92,6 +95,7 @@
     pre code {
       padding: 0;
       overflow: visible;
+      overflow-wrap: normal;
     }
     .sourceCode {
      background-color: transparent;
@@ -133,15 +137,26 @@
     #TOC li {
       list-style: none;
     }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
     #TOC a:not(:hover) {
       text-decoration: none;
     }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -180,7 +195,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -193,7 +208,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -213,7 +228,8 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">D2528R1 - C++ Identifier Security using Unicode Standard Annex 39</h1>
+<h1 class="title">D2528R1 - C++ Identifier Security using Unicode
+Standard Annex 39</h1>
 </header>
 <pre><code>C++ Identifier Security using Unicode Standard Annex 39 v2
 
@@ -223,132 +239,371 @@ Project:    Programming Language C++
 Audience:   SG-16 EWG CWG
 Reply-to:   Reini Urban &lt;reini.urban@gmail.com&gt;</code></pre>
 <h1 id="abstract">1 Abstract</h1>
-<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of C++26.</p>
-<p>Unicode identifiers bury a small risk for homoglyph attacks getting into source code. Compilers are not confused, but reviewers and programmers are as it’s impossible to detect such attacks without special tooling, preferably the compiler as the source of truth. And essentially confusable identifiers are not identifiable anymore.</p>
+<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of
+C++26.</p>
+<p>Unicode identifiers bury a small risk for homoglyph attacks getting
+into source code. Compilers are not confused, but reviewers and
+programmers are as it’s impossible to detect such attacks without
+special tooling, preferably the compiler as the source of truth. And
+essentially confusable identifiers are not identifiable anymore.</p>
 <h1 id="changes">2 Changes</h1>
 <p>From R0:</p>
 <ul>
 <li>Add internal links.</li>
 <li>Rename C23 to C26, it’s too late for C++23.</li>
 <li>Disallow non-confusable <code>Technical</code> U+1C0..U+1C3</li>
-<li>Fix a lot of not Allowed ID_Start ranges. safec26_start_list from 355 ranges, 115 singles, 99350 codepoints to 243 ranges, 93 singles, 95986 codepoints</li>
-<li>Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU to the Greek confusable exceptions in 19.1.</li>
+<li>Fix a lot of not Allowed ID_Start ranges. safec26_start_list from
+355 ranges, 115 singles, 99350 codepoints to 243 ranges, 93 singles,
+95986 codepoints</li>
+<li>Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU
+to the Greek confusable exceptions in 19.1.</li>
 <li>Added Appendix G - Medial.</li>
 <li>Change U+B7 Catalan MIDDLE DOT from Inclusion to Uncommon Use.</li>
-<li>Disallow Arabic Presentation Forms-A: U+FB50–U+FDFF and Arabic Presentation Forms-B: U+FE70–U+FEFF</li>
-<li>Added wording feedback from the first SSRG discussion, and restructure the paragraphs a bit to be less technical, and make it more readable to non-Unicode experts.</li>
-<li>Added discussions of the gcc and clang-tidy -Whomoglyph approaches via confusables.</li>
-<li>Extend 8.3 Combining marks script run detection for spoofing. Added Appendix H with the list of affected letters.</li>
+<li>Disallow Arabic Presentation Forms-A: U+FB50–U+FDFF and Arabic
+Presentation Forms-B: U+FE70–U+FEFF</li>
+<li>Added wording feedback from the first SSRG discussion, and
+restructure the paragraphs a bit to be less technical, and make it more
+readable to non-Unicode experts.</li>
+<li>Added discussions of the gcc and clang-tidy -Whomoglyph approaches
+via confusables.</li>
+<li>Extend 8.3 Combining marks script run detection for spoofing. Added
+Appendix H with the list of affected letters.</li>
 <li>Updates from Unicode 14 to 15</li>
 </ul>
 <h1 id="introduction">3 Introduction</h1>
-<p>In response to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, and in parallel to <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm">n2932</a> for C.</p>
-<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of C++26.</p>
+<p>In response to <a
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>,
+and in parallel to <a
+href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm">n2932</a>
+for C.</p>
+<p>Adopt Unicode Annex 39 “Unicode Security Mechanisms” as part of
+C++26.</p>
 <ul>
-<li>Comply to a variant of the <a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a> Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without its confusables with Latin,</li>
-<li>Disallow all Limited Use <a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts">TR31#Table_7</a> and Excluded scripts <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>,</li>
-<li>Only allow <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> Recommended, Inclusion, Technical Identifier Type properties,</li>
-<li>Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with mixed-scripts (SCX) <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a>, if they are not already addressed by the NFC requirement from C++23, as of <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a>.</li>
+<li>Comply to a variant of the <a
+href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a>
+Mixed-Scripts Moderately Restrictive profile, but allow some Greek
+letters without its confusables with Latin,</li>
+<li>Disallow all Limited Use <a
+href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts">TR31#Table_7</a>
+and Excluded scripts <a
+href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>,</li>
+<li>Only allow <a
+href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table
+1</a> Recommended, Inclusion, Technical Identifier Type properties,</li>
+<li>Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with
+mixed-scripts (SCX) <a
+href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a>,
+if they are not already addressed by the NFC requirement from C++23, as
+of <a
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a>.</li>
 </ul>
 <p>Optionally:</p>
 <ul>
-<li>Implementations may allow an optional <code>#pragma unicode &lt;LongScript&gt;</code> that Excluded scripts can be added to the allowed set of scripts per source file.</li>
+<li>Implementations may allow an optional
+<code>#pragma unicode &lt;LongScript&gt;</code> that Excluded scripts
+can be added to the allowed set of scripts per source file.</li>
 </ul>
 <p>Open points:</p>
 <ul>
 <li>How to name the <code>#pragma unicode</code> extension.</li>
-<li>Which context to use in C++: before-cpp, private (lexically scoped), after-cpp, or even within word-chunks only <a href="https://unicode.org/reports/tr55/#Identifier-Chunks">TR55#5.1.2.1</a>.</li>
-<li>Go against TR39 recommendations and don’t disallow Excluded Scripts. This would require different initial XID tables, would enlarge the attack surface implementations and font designers have no experience with yet, but would simplify the implementations.</li>
+<li>Which context to use in C++: before-cpp, private (lexically scoped),
+after-cpp, or even within word-chunks only <a
+href="https://unicode.org/reports/tr55/#Identifier-Chunks">TR55#5.1.2.1</a>.</li>
+<li>Go against TR39 recommendations and don’t disallow Excluded Scripts.
+This would require different initial XID tables, would enlarge the
+attack surface implementations and font designers have no experience
+with yet, but would simplify the implementations.</li>
 </ul>
-<p>In addition adopt this proposal as a Defect Report against C++23 and earlier. The author provides the <a href="https://github.com/rurban/libu8ident/">libu8ident</a> library (Apache 2 licensed) and its generated tables to all implementors.</p>
-<p>TR39 checks could be implemented as warnings, TR31 violations not. But note that even TR31 has bugs still, to be hopefully fixed in the next Unicode versions. (<em>Unicode 15 did not</em>). TR55 was adressed to fix some parts, but leaves many open points.</p>
+<p>In addition adopt this proposal as a Defect Report against C++23 and
+earlier. The author provides the <a
+href="https://github.com/rurban/libu8ident/">libu8ident</a> library
+(Apache 2 licensed) and its generated tables to all implementors.</p>
+<p>TR39 checks could be implemented as warnings, TR31 violations not.
+But note that even TR31 has bugs still, to be hopefully fixed in the
+next Unicode versions. (<em>Unicode 15 did not</em>). TR55 was adressed
+to fix some parts, but leaves many open points.</p>
 <h1 id="motivation">4 Motivation</h1>
-<p>One driving factor for addressing this now is that GCC has fixed their long standing bug 67224 “UTF-8 support for identifier names in GCC”. Clang has always supported too many C++11 code points in source code. MSVC in its usual configuration defaults to code page 1252, but can be told to accept UTF-8 source. With GCC now allowing it, the barrier to use of Unicode characters outside the basic source character set has dropped considerably. Use of characters via universal character names was always possible, but never widely used. Examples found in the wild of use of UCNs in identifiers come from compiler and related tool test suites, but it’s trivial to come up with such spoofing attacks. There is no report yet from misuse in C ABI’s from linkers and binutils.</p>
-<p>Restricting the profile of characters is much easier if no one is depending on them yet.</p>
-<p>Some actual C++11 user-code representing the epsilon transport equation:</p>
+<p>One driving factor for addressing this now is that GCC has fixed
+their long standing bug 67224 “UTF-8 support for identifier names in
+GCC”. Clang has always supported too many C++11 code points in source
+code. MSVC in its usual configuration defaults to code page 1252, but
+can be told to accept UTF-8 source. With GCC now allowing it, the
+barrier to use of Unicode characters outside the basic source character
+set has dropped considerably. Use of characters via universal character
+names was always possible, but never widely used. Examples found in the
+wild of use of UCNs in identifiers come from compiler and related tool
+test suites, but it’s trivial to come up with such spoofing attacks.
+There is no report yet from misuse in C ABI’s from linkers and
+binutils.</p>
+<p>Restricting the profile of characters is much easier if no one is
+depending on them yet.</p>
+<p>Some actual C++11 user-code representing the epsilon transport
+equation:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    solve<span class="op">(</span>div<span class="op">(</span>U <span class="op">*</span> ε<span class="op">)</span> <span class="op">-</span> div<span class="op">(</span>νt <span class="op">*</span> grad<span class="op">(</span>ε<span class="op">))</span> <span class="op">/</span> σε <span class="op">+</span> C2 <span class="op">*</span> ω <span class="op">*</span> Sp<span class="op">(</span>ε<span class="op">)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      <span class="op">==</span> C1 <span class="op">*</span> ω <span class="op">*</span> G<span class="op">,</span> ε<span class="op">,</span> α<span class="op">);</span></span></code></pre></div>
-<p>From visual inspection you can not decide if the greek identifiers here are actual greek, latin or cyrillic.</p>
-<p>Even worse is this, which writes an identifier in latin and then in cyrillic. These can be in different source files. The string also btw, but strings don’t need to be identifiable.</p>
+<p>From visual inspection you can not decide if the greek identifiers
+here are actual greek, latin or cyrillic.</p>
+<p>Even worse is this, which writes an identifier in latin and then in
+cyrillic. These can be in different source files. The string also btw,
+but strings don’t need to be identifiable.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> CHECK <span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>arg<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> strcmp<span class="op">(</span>arg<span class="op">,</span> <span class="st">&quot;check&quot;</span><span class="op">)</span> <span class="op">==</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> СНЕСК <span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>arg<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> strcmp<span class="op">(</span>arg<span class="op">,</span> <span class="st">&quot;сhесk&quot;</span><span class="op">)</span> <span class="op">==</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>or from <a href="https://unicode.org/reports/tr55/#Spoofing-confusables" class="uri">https://unicode.org/reports/tr55/#Spoofing-confusables</a>:</p>
+<p>or from <a
+href="https://unicode.org/reports/tr55/#Spoofing-confusables"
+class="uri">https://unicode.org/reports/tr55/#Spoofing-confusables</a>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> zero<span class="op">(</span><span class="dt">double</span><span class="op">**</span> matrix<span class="op">,</span> <span class="dt">int</span> rows<span class="op">,</span> <span class="dt">int</span> columns<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> rows<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span><span class="op">*</span> row <span class="op">=</span> matrix<span class="op">[</span>i<span class="op">];</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> і <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> і <span class="op">&lt;</span> columns<span class="op">;</span> <span class="op">++</span>і<span class="op">)</span> <span class="op">{</span> <span class="co">// Cyrillic i</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      row<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      row<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="er">.0</span><span class="op">;</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>This program looks like it zeros a rows by columns rectangle, but it actually only zeros a diagonal, because the identifier і on line 4 is a Cyrillic letter, whereas i is the Latin letter everywhere else.</p>
-<p>Adopting TR39 would fix all of the known security problems with C++/C identifiers. With C++ it is more severe as declarations are easily confusable with initializations. But not as severe as in unstrict dynamic languages.</p>
-<p>The recent <a href="https://trojansource.codes" class="uri">https://trojansource.codes</a> effort caused gcc to emit a new bidi warning, and github to implement similar warnings. Note that secure identifiers don’t help against bidi overrides in strings or comments, these issues are orthogonal. The Unicode consortium implemented a unicode spoofing taskforce <a href="https://www.unicode.org/L2/L2022/22007-avoiding-spoof.pdf" class="uri">https://www.unicode.org/L2/L2022/22007-avoiding-spoof.pdf</a>. Their ICU library would need an identifier check API at least.</p>
-<p>There used to be no linter, but there is now one: My <strong>u8idlint</strong> from <a href="https://github.com/rurban/libu8ident" class="uri">https://github.com/rurban/libu8ident</a>, which can be used to check for ALLOWED,SAFEC26,C23,ID,XID,C11 or ALLUTF8 TR31 profiles, for various TR39 mixed script profile violations, confusables, invalid combining marks and TR15 normalization problems. Go also came up with a unicode spoofing linter lately: <a href="https://github.com/NebulousLabs/glyphcheck" class="uri">https://github.com/NebulousLabs/glyphcheck</a></p>
-<p>So far only Rust, cperl and Java follow a TR39 Unicode security guideline for identifiers, zig and J refused to support non-ASCII identifiers. Everbody else is vulnerable to potential security attacks and does allow non-identifiable identifiers. They should rename their identifiers to “symbols”.</p>
+<p>This program looks like it zeros a rows by columns rectangle, but it
+actually only zeros a diagonal, because the identifier і on line 4 is a
+Cyrillic letter, whereas i is the Latin letter everywhere else.</p>
+<p>Adopting TR39 would fix all of the known security problems with C++/C
+identifiers. With C++ it is more severe as declarations are easily
+confusable with initializations. But not as severe as in unstrict
+dynamic languages.</p>
+<p>The recent <a href="https://trojansource.codes"
+class="uri">https://trojansource.codes</a> effort caused gcc to emit a
+new bidi warning, and github to implement similar warnings. Note that
+secure identifiers don’t help against bidi overrides in strings or
+comments, these issues are orthogonal. The Unicode consortium
+implemented a unicode spoofing taskforce <a
+href="https://www.unicode.org/L2/L2022/22007-avoiding-spoof.pdf"
+class="uri">https://www.unicode.org/L2/L2022/22007-avoiding-spoof.pdf</a>.
+Their ICU library would need an identifier check API at least.</p>
+<p>There used to be no linter, but there is now one: My
+<strong>u8idlint</strong> from <a
+href="https://github.com/rurban/libu8ident"
+class="uri">https://github.com/rurban/libu8ident</a>, which can be used
+to check for ALLOWED,SAFEC26,C23,ID,XID,C11 or ALLUTF8 TR31 profiles,
+for various TR39 mixed script profile violations, confusables, invalid
+combining marks and TR15 normalization problems. Go also came up with a
+unicode spoofing linter lately: <a
+href="https://github.com/NebulousLabs/glyphcheck"
+class="uri">https://github.com/NebulousLabs/glyphcheck</a></p>
+<p>So far only Rust, cperl and Java follow a TR39 Unicode security
+guideline for identifiers, zig and J refused to support non-ASCII
+identifiers. Everbody else is vulnerable to potential security attacks
+and does allow non-identifiable identifiers. They should rename their
+identifiers to “symbols”.</p>
 <p>Links:</p>
 <ul>
-<li><a href="https://unicode.org/reports/tr55/#Spoofing-confusables" class="uri">https://unicode.org/reports/tr55/#Spoofing-confusables</a></li>
-<li><a href="https://cwe.mitre.org/data/definitions/1007.html" class="uri">https://cwe.mitre.org/data/definitions/1007.html</a> (<em>The gcc CWE-1007 -Whomoglyph warning is linking to it.</em>)</li>
-<li><a href="https://websec.github.io/unicode-security-guide/visual-spoofing/" class="uri">https://websec.github.io/unicode-security-guide/visual-spoofing/</a></li>
-<li><a href="http://www.unicode.org/reports/tr31/" class="uri">http://www.unicode.org/reports/tr31/</a>, <a href="http://www.unicode.org/reports/tr36/" class="uri">http://www.unicode.org/reports/tr36/</a> and <a href="http://www.unicode.org/reports/tr39" class="uri">http://www.unicode.org/reports/tr39</a></li>
-<li><a href="https://twitter.com/zygoloid/status/1187150150835195905" class="uri">https://twitter.com/zygoloid/status/1187150150835195905</a>, <a href="https://github.com/golang/go/issues/20209" class="uri">https://github.com/golang/go/issues/20209</a>, <a href="https://twitter.com/jupenur/status/1244286243518713857" class="uri">https://twitter.com/jupenur/status/1244286243518713857</a></li>
-<li><a href="https://certitude.consulting/blog/en/invisible-backdoor/" class="uri">https://certitude.consulting/blog/en/invisible-backdoor/</a></li>
-<li><a href="https://github.com/rurban/libu8ident/tree/master/texts/" class="uri">https://github.com/rurban/libu8ident/tree/master/texts/</a> with *-sec*.c</li>
+<li><a href="https://unicode.org/reports/tr55/#Spoofing-confusables"
+class="uri">https://unicode.org/reports/tr55/#Spoofing-confusables</a></li>
+<li><a href="https://cwe.mitre.org/data/definitions/1007.html"
+class="uri">https://cwe.mitre.org/data/definitions/1007.html</a>
+(<em>The gcc CWE-1007 -Whomoglyph warning is linking to it.</em>)</li>
+<li><a
+href="https://websec.github.io/unicode-security-guide/visual-spoofing/"
+class="uri">https://websec.github.io/unicode-security-guide/visual-spoofing/</a></li>
+<li><a href="http://www.unicode.org/reports/tr31/"
+class="uri">http://www.unicode.org/reports/tr31/</a>, <a
+href="http://www.unicode.org/reports/tr36/"
+class="uri">http://www.unicode.org/reports/tr36/</a> and <a
+href="http://www.unicode.org/reports/tr39"
+class="uri">http://www.unicode.org/reports/tr39</a></li>
+<li><a href="https://twitter.com/zygoloid/status/1187150150835195905"
+class="uri">https://twitter.com/zygoloid/status/1187150150835195905</a>,
+<a href="https://github.com/golang/go/issues/20209"
+class="uri">https://github.com/golang/go/issues/20209</a>, <a
+href="https://twitter.com/jupenur/status/1244286243518713857"
+class="uri">https://twitter.com/jupenur/status/1244286243518713857</a></li>
+<li><a href="https://certitude.consulting/blog/en/invisible-backdoor/"
+class="uri">https://certitude.consulting/blog/en/invisible-backdoor/</a></li>
+<li><a href="https://github.com/rurban/libu8ident/tree/master/texts/"
+class="uri">https://github.com/rurban/libu8ident/tree/master/texts/</a>
+with *-sec*.c</li>
 </ul>
 <h1 id="design">5 Design</h1>
 <p>First we are discussing two different approaches found in praxis:</p>
 <ol type="1">
-<li><p><a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4 Confusable_Detection</a>,</p>
+<li><p><a
+href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4
+Confusable_Detection</a>,</p>
 <p>vs.</p></li>
-<li><p><a href="http://www.unicode.org/reports/tr39/#Mixed_Script_Detection">TR39#5.1 Mixed_Script_Detection</a>.</p></li>
+<li><p><a
+href="http://www.unicode.org/reports/tr39/#Mixed_Script_Detection">TR39#5.1
+Mixed_Script_Detection</a>.</p></li>
 </ol>
-<p>TR39 lists some options how to implement a security mechanism for identifiers. In praxis there are three successful usages of the mixed-script approach in java, cperl and rust, as specified here. No other language implemented TR39 since and uses it. Python tried the confusables approach optionally, and gcc and clang-tidy is trying it out now. See <a href="#12-implementations-and-strategies">12 Implementations and Strategies</a>.</p>
-<p>GCC has a new <strong>-Whomoglyph</strong> warning patch at <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR 103027</a> (see also my github for an updated version). It implements the “skeleton” algorithm from <a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a> so that every new identifier is mapped to a “skeleton”, and if the skeleton is already in use by a different identifier, issue a <code>-Whomoglyph</code> diagnostic. It uses the <code>security/confusables.txt</code> table to determine which characters are confusable. It uses a NFD lookup and three hash lookups per identifier. NFD is relatively cheap compared to NFC, mandatory since C23 and C++23, but much more expensive than the mixed script approach which uses only a single range-lookup in most cases.</p>
-<p>clang-tidy <a href="https://reviews.llvm.org/D112916" class="uri">https://reviews.llvm.org/D112916</a> was fairly unsucessful so far, and used the similar confusables approach.</p>
+<p>TR39 lists some options how to implement a security mechanism for
+identifiers. In praxis there are three successful usages of the
+mixed-script approach in java, cperl and rust, as specified here. No
+other language implemented TR39 since and uses it. Python tried the
+confusables approach optionally, and gcc and clang-tidy is trying it out
+now. See <a href="#12-implementations-and-strategies">12 Implementations
+and Strategies</a>.</p>
+<p>GCC has a new <strong>-Whomoglyph</strong> warning patch at <a
+href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR 103027</a>
+(see also my github for an updated version). It implements the
+“skeleton” algorithm from <a
+href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a>
+so that every new identifier is mapped to a “skeleton”, and if the
+skeleton is already in use by a different identifier, issue a
+<code>-Whomoglyph</code> diagnostic. It uses the
+<code>security/confusables.txt</code> table to determine which
+characters are confusable. It uses a NFD lookup and three hash lookups
+per identifier. NFD is relatively cheap compared to NFC, mandatory since
+C23 and C++23, but much more expensive than the mixed script approach
+which uses only a single range-lookup in most cases.</p>
+<p>clang-tidy <a href="https://reviews.llvm.org/D112916"
+class="uri">https://reviews.llvm.org/D112916</a> was fairly unsucessful
+so far, and used the similar confusables approach.</p>
 <p>Pros:</p>
 <ul>
-<li><p>confusables need not to care about scripts, in which language, the document is written. The first variant of an identifier is the accepted one, and the subsequent ones with expanded confusable matches are invalid. First come, first serves.</p></li>
-<li><p>Forbidding rarely used scripts can be seen as politically loaded.</p></li>
+<li><p>confusables need not to care about scripts, in which language,
+the document is written. The first variant of an identifier is the
+accepted one, and the subsequent ones with expanded confusable matches
+are invalid. First come, first serves.</p></li>
+<li><p>Forbidding rarely used scripts can be seen as politically
+loaded.</p></li>
 </ul>
 <p>Cons:</p>
 <ul>
-<li><p><code>confusables.txt</code> has much more bugs and oddities than TR31, the should-be stable list of XID identifiers. So far I’ve found 3 bugs in TR31 for Unicode v14. In confusables.txt ASCII has 12 exceptions to be ignored, Greek needs 12 exceptions out of 260, and I didn’t check any other scripts.</p></li>
-<li><p>Following TR39#5 Mixed Scripts would be easier to understand, as it is defined by simple rules, and not a hand-curated, buggy and unstable table. Even the first violation is an error, thus no surprises when code moves around.</p></li>
-<li><p>Implementing the <code>confusable.txt</code> checks only (as proposed in the two gcc and clang tickets) can be slow (as experienced in clang-tidy), and led to a huge number of warnings (over 100.000). The GCC implementation (see my github) is fast, but needs recursive dynamic hash lookups. Whilst implementing the mixed-scripts strategy as laid out here is extremely fast and led to no warnings so far in published code.</p></li>
-<li><p>Mixed scripts are already successfully used in praxis for several years, without any complaints.</p></li>
+<li><p><code>confusables.txt</code> has much more bugs and oddities than
+TR31, the should-be stable list of XID identifiers. So far I’ve found 3
+bugs in TR31 for Unicode v14. In confusables.txt ASCII has 12 exceptions
+to be ignored, Greek needs 12 exceptions out of 260, and I didn’t check
+any other scripts.</p></li>
+<li><p>Following TR39#5 Mixed Scripts would be easier to understand, as
+it is defined by simple rules, and not a hand-curated, buggy and
+unstable table. Even the first violation is an error, thus no surprises
+when code moves around.</p></li>
+<li><p>Implementing the <code>confusable.txt</code> checks only (as
+proposed in the two gcc and clang tickets) can be slow (as experienced
+in clang-tidy), and led to a huge number of warnings (over 100.000). The
+GCC implementation (see my github) is fast, but needs recursive dynamic
+hash lookups. Whilst implementing the mixed-scripts strategy as laid out
+here is extremely fast and led to no warnings so far in published
+code.</p></li>
+<li><p>Mixed scripts are already successfully used in praxis for several
+years, without any complaints.</p></li>
 </ul>
-<p>There were a few more design decisions made, over TR39 recommendations:</p>
+<p>There were a few more design decisions made, over TR39
+recommendations:</p>
 <ul>
-<li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters. The rationale is that the by far mostly used script is Greek, because of its mathematical symbols and physical constants actively used by C++ physicists. This is in fact the only usage of unicode identifiers in the wild. There is some overlap with Latin symbols, and in all cases where a Greek letter is confusable with a Latin one, the Latin one must be used. See <a href="#appendix-f---greek-confusables">Appendix F</a>.</li>
+<li>Allow some Greek letters mixed with Latin, that are not confusable
+with Latin letters. The rationale is that the by far mostly used script
+is Greek, because of its mathematical symbols and physical constants
+actively used by C++ physicists. This is in fact the only usage of
+unicode identifiers in the wild. There is some overlap with Latin
+symbols, and in all cases where a Greek letter is confusable with a
+Latin one, the Latin one must be used. See <a
+href="#appendix-f---greek-confusables">Appendix F</a>.</li>
 </ul>
-<p>TR39 recommends to forbid some sets of Limited Use scripts for identifiers, and recommends to only optionally allow some other Excluded scripts. See <a href="#7.2-script-restrictions">7.2 Script restrictions</a>.</p>
+<p>TR39 recommends to forbid some sets of Limited Use scripts for
+identifiers, and recommends to only optionally allow some other Excluded
+scripts. See <a href="#7.2-script-restrictions">7.2 Script
+restrictions</a>.</p>
 <p>Speed/Size summary:</p>
-<p>The mixed-script approach was also sucessfully used in a dynamic language, with much stricter performance restrictions than offline compilers or linters. There was no noticable compile-time performance degradation, as unicode identifiers are extremely rare, and the NFC check is by far slower than the mixed script and illegal combining mark checks. NFC needs 183K alone, the mixed script check with the TR31, medial and mark tables 131K in my unoptimized, generic implementation. C++26 can do a bit better, but this is good enough.</p>
+<p>The mixed-script approach was also sucessfully used in a dynamic
+language, with much stricter performance restrictions than offline
+compilers or linters. There was no noticable compile-time performance
+degradation, as unicode identifiers are extremely rare, and the NFC
+check is by far slower than the mixed script and illegal combining mark
+checks. NFC needs 183K alone, the mixed script check with the TR31,
+medial and mark tables 131K in my unoptimized, generic implementation.
+C++26 can do a bit better, but this is good enough.</p>
 <h1 id="summary">6 Summary</h1>
-<p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a> correctly detected that Unicode identifiers are still not identifiable, and are prone to bidi- and homoglyph attacks. But it stated that implementing TR39 would be too hard. Having properly implemented the Unicode Security Guidelines for identifers for several years, plus pushed Rust to do so also, proves the contrary. TR39 would catch all known homoglyph and bidi identifier attacks.</p>
-<p>Further restriction of the TR31 profile as recommended by TR39 to only recommended scripts leads to smaller sets for identifiers, and implementation of a proper TR39 mixed script profile and identifier types fixes most of the known unicode security problems with identifiers. The only remaining problems are bidi overrides in strings or comments evading syntax, which cannot be handled with identifier restrictions, but tokenizer or preprocessor warnings, as recently added to gcc and clang. <code>#include filename</code> restrictions should be done also, but that is also out of the scope of this document, as the existing filesystems care much less about unicode security for identifiers than programming languages. Spoofing attacks on filenames are not yet seen in the wild, but will appear sooner or later, same as they appeared in browsers and email. Also names in C/C++ object files: linkers, .def files, ffi’s.</p>
-<p>Implementing TR39 mixed script detection per document (C++ Header and Source file) forbids insecure mixes of Greek and Cyrillic, dangerous Arabic RTL bidi attacks and confusables. You can still write in your language, but then only in commonly written languages, and not mixed with others. Identifiers are still identifiable.</p>
-<p>The question remains if TR39 security violations should be ill-formed (throw an compilation error or warning), or not. Since we do have the <code>-std=c++26</code> option, and the issues are security relevant, ill-formeded seems to be best. Implementations might choose to go for compiler warnings or linters or just toolchain implementations, i.e. editors and reviewer tools. The practical security problems are not severe and are easy to fix, as we had none in the years clang allowed insecure unicode, and there were no major known problems on the easier to attack dynamic languages. But gcc just added it now with gcc-10, so the impact might just come later. TR39 is considered stable and not a moving target. There were no impactful changes in the last 10 years.</p>
-<h1 id="what-will-this-proposal-change">7 What will this proposal change</h1>
-<h2 id="the-set-of-tr31-xid-characters-will-become-much-smaller">7.1 The set of TR31 XID characters will become much smaller</h2>
-<p>Restricting the <strong>Identifier Type</strong> plus the Recommended Scripts, will shrink the original XID set from 971267 codepoints to 99350 codepoints. The ranges expand from 36 to 426. (when split by scripts already, 25 splits happen). Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF, the Arabic Presentation Forms-A: U+FB50–U+FDFF and Arabic Presentation Forms-B: U+FE70–U+FEFF are now forbidden.</p>
-<p><code>ID_Start</code> consists of Lu + Ll + Lt + Lm + Lo + Nl, +<code>Other_ID_Start</code>, -<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code></p>
+<p><a
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949</a>
+correctly detected that Unicode identifiers are still not identifiable,
+and are prone to bidi- and homoglyph attacks. But it stated that
+implementing TR39 would be too hard. Having properly implemented the
+Unicode Security Guidelines for identifers for several years, plus
+pushed Rust to do so also, proves the contrary. TR39 would catch all
+known homoglyph and bidi identifier attacks.</p>
+<p>Further restriction of the TR31 profile as recommended by TR39 to
+only recommended scripts leads to smaller sets for identifiers, and
+implementation of a proper TR39 mixed script profile and identifier
+types fixes most of the known unicode security problems with
+identifiers. The only remaining problems are bidi overrides in strings
+or comments evading syntax, which cannot be handled with identifier
+restrictions, but tokenizer or preprocessor warnings, as recently added
+to gcc and clang. <code>#include filename</code> restrictions should be
+done also, but that is also out of the scope of this document, as the
+existing filesystems care much less about unicode security for
+identifiers than programming languages. Spoofing attacks on filenames
+are not yet seen in the wild, but will appear sooner or later, same as
+they appeared in browsers and email. Also names in C/C++ object files:
+linkers, .def files, ffi’s.</p>
+<p>Implementing TR39 mixed script detection per document (C++ Header and
+Source file) forbids insecure mixes of Greek and Cyrillic, dangerous
+Arabic RTL bidi attacks and confusables. You can still write in your
+language, but then only in commonly written languages, and not mixed
+with others. Identifiers are still identifiable.</p>
+<p>The question remains if TR39 security violations should be ill-formed
+(throw an compilation error or warning), or not. Since we do have the
+<code>-std=c++26</code> option, and the issues are security relevant,
+ill-formeded seems to be best. Implementations might choose to go for
+compiler warnings or linters or just toolchain implementations, i.e.
+editors and reviewer tools. The practical security problems are not
+severe and are easy to fix, as we had none in the years clang allowed
+insecure unicode, and there were no major known problems on the easier
+to attack dynamic languages. But gcc just added it now with gcc-10, so
+the impact might just come later. TR39 is considered stable and not a
+moving target. There were no impactful changes in the last 10 years.</p>
+<h1 id="what-will-this-proposal-change">7 What will this proposal
+change</h1>
+<h2 id="the-set-of-tr31-xid-characters-will-become-much-smaller">7.1 The
+set of TR31 XID characters will become much smaller</h2>
+<p>Restricting the <strong>Identifier Type</strong> plus the Recommended
+Scripts, will shrink the original XID set from 971267 codepoints to
+99350 codepoints. The ranges expand from 36 to 426. (when split by
+scripts already, 25 splits happen). Additionally the Halfwidth and
+Fullwidth Forms, U+FF00..U+FFEF, the Arabic Presentation Forms-A:
+U+FB50–U+FDFF and Arabic Presentation Forms-B: U+FE70–U+FEFF are now
+forbidden.</p>
+<p><code>ID_Start</code> consists of Lu + Ll + Lt + Lm + Lo + Nl,
++<code>Other_ID_Start</code>, -<code>Pattern_Syntax</code>,
+-<code>Pattern_White_Space</code></p>
 <p>131899 codepoints</p>
-<p><code>ID_Continue</code> consists of <code>ID_Start</code>, + Mn + Mc + Nd + Pc, +<code>Other_ID_Continue</code>, -<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code>.</p>
+<p><code>ID_Continue</code> consists of <code>ID_Start</code>, + Mn + Mc
++ Nd + Pc, +<code>Other_ID_Continue</code>,
+-<code>Pattern_Syntax</code>, -<code>Pattern_White_Space</code>.</p>
 <p>135072 codepoints (= ID_Start + 3173)</p>
-<p><code>XID_Start</code> and <code>XID_Continue</code> ensure that <code>isIdentifer(string)</code> then <code>isIdentifier(NFKx(string))</code> (<em>removing the NFKC quirks</em>)</p>
-<p><code>XID_Start</code>: 131876 codepoints, <code>XID_Continue</code>: 135053 codepoints (= <code>XID_Start</code> + 3173)</p>
-<p>See <a href="#appendix-a---c26xid_start">Appendix A - C26XID_Start</a> and <a href="#appendix-b---c26xid_continue">Appendix B - C26XID_Continue</a>.</p>
-<p>For the medial positions see Section 19 <a href="#appendix-g---medial">Appendix G - Medial</a>. They are not allowed as first nor as last character in a word, but this set of identifiers contain none, as we disallow the legacy Arabic Presentation forms.</p>
+<p><code>XID_Start</code> and <code>XID_Continue</code> ensure that
+<code>isIdentifer(string)</code> then
+<code>isIdentifier(NFKx(string))</code> (<em>removing the NFKC
+quirks</em>)</p>
+<p><code>XID_Start</code>: 131876 codepoints, <code>XID_Continue</code>:
+135053 codepoints (= <code>XID_Start</code> + 3173)</p>
+<p>See <a href="#appendix-a---c26xid_start">Appendix A -
+C26XID_Start</a> and <a href="#appendix-b---c26xid_continue">Appendix B
+- C26XID_Continue</a>.</p>
+<p>For the medial positions see Section 19 <a
+href="#appendix-g---medial">Appendix G - Medial</a>. They are not
+allowed as first nor as last character in a word, but this set of
+identifiers contain none, as we disallow the legacy Arabic Presentation
+forms.</p>
 <h2 id="script-restrictions">7.2 Script restrictions</h2>
-<p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html#xid_continue-does-not-include-layout-and-format-control-characters">P1949R7</a> for C++23 previously stated: <em>“This paper also does not propose excluding any scripts categorically, regardless of their status as historic or obsolete. Characters from Anatolian Hieroglyphs would be available for use, to the extent that anyone wishes to do so.”</em></p>
-<p><a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table 4</a> states: <em>“Some scripts are not in customary modern use, and thus implementations may want to exclude them from identifiers. These include historic and obsolete scripts, scripts used mostly liturgically, and regional scripts used only in very small communities or with very limited current usage. Some scripts also have unresolved architectural issues that make them currently unsuitable for identifiers. The scripts in Table 4, Excluded Scripts are recommended for exclusion from identifiers.”</em></p>
-<p>These Excluded Scripts are initially disallowed <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a> but can be optionally be allowed via a new <code>#pragma unicode ExcludedScript</code>:</p>
+<p><a
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html#xid_continue-does-not-include-layout-and-format-control-characters">P1949R7</a>
+for C++23 previously stated: <em>“This paper also does not propose
+excluding any scripts categorically, regardless of their status as
+historic or obsolete. Characters from Anatolian Hieroglyphs would be
+available for use, to the extent that anyone wishes to do so.”</em></p>
+<p><a
+href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table
+4</a> states: <em>“Some scripts are not in customary modern use, and
+thus implementations may want to exclude them from identifiers. These
+include historic and obsolete scripts, scripts used mostly liturgically,
+and regional scripts used only in very small communities or with very
+limited current usage. Some scripts also have unresolved architectural
+issues that make them currently unsuitable for identifiers. The scripts
+in Table 4, Excluded Scripts are recommended for exclusion from
+identifiers.”</em></p>
+<p>These Excluded Scripts are initially disallowed <a
+href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>
+but can be optionally be allowed via a new
+<code>#pragma unicode ExcludedScript</code>:</p>
 <pre><code>Ahom Anatolian_Hieroglyphs Avestan Bassa_Vah Bhaiksuki Brahmi
 Braille Buginese Buhid Carian Caucasian_Albanian Chorasmian Coptic
 Cuneiform Cypriot Cypro_Minoan Deseret Dives_Akuru Dogra Duployan
@@ -366,48 +621,126 @@ Psalter_Pahlavi Rejang Runic Samaritan Sharada Shavian Siddham
 SignWriting Sogdian Sora_Sompeng Soyombo Tagalog Tagbanwa Takri
 Tangsa Tangut Tirhuta Toto Ugaritic Vithkuqi Warang_Citi Yezidi
 Zanabazar_Square</code></pre>
-<p><em>“Modern scripts that are in more limited use are listed in Table 7, Limited Use Scripts. To avoid security issues, some implementations may wish to disallow the limited-use scripts in identifiers. For more information on usage, see the Unicode Locale project [CLDR].”</em> These Limited Use Scripts are now disallowed <a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts">TR31#Table_7</a>:</p>
+<p><em>“Modern scripts that are in more limited use are listed in Table
+7, Limited Use Scripts. To avoid security issues, some implementations
+may wish to disallow the limited-use scripts in identifiers. For more
+information on usage, see the Unicode Locale project [CLDR].”</em> These
+Limited Use Scripts are now disallowed <a
+href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts">TR31#Table_7</a>:</p>
 <pre><code>Adlam Balinese Bamum Batak Canadian_Aboriginal Chakma Cham Cherokee
 Hanifi_Rohingya Javanese Kayah_Li Lepcha Limbu Lisu Mandaic
 Meetei_Mayek Miao New_Tai_Lue Newa Nko Nyiakeng_Puachue_Hmong Ol_Chiki
 Osage Saurashtra Sundanese Syloti_Nagri Syriac Tai_Le Tai_Tham
 Tai_Viet Tifinagh Vai Wancho Yi Unknown</code></pre>
-<p>This recommendation follows TR39, to recommended scripts only, Excluded and Limited Use not. For some years until Unicode 10 there was a “Aspirational Use Scripts” table, which included a subset of the optional Limited Use scripts to be allowed in identifiers. But <em>“this has not proven to be productive for the derivation of identifier-related classes used in security profiles”</em>.</p>
+<p>This recommendation follows TR39, to recommended scripts only,
+Excluded and Limited Use not. For some years until Unicode 10 there was
+a “Aspirational Use Scripts” table, which included a subset of the
+optional Limited Use scripts to be allowed in identifiers. But <em>“this
+has not proven to be productive for the derivation of identifier-related
+classes used in security profiles”</em>.</p>
 <p>Thus these scripts will stay allowed:</p>
 <pre><code>Common Inherited Latin Arabic Armenian Bengali Bopomofo Cyrillic
 Devanagari Ethiopic Georgian Greek Gujarati Gurmukhi Hangul Han Hebrew
 Hiragana Katakana Kannada Khmer Lao Malayalam Myanmar Oriya
 Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>Stability:</p>
-<p>Historically the most changes in latest unicode versions have been with adding to Emojis and Limited Use scripts. Thus the expected set of valid identifiers looks stable, when all the current TR31 bugs will be fixed. I have no idea about the TR39 confusables.txt bugs, as there is no categorization yet.</p>
-<p>The script property and its name are defined in <a href="https://www.unicode.org/reports/tr24/">TR24</a>. We use the long Unicode Script property value, not the abbrevated 4-letter short name, which maps somehow to the 4-letter <a href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924">ISO 15924 Codes</a>.</p>
-<h2 id="documents-with-identifiers-in-many-multiple-scriptslanguages-will-become-illegal">7.3 Documents with identifiers in many multiple scripts/languages will become illegal</h2>
-<p>C++26 (and C26) will follow the TR39 Security Profile 4 <strong>Moderately Restrictive</strong>, with an exception for Greek.</p>
+<p>Historically the most changes in latest unicode versions have been
+with adding to Emojis and Limited Use scripts. Thus the expected set of
+valid identifiers looks stable, when all the current TR31 bugs will be
+fixed. I have no idea about the TR39 confusables.txt bugs, as there is
+no categorization yet.</p>
+<p>The script property and its name are defined in <a
+href="https://www.unicode.org/reports/tr24/">TR24</a>. We use the long
+Unicode Script property value, not the abbrevated 4-letter short name,
+which maps somehow to the 4-letter <a
+href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924">ISO
+15924 Codes</a>.</p>
+<h2
+id="documents-with-identifiers-in-many-multiple-scriptslanguages-will-become-illegal">7.3
+Documents with identifiers in many multiple scripts/languages will
+become illegal</h2>
+<p>C++26 (and C26) will follow the TR39 Security Profile 4
+<strong>Moderately Restrictive</strong>, with an exception for
+Greek.</p>
 <ul>
 <li>All identifiers in a document qualify as Single Script, or</li>
-<li>All identifiers in a document are covered by any of the following sets of scripts, according to the definition in Mixed Scripts:
+<li>All identifiers in a document are covered by any of the following
+sets of scripts, according to the definition in Mixed Scripts:
 <ul>
 <li>Latin + Han + Hiragana + Katakana (Japanese)</li>
 <li>Latin + Han + Bopomofo (Chinese)</li>
 <li>Latin + Han + Hangul (Korean), or</li>
 </ul></li>
-<li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
-<li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
+<li>All identifiers in a document are covered by Latin and any one other
+Recommended script, except Cyrillic.</li>
+<li>Allow some Greek letters mixed with Latin, that are not confusable
+with Latin letters.</li>
 </ul>
-<p>See Section 10 <a href="#10-tr39-mixed-scripts">TR39 Mixed Scripts</a>.</p>
-<h2 id="mixed-script-runs-with-combining-marks-will-become-illegal">7.4 Mixed-script runs with combining marks will become illegal</h2>
-<p>C++26 (and C26) will check for unlikely sequences of <strong>combining marks</strong>, and reject some. Combining Marks have no script property per se, but a variable list of allowed SCX scripts, which need to be checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
-<p>This section is technically security-relevant, as over-long runs of combining marks may lead to overflow in sequences.</p>
-<p>See <a href="#8.2-scx-extensions">8.2 “SCX Extensions”</a> and <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> below.</p>
-<h1 id="tr24-scripts-the-sc-and-scx-properties">8 TR24 Scripts, the SC and SCX properties</h1>
+<p>See Section 10 <a href="#10-tr39-mixed-scripts">TR39 Mixed
+Scripts</a>.</p>
+<h2 id="mixed-script-runs-with-combining-marks-will-become-illegal">7.4
+Mixed-script runs with combining marks will become illegal</h2>
+<p>C++26 (and C26) will check for unlikely sequences of
+<strong>combining marks</strong>, and reject some. Combining Marks have
+no script property per se, but a variable list of allowed SCX scripts,
+which need to be checked against the base character. Also 4 Japanese
+KATAKANA-HIRAGANA PROLONGED SOUND MARK modifier letters.</p>
+<p>This section is technically security-relevant, as over-long runs of
+combining marks may lead to overflow in sequences.</p>
+<p>See <a href="#8.2-scx-extensions">8.2 “SCX Extensions”</a> and <a
+href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3
+“Combining marks script run detection for spoofing”</a> below.</p>
+<h1 id="tr24-scripts-the-sc-and-scx-properties">8 TR24 Scripts, the SC
+and SCX properties</h1>
 <h2 id="sc">8.1 SC</h2>
-<p>C++ only needs to map unicode characters to a script property via a single byte. There are currently 161 scripts assigned, 32 of them are in common use as identifiers, hence called <strong>Recommended</strong> scripts. The rest is split up into 127-31 <strong>Excluded</strong> scripts, which are not in common use, and 161-127 <strong>Limited_Use</strong> scripts, which are not to be used in identifiers at all.</p>
-<p>Regarding the discriminatory aspect of Excluded Scripts from <a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>. <em>“Some scripts are not in customary modern use, and thus implementations may want to exclude them from identifiers. These include historic and obsolete scripts, scripts used mostly liturgically, and regional scripts used only in very small communities or with very limited current usage. Some scripts also have unresolved architectural issues that make them currently unsuitable for identifiers. The scripts in Table 4, Excluded Scripts are recommended for exclusion from identifiers.”</em> Nevertheless an implementation might choose to allow some optionally via a new <code>#pragma unicode Script</code>.</p>
-<p>Regarding Limited Use scripts: TR31#2.4: <em>“Modern scripts that are in more limited use are listed in Table 7, Limited Use Scripts. To avoid security issues, some implementations may wish to disallow the limited-use scripts in identifiers. For more information on usage, see the Unicode Locale project <a href="http://cldr.unicode.org/">CLDR</a>.”</em></p>
-<p>Regarding stability: New scripts are added on a yearly basis, but nothing was added to the stable set of recommended scripts. For a while there was a list of <strong>Aspirational</strong> scripts to be added eventually, but this list was abandoned with Unicode 10.0. Probably also because nobody but Java, cperl and Rust implemented its identifier profile by scripts, rather went with insecure identifiers.</p>
-<p>For error messages and an optional pragma to allow certain Exluded scripts, we use the long <strong>Script property value</strong>. Do not use the term “script name”, as this is ambigious and <a href="https://www.unicode.org/reports/tr24/#Script_Names">misused</a>. The Script Property Value is the titlecased name of the script from the UCD, with spaces replaced by underscores. They are defined in the yearly updated <a href="https://www.unicode.org/Public/UNIDATA/Scripts.txt">Scripts</a>.</p>
+<p>C++ only needs to map unicode characters to a script property via a
+single byte. There are currently 161 scripts assigned, 32 of them are in
+common use as identifiers, hence called <strong>Recommended</strong>
+scripts. The rest is split up into 127-31 <strong>Excluded</strong>
+scripts, which are not in common use, and 161-127
+<strong>Limited_Use</strong> scripts, which are not to be used in
+identifiers at all.</p>
+<p>Regarding the discriminatory aspect of Excluded Scripts from <a
+href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers">TR31#Table_4</a>.
+<em>“Some scripts are not in customary modern use, and thus
+implementations may want to exclude them from identifiers. These include
+historic and obsolete scripts, scripts used mostly liturgically, and
+regional scripts used only in very small communities or with very
+limited current usage. Some scripts also have unresolved architectural
+issues that make them currently unsuitable for identifiers. The scripts
+in Table 4, Excluded Scripts are recommended for exclusion from
+identifiers.”</em> Nevertheless an implementation might choose to allow
+some optionally via a new <code>#pragma unicode Script</code>.</p>
+<p>Regarding Limited Use scripts: TR31#2.4: <em>“Modern scripts that are
+in more limited use are listed in Table 7, Limited Use Scripts. To avoid
+security issues, some implementations may wish to disallow the
+limited-use scripts in identifiers. For more information on usage, see
+the Unicode Locale project <a
+href="http://cldr.unicode.org/">CLDR</a>.”</em></p>
+<p>Regarding stability: New scripts are added on a yearly basis, but
+nothing was added to the stable set of recommended scripts. For a while
+there was a list of <strong>Aspirational</strong> scripts to be added
+eventually, but this list was abandoned with Unicode 10.0. Probably also
+because nobody but Java, cperl and Rust implemented its identifier
+profile by scripts, rather went with insecure identifiers.</p>
+<p>For error messages and an optional pragma to allow certain Exluded
+scripts, we use the long <strong>Script property value</strong>. Do not
+use the term “script name”, as this is ambigious and <a
+href="https://www.unicode.org/reports/tr24/#Script_Names">misused</a>.
+The Script Property Value is the titlecased name of the script from the
+UCD, with spaces replaced by underscores. They are defined in the yearly
+updated <a
+href="https://www.unicode.org/Public/UNIDATA/Scripts.txt">Scripts</a>.</p>
 <h2 id="scx-extensions">8.2 SCX Extensions</h2>
-<p>Not all characters are uniquely used in a single script only. Many are used in a variable numbers of scripts. These are assigned to the Common or Inherited script, and are exactly specified in the <a href="https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt">ScriptExtensions</a>, aka SCX. The SCX property is a list of possible scripts per character. This list is using the short 4-letter script property, which needs to be resolved via the <a href="https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt">PropValue</a> to its long script property value. (E.g. Syrc to Syriac)</p>
+<p>Not all characters are uniquely used in a single script only. Many
+are used in a variable numbers of scripts. These are assigned to the
+Common or Inherited script, and are exactly specified in the <a
+href="https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt">ScriptExtensions</a>,
+aka SCX. The SCX property is a list of possible scripts per character.
+This list is using the short 4-letter script property, which needs to be
+resolved via the <a
+href="https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt">PropValue</a>
+to its long script property value. (E.g. Syrc to Syriac)</p>
 <pre><code># Script_Extensions=Arab Syrc
 
 064B..0655 ; Arab Syrc # Mn  [11] ARABIC FATHATAN..ARABIC HAMZA BELOW
@@ -415,117 +748,358 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 # Script_Extensions=Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc
 
 0640       ; Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc # Lm  ARABIC TATWEEL</code></pre>
-<p>Some of the SCX scripts contain only a single script. These could be directly added to the list of SC scripts for the purpose of identifier security checks, but I advise against, for easier Combining Marks checks against the base character script. See below <a href="#combining-marks-script-run-detection-for-spoofing">8.3</a>.</p>
+<p>Some of the SCX scripts contain only a single script. These could be
+directly added to the list of SC scripts for the purpose of identifier
+security checks, but I advise against, for easier Combining Marks checks
+against the base character script. See below <a
+href="#combining-marks-script-run-detection-for-spoofing">8.3</a>.</p>
 <p>E.g.</p>
 <pre><code>3006       ; Hani # Lo       IDEOGRAPHIC CLOSING MARK</code></pre>
-<p>U+3006 with the Common script property is assigned to the Hani -&gt; Han script.</p>
-<p>Multiple SCX list entries can be resolved when the previous scripts in the identifier context are already resolved to one or the other possibility. Thus for SCX=(Arab Syrc) we need to check if Arabic or Syriac was already seen. If not, the new character with that SCX is illegal, violating our Mixed Script profile.</p>
-<h2 id="combining-marks-script-run-detection-for-spoofing">8.3 Combining marks script run detection for spoofing</h2>
+<p>U+3006 with the Common script property is assigned to the Hani -&gt;
+Han script.</p>
+<p>Multiple SCX list entries can be resolved when the previous scripts
+in the identifier context are already resolved to one or the other
+possibility. Thus for SCX=(Arab Syrc) we need to check if Arabic or
+Syriac was already seen. If not, the new character with that SCX is
+illegal, violating our Mixed Script profile.</p>
+<h2 id="combining-marks-script-run-detection-for-spoofing">8.3 Combining
+marks script run detection for spoofing</h2>
 <p>Check for unlikely sequences of <strong>combining marks</strong>:</p>
 <ul>
 <li>Forbid starting combining marks.</li>
 <li>Forbid sequences of the same nonspacing mark.</li>
-<li>Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).</li>
-<li>Optionally forbid sequences of base character + nonspacing mark that look the same as or confusingly similar to the base character alone (because the nonspacing mark overlays a portion of the base character). Examples are U+0069 LOWERCASE LETTER I or U+0131 LATIN SMALL LETTER DOTLESS I combined with U+0307 COMBINING DOT ABOVE.</li>
-<li>Optionally forbid non-spacing marks with base chars already including the non-spacing mark, like Ä with DIAERESIS.</li>
+<li>Forbid sequences of more than 4 nonspacing marks (gc=Mn or
+gc=Me).</li>
+<li>Optionally forbid sequences of base character + nonspacing mark that
+look the same as or confusingly similar to the base character alone
+(because the nonspacing mark overlays a portion of the base character).
+Examples are U+0069 LOWERCASE LETTER I or U+0131 LATIN SMALL LETTER
+DOTLESS I combined with U+0307 COMBINING DOT ABOVE.</li>
+<li>Optionally forbid non-spacing marks with base chars already
+including the non-spacing mark, like Ä with DIAERESIS.</li>
 </ul>
-<p>Since we disallow already most combining marks (at least the Latin ones) with the requirement of NFC in <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>, this set of cases is quite small.</p>
+<p>Since we disallow already most combining marks (at least the Latin
+ones) with the requirement of NFC in <a
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html">P1949R7</a>,
+this set of cases is quite small.</p>
 <p>Special-cases:</p>
-<p>Using the Script property alone will not detect that the U+30FC ( ー ) KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana, gc=Lm) should not be mixed with Latin. See <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a> and <a href="https://www.unicode.org/reports/tr46/">TR46</a>. We only have to check only 4 such explicitly japanese-only PROLONGED SOUND MARKs, all other Lm modifiers may mix with all SCX.</p>
-<p>The list of allowed combining mark characters (with Common or Inherited scripts) in the C++26 TR31 profile is: Lm <code>Modifier_Letter</code>, Mc <code>Spacing_Mark</code>, Mn <code>Nonspacing_Mark</code>, Me <code>Enclosing_Mark</code>. Sk and Cf are not part of XIDs.</p>
-<p>69 matches for “XID_Continue # Lm” in buffer: DerivedCoreProperties.txt See <a href="#appendix-c---xid_continue-lm">Appendix C</a> for all.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..</span>
+<p>Using the Script property alone will not detect that the U+30FC ( ー
+) KATAKANA-HIRAGANA PROLONGED SOUND MARK (Script=Common, SCX=Hira Kana,
+gc=Lm) should not be mixed with Latin. See <a
+href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a>
+and <a href="https://www.unicode.org/reports/tr46/">TR46</a>. We only
+have to check only 4 such explicitly japanese-only PROLONGED SOUND
+MARKs, all other Lm modifiers may mix with all SCX.</p>
+<p>The list of allowed combining mark characters (with Common or
+Inherited scripts) in the C++26 TR31 profile is: Lm
+<code>Modifier_Letter</code>, Mc <code>Spacing_Mark</code>, Mn
+<code>Nonspacing_Mark</code>, Me <code>Enclosing_Mark</code>. Sk and Cf
+are not part of XIDs.</p>
+<p>69 matches for “XID_Continue # Lm” in buffer:
+DerivedCoreProperties.txt See <a
+href="#appendix-c---xid_continue-lm">Appendix C</a> for all.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER REVERSED GLOTTAL STOP</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>02C6..02D1    ; XID_Continue # Lm  [12] MODIFIER LETTER CIRCUMFLEX ACCENT..</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER HALF TRIANGULAR</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
-<p>528 matches for “XID_Continue # M” in buffer: DerivedCoreProperties.txt See <a href="#appendix-d---xid_continue-m">Appendix D</a> for all.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..</span>
+<p>528 matches for “XID_Continue # M” in buffer:
+DerivedCoreProperties.txt See <a
+href="#appendix-d---xid_continue-m">Appendix D</a> for all.</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LATIN SMALL LETTER X</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CYRILLIC POKRYTIE</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
-<p>From these 69 Lm plus 528 M[cn] ranges filtering out the non-C++26 XID candidates, only #8 Identifier_Type = Recommended, Inclusion, non-confusable Technical, plus only #4.2 Recommended Scripts, plus only codepoints with multiple SCX entries, plus only codepoints which don’t decompose to NFC, leads only to the Lm characters, which can mix with all scripts. Not a single Mn or Mc codepoints is left.</p>
-<p>So some of the Common <code>XID_Continue</code> marks therefore cannot be detected with the SCX logic. But all of them do not combine with Latin and are already filtered by the C++26 Mixed Script profile.</p>
-<p>Most Lm Modifier Letters (besides the 4 Japanese PROLONGED SOUND MARKs) are freestanding base characters, which can be combined with any other letter.</p>
-<p>See <a href="https://www.unicode.org/reports/tr31/#Combining_Marks">TR31#2.1 Combining_Marks</a> and <a href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2 Modifier_Letters</a></p>
-<p>Most of the Combining Marks are caught by the NFC requirement from C++23 (P1949r7), but some optional checks for gc=Mn against base chars still might be added:</p>
+<p>From these 69 Lm plus 528 M[cn] ranges filtering out the non-C++26
+XID candidates, only #8 Identifier_Type = Recommended, Inclusion,
+non-confusable Technical, plus only #4.2 Recommended Scripts, plus only
+codepoints with multiple SCX entries, plus only codepoints which don’t
+decompose to NFC, leads only to the Lm characters, which can mix with
+all scripts. Not a single Mn or Mc codepoints is left.</p>
+<p>So some of the Common <code>XID_Continue</code> marks therefore
+cannot be detected with the SCX logic. But all of them do not combine
+with Latin and are already filtered by the C++26 Mixed Script
+profile.</p>
+<p>Most Lm Modifier Letters (besides the 4 Japanese PROLONGED SOUND
+MARKs) are freestanding base characters, which can be combined with any
+other letter.</p>
+<p>See <a
+href="https://www.unicode.org/reports/tr31/#Combining_Marks">TR31#2.1
+Combining_Marks</a> and <a
+href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2
+Modifier_Letters</a></p>
+<p>Most of the Combining Marks are caught by the NFC requirement from
+C++23 (P1949r7), but some optional checks for gc=Mn against base chars
+still might be added:</p>
 <ul>
-<li><p>Forbid U+0069 LOWERCASE LETTER I or the DOTLESS letters i and j combined with U+0307 COMBINING DOT ABOVE as special-cases.</p></li>
-<li><p>Forbid non-spacing marks with base chars already including the non-spacing mark. They would be rendered either indistuinguishable or with the combining mark doubled. There are currently 82 non-spacing marks, e.g. GRAVE, DOT ABOVE, … most of them in the U+0300-U+0341 range, but some also in U+20D0-U+20E1 and U+3099-U+309A ranges. From these there exist 31 with a list of letters which already include those non-spacing marks. See <a href="#appendix-h---letters-with-non-spacing-marks">Appendix H</a>.</p></li>
+<li><p>Forbid U+0069 LOWERCASE LETTER I or the DOTLESS letters i and j
+combined with U+0307 COMBINING DOT ABOVE as special-cases.</p></li>
+<li><p>Forbid non-spacing marks with base chars already including the
+non-spacing mark. They would be rendered either indistuinguishable or
+with the combining mark doubled. There are currently 82 non-spacing
+marks, e.g. GRAVE, DOT ABOVE, … most of them in the U+0300-U+0341 range,
+but some also in U+20D0-U+20E1 and U+3099-U+309A ranges. From these
+there exist 31 with a list of letters which already include those
+non-spacing marks. See <a
+href="#appendix-h---letters-with-non-spacing-marks">Appendix
+H</a>.</p></li>
 </ul>
-<p>See also <a href="https://www.unicode.org/reports/tr24/#Common">TR24#5.1 Handling Characters with the Common Script Property</a> and <a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks">TR24#5.2 Handling Combining Marks</a>.</p>
+<p>See also <a
+href="https://www.unicode.org/reports/tr24/#Common">TR24#5.1 Handling
+Characters with the Common Script Property</a> and <a
+href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks">TR24#5.2
+Handling Combining Marks</a>.</p>
 <h1 id="tr39-identifier-type">9 TR39 Identifier Type</h1>
-<p>TR39 recommends to disable some characters from recommended scripts: <em>“Some characters used with recommended scripts may still be problematic for identifiers, for example because they are part of extensions that are not in modern customary use, and thus implementations may want to exclude them from identifiers. These include characters for historic and obsolete orthographies, characters used mostly liturgically, and in orthographies for languages used only in very small communities or with very limited current or declining usage. Some characters also have architectural issues that may make them unsuitable for identifiers.”</em></p>
-<p>The <strong>Identifier Type</strong> property <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table 1</a> recommendation should be mandatory, with the addition of the non-confusable <strong>Technical</strong> Identifier Type to be allowed.</p>
-<p>I.e. <code>Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,</code> <code>Deprecated, Not_Character</code> are not part of identifiers.</p>
-<p>Allowed are Recommended, Inclusion, and all non-confusable Technical TR39 Identifier Types.</p>
-<p>Note that several Technical Identifier_Type are confusable, but not marked as such. So far only the Latin letters U+1C0 ǀ, U+1C1 ǁ, U+1C3 ǃ which are confusable with operators.</p>
-<p>Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are forbidden, even if allowed in TR31. They are confusable with the Latin base alphabet A-Z.</p>
-<p>Additionally the Arabic Presentation Forms-A: U+FB50–U+FDFF and Arabic Presentation Forms-B: U+FE70–U+FEFF are now forbidden. Forms-A contains a list of Arabic presentation forms encoded as characters primarily for compatibility reasons. Forms-B are for compatibility with preexisting standards and legacy implementations that use these forms as character. Instead of these, letters from the Arabic block (U+0600..U+06FF) should be used for identifiers. See <a href="https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf#G37489" class="uri">https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf#G37489</a> and <a href="https://www.unicode.org/reports/tr53/" class="uri">https://www.unicode.org/reports/tr53/</a>. The TR39 idtype of these should be changed to Obsolete.</p>
-<p>There are 79 Technical ranges added to the original list of Recommended and Inclusion ID’s, with the confusables U+1C0..U+1C3 manually excluded.</p>
+<p>TR39 recommends to disable some characters from recommended scripts:
+<em>“Some characters used with recommended scripts may still be
+problematic for identifiers, for example because they are part of
+extensions that are not in modern customary use, and thus
+implementations may want to exclude them from identifiers. These include
+characters for historic and obsolete orthographies, characters used
+mostly liturgically, and in orthographies for languages used only in
+very small communities or with very limited current or declining usage.
+Some characters also have architectural issues that may make them
+unsuitable for identifiers.”</em></p>
+<p>The <strong>Identifier Type</strong> property <a
+href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type">TR39#Table
+1</a> recommendation should be mandatory, with the addition of the
+non-confusable <strong>Technical</strong> Identifier Type to be
+allowed.</p>
+<p>I.e.
+<code>Limited_Use, Obsolete, Exclusion, Not_XID, Not_NFKC, Default_Ignorable,</code>
+<code>Deprecated, Not_Character</code> are not part of identifiers.</p>
+<p>Allowed are Recommended, Inclusion, and all non-confusable Technical
+TR39 Identifier Types.</p>
+<p>Note that several Technical Identifier_Type are confusable, but not
+marked as such. So far only the Latin letters U+1C0 ǀ, U+1C1 ǁ, U+1C3 ǃ
+which are confusable with operators.</p>
+<p>Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF are
+forbidden, even if allowed in TR31. They are confusable with the Latin
+base alphabet A-Z.</p>
+<p>Additionally the Arabic Presentation Forms-A: U+FB50–U+FDFF and
+Arabic Presentation Forms-B: U+FE70–U+FEFF are now forbidden. Forms-A
+contains a list of Arabic presentation forms encoded as characters
+primarily for compatibility reasons. Forms-B are for compatibility with
+preexisting standards and legacy implementations that use these forms as
+character. Instead of these, letters from the Arabic block
+(U+0600..U+06FF) should be used for identifiers. See <a
+href="https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf#G37489"
+class="uri">https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf#G37489</a>
+and <a href="https://www.unicode.org/reports/tr53/"
+class="uri">https://www.unicode.org/reports/tr53/</a>. The TR39 idtype
+of these should be changed to Obsolete.</p>
+<p>There are 79 Technical ranges added to the original list of
+Recommended and Inclusion ID’s, with the confusables U+1C0..U+1C3
+manually excluded.</p>
 <pre><code>grep &#39;, U8ID_Technical&#39; scripts.h | egrep -v &#39;Not_XID|U8ID_Obsolete|U8ID_Exclusion&#39;</code></pre>
-<p>See <a href="#appendix-e---idtype-technical">Appendix E - IDType Technical</a>.</p>
+<p>See <a href="#appendix-e---idtype-technical">Appendix E - IDType
+Technical</a>.</p>
 <h1 id="tr39-mixed-scripts">10 TR39 Mixed Scripts</h1>
-<p><a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a> defines some security profiles for identifers to avoid the most common identifier insecurities, that identifiers will stay identifiable.</p>
-<p>We want to choose a variant of the <strong>Moderately Restrictive</strong> profile, with an exception for non-confusable Greek. I called this profile C26_4 or SAFEC26 in libu8ident.</p>
+<p><a
+href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection">TR39#5.2</a>
+defines some security profiles for identifers to avoid the most common
+identifier insecurities, that identifiers will stay identifiable.</p>
+<p>We want to choose a variant of the <strong>Moderately
+Restrictive</strong> profile, with an exception for non-confusable
+Greek. I called this profile C26_4 or SAFEC26 in libu8ident.</p>
 <ul>
 <li>All identifiers in a document qualify as Single Script, or</li>
-<li>All identifiers in a document are covered by any of the following sets of scripts, according to the definition in Mixed Scripts:
+<li>All identifiers in a document are covered by any of the following
+sets of scripts, according to the definition in Mixed Scripts:
 <ul>
 <li>Latin + Han + Hiragana + Katakana (Japanese),</li>
 <li>Latin + Han + Bopomofo (Chinese),</li>
 <li>Latin + Han + Hangul (Korean), or</li>
 </ul></li>
-<li>All identifiers in a document are covered by Latin and any one other Recommended script, except Cyrillic.</li>
-<li>Allow some Greek letters mixed with Latin, that are not confusable with Latin letters.</li>
+<li>All identifiers in a document are covered by Latin and any one other
+Recommended script, except Cyrillic.</li>
+<li>Allow some Greek letters mixed with Latin, that are not confusable
+with Latin letters.</li>
 </ul>
-<p>Greek alone is always allowed, as Cyrillic, but wherever we have a valid Latin letter which looks the same as the Greek counterpart, the Greek letter is forbidden, choose the Latin one instead. E.g. ( Α → A )GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A. See <a href="#appendix-f---greek-confusables">Appendix F</a> for the generated list with 12 exceptions.</p>
-<p>Thus it prevents Cyrillic mixed with Latin or any other script, but does allow any East-Asian CFK language, other common and widely used languages and Latin mixed with Greek, mainly used for its popular and actually used mathematical symbols. Many mathematical symbols already exists outside of Greek, but these are mainly used for operators in advanced programming languages, not as identifiers. See also <a href="http://xahlee.info/comp/unicode_math_operators.html" class="uri">http://xahlee.info/comp/unicode_math_operators.html</a> for a nice overview.</p>
+<p>Greek alone is always allowed, as Cyrillic, but wherever we have a
+valid Latin letter which looks the same as the Greek counterpart, the
+Greek letter is forbidden, choose the Latin one instead. E.g. ( Α → A
+)GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A. See <a
+href="#appendix-f---greek-confusables">Appendix F</a> for the generated
+list with 12 exceptions.</p>
+<p>Thus it prevents Cyrillic mixed with Latin or any other script, but
+does allow any East-Asian CFK language, other common and widely used
+languages and Latin mixed with Greek, mainly used for its popular and
+actually used mathematical symbols. Many mathematical symbols already
+exists outside of Greek, but these are mainly used for operators in
+advanced programming languages, not as identifiers. See also <a
+href="http://xahlee.info/comp/unicode_math_operators.html"
+class="uri">http://xahlee.info/comp/unicode_math_operators.html</a> for
+a nice overview.</p>
 <p>E.g. here we have some:</p>
 <ul>
 <li>U+2217 (∗) ASTERISK OPERATOR (Script=Common). Not_XID</li>
-<li>U+2107 (ℇ) EULER CONSTANT (Script=Common, Lu) is a proper letter, but with Restricted IdentifierStatus.</li>
-<li>U+2126 (Ω) OHM SIGN (Script=Greek, L&amp;) is a greek letter, but with Restricted IdentifierStatus.</li>
-<li>U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete, Not_XID</li>
-<li>U+0392 ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B Greek confusable</li>
-<li>U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C Greek confusable</li>
+<li>U+2107 (ℇ) EULER CONSTANT (Script=Common, Lu) is a proper letter,
+but with Restricted IdentifierStatus.</li>
+<li>U+2126 (Ω) OHM SIGN (Script=Greek, L&amp;) is a greek letter, but
+with Restricted IdentifierStatus.</li>
+<li>U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete,
+Not_XID</li>
+<li>U+0392 ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B
+Greek confusable</li>
+<li>U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C
+Greek confusable</li>
 <li>U+0381 ; ( α → a ) GREEK SMALL LETTER ALPHA. Not confusable</li>
-<li>U+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P. Not confusable</li>
-<li>U+03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA. Not confusable, but in the confusables.txt list. Used for the Stefan-Boltzmann constant.</li>
-<li>U+039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER K. Confusable.</li>
-<li>U+03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA. Confusable even if nobody uses the Latin counterpart.</li>
-<li>U+03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T. Confusable even if nobody uses the Latin counterpart.</li>
-<li>U+03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER ESH. Confusable even if nobody uses the Latin counterpart.</li>
-<li>U+03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER SHARP S. Confusable and an edge-case.</li>
+<li>U+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P. Not
+confusable</li>
+<li>U+03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA. Not confusable, but in
+the confusables.txt list. Used for the Stefan-Boltzmann constant.</li>
+<li>U+039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER
+K. Confusable.</li>
+<li>U+03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER
+KRA. Confusable even if nobody uses the Latin counterpart.</li>
+<li>U+03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL
+CAPITAL T. Confusable even if nobody uses the Latin counterpart.</li>
+<li>U+03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER
+ESH. Confusable even if nobody uses the Latin counterpart.</li>
+<li>U+03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER
+SHARP S. Confusable and an edge-case.</li>
 </ul>
-<p>And some actual C++ user-code representing the epsilon transport equation:</p>
+<p>And some actual C++ user-code representing the epsilon transport
+equation:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>    solve<span class="op">(</span>div<span class="op">(</span>U <span class="op">*</span> ε<span class="op">)</span> <span class="op">-</span> div<span class="op">(</span>νt <span class="op">*</span> grad<span class="op">(</span>ε<span class="op">))</span> <span class="op">/</span> σε <span class="op">+</span> C2 <span class="op">*</span> ω <span class="op">*</span> Sp<span class="op">(</span>ε<span class="op">)</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>      <span class="op">==</span> C1 <span class="op">*</span> ω <span class="op">*</span> G<span class="op">,</span> ε<span class="op">,</span> α<span class="op">);</span></span></code></pre></div>
-<p>TR39 also compiles a convenient <a href="https://www.unicode.org/Public/security/latest/IdentifierStatus.txt">IdentifierStatus</a> list. But all the math letters with Script=Common from U+2100 to U+2200 are restricted, as Greek is forbidden mixed with Latin in the original TR39 Moderately Restrictive profile. Most are allowed according to the TR31 and TR39 rules of SAFEC26, so we need to come up with our own list of <code>XID_Start/XID_Continue</code> codepoints, excluding the Limited Use and Excluded scripts. And if an implementation choses to allow Excluded scripts with more logic to allow only this script.</p>
-<p>Since the TR31 XID list also got the median positions wrong (for 98 Arabic codepoints), has some confusables with ops, and forgot about the Halfwidth and Fullwidth, U+FF00..U+FFEF confusables, we need to fixup and generate the XID lists by ourselves.</p>
-<p>It is recommended to already exclude Limited Use and Excluded scripts from the initial list of identifier ranges, as this is the most common use-case, and shortens the common search paths. Only with the <code>#pragma Unicode ExcludedScript</code> search the full XID lists and the full scripts list.</p>
-<p>The TR39 Mixed Scripts profile alone does not prevent from all spoofing attacks, but the additional rules from <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 “Combining marks script run detection for spoofing”</a> are kept tiny.</p>
+<p>TR39 also compiles a convenient <a
+href="https://www.unicode.org/Public/security/latest/IdentifierStatus.txt">IdentifierStatus</a>
+list. But all the math letters with Script=Common from U+2100 to U+2200
+are restricted, as Greek is forbidden mixed with Latin in the original
+TR39 Moderately Restrictive profile. Most are allowed according to the
+TR31 and TR39 rules of SAFEC26, so we need to come up with our own list
+of <code>XID_Start/XID_Continue</code> codepoints, excluding the Limited
+Use and Excluded scripts. And if an implementation choses to allow
+Excluded scripts with more logic to allow only this script.</p>
+<p>Since the TR31 XID list also got the median positions wrong (for 98
+Arabic codepoints), has some confusables with ops, and forgot about the
+Halfwidth and Fullwidth, U+FF00..U+FFEF confusables, we need to fixup
+and generate the XID lists by ourselves.</p>
+<p>It is recommended to already exclude Limited Use and Excluded scripts
+from the initial list of identifier ranges, as this is the most common
+use-case, and shortens the common search paths. Only with the
+<code>#pragma Unicode ExcludedScript</code> search the full XID lists
+and the full scripts list.</p>
+<p>The TR39 Mixed Scripts profile alone does not prevent from all
+spoofing attacks, but the additional rules from <a
+href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3
+“Combining marks script run detection for spoofing”</a> are kept
+tiny.</p>
 <h1 id="contexts-scopes">11 Contexts (Scopes)</h1>
-<p>This is not discussed in any of the unicode security guidelines for identifiers. One could argue that a mixed-script profile is valid only for a single identifier, or it is valid for the whole source file document. And there needs to be a definition if before or after the preprocessor, and if to treat names in private structs, classes and local names in functions as seperate contexts.</p>
-<p>If valid for only a single identifier you could arbitralily mix up Cyrillic with Greek identifiers in a C++ namespace, and thus these identifiers would not be identifiable anymore, as both both can render to the very same glyphs. Thus we adopt the notion of identifier contexts.</p>
-<p>With programming languages this is a source file, with objects files this is a module. For identifiers in object files there are open issues with binutils, linkers, exported identifiers, encodings. For filesystems this would be a directory.</p>
-<p>For every source file we need to store a context with the list of already seen scripts and how many. The maximal number of scripts is 4, for the case of Japanese mixed with Latin. (<code>Katakana + Hiragana +</code> <code>Han + Latin</code>), thus we can save that list in a single 4-byte word, and the lookup and memory management is trivial.</p>
-<p>Since the compiler sees the identifiers after the preprocessor included all headers, the context definition is a bit blurry. Is the context for mixed scripts an original source file (before cpp) or the resulting file after inclusion of all files (after cpp). This is similar to the problem with lexical variables a couple of decades ago.</p>
+<p>This is not discussed in any of the unicode security guidelines for
+identifiers. One could argue that a mixed-script profile is valid only
+for a single identifier, or it is valid for the whole source file
+document. And there needs to be a definition if before or after the
+preprocessor, and if to treat names in private structs, classes and
+local names in functions as seperate contexts.</p>
+<p>If valid for only a single identifier you could arbitralily mix up
+Cyrillic with Greek identifiers in a C++ namespace, and thus these
+identifiers would not be identifiable anymore, as both both can render
+to the very same glyphs. Thus we adopt the notion of identifier
+contexts.</p>
+<p>With programming languages this is a source file, with objects files
+this is a module. For identifiers in object files there are open issues
+with binutils, linkers, exported identifiers, encodings. For filesystems
+this would be a directory.</p>
+<p>For every source file we need to store a context with the list of
+already seen scripts and how many. The maximal number of scripts is 4,
+for the case of Japanese mixed with Latin.
+(<code>Katakana + Hiragana +</code> <code>Han + Latin</code>), thus we
+can save that list in a single 4-byte word, and the lookup and memory
+management is trivial.</p>
+<p>Since the compiler sees the identifiers after the preprocessor
+included all headers, the context definition is a bit blurry. Is the
+context for mixed scripts an original source file (before cpp) or the
+resulting file after inclusion of all files (after cpp). This is similar
+to the problem with lexical variables a couple of decades ago.</p>
 <ol type="1">
-<li><p><strong>before-cpp</strong>: One could argue that the scope of a variable should be contained in a lexical block, which can be statically determined and safely enclosed. With identifiers that would mean that the preprocessor already should perform the TR31 lexer checks and TR39 security checks, and one could define Arabic headers using private arabic fields, and include another header with Cyrillic only names. This would allow confusables in the resulting object file, and source files would be easy to check with external tools.</p></li>
-<li><p><strong>private/scoped</strong>: Another argument would be that all exported names end up in the object files and library flat, which would support the seperation of private and public name contexts, where to perform the mixed-script checks. Private contexts (e.g. static structs, private class fields, local names in functions) should be seperated from the rest. This would prevent from confusables in struct/class fields/methods, and the rest is seperated by the checks for the public names. Jabuk Jelinek favored this approach to the GCC -Whomoglyph PR answer: <a href="https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html" class="uri">https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html</a></p></li>
-<li><p><strong>after-cpp</strong>: The third, strictest variant would define the context in the file after cpp. You would not be able to include a Cyrillic-only header, and you would not be able to use Cyrillic private fields. This would be the least surprising and most secure option. As long as the security risk lies ahead of us, one should go for the strictest option. Cyrillic header projects should be isolated and not used at all outside of non-cyrillic projects. I’m pointing the fingers at Cyrillic because it has the biggest number of confusables with Latin. Arabic headers e.g. are not all confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic speaker can identify and see differences in its names without long training. Same for CFK and the other recommended scripts.</p></li>
+<li><p><strong>before-cpp</strong>: One could argue that the scope of a
+variable should be contained in a lexical block, which can be statically
+determined and safely enclosed. With identifiers that would mean that
+the preprocessor already should perform the TR31 lexer checks and TR39
+security checks, and one could define Arabic headers using private
+arabic fields, and include another header with Cyrillic only names. This
+would allow confusables in the resulting object file, and source files
+would be easy to check with external tools.</p></li>
+<li><p><strong>private/scoped</strong>: Another argument would be that
+all exported names end up in the object files and library flat, which
+would support the seperation of private and public name contexts, where
+to perform the mixed-script checks. Private contexts (e.g. static
+structs, private class fields, local names in functions) should be
+seperated from the rest. This would prevent from confusables in
+struct/class fields/methods, and the rest is seperated by the checks for
+the public names. Jabuk Jelinek favored this approach to the GCC
+-Whomoglyph PR answer: <a
+href="https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html"
+class="uri">https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html</a></p></li>
+<li><p><strong>after-cpp</strong>: The third, strictest variant would
+define the context in the file after cpp. You would not be able to
+include a Cyrillic-only header, and you would not be able to use
+Cyrillic private fields. This would be the least surprising and most
+secure option. As long as the security risk lies ahead of us, one should
+go for the strictest option. Cyrillic header projects should be isolated
+and not used at all outside of non-cyrillic projects. I’m pointing the
+fingers at Cyrillic because it has the biggest number of confusables
+with Latin. Arabic headers e.g. are not all confusable with Latin or
+CFK, but I doubt that any non Hebrew/Arabic speaker can identify and see
+differences in its names without long training. Same for CFK and the
+other recommended scripts.</p></li>
 </ol>
-<h1 id="implementations-and-strategies">12 Implementations and Strategies</h1>
-<p>I implemented for <a href="https://github.com/perl11/cperl">cperl</a>, a fork of perl5, the General Security profile “Moderately restrictive” (4) for identifiers in 2017, together with transparent normalization of NFC. This is a dynamic language with the need for fast tokenizing, and compilation. Still I did not see a need to restrict all source code identifiers to be already in NFC. Even with the added unicode checks and dynamic normalization the tokenizer is still faster than the simplier perl5 tokenizer.</p>
-<p>Then when GCC went to full insecure identifiers I implemented the more general <a href="https://github.com/rurban/libu8ident">libu8ident</a> library, which can be used with all known TR39 identifier type profiles, the mixed-script security profiles, TR31 XID character sets and all TR15 normalizations. There I tested various performance strategies of the unicode lookups. Tested was CRoaring, which was only useful for sets of single codepoints, the list of confusables. Most of the needed lists were best structured as binary-search in range pairs. Most of them were fastest with special-casing the codepoints below U+128 with a simple linear search. Binary search in an Eytzinger layout was not convincibly faster, neither hybrid searches by 1. splitting up ranges from single codepoints, nor 2. seperating 16bit from 32bit codepoints. Perfect hashes for singular lookup are used in some similar implementations, esp. for confusables and the normalization check. I’m still working on the perfect hashes approach (the new perl5 unicode tables, PostgresQL PerfectHash.pm, nbperf, gperf).</p>
+<h1 id="implementations-and-strategies">12 Implementations and
+Strategies</h1>
+<p>I implemented for <a
+href="https://github.com/perl11/cperl">cperl</a>, a fork of perl5, the
+General Security profile “Moderately restrictive” (4) for identifiers in
+2017, together with transparent normalization of NFC. This is a dynamic
+language with the need for fast tokenizing, and compilation. Still I did
+not see a need to restrict all source code identifiers to be already in
+NFC. Even with the added unicode checks and dynamic normalization the
+tokenizer is still faster than the simplier perl5 tokenizer.</p>
+<p>Then when GCC went to full insecure identifiers I implemented the
+more general <a
+href="https://github.com/rurban/libu8ident">libu8ident</a> library,
+which can be used with all known TR39 identifier type profiles, the
+mixed-script security profiles, TR31 XID character sets and all TR15
+normalizations. There I tested various performance strategies of the
+unicode lookups. Tested was CRoaring, which was only useful for sets of
+single codepoints, the list of confusables. Most of the needed lists
+were best structured as binary-search in range pairs. Most of them were
+fastest with special-casing the codepoints below U+128 with a simple
+linear search. Binary search in an Eytzinger layout was not convincibly
+faster, neither hybrid searches by 1. splitting up ranges from single
+codepoints, nor 2. seperating 16bit from 32bit codepoints. Perfect
+hashes for singular lookup are used in some similar implementations,
+esp. for confusables and the normalization check. I’m still working on
+the perfect hashes approach (the new perl5 unicode tables, PostgresQL
+PerfectHash.pm, nbperf, gperf).</p>
 <p>Rust has a good implementation also.</p>
 <p>ICU has no implementation for TR39 checks (yet).</p>
-<p>gcc <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR 103027</a> implements the “skeleton” algorithm from <a href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a> via a switch table (!) for all decomposables and confusables, and two extra dynamic hashtables for the NFD expanded identifiers. There’s a lot of room of improvement there, e.g. with perfect hashes instead of a switch table for the huge and sparse tables, but they had no complaints on speed and size yet. Implementing the mixed-scripts approach in C++26/C26 for their -Whomoglyph warnings would be much faster and smaller though.</p>
-<p>Also gcc and all other major compilers don’t optimize large constant sparse case arrays to perfect hashes yet, so their switch/case lookups are linear, not constant. See e.g. <a href="https://programming.sirrida.de/hashsuper.pdf" class="uri">https://programming.sirrida.de/hashsuper.pdf</a>, which becomes a bottleneck just now with adopting large and sparse unicode switch statements, here with decompositions and confusables.</p>
+<p>gcc <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027">PR
+103027</a> implements the “skeleton” algorithm from <a
+href="http://www.unicode.org/reports/tr39/#Confusable_Detection">TR39#4</a>
+via a switch table (!) for all decomposables and confusables, and two
+extra dynamic hashtables for the NFD expanded identifiers. There’s a lot
+of room of improvement there, e.g. with perfect hashes instead of a
+switch table for the huge and sparse tables, but they had no complaints
+on speed and size yet. Implementing the mixed-scripts approach in
+C++26/C26 for their -Whomoglyph warnings would be much faster and
+smaller though.</p>
+<p>Also gcc and all other major compilers don’t optimize large constant
+sparse case arrays to perfect hashes yet, so their switch/case lookups
+are linear, not constant. See e.g. <a
+href="https://programming.sirrida.de/hashsuper.pdf"
+class="uri">https://programming.sirrida.de/hashsuper.pdf</a>, which
+becomes a bottleneck just now with adopting large and sparse unicode
+switch statements, here with decompositions and confusables.</p>
 <h1 id="appendix-a---c26xid_start">13 Appendix A - C26XID_Start</h1>
-<p>Created with mkc26 from libu8ident. <em>The SCX is modelled as if your compiler would allow static initialization of strings as {char,…,0}.</em></p>
+<p>Created with mkc26 from libu8ident. <em>The SCX is modelled as if
+your compiler would allow static initialization of strings as
+{char,…,0}.</em></p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> sc <span class="op">{</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint32_t</span> from<span class="op">;</span></span>
@@ -884,8 +1458,11 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb14-356"><a href="#cb14-356" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0x31350</span><span class="op">,</span> <span class="bn">0x323AF</span><span class="op">,</span> SC_Han<span class="op">,</span> GC_Lo<span class="op">,</span> NULL<span class="op">},</span> <span class="co">//  𱍐..𲎯</span></span>
 <span id="cb14-357"><a href="#cb14-357" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb14-358"><a href="#cb14-358" aria-hidden="true" tabindex="-1"></a><span class="co">// 245 ranges, 94 singles, 100181 codepoints</span></span></code></pre></div>
-<h1 id="appendix-b---c26xid_continue">14 Appendix B - C26XID_Continue</h1>
-<p>Created with mkc26 from libu8ident. <em>The SCX is modelled as if your compiler would allow static initialization of strings as {char,…,0}.</em></p>
+<h1 id="appendix-b---c26xid_continue">14 Appendix B -
+C26XID_Continue</h1>
+<p>Created with mkc26 from libu8ident. <em>The SCX is modelled as if
+your compiler would allow static initialization of strings as
+{char,…,0}.</em></p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC,</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">// and !MARK. Split on GC and SCX</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> sc safec_cont_list<span class="op">[</span><span class="dv">21</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span></span>
@@ -914,11 +1491,24 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span><span class="bn">0xA9F0</span><span class="op">,</span> <span class="bn">0xA9F9</span><span class="op">,</span> SC_Myanmar<span class="op">,</span> GC_Nd<span class="op">,</span> NULL<span class="op">},</span> <span class="co">//  ꧰..꧹</span></span>
 <span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="co">// 20 ranges, 1 singles, 172 codepoints</span></span></code></pre></div>
-<h1 id="appendix-c---xid_continue-lm">15 Appendix C - XID_Continue # Lm</h1>
-<p>Needed for the combining marks special-cases in Section 8.3 <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 Combining marks script run detection for spoofing</a>, which is needed for <a href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a> and <a href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2</a> checks.</p>
-<p>Practically this list is not needed, as only the 4 Japanese PROLONGED SOUND MARKs need to be checked. All other Lm Modifier Letters are freestanding base characters, which can be combined with any other letter.</p>
-<p>69 matches for “XID_Continue # Lm” in buffer: DerivedCoreProperties.txt</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..</span>
+<h1 id="appendix-c---xid_continue-lm">15 Appendix C - XID_Continue #
+Lm</h1>
+<p>Needed for the combining marks special-cases in Section 8.3 <a
+href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3
+Combining marks script run detection for spoofing</a>, which is needed
+for <a
+href="https://www.unicode.org/reports/tr39/#Optional_Detection">TR39#5.4</a>
+and <a
+href="https://www.unicode.org/reports/tr31/#Modifier_Letters">TR31#2.2</a>
+checks.</p>
+<p>Practically this list is not needed, as only the 4 Japanese PROLONGED
+SOUND MARKs need to be checked. All other Lm Modifier Letters are
+freestanding base characters, which can be combined with any other
+letter.</p>
+<p>69 matches for “XID_Continue # Lm” in buffer:
+DerivedCoreProperties.txt</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER REVERSED GLOTTAL STOP</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>02C6..02D1    ; XID_Continue # Lm  [12] MODIFIER LETTER CIRCUMFLEX ACCENT..</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                                        MODIFIER LETTER HALF TRIANGULAR COLON</span>
@@ -1019,10 +1609,15 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb16-99"><a href="#cb16-99" aria-hidden="true" tabindex="-1"></a>                                        NYIAKENG PUACHUE HMONG SYLLABLE LENGTHENER</span>
 <span id="cb16-100"><a href="#cb16-100" aria-hidden="true" tabindex="-1"></a>1E4EB         ; XID_Continue # Lm       NAG MUNDARI SIGN OJOD</span>
 <span id="cb16-101"><a href="#cb16-101" aria-hidden="true" tabindex="-1"></a>1E94B         ; XID_Continue # Lm       ADLAM NASALIZATION MARK</span></code></pre></div>
-<h1 id="appendix-d---xid_continue-m">16 Appendix D - XID_Continue # M</h1>
-<p>Needed for the combining marks checks in Section 8.3 <a href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3 Combining marks script run detection for spoofing</a>.</p>
-<p>528 matches for “XID_Continue # M” in buffer: DerivedCoreProperties.txt</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..</span>
+<h1 id="appendix-d---xid_continue-m">16 Appendix D - XID_Continue #
+M</h1>
+<p>Needed for the combining marks checks in Section 8.3 <a
+href="#8.3-combining-marks-script-run-detection-for-spoofing">8.3
+Combining marks script run detection for spoofing</a>.</p>
+<p>528 matches for “XID_Continue # M” in buffer:
+DerivedCoreProperties.txt</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                                        COMBINING LATIN SMALL LETTER X</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                        COMBINING CYRILLIC POKRYTIE</span>
@@ -1642,15 +2237,22 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb17-618"><a href="#cb17-618" aria-hidden="true" tabindex="-1"></a>                                        MENDE KIKAKUI COMBINING NUMBER MILLIONS</span>
 <span id="cb17-619"><a href="#cb17-619" aria-hidden="true" tabindex="-1"></a>1E944..1E94A  ; XID_Continue # Mn   [7] ADLAM ALIF LENGTHENER..ADLAM NUKTA</span>
 <span id="cb17-620"><a href="#cb17-620" aria-hidden="true" tabindex="-1"></a>E0100..E01EF  ; XID_Continue # Mn [240] VARIATION SELECTOR-17..-256</span></code></pre></div>
-<h1 id="appendix-e---idtype-technical">17 Appendix E - IDType Technical</h1>
-<p>Needed for Section 9 <a href="#9-tr39-identifier-type">TR39 Identifier Type</a>. List of Technical ID characters, added to the TR39 Recommended and Inclusion IDTypes. TR39#Table 1 <a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type" class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a>. In guidance with TR39.</p>
+<h1 id="appendix-e---idtype-technical">17 Appendix E - IDType
+Technical</h1>
+<p>Needed for Section 9 <a href="#9-tr39-identifier-type">TR39
+Identifier Type</a>. List of Technical ID characters, added to the TR39
+Recommended and Inclusion IDTypes. TR39#Table 1 <a
+href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type"
+class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a>.
+In guidance with TR39.</p>
 <p>The confusables</p>
 <pre><code>01C0..01C3    ; Technical  # 1.1    [4] LATIN LETTER DENTAL CLICK..
                                     RETROFLEX CLICK</code></pre>
 <p>are excluded here.</p>
 <pre><code>grep &#39; Technical &#39; IdentifierType.txt |
   egrep -v &#39;Not_XID|Obsolete|Exclusion|Uncommon_Use|Limited_Use&#39;</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>0180          ; Technical  # 1.1        LATIN SMALL LETTER B WITH STROKE</span>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>0180          ; Technical  # 1.1        LATIN SMALL LETTER B WITH STROKE</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>0234..0236    ; Technical  # 4.0    [3] LATIN SMALL LETTER L WITH CURL..</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                                        T WITH CURL</span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>0250..0252    ; Technical  # 1.1    [3] LATIN SMALL LETTER TURNED A..ALPHA</span>
@@ -1803,11 +2405,21 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING TRIPLE TONGUE</span>
 <span id="cb20-152"><a href="#cb20-152" aria-hidden="true" tabindex="-1"></a>1D1AA..1D1AD  ; Technical  # 3.1    [4] MUSICAL SYMBOL COMBINING DOWN BOW..</span>
 <span id="cb20-153"><a href="#cb20-153" aria-hidden="true" tabindex="-1"></a>                                        MUSICAL SYMBOL COMBINING SNAP PIZZICATO</span></code></pre></div>
-<h1 id="appendix-f---greek-confusables">18 Appendix F - Greek Confusables</h1>
-<p>Needed for exclusion in the Section 9 <a href="#tr39-mixed-scripts">TR39 Mixed Scripts</a> Greek rule. Where-ever we have a Greek letter confusable with Latin, and we already saw Latin, forbid the Greek letter in favor of the Latin letter. See TR39 <a href="https://www.unicode.org/Public/security/latest/confusables.txt">confusables</a>. Note that these confusables cannot be excluded upfront in the TR31 identifier parsing, as Greek alone is allowed.</p>
+<h1 id="appendix-f---greek-confusables">18 Appendix F - Greek
+Confusables</h1>
+<p>Needed for exclusion in the Section 9 <a
+href="#tr39-mixed-scripts">TR39 Mixed Scripts</a> Greek rule. Where-ever
+we have a Greek letter confusable with Latin, and we already saw Latin,
+forbid the Greek letter in favor of the Latin letter. See TR39 <a
+href="https://www.unicode.org/Public/security/latest/confusables.txt">confusables</a>.
+Note that these confusables cannot be excluded upfront in the TR31
+identifier parsing, as Greek alone is allowed.</p>
 <h2 id="exceptions">18.1 Exceptions</h2>
-<p>Allow these 12 Greek letters and symbols to be confusable with Latin: <code>037A, 0381, 0398, 03B5, 03B7, 03B8, 03B9, 03BD, 03C3, 03D1, 03F1, 03F4</code>. The confusables.txt list is extremely buggy.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
+<p>Allow these 12 Greek letters and symbols to be confusable with Latin:
+<code>037A, 0381, 0398, 03B5, 03B7, 03B8, 03B9, 03BD, 03C3, 03D1, 03F1, 03F4</code>.
+The confusables.txt list is extremely buggy.</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>0381 ; ( α → a ) GREEK SMALL LETTER ALPHA</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...</span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>03B5 ; ( ε → ꞓ ) GREEK SMALL LETTER EPSILON</span>
@@ -1821,9 +2433,11 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P</span>
 <span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...</span></code></pre></div>
 <h2 id="confusables">18.2 Confusables</h2>
-<p>List of all the 72 Greek-Latin confusables: Note, these still include the exceptions above.</p>
+<p>List of all the 72 Greek-Latin confusables: Note, these still include
+the exceptions above.</p>
 <pre><code>grep GREEK confusables.txt | grep LETTER | grep LATIN</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>03B1 ; ( α → a ) GREEK SMALL LETTER ALPHA → LATIN SMALL LETTER A</span>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>03B1 ; ( α → a ) GREEK SMALL LETTER ALPHA → LATIN SMALL LETTER A</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>0391 ; ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>1D217; ( 𝈗 → Ɐ ) GREEK VOCAL NOTATION SYMBOL-24 → LATIN CAPITAL LETTER TURNED A</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>0392 ; ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B</span>
@@ -1901,18 +2515,27 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a>03C7 ; ( ꭓ → χ ) LATIN SMALL LETTER CHI → GREEK SMALL LETTER CHI</span>
 <span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a>03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA</span></code></pre></div>
 <h1 id="appendix-g---medial">19 Appendix G - Medial</h1>
-<p>List of all the medial letter and mark ranges. These characters are treated wrongly in all programming languages I checked. In the UCD Standard some are wrongly in <code>XID_Start</code>, but must be treated as <code>XID_Continue</code>, with a special check that they must not be in the final position of an identifier. Here we prove that for C++26 we don’t need to check for medial positions, because we restrict our TR31 set.</p>
+<p>List of all the medial letter and mark ranges. These characters are
+treated wrongly in all programming languages I checked. In the UCD
+Standard some are wrongly in <code>XID_Start</code>, but must be treated
+as <code>XID_Continue</code>, with a special check that they must not be
+in the final position of an identifier. Here we prove that for C++26 we
+don’t need to check for medial positions, because we restrict our TR31
+set.</p>
 <pre><code>grep &quot;; XID_Start &quot; DerivedCoreProperties.txt | grep MEDIAL</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>FE77          ; XID_Start # Lo       ARABIC FATHA MEDIAL FORM</span>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>FE77          ; XID_Start # Lo       ARABIC FATHA MEDIAL FORM</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>FE79          ; XID_Start # Lo       ARABIC DAMMA MEDIAL FORM</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>FE7B          ; XID_Start # Lo       ARABIC KASRA MEDIAL FORM</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>FE7D          ; XID_Start # Lo       ARABIC SHADDA MEDIAL FORM</span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>FE7F..FEFC    ; XID_Start # Lo [126] ARABIC SUKUN MEDIAL FORM</span>
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                                     ..ARABIC LIGATURE LAM WITH ALEF FINAL FORM</span></code></pre></div>
-<p>All these are in the excluded Arabic Presentation Forms-B: U+FE70–U+FEFF block.</p>
+<p>All these are in the excluded Arabic Presentation Forms-B:
+U+FE70–U+FEFF block.</p>
 <p>The ones which are correctly in XID_Continue:</p>
 <pre><code>grep &quot;; XID_Continue &quot; DerivedCoreProperties.txt | grep MEDIAL</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>103B..103C    ; XID_Continue # Mc   [2] MYANMAR CONSONANT SIGN MEDIAL YA</span>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>103B..103C    ; XID_Continue # Mc   [2] MYANMAR CONSONANT SIGN MEDIAL YA</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                                        ..MYANMAR CONSONANT SIGN MEDIAL RA</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>103D..103E    ; XID_Continue # Mn   [2] MYANMAR CONSONANT SIGN MEDIAL WA</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                                        ..MYANMAR CONSONANT SIGN MEDIAL HA</span>
@@ -1931,40 +2554,97 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                                        ..AHOM CONSONANT SIGN MEDIAL LIGATING RA</span>
 <span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>11940         ; XID_Continue # Mc       DIVES AKURU MEDIAL YA</span>
 <span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>11942         ; XID_Continue # Mc       DIVES AKURU MEDIAL RA</span></code></pre></div>
-<p>All these are either combining marks or in the excluded Arabic Presentation Forms-B: U+FE70–U+FEFF block.</p>
-<p>Then see also <a href="https://www.unicode.org/reports/tr31/#Table_Optional_Medial" class="uri">https://www.unicode.org/reports/tr31/#Table_Optional_Medial</a>, even they are mostly not part of any TR31 XID set. For us relevant is only the Catalan U+B7 MIDDLE DOT, which is an identifier in the Latin script. There is no Catalan script (yet), so we cannot disallow that via our mixed script check. Hence we explicitly disallow the ‘·’ U+B7 MIDDLE DOT and punish all our Catalan programmers for security reasons. Usage of the special Catalan characters ‘Ŀ’ (U+013F) and ‘ŀ’ (U+0140) for this usecase is also disallowed as they are not NFKC. See <a href="https://en.wikipedia.org/wiki/Catalan_orthography#Punt_volat_(middot)" class="uri">https://en.wikipedia.org/wiki/Catalan_orthography#Punt_volat_(middot)</a> and <a href="https://en.wikipedia.org/wiki/Interpunct" class="uri">https://en.wikipedia.org/wiki/Interpunct</a>. If this turns out too strict add a NFKC exception to allow ‘Ŀ’ (U+013F) and ‘ŀ’ (U+0140).</p>
-<p>Other middle dot usages have their own codepoints and their own scripts, such as Chinese U+2027, Katakana U+30FB and U+FF65 (Not NFKC), Hangul U+318D, Canadian Aboriginal Syllabics U+1427 (Limited Use Script), and the Latin U+A78F (Uncommon Use).</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>00B7          ; XID_Continue # Po    MIDDLE DOT</span></code></pre></div>
-<p>So there is no medial character to consider, also no initial, isolated, nor final positions in the Arabic presentation forms.</p>
-<h1 id="appendix-h---letters-with-non-spacing-marks">20 Appendix H - Letters with non-spacing marks</h1>
-<p>From all 82 non-spacing marks, the list of letters already including its 31 non-spacing marks:</p>
+<p>All these are either combining marks or in the excluded Arabic
+Presentation Forms-B: U+FE70–U+FEFF block.</p>
+<p>Then see also <a
+href="https://www.unicode.org/reports/tr31/#Table_Optional_Medial"
+class="uri">https://www.unicode.org/reports/tr31/#Table_Optional_Medial</a>,
+even they are mostly not part of any TR31 XID set. For us relevant is
+only the Catalan U+B7 MIDDLE DOT, which is an identifier in the Latin
+script. There is no Catalan script (yet), so we cannot disallow that via
+our mixed script check. Hence we explicitly disallow the ‘·’ U+B7 MIDDLE
+DOT and punish all our Catalan programmers for security reasons. Usage
+of the special Catalan characters ‘Ŀ’ (U+013F) and ‘ŀ’ (U+0140) for this
+usecase is also disallowed as they are not NFKC. See <a
+href="https://en.wikipedia.org/wiki/Catalan_orthography#Punt_volat_(middot)"
+class="uri">https://en.wikipedia.org/wiki/Catalan_orthography#Punt_volat_(middot)</a>
+and <a href="https://en.wikipedia.org/wiki/Interpunct"
+class="uri">https://en.wikipedia.org/wiki/Interpunct</a>. If this turns
+out too strict add a NFKC exception to allow ‘Ŀ’ (U+013F) and ‘ŀ’
+(U+0140).</p>
+<p>Other middle dot usages have their own codepoints and their own
+scripts, such as Chinese U+2027, Katakana U+30FB and U+FF65 (Not NFKC),
+Hangul U+318D, Canadian Aboriginal Syllabics U+1427 (Limited Use
+Script), and the Latin U+A78F (Uncommon Use).</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode txt"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>00B7          ; XID_Continue # Po    MIDDLE DOT</span></code></pre></div>
+<p>So there is no medial character to consider, also no initial,
+isolated, nor final positions in the Arabic presentation forms.</p>
+<h1 id="appendix-h---letters-with-non-spacing-marks">20 Appendix H -
+Letters with non-spacing marks</h1>
+<p>From all 82 non-spacing marks, the list of letters already including
+its 31 non-spacing marks:</p>
 <ul>
 <li><p>NSM: GRAVE 0300</p>
-<p>00C0, 00C8, 00CC, 00D2, 00D9, 00E0, 00E8, 00EC 00F2, 00F9, 01DB, 01DC, 01F8, 01F9, 0400, 040D 0450, 045D, 1E14, 1E15, 1E50, 1E51, 1E80, 1E81 1EA6, 1EA7, 1EB0, 1EB1, 1EC0, 1EC1, 1ED2, 1ED3 1EDC, 1EDD, 1EEA, 1EEB, 1EF2, 1EF3, 1F02, 1F03 1F0A, 1F0B, 1F12, 1F13, 1F1A, 1F1B, 1F22, 1F23 1F2A, 1F2B, 1F32, 1F33, 1F3A, 1F3B, 1F42, 1F43 1F4A, 1F4B, 1F52, 1F53, 1F5B, 1F62, 1F63, 1F6A 1F6B, 1F70, 1F72, 1F74, 1F76, 1F78, 1F7A, 1F7C 1FBA, 1FC8, 1FCA, 1FD2, 1FDA, 1FE2, 1FEA, 1FF8 1FFA</p>
+<p>00C0, 00C8, 00CC, 00D2, 00D9, 00E0, 00E8, 00EC 00F2, 00F9, 01DB,
+01DC, 01F8, 01F9, 0400, 040D 0450, 045D, 1E14, 1E15, 1E50, 1E51, 1E80,
+1E81 1EA6, 1EA7, 1EB0, 1EB1, 1EC0, 1EC1, 1ED2, 1ED3 1EDC, 1EDD, 1EEA,
+1EEB, 1EF2, 1EF3, 1F02, 1F03 1F0A, 1F0B, 1F12, 1F13, 1F1A, 1F1B, 1F22,
+1F23 1F2A, 1F2B, 1F32, 1F33, 1F3A, 1F3B, 1F42, 1F43 1F4A, 1F4B, 1F52,
+1F53, 1F5B, 1F62, 1F63, 1F6A 1F6B, 1F70, 1F72, 1F74, 1F76, 1F78, 1F7A,
+1F7C 1FBA, 1FC8, 1FCA, 1FD2, 1FDA, 1FE2, 1FEA, 1FF8 1FFA</p>
 <p>“ÀÈÌÒÙàèìòùǛǜǸǹЀЍѐѝḔḕṐṑẀẁẦầẰằỀềỒồỜờỪừỲỳἂἃἊἋἒἓἚἛἢἣἪἫἲἳἺἻὂὃὊὋὒὓὛὢὣὪὫὰὲὴὶὸὺὼᾺῈῊῒῚῢῪῸῺ”</p></li>
 <li><p>NSM: ACUTE 0301</p>
-<p>00C1, 00C9, 00CD, 00D3, 00DA, 00DD, 00E1, 00E9 00ED, 00F3, 00FA, 00FD, 0106, 0107, 0139, 013A 0143, 0144, 0154, 0155, 015A, 015B, 0179, 017A 01D7, 01D8, 01F4, 01F5, 01FA, 01FB, 01FC, 01FD 01FE, 01FF, 0386, 0388, 0389, 038A, 038C, 038E 038F, 0390, 03AC, 03AD, 03AE, 03AF, 03B0, 03CC 03CD, 03CE, 03D3, 0403, 040C, 0453, 045C, 1E08 1E09, 1E16, 1E17, 1E2E, 1E2F, 1E30, 1E31, 1E3E 1E3F, 1E4C, 1E4D, 1E52, 1E53, 1E54, 1E55, 1E78 1E79, 1E82, 1E83, 1EA4, 1EA5, 1EAE, 1EAF, 1EBE 1EBF, 1ED0, 1ED1, 1EDA, 1EDB, 1EE8, 1EE9, 1F04 1F05, 1F0C, 1F0D, 1F14, 1F15, 1F1C, 1F1D, 1F24 1F25, 1F2C, 1F2D, 1F34, 1F35, 1F3C, 1F3D, 1F44 1F45, 1F4C, 1F4D, 1F54, 1F55, 1F5D, 1F64, 1F65 1F6C, 1F6D</p>
+<p>00C1, 00C9, 00CD, 00D3, 00DA, 00DD, 00E1, 00E9 00ED, 00F3, 00FA,
+00FD, 0106, 0107, 0139, 013A 0143, 0144, 0154, 0155, 015A, 015B, 0179,
+017A 01D7, 01D8, 01F4, 01F5, 01FA, 01FB, 01FC, 01FD 01FE, 01FF, 0386,
+0388, 0389, 038A, 038C, 038E 038F, 0390, 03AC, 03AD, 03AE, 03AF, 03B0,
+03CC 03CD, 03CE, 03D3, 0403, 040C, 0453, 045C, 1E08 1E09, 1E16, 1E17,
+1E2E, 1E2F, 1E30, 1E31, 1E3E 1E3F, 1E4C, 1E4D, 1E52, 1E53, 1E54, 1E55,
+1E78 1E79, 1E82, 1E83, 1EA4, 1EA5, 1EAE, 1EAF, 1EBE 1EBF, 1ED0, 1ED1,
+1EDA, 1EDB, 1EE8, 1EE9, 1F04 1F05, 1F0C, 1F0D, 1F14, 1F15, 1F1C, 1F1D,
+1F24 1F25, 1F2C, 1F2D, 1F34, 1F35, 1F3C, 1F3D, 1F44 1F45, 1F4C, 1F4D,
+1F54, 1F55, 1F5D, 1F64, 1F65 1F6C, 1F6D</p>
 <p>“ÁÉÍÓÚÝáéíóúýĆćĹĺŃńŔŕŚśŹźǗǘǴǵǺǻǼǽǾǿΆΈΉΊΌΎΏΐάέήίΰόύώϓЃЌѓќḈḉḖḗḮḯḰḱḾḿṌṍṒṓṔṕṸṹẂẃẤấẮắẾếỐốỚớỨứἄἅἌἍἔἕἜἝἤἥἬἭἴἵἼἽὄὅὌὍὔὕὝὤὥὬὭ”</p></li>
 <li><p>NSM: CIRCUMFLEX 0302</p>
-<p>00C2, 00CA, 00CE, 00D4, 00DB, 00E2, 00EA, 00EE 00F4, 00FB, 0108, 0109, 011C, 011D, 0124, 0125 0134, 0135, 015C, 015D, 0174, 0175, 0176, 0177 1E90, 1E91, 1EAC, 1EAD, 1EC6, 1EC7, 1ED8, 1ED9</p>
+<p>00C2, 00CA, 00CE, 00D4, 00DB, 00E2, 00EA, 00EE 00F4, 00FB, 0108,
+0109, 011C, 011D, 0124, 0125 0134, 0135, 015C, 015D, 0174, 0175, 0176,
+0177 1E90, 1E91, 1EAC, 1EAD, 1EC6, 1EC7, 1ED8, 1ED9</p>
 <p>“ÂÊÎÔÛâêîôûĈĉĜĝĤĥĴĵŜŝŴŵŶŷẐẑẬậỆệỘộ”</p></li>
 <li><p>NSM: TILDE 0303</p>
-<p>00C3, 00D1, 00D5, 00E3, 00F1, 00F5, 0128, 0129 0168, 0169, 1E7C, 1E7D, 1EAA, 1EAB, 1EB4, 1EB5 1EBC, 1EBD, 1EC4, 1EC5, 1ED6, 1ED7, 1EE0, 1EE1 1EEE, 1EEF, 1EF8, 1EF9</p>
+<p>00C3, 00D1, 00D5, 00E3, 00F1, 00F5, 0128, 0129 0168, 0169, 1E7C,
+1E7D, 1EAA, 1EAB, 1EB4, 1EB5 1EBC, 1EBD, 1EC4, 1EC5, 1ED6, 1ED7, 1EE0,
+1EE1 1EEE, 1EEF, 1EF8, 1EF9</p>
 <p>“ÃÑÕãñõĨĩŨũṼṽẪẫẴẵẼẽỄễỖỗỠỡỮữỸỹ”</p></li>
 <li><p>NSM: MACRON 0304</p>
-<p>0100, 0101, 0112, 0113, 012A, 012B, 014C, 014D 016A, 016B, 01D5, 01D6, 01DE, 01DF, 01E0, 01E1 01E2, 01E3, 01EC, 01ED, 022A, 022B, 022C, 022D 0230, 0231, 0232, 0233, 04E2, 04E3, 04EE, 04EF 1E20, 1E21, 1E38, 1E39, 1E5C, 1E5D, 1FB1, 1FB9 1FD1, 1FD9, 1FE1, 1FE9</p>
+<p>0100, 0101, 0112, 0113, 012A, 012B, 014C, 014D 016A, 016B, 01D5,
+01D6, 01DE, 01DF, 01E0, 01E1 01E2, 01E3, 01EC, 01ED, 022A, 022B, 022C,
+022D 0230, 0231, 0232, 0233, 04E2, 04E3, 04EE, 04EF 1E20, 1E21, 1E38,
+1E39, 1E5C, 1E5D, 1FB1, 1FB9 1FD1, 1FD9, 1FE1, 1FE9</p>
 <p>“ĀāĒēĪīŌōŪūǕǖǞǟǠǡǢǣǬǭȪȫȬȭȰȱȲȳӢӣӮӯḠḡḸḹṜṝᾱᾹῑῙῡῩ”</p></li>
 <li><p>NSM: BREVE 0306</p>
-<p>0102, 0103, 0114, 0115, 011E, 011F, 012C, 012D 014E, 014F, 016C, 016D, 040E, 0419, 0439, 045E 04C1, 04C2, 04D0, 04D1, 04D6, 04D7, 1E1C, 1E1D 1EB6, 1EB7, 1FB0, 1FB8, 1FD0, 1FD8, 1FE0, 1FE8</p>
+<p>0102, 0103, 0114, 0115, 011E, 011F, 012C, 012D 014E, 014F, 016C,
+016D, 040E, 0419, 0439, 045E 04C1, 04C2, 04D0, 04D1, 04D6, 04D7, 1E1C,
+1E1D 1EB6, 1EB7, 1FB0, 1FB8, 1FD0, 1FD8, 1FE0, 1FE8</p>
 <p>“ĂăĔĕĞğĬĭŎŏŬŭЎЙйўӁӂӐӑӖӗḜḝẶặᾰᾸῐῘῠῨ”</p></li>
 <li><p>NSM: DOT ABOVE 0307</p>
-<p>010A, 010B, 0116, 0117, 0120, 0121, 0130, 017B 017C, 0226, 0227, 022E, 022F, 06A7, 06AC, 06B6 06BF, 06CF, 0762, 0765, 087A, 1DA1, 1E02, 1E03 1E0A, 1E0B, 1E1E, 1E1F, 1E22, 1E23, 1E40, 1E41 1E44, 1E45, 1E56, 1E57, 1E58, 1E59, 1E60, 1E61 1E64, 1E65, 1E66, 1E67, 1E68, 1E69, 1E6A, 1E6B 1E86, 1E87, 1E8A, 1E8B, 1E8E, 1E8F, 1E9B, 312E 10798, 10EB0</p>
+<p>010A, 010B, 0116, 0117, 0120, 0121, 0130, 017B 017C, 0226, 0227,
+022E, 022F, 06A7, 06AC, 06B6 06BF, 06CF, 0762, 0765, 087A, 1DA1, 1E02,
+1E03 1E0A, 1E0B, 1E1E, 1E1F, 1E22, 1E23, 1E40, 1E41 1E44, 1E45, 1E56,
+1E57, 1E58, 1E59, 1E60, 1E61 1E64, 1E65, 1E66, 1E67, 1E68, 1E69, 1E6A,
+1E6B 1E86, 1E87, 1E8A, 1E8B, 1E8E, 1E8F, 1E9B, 312E 10798, 10EB0</p>
 <p>“ĊċĖėĠġİŻżȦȧȮȯڧڬڶڿۏݢݥࡺᶡḂḃḊḋḞḟḢḣṀṁṄṅṖṗṘṙṠṡṤṥṦṧṨṩṪṫẆẇẊẋẎẏẛㄮ𐞘𐺰”</p></li>
 <li><p>NSM: DIAERESIS 0308</p>
-<p>00C4, 00CB, 00CF, 00D6, 00DC, 00E4, 00EB, 00EF 00F6, 00FC, 00FF, 0178, 03AA, 03AB, 03CA, 03CB 03D4, 0401, 0407, 0451, 0457, 04D2, 04D3, 04DA 04DB, 04DC, 04DD, 04DE, 04DF, 04E4, 04E5, 04E6 04E7, 04EA, 04EB, 04EC, 04ED, 04F0, 04F1, 04F4 04F5, 04F8, 04F9, 1DF2, 1DF3, 1DF4, 1E26, 1E27 1E4E, 1E4F, 1E7A, 1E7B, 1E84, 1E85, 1E8C, 1E8D 1E97</p>
+<p>00C4, 00CB, 00CF, 00D6, 00DC, 00E4, 00EB, 00EF 00F6, 00FC, 00FF,
+0178, 03AA, 03AB, 03CA, 03CB 03D4, 0401, 0407, 0451, 0457, 04D2, 04D3,
+04DA 04DB, 04DC, 04DD, 04DE, 04DF, 04E4, 04E5, 04E6 04E7, 04EA, 04EB,
+04EC, 04ED, 04F0, 04F1, 04F4 04F5, 04F8, 04F9, 1DF2, 1DF3, 1DF4, 1E26,
+1E27 1E4E, 1E4F, 1E7A, 1E7B, 1E84, 1E85, 1E8C, 1E8D 1E97</p>
 <p>“ÄËÏÖÜäëïöüÿŸΪΫϊϋϔЁЇёїӒӓӚӛӜӝӞӟӤӥӦӧӪӫӬӭӰӱӴӵӸӹᷲᷳᷴḦḧṎṏṺṻẄẅẌẍẗ”</p></li>
 <li><p>NSM: HOOK ABOVE 0309</p>
-<p>1EA2, 1EA3, 1EA8, 1EA9, 1EB2, 1EB3, 1EBA, 1EBB 1EC2, 1EC3, 1EC8, 1EC9, 1ECE, 1ECF, 1ED4, 1ED5 1EDE, 1EDF, 1EE6, 1EE7, 1EEC, 1EED, 1EF6, 1EF7</p>
+<p>1EA2, 1EA3, 1EA8, 1EA9, 1EB2, 1EB3, 1EBA, 1EBB 1EC2, 1EC3, 1EC8,
+1EC9, 1ECE, 1ECF, 1ED4, 1ED5 1EDE, 1EDF, 1EE6, 1EE7, 1EEC, 1EED, 1EF6,
+1EF7</p>
 <p>“ẢảẨẩẲẳẺẻỂểỈỉỎỏỔổỞởỦủỬửỶỷ”</p></li>
 <li><p>NSM: RING ABOVE 030A</p>
 <p>00C5, 00E5, 016E, 016F, 1E98, 1E99</p>
@@ -1973,25 +2653,36 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>0150, 0151, 0170, 0171, 04F2, 04F3</p>
 <p>“ŐőŰűӲӳ”</p></li>
 <li><p>NSM: HACEK 030C</p>
-<p>010C, 010D, 010E, 010F, 011A, 011B, 013D, 013E 0147, 0148, 0158, 0159, 0160, 0161, 0164, 0165 017D, 017E, 01CD, 01CE, 01CF, 01D0, 01D1, 01D2 01D3, 01D4, 01D9, 01DA, 01E6, 01E7, 01E8, 01E9 01EE, 01EF, 01F0, 021E, 021F</p>
+<p>010C, 010D, 010E, 010F, 011A, 011B, 013D, 013E 0147, 0148, 0158,
+0159, 0160, 0161, 0164, 0165 017D, 017E, 01CD, 01CE, 01CF, 01D0, 01D1,
+01D2 01D3, 01D4, 01D9, 01DA, 01E6, 01E7, 01E8, 01E9 01EE, 01EF, 01F0,
+021E, 021F</p>
 <p>“ČčĎďĚěĽľŇňŘřŠšŤťŽžǍǎǏǐǑǒǓǔǙǚǦǧǨǩǮǯǰȞȟ”</p></li>
 <li><p>NSM: DOUBLE GRAVE 030F</p>
-<p>0200, 0201, 0204, 0205, 0208, 0209, 020C, 020D 0210, 0211, 0214, 0215, 0476, 0477</p>
+<p>0200, 0201, 0204, 0205, 0208, 0209, 020C, 020D 0210, 0211, 0214,
+0215, 0476, 0477</p>
 <p>“ȀȁȄȅȈȉȌȍȐȑȔȕѶѷ”</p></li>
 <li><p>NSM: INVERTED BREVE 0311</p>
-<p>0202, 0203, 0206, 0207, 020A, 020B, 020E, 020F 0212, 0213, 0216, 0217</p>
+<p>0202, 0203, 0206, 0207, 020A, 020B, 020E, 020F 0212, 0213, 0216,
+0217</p>
 <p>“ȂȃȆȇȊȋȎȏȒȓȖȗ”</p></li>
 <li><p>NSM: COMMA ABOVE 0313</p>
-<p>1F00, 1F08, 1F10, 1F18, 1F20, 1F28, 1F30, 1F38 1F40, 1F48, 1F50, 1F60, 1F68, 1FE4</p>
+<p>1F00, 1F08, 1F10, 1F18, 1F20, 1F28, 1F30, 1F38 1F40, 1F48, 1F50,
+1F60, 1F68, 1FE4</p>
 <p>“ἀἈἐἘἠἨἰἸὀὈὐὠὨῤ”</p></li>
 <li><p>NSM: REVERSED COMMA ABOVE 0314</p>
-<p>1F01, 1F09, 1F11, 1F19, 1F21, 1F29, 1F31, 1F39 1F41, 1F49, 1F51, 1F59, 1F61, 1F69, 1FE5, 1FEC</p>
+<p>1F01, 1F09, 1F11, 1F19, 1F21, 1F29, 1F31, 1F39 1F41, 1F49, 1F51,
+1F59, 1F61, 1F69, 1FE5, 1FEC</p>
 <p>“ἁἉἑἙἡἩἱἹὁὉὑὙὡὩῥῬ”</p></li>
 <li><p>NSM: HORN 031B</p>
 <p>01A0, 01A1, 01AF, 01B0</p>
 <p>“ƠơƯư”</p></li>
 <li><p>NSM: DOT BELOW 0323</p>
-<p>068A, 0694, 06A3, 06B9, 06FA, 06FB, 06FC, 0766 088B, 08A5, 08B4, 1E04, 1E05, 1E0C, 1E0D, 1E24 1E25, 1E32, 1E33, 1E36, 1E37, 1E42, 1E43, 1E46 1E47, 1E5A, 1E5B, 1E62, 1E63, 1E6C, 1E6D, 1E7E 1E7F, 1E88, 1E89, 1E92, 1E93, 1EA0, 1EA1, 1EB8 1EB9, 1ECA, 1ECB, 1ECC, 1ECD, 1EE2, 1EE3, 1EE4 1EE5, 1EF0, 1EF1, 1EF4, 1EF5, 1BC26</p>
+<p>068A, 0694, 06A3, 06B9, 06FA, 06FB, 06FC, 0766 088B, 08A5, 08B4,
+1E04, 1E05, 1E0C, 1E0D, 1E24 1E25, 1E32, 1E33, 1E36, 1E37, 1E42, 1E43,
+1E46 1E47, 1E5A, 1E5B, 1E62, 1E63, 1E6C, 1E6D, 1E7E 1E7F, 1E88, 1E89,
+1E92, 1E93, 1EA0, 1EA1, 1EB8 1EB9, 1ECA, 1ECB, 1ECC, 1ECD, 1EE2, 1EE3,
+1EE4 1EE5, 1EF0, 1EF1, 1EF4, 1EF5, 1BC26</p>
 <p>“ڊڔڣڹۺۻۼݦࢋࢥࢴḄḅḌḍḤḥḲḳḶḷṂṃṆṇṚṛṢṣṬṭṾṿẈẉẒẓẠạẸẹỊịỌọỢợỤụỰựỴỵ𛰦”</p></li>
 <li><p>NSM: DOUBLE DOT BELOW 0324</p>
 <p>1E72, 1E73</p>
@@ -2003,13 +2694,15 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>0218, 0219, 021A, 021B</p>
 <p>“ȘșȚț”</p></li>
 <li><p>NSM: CEDILLA 0327</p>
-<p>00C7, 00E7, 0122, 0123, 0136, 0137, 013B, 013C 0145, 0146, 0156, 0157, 015E, 015F, 0162, 0163 0228, 0229, 1E10, 1E11, 1E28, 1E29</p>
+<p>00C7, 00E7, 0122, 0123, 0136, 0137, 013B, 013C 0145, 0146, 0156,
+0157, 015E, 015F, 0162, 0163 0228, 0229, 1E10, 1E11, 1E28, 1E29</p>
 <p>“ÇçĢģĶķĻļŅņŖŗŞşŢţȨȩḐḑḨḩ”</p></li>
 <li><p>NSM: OGONEK 0328</p>
 <p>0104, 0105, 0118, 0119, 012E, 012F, 0172, 0173 01EA, 01EB</p>
 <p>“ĄąĘęĮįŲųǪǫ”</p></li>
 <li><p>NSM: CIRCUMFLEX BELOW 032D</p>
-<p>1E12, 1E13, 1E18, 1E19, 1E3C, 1E3D, 1E4A, 1E4B 1E70, 1E71, 1E76, 1E77</p>
+<p>1E12, 1E13, 1E18, 1E19, 1E3C, 1E3D, 1E4A, 1E4B 1E70, 1E71, 1E76,
+1E77</p>
 <p>“ḒḓḘḙḼḽṊṋṰṱṶṷ”</p></li>
 <li><p>NSM: BREVE BELOW 032E</p>
 <p>1E2A, 1E2B</p>
@@ -2018,16 +2711,22 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <p>1E1A, 1E1B, 1E2C, 1E2D, 1E74, 1E75</p>
 <p>“ḚḛḬḭṴṵ”</p></li>
 <li><p>NSM: MACRON BELOW 0331</p>
-<p>1E06, 1E07, 1E0E, 1E0F, 1E34, 1E35, 1E3A, 1E3B 1E48, 1E49, 1E5E, 1E5F, 1E6E, 1E6F, 1E94, 1E95 1E96</p>
+<p>1E06, 1E07, 1E0E, 1E0F, 1E34, 1E35, 1E3A, 1E3B 1E48, 1E49, 1E5E,
+1E5F, 1E6E, 1E6F, 1E94, 1E95 1E96</p>
 <p>“ḆḇḎḏḴḵḺḻṈṉṞṟṮṯẔẕẖ”</p></li>
 <li><p>NSM: THREE DOTS ABOVE 20DB</p>
-<p>063F, 0685, 069E, 069F, 06A0, 06A8, 06B4, 06B7 06BD, 0763, 08A7, 08C3, 08C4, 08C5</p>
+<p>063F, 0685, 069E, 069F, 06A0, 06A8, 06B4, 06B7 06BD, 0763, 08A7,
+08C3, 08C4, 08C5</p>
 <p>“ؿڅڞڟڠڨڴڷڽݣࢧࣃࣄࣅ”</p></li>
 <li><p>NSM: FOUR DOTS ABOVE 20DC</p>
 <p>0690, 0699, 075C</p>
 <p>“ڐڙݜ”</p></li>
 <li><p>NSM: KATAKANA-HIRAGANA VOICED SOUND MARK 3099</p>
-<p>304C, 304E, 3050, 3052, 3054, 3056, 3058, 305A 305C, 305E, 3060, 3062, 3065, 3067, 3069, 3070 3073, 3076, 3079, 307C, 3094, 309E, 30AC, 30AE 30B0, 30B2, 30B4, 30B6, 30B8, 30BA, 30BC, 30BE 30C0, 30C2, 30C5, 30C7, 30C9, 30D0, 30D3, 30D6 30D9, 30DC, 30F4, 30F7, 30F8, 30F9, 30FA, 30FE FF9E</p>
+<p>304C, 304E, 3050, 3052, 3054, 3056, 3058, 305A 305C, 305E, 3060,
+3062, 3065, 3067, 3069, 3070 3073, 3076, 3079, 307C, 3094, 309E, 30AC,
+30AE 30B0, 30B2, 30B4, 30B6, 30B8, 30BA, 30BC, 30BE 30C0, 30C2, 30C5,
+30C7, 30C9, 30D0, 30D3, 30D6 30D9, 30DC, 30F4, 30F7, 30F8, 30F9, 30FA,
+30FE FF9E</p>
 <p>“がぎぐげござじずぜぞだぢづでどばびぶべぼゔゞガギグゲゴザジズゼゾダヂヅデドバビブベボヴヷヸヹヺヾﾞ”</p></li>
 <li><p>NSM: KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK 309A</p>
 <p>3071, 3074, 3077, 307A, 307D, 30D1, 30D4, 30D7 30DA, 30DD, FF9F</p>
@@ -2036,77 +2735,140 @@ Sinhala Tamil Telugu Thaana Thai Tibetan</code></pre>
 <h1 id="references">21 References</h1>
 <dl>
 <dt>[AltId] Unicode Standard Annex</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax</a></p>
+<dd>
+<p><a
+href="http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax"
+class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Alternative_Identifier_Syntax</a></p>
 </dd>
 <dt>[DefId] Unicode Standard Annex.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax" class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax</a></p>
+<dd>
+<p><a
+href="http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax"
+class="uri">http://www.unicode.org/reports/tr31/tr31-11.html#Default_Identifier_Syntax</a></p>
 </dd>
-<dt>[ISO 15924 Codes] TR24 Unicode Script Property Values and ISO 15924 Codes.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924" class="uri">https://www.unicode.org/reports/tr24/#Relation_To_ISO15924</a></p>
+<dt>[ISO 15924 Codes] TR24 Unicode Script Property Values and ISO 15924
+Codes.</dt>
+<dd>
+<p><a href="https://www.unicode.org/reports/tr24/#Relation_To_ISO15924"
+class="uri">https://www.unicode.org/reports/tr24/#Relation_To_ISO15924</a></p>
 </dd>
-<dt>[libu8ident] Reini Urban. 2022. Unicode security guidelines for identifiers.</dt>
-<dd><p><a href="https://github.com/rurban/libu8ident/" class="uri">https://github.com/rurban/libu8ident/</a></p>
+<dt>[libu8ident] Reini Urban. 2022. Unicode security guidelines for
+identifiers.</dt>
+<dd>
+<p><a href="https://github.com/rurban/libu8ident/"
+class="uri">https://github.com/rurban/libu8ident/</a></p>
 </dd>
 </dl>
-<p>[N3146] Clark Nelson. 2010. Recommendations for extended identifier characters for C and C++.</p>
-<p>: <a href="https://wg21.link/n3146" class="uri">https://wg21.link/n3146</a></p>
-<p>[P1949] Steve Downey et al. 2021. C++ Identifier Syntax using Unicode Standard Annex 31.</p>
-<p>: <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html" class="uri">http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html</a></p>
+<p>[N3146] Clark Nelson. 2010. Recommendations for extended identifier
+characters for C and C++.</p>
+<p>: <a href="https://wg21.link/n3146"
+class="uri">https://wg21.link/n3146</a></p>
+<p>[P1949] Steve Downey et al. 2021. C++ Identifier Syntax using Unicode
+Standard Annex 31.</p>
+<p>: <a
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html"
+class="uri">http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html</a></p>
 <dl>
 <dt>[TR15] Ken Whistler. Unicode Normalization Forms.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr15" class="uri">http://www.unicode.org/reports/tr15</a></p>
+<dd>
+<p><a href="http://www.unicode.org/reports/tr15"
+class="uri">http://www.unicode.org/reports/tr15</a></p>
 </dd>
 <dt>[TR24] Ken Whistler. Unicode Script Property.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr24/#Common" class="uri">https://www.unicode.org/reports/tr24/#Common</a></p>
+<dd>
+<p><a href="https://www.unicode.org/reports/tr24/#Common"
+class="uri">https://www.unicode.org/reports/tr24/#Common</a></p>
 </dd>
 <dt>[TR24#5.1] Handling Characters with the Common Script Property.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr24/#Common" class="uri">https://www.unicode.org/reports/tr24/#Common</a></p>
+<dd>
+<p><a href="https://www.unicode.org/reports/tr24/#Common"
+class="uri">https://www.unicode.org/reports/tr24/#Common</a></p>
 </dd>
 <dt>[TR24#5.2] Handling Combining Marks.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks" class="uri">https://www.unicode.org/reports/tr24/#Nonspacing_Marks</a></p>
+<dd>
+<p><a href="https://www.unicode.org/reports/tr24/#Nonspacing_Marks"
+class="uri">https://www.unicode.org/reports/tr24/#Nonspacing_Marks</a></p>
 </dd>
 <dt>[TR31] Mark Davis. Unicode Identifier and Pattern Syntax.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr31" class="uri">http://www.unicode.org/reports/tr31</a></p>
+<dd>
+<p><a href="http://www.unicode.org/reports/tr31"
+class="uri">http://www.unicode.org/reports/tr31</a></p>
 </dd>
 <dt>[TR31#2.1] Combining Marks.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr31/#Combining_Marks" class="uri">https://www.unicode.org/reports/tr31/#Combining_Marks</a></p>
+<dd>
+<p><a href="https://www.unicode.org/reports/tr31/#Combining_Marks"
+class="uri">https://www.unicode.org/reports/tr31/#Combining_Marks</a></p>
 </dd>
 <dt>[TR31#2.2] Modifier Letters.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr31/#Modifier_Letters" class="uri">https://www.unicode.org/reports/tr31/#Modifier_Letters</a></p>
+<dd>
+<p><a href="https://www.unicode.org/reports/tr31/#Modifier_Letters"
+class="uri">https://www.unicode.org/reports/tr31/#Modifier_Letters</a></p>
 </dd>
-<dt>[TR31#Table 4] Table Candidate Characters for Exclusion from Identifiers.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers" class="uri">https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers</a></p>
+<dt>[TR31#Table 4] Table Candidate Characters for Exclusion from
+Identifiers.</dt>
+<dd>
+<p><a
+href="https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers"
+class="uri">https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers</a></p>
 </dd>
 <dt>[TR31#Table 7] Limited Use Scripts.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts" class="uri">http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts</a></p>
+<dd>
+<p><a
+href="http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts"
+class="uri">http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts</a></p>
 </dd>
-<dt>[TR36] Mark Davis and Michel Suignard. Unicode Security Considerations.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr36" class="uri">http://www.unicode.org/reports/tr36</a></p>
+<dt>[TR36] Mark Davis and Michel Suignard. Unicode Security
+Considerations.</dt>
+<dd>
+<p><a href="http://www.unicode.org/reports/tr36"
+class="uri">http://www.unicode.org/reports/tr36</a></p>
 </dd>
-<dt>[TR39] Mark Davis and Michel Suignard. Unicode Security Mechanisms.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr36" class="uri">http://www.unicode.org/reports/tr36</a></p>
+<dt>[TR39] Mark Davis and Michel Suignard. Unicode Security
+Mechanisms.</dt>
+<dd>
+<p><a href="http://www.unicode.org/reports/tr36"
+class="uri">http://www.unicode.org/reports/tr36</a></p>
 </dd>
 </dl>
 <p>[TR39#Table 1] Identifier Status and Type Table 1.</p>
-<p><a href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type" class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a></p>
+<p><a
+href="https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type"
+class="uri">https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type</a></p>
 <dl>
 <dt>[TR39#4] Confusable Detection.</dt>
-<dd><p>&lt;https://www.unicode.org/reports/tr39/#Confusable Detection&gt;</p>
+<dd>
+<p>&lt;https://www.unicode.org/reports/tr39/#Confusable
+Detection&gt;</p>
 </dd>
 <dt>[TR39#5.2] Mixed-Scripts Restriction-Level Detection.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection" class="uri">https://www.unicode.org/reports/tr39/#Restriction_Level_Detection</a></p>
+<dd>
+<p><a
+href="https://www.unicode.org/reports/tr39/#Restriction_Level_Detection"
+class="uri">https://www.unicode.org/reports/tr39/#Restriction_Level_Detection</a></p>
 </dd>
 <dt>[TR39#5.4] Optional Detection.</dt>
-<dd><p><a href="https://www.unicode.org/reports/tr39/#Optional_Detection" class="uri">https://www.unicode.org/reports/tr39/#Optional_Detection</a></p>
+<dd>
+<p><a href="https://www.unicode.org/reports/tr39/#Optional_Detection"
+class="uri">https://www.unicode.org/reports/tr39/#Optional_Detection</a></p>
 </dd>
-<dt>[TR44] Ken Whistler and Laurențiu Iancu. Unicode Character Database.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr44" class="uri">http://www.unicode.org/reports/tr44</a></p>
+<dt>[TR44] Ken Whistler and Laurențiu Iancu. Unicode Character
+Database.</dt>
+<dd>
+<p><a href="http://www.unicode.org/reports/tr44"
+class="uri">http://www.unicode.org/reports/tr44</a></p>
 </dd>
-<dt>[TR46] Mark Davis and Michel Suignard. Unicode IDNA Compatibility Processing.</dt>
-<dd><p><a href="http://www.unicode.org/reports/tr46" class="uri">http://www.unicode.org/reports/tr46</a></p>
+<dt>[TR46] Mark Davis and Michel Suignard. Unicode IDNA Compatibility
+Processing.</dt>
+<dd>
+<p><a href="http://www.unicode.org/reports/tr46"
+class="uri">http://www.unicode.org/reports/tr46</a></p>
 </dd>
-<dt>[TR55] Robin Leroy amd Mark Davis. Unicode IDNA Compatibility Processing.</dt>
-<dd><p><a href="https://unicode.org/reports/tr55/#Identifier-Chunks" class="uri">https://unicode.org/reports/tr55/#Identifier-Chunks</a> (Proposed Draft 2022-11-18)</p>
+<dt>[TR55] Robin Leroy amd Mark Davis. Unicode IDNA Compatibility
+Processing.</dt>
+<dd>
+<p><a href="https://unicode.org/reports/tr55/#Identifier-Chunks"
+class="uri">https://unicode.org/reports/tr55/#Identifier-Chunks</a>
+(Proposed Draft 2022-11-18)</p>
 </dd>
 </dl>
 </body>

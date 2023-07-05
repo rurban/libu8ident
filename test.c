@@ -28,7 +28,7 @@ static char buf[128]; // for hex display
 
 // private access
 unsigned u8ident_options(void);
-unsigned u8ident_profile(void);
+enum u8id_profile u8ident_profile(void);
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 static inline bool is_profile_6(void) {
