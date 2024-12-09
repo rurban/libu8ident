@@ -594,7 +594,7 @@ codepoint.
 LICENSE
 -------
 
-Copyright (c) 2021,2022, Reini Urban. All rights reserved.
+Copyright (c) 2021,2022,2024 Reini Urban. All rights reserved.
 
 This software is dual-licensed under either the Apache-2.0 license or the
 GPL-2.0 or later. See the LICENSE file.
@@ -632,7 +632,7 @@ TODO
 * **FCD**: This normalization is broken.
 
 * **gperf** for integer keys: Check perfect hash performance for some
-  sparse tables, such as i.e. confusables. See my gperf intkeys branch on [gitlab](https://gitlab.com/rurban/gperf/commits/intkeys).
+  sparse tables, such as i.e. confusables. See my gperf intkeys branch on [gitlab](https://gitlab.com/rurban/gperf/commits/intkeys). Or my [nbperf](https://github.com/rurban/nbperf/) intkey support.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
 

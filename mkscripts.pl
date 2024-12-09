@@ -345,6 +345,7 @@ open my $SCX, "<", $scxn or die "$scxn $!";
 my $scl;
 while (<$SCX>) {
   if (/^# Script_Extensions=/) { $started++; }
+  if (/^# \@/) { $started++; }
   next unless $started;
   if (/^([0-9A-F]{4,5})\.\.([0-9A-F]{4,5})\s+; ([\w ]+) # (\w.) /) {
     ($from, $to, $scl, $gc) = (hex($1), hex($2), $3, $4);
