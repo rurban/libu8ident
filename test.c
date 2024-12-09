@@ -71,7 +71,8 @@ void test_scripts_no_init(void) {
   assert(scx->gc == GC_Mn);
   assert(strlen(scx->scx) == 2);
   assert(scx->scx[0] == 0x03);   // Arab
-  assert(scx->scx[1] == '\x9b'); // Syrc, signed!
+  assert(strcmp(u8ident_script_name((uint8_t)scx->scx[0]), "Arabic") == 0);
+  assert(strcmp(u8ident_script_name((uint8_t)scx->scx[1]), "Syriac") == 0);
 #ifndef DISABLE_CHECK_XID
   assert(!isID_start('0'));
   assert(!isXID_start('0'));
