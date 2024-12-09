@@ -258,7 +258,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 
 #ifdef HAVE_CONFUS
     /* allow some latin confusables: 0 1 I ` | U+30, U+31, U+49, U+60, U+7C */
-    /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6 */
+    /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6, 0x03BB (λ) */
     if (unlikely(s_u8id_options &
                      (U8ID_WARN_CONFUSABLE | U8ID_ERROR_CONFUSABLE) &&
                  cp > 0x7C)) {

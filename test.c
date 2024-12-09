@@ -197,8 +197,8 @@ void test_script(void) {
   assert(strEQc(u8ident_script_name(u8ident_get_script(0x3BB)), "Greek"));
   // last
   assert(strEQc(u8ident_script_name(u8ident_get_script(0x3E1)), "Greek"));
-  // U+3BB Greek
-  int ret = u8ident_check((const uint8_t *)"λ2", NULL);
+  // Δ Greek is currently not latin-greek confusable
+  int ret = u8ident_check((const uint8_t *)"Δ2", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek only
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   const char *s = u8ident_existing_scripts(ctx);
@@ -206,7 +206,7 @@ void test_script(void) {
   free((char *)s);
 #endif
 
-  ret = u8ident_check((const uint8_t *)"aλ", NULL); // Latin + Greek
+  ret = u8ident_check((const uint8_t *)"aΔ", NULL); // Latin + Greek
   CHECK_RET(ret, U8ID_EOK, ctx);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   s = u8ident_existing_scripts(ctx);
@@ -516,6 +516,8 @@ void test_mixed_scripts(int xid_check) {
   }
 #endif
 
+#if U8ID_UNICODE_MAJOR < 15
+  // GREEK SMALL LETTER LAMDA did have no LATIN counter-part then (it has now)
   ret = u8ident_check((const uint8_t *)"abcλ", NULL); // Greek
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
@@ -534,12 +536,37 @@ void test_mixed_scripts(int xid_check) {
 #else
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #endif
+  u8ident_free();
+
+#else // new UNICODE 16 confusables
+
+  // Now confusable LATIN SMALL LETTER LAMBDA → GREEK SMALL LETTER LAMDA
+  ret = u8ident_check((const uint8_t *)"abcΔ", NULL); // Greek
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK, 0);
+#endif
+  u8ident_free();
+
+  u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
+  ret = u8ident_check((const uint8_t *)"abcΔѝ", NULL); // Greek + Cyrillic
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C26_4
+  CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
+    U8ID_NORM == FCC
+  CHECK_RET(ret, U8ID_EOK, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
+#endif
+  u8ident_free();
+#endif
 
   // U+37B Greek, U+985 Bengali. 37B confusable with latin
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#elif U8ID_PROFILE == C26_4
+#elif U8ID_PROFILE == C26_4 && U8ID_UNICODE_MAJOR < 16
   CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // multi-scripts allowed in 5 and 6
