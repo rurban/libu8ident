@@ -121,6 +121,7 @@ Unicode-Normalize: un8ifcan.h
 	  git clone https://github.com/rurban/Unicode-Normalize; fi
 regen-norm: Unicode-Normalize un8ifcan.h
 	cd $(srcdir)/Unicode-Normalize && \
+	  $(PERL) mkheader && \
 	  $(PERL) Makefile.PL && \
 	  make && \
 	  $(PERL) mkheader -ind -std && \
