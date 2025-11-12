@@ -1,4 +1,4 @@
-/* ANSI-C code produced by gperf version 3.1 */
+/* ANSI-C code produced by gperf version 3.2 */
 /* Command-line: gperf -n gconfus.h.in  */
 /* Computed positions: -k'1-5' */
 
@@ -101,12 +101,17 @@ hash (register const char *str, register size_t len)
       164050, 164050, 164050, 164050, 164050, 164050, 164050, 164050, 164050, 164050,
       164050, 164050, 164050, 164050, 164050, 164050, 164050
     };
+  (void) len;
   return asso_values[(unsigned char)str[4]+37] + asso_values[(unsigned char)str[3]+1] + asso_values[(unsigned char)str[2]+59] + asso_values[(unsigned char)str[1]+29] + asso_values[(unsigned char)str[0]];
 }
 
 const struct confus_gperf *
 in_word_set (register const char *str, register size_t len)
 {
+#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) || (defined __clang__ && __clang_major__ >= 3)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
   static const struct confus_gperf wordlist[] =
     {
       {(char*)0}, {(char*)0}, {(char*)0},
@@ -54415,6 +54420,9 @@ in_word_set (register const char *str, register size_t len)
 #line 5266 "gconfus.h.in"
       {"0335E",	"6\347\202\271"}
     };
+#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) || (defined __clang__ && __clang_major__ >= 3)
+#pragma GCC diagnostic pop
+#endif
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
@@ -54428,7 +54436,7 @@ in_word_set (register const char *str, register size_t len)
             return &wordlist[key];
         }
     }
-  return 0;
+  return (struct confus_gperf *) 0;
 }
 #line 12735 "gconfus.h.in"
 
