@@ -54,7 +54,7 @@ CFLAGS += -I../CRoaring
 HDRS += confus_croar.h roaring.h
 endif
 endif
-ALLHDRS = $(HDRS) unic26.h
+ALLHDRS = $(HDRS) unitr39.h
 #OBJS = u8ident.o u8idscr.o u8idnorm.o u8idroar.o
 OBJS = $(SRC:.c=.o)
 LIB = libu8ident.a
@@ -127,7 +127,7 @@ endif
 
 most: $(LIB) $(SOLIB) u8idlint doc/$(DCURCXX).html
 
-all: mkc26 most test-texts test perf docs
+all: mktr39 most test-texts test perf docs
 
 .version: makefile.gnu
 	build-aux/git-version-gen .version
@@ -170,7 +170,7 @@ medial.h: mkmedial.pl # UnicodeData.txt
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl FORCE
 	$(PERL) mkconfus.pl
 
-u8idlint: u8idlint.c unic26.h unic11.h $(LIB)
+u8idlint: u8idlint.c unitr39.h unic11.h $(LIB)
 	$(CC) $(CFLAGS_REL) -fpie $(DEFINES) -I. -Iinclude u8idlint.c -o $@ $(LIB) $(LIBUNISTR)
 
 .PHONY: check check-all check-extra check-asan check-norms check-profiles check-tr31 check-mdl \
@@ -224,10 +224,10 @@ regen-u8idlint-test: u8idlint
 	-./u8idlint -xid texts/bidi-sec-2.c >texts/bidi-sec-2.tst
 	-./u8idlint -xc11 texts/bidi-sec-2.c >texts/bidi-sec-2-c11.tst
 
-c11-all.h unic26.h: mkc26 scripts.h mark.h medial.h
-	./mkc26
-mkc26: mkc26.c $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_TR39 -I. -Iinclude mkc26.c $(SRC) -o $@
+c11-all.h unitr39.h: mktr39 scripts.h mark.h medial.h
+	./mktr39
+mktr39: mktr39.c $(SRC) $(HEADER) $(HDRS)
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_TR39 -I. -Iinclude mktr39.c $(SRC) -o $@
 check-asan: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
@@ -243,7 +243,7 @@ perf: perf.c u8idroar.c $(HEADER) $(ALLHDRS) \
 
 clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o $(LIB) $(SOLIB) \
-	       perf mkroar mkc26 u8idlint example \
+	       perf mkroar mktr39 u8idlint example \
 	       test test-texts test-asan test-tr31 \
 	       test-prof{2,3,4,5,6,TR39_4,C11_6,TR39,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD} \

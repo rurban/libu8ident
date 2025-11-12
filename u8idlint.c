@@ -39,7 +39,7 @@
 #include "u8idscr.h"
 #define EXTERN_SCRIPTS
 #include "unic11.h"
-#include "unic26.h"
+#include "unitr39.h"
 //#include "mark.h"
 
 int verbose = 0;

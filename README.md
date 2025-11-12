@@ -204,7 +204,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   allowing secure identifiers. `U8ID_PROFILE_TR39_4` is the secure
   extension over C11, disallowing the restricted and limited_use
   scripts and identifiers, arbitrary rtl and ltr overrides, and all
-  the insecure mixed scripts combinations.  See `unic26.h`, and the
+  the insecure mixed scripts combinations.  See `unitr39.h`, and the
   C++26 paper [D2528R1](doc/D2528R1.md).
 
 `c11_6`. **C11STD**

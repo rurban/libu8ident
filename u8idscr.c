@@ -39,7 +39,7 @@
 // we are the owner of these lists
 #undef EXTERN_SCRIPTS
 #include "unic11.h"
-#include "unic26.h"
+#include "unitr39.h"
 #include "medial.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)

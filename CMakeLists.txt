@@ -223,10 +223,10 @@ if(NOT CMAKE_CROSSCOMPILING)
   set(ENV{U8IDTEST_TEXTS} "${CMAKE_CURRENT_SOURCE_DIR}/texts")
   add_executable(test-texts test-texts.c ${libu8ident_SOURCES})
   add_test(test-texts ./test-texts)
-  add_executable(mkc26 mkc26.c ${libu8ident_SOURCES})
-  set_source_files_properties(mkc26
+  add_executable(mktr39 mktr39.c ${libu8ident_SOURCES})
+  set_source_files_properties(mktr39
     PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_TR39)
-  add_test(mkc26 ./mkc26)
+  add_test(mktr39 ./mktr39)
 endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(

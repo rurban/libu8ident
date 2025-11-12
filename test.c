@@ -14,7 +14,7 @@
 #  include "u8idroar.h"
 #endif
 #define EXTERN_SCRIPTS
-#include "unic26.h"
+#include "unitr39.h"
 #include "medial.h"
 #undef EXTERN_SCRIPTS
 #ifdef HAVE_CONFUS

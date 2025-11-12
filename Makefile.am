@@ -27,7 +27,7 @@ bin_PROGRAMS = u8idlint
 u8idlint_SOURCES = u8idlint.c $(libu8ident_la_SOURCES)
 u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 u8idlint_LDADD = $(u8idlint_LIBS)
-EXTRA_HEADERS = c11-safe.h unic26.h
+EXTRA_HEADERS = c11-safe.h unitr39.h
 
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc
@@ -50,7 +50,7 @@ doc_DATA += $(html_DATA)
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h medial.h unic11.h unic26.h scripts16.h gconfus.h htable.h
+	confus_croar.h mark.h medial.h unic11.h unitr39.h scripts16.h gconfus.h htable.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
 	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
 	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -138,7 +138,7 @@ regen-scripts:
 	$(PERL) mkscripts.pl
 	$(PERL) mkgc.pl
 	$(PERL) mkmark.pl
-	-$(MAKE) unic26.h
+	-$(MAKE) unitr39.h
 # Download some UCD files and create confus.h
 regen-confus:
 	-$(WGET) -N https://www.unicode.org/Public/security/latest/confusables.txt
@@ -203,7 +203,7 @@ regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(DCU
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man \
 	pkg docs patch-c-doc regen-c-patch docker-html docker-pdf
 
-EXTRA_PROGRAMS = mkc26 test test-texts example
+EXTRA_PROGRAMS = mktr39 test test-texts example
 TESTS = test example
 if !HAVE_WINDOWS
 EXTRA_PROGRAMS += test_asan
@@ -214,8 +214,8 @@ test_CFLAGS = $(AM_CFLAGS)
 test_texts_SOURCES = test-texts.c $(libu8ident_la_SOURCES)
 test_texts_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_LDADD = $(u8idlint_LIBS)
-mkc26_SOURCES = mkc26.c $(libu8ident_la_SOURCES)
-mkc26_CFLAGS = $(AM_CFLAGS)
+mktr39_SOURCES = mktr39.c $(libu8ident_la_SOURCES)
+mktr39_CFLAGS = $(AM_CFLAGS)
 example_SOURCES = example.c
 example_LDADD = libu8ident.la
 test_asan_CFLAGS = $(AM_CFLAGS) -g -fsanitize=address
@@ -241,12 +241,12 @@ mkroar: mkroar.c
 	@echo "ERROR mkroar requires roaring.c (--with-croaring)"
 endif
 
-c11-all.h unic26.h: mkc26$(EXEEXT) scripts.h mark.h medial.h
-	./mkc26$(EXEXT)
+c11-all.h unitr39.h: mktr39$(EXEEXT) scripts.h mark.h medial.h
+	./mktr39$(EXEXT)
 if !HAVE_WINDOWS
-	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unic26.h $(srcdir)/
+	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unitr39.h $(srcdir)/
 else
-	-copy /y c11-all.h unic26.h $(srcdir)/
+	-copy /y c11-all.h unitr39.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
@@ -347,7 +347,7 @@ dist-hook:
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,TR39_4,C11_6,TR39,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) perf$(EXEEXT) \
-	     texts.tst mkc26$(EXEEXT) example$(EXEEXT)
+	     texts.tst mktr39$(EXEEXT) example$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst \
 	     test-texts.test doc/$(NCURC).pdf
 distclean-compile:
