@@ -9,7 +9,7 @@
 */
 
 #ifdef EXTERN_SCRIPTS
-extern const struct range_bool medial_list[77];
+extern const struct range_bool medial_list[75];
 #else
 const struct range_bool medial_list[] = {
     // clang-format off
@@ -88,8 +88,6 @@ const struct range_bool medial_list[] = {
     {0x1171D, 0x1171F},	// 𑜝..𑜟
     {0x11940, 0x11940},	// 𑥀
     {0x11942, 0x11942},	// 𑥂
-    {0x1612A, 0x1612C},	// 𖄪..𖄬
-    {0x1612E, 0x1612E},	// 𖄮
     // clang-format on
-}; // 8 ranges, 69 singles, 116 codepoints
+}; // 7 ranges, 68 singles, 112 codepoints
 #endif

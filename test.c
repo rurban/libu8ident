@@ -95,10 +95,32 @@ void test_scripts_no_init(void) {
   assert(isALLUTF8_cont('0'));
   assert(isASCII_cont('0'));
 
+  assert(!isID_start('$'));
+  assert(!isXID_start('$'));
+  assert(!isID_cont('$'));
+  assert(!isXID_cont('$'));
+  assert(!isALLOWED_start('$'));
+  assert(!isALLOWED_cont('$'));
+  // GH #25: It is implementation-defined if $ is allowed in identifiers
+#ifdef ALLOW_DOLLAR /* default */
+  assert(isC11_start('$'));
+  assert(isTR39_start('$'));
+  assert(isC23_start('$'));
+  assert(isC11_cont('$'));
+  assert(isTR39_cont('$'));
+  assert(isC23_cont('$'));
+#else
+  assert(!isC11_start('$'));
+  assert(!isTR39_start('$'));
+  assert(!isC23_start('$'));
+  assert(!isC11_cont('$'));
+  assert(!isTR39_cont('$'));
+  assert(!isC23_cont('$'));
+#endif
+
   assert(isALLOWED_cont(0x27));  // '
   assert(!isALLOWED_cont(0x26)); // &
   assert(isALLOWED_cont(0x40e)); // Ў
-
 #if !defined U8ID_NORM || U8ID_NORM == NFC
   assert(isC23_cont(0x311)); // ̑
 #endif

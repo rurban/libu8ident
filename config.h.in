@@ -5,6 +5,9 @@
 #define __U8ID_CONF_H__
 
 
+/* Defined to 1 to enable $ in identifiers */
+#undef ALLOW_DOLLAR
+
 /* Defined to the path to the CRoaring library */
 #undef CROARING_PATH
 

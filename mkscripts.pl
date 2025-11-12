@@ -892,7 +892,7 @@ extern const struct scx scx_list[%u];
 
 #ifndef DISABLE_CHECK_XID
 // Allowed scripts from IdentifierStatus.txt. TR 39
-// Note that this includes 0..9 already
+// Note that this includes 0..9 already, but \$ not.
 #  ifndef EXTERN_SCRIPTS
 LOCAL const struct range_bool allowed_id_list[] = {
     // clang-format off

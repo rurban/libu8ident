@@ -1,5 +1,5 @@
 # configure.ac - Process with autoconf to produce a configure script
-# (C) 2021-2022  Reini Urban <rurban@cpan.org>
+# (C) 2021-2022,2025  Reini Urban <rurban@cpan.org>
 # See LICENSE
 AC_PREREQ([2.69])
 AC_INIT([libu8ident],
@@ -165,6 +165,20 @@ if test -n "$CROARING_PATH"; then
 fi
 AM_CONDITIONAL([HAVE_CONFUS], [test x$HAVE_CONFUS = x1])
 AM_CONDITIONAL([HAVE_CROARING], [test x$HAVE_CROARING = x1])
+
+AC_MSG_CHECKING([for --disable-dollar])
+AC_ARG_ENABLE([dollar],
+        [AS_HELP_STRING([--disable-dollar],
+	  [disables '$' in identifiers @<:@default=enabled@:>@])],
+	[case "${enableval}" in
+	yes) ALLOW_DOLLAR=1;
+             AC_DEFINE([ALLOW_DOLLAR], 1,
+               [Defined to 1 to enable $ in identifiers])
+             AC_MSG_RESULT([no])
+             ;;
+	*)   AC_MSG_RESULT([yes]) ;;
+	esac], [ALLOW_DOLLAR=yes ])
+AC_SUBST([ALLOW_DOLLAR])
 
 AC_MSG_NOTICE([
 
