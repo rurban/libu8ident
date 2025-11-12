@@ -53,7 +53,7 @@
 #define FCD 4
 #define FCC 5
 #define C11_6 7
-#define C26_4 8
+#define TR39_4 8
 
 // allowed set of identifiers. TR31 --xid tokenizer options
 // we need XID, the default, as first for uninitialized options.
@@ -61,7 +61,7 @@ enum xid_e {
   XID,     // ID minus NFKC quirks, labelled stable, the default.
   ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts.
   ALLOWED, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
-  SAFEC26, // practical XID with TR39 security measures, see P2528R1.
+  TR39, // practical XID with TR39 security measures, see P2528R1.
   C23,     // XID with NFC requirement from C23 (P1949, N2828).
   C11,     // the stable insecure AltId ranges from the C11 standard, Annex D.
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal.
@@ -70,7 +70,7 @@ enum xid_e {
 #define XID 0
 #define ID 1
 #define ALLOWED 2
-#define SAFEC26 3
+#define TR39 3
 #define C23 4
 #define C11 5
 #define ALLUTF8 6
@@ -118,18 +118,18 @@ enum xid_e {
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_5
 #  elif U8ID_PROFILE == 6
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_6
-#  elif U8ID_PROFILE == C26_4
-#    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C26_4
-#    define U8ID_PROFILE_SAFEC26
+#  elif U8ID_PROFILE == TR39_4
+#    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_TR39_4
+#    define U8ID_PROFILE_TR39
 #  elif U8ID_PROFILE == C11_6
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
 #    define U8ID_PROFILE_C11STD
 #  else
 #    error "Invalid U8ID_PROFILE "_XSTR(U8ID_PROFILE)
 #  endif
-#elif defined U8ID_PROFILE_SAFEC26
-#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C26_4
-#  define U8ID_PROFILE C26_4
+#elif defined U8ID_PROFILE_TR39
+#  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_TR39_4
+#  define U8ID_PROFILE TR39_4
 #elif defined U8ID_PROFILE_C11STD
 #  define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
 #  define U8ID_PROFILE C11_6
@@ -155,8 +155,8 @@ enum xid_e {
 #      define U8ID_TR31_DEFAULT U8ID_TR31_ALLOWED
 #    elif U8ID_TR31 == ASCII
 #      define U8ID_TR31_DEFAULT U8ID_TR31_ASCII
-#    elif U8ID_TR31 == SAFEC26
-#      define U8ID_TR31_DEFAULT U8ID_TR31_SAFEC26
+#    elif U8ID_TR31 == TR39
+#      define U8ID_TR31_DEFAULT U8ID_TR31_TR39
 #    elif U8ID_TR31 == ID
 #      define U8ID_TR31_DEFAULT U8ID_TR31_ID
 #    elif U8ID_TR31 == XID
@@ -174,7 +174,7 @@ enum xid_e {
 #endif
 
 #if defined U8ID_NORM && (U8ID_NORM != NFC)
-#  if (U8ID_TR31 == SAFEC26) || (U8ID_TR31 == C23)
+#  if (U8ID_TR31 == TR39) || (U8ID_TR31 == C23)
 #    error "Invalid U8ID_NORM with U8ID_TR31"
 #  endif
 #endif

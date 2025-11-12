@@ -213,12 +213,12 @@ test-texts: test-texts.c $(SRC) $(HEADER) $(ALLHDRS)
 example: example.c $(SOLIB)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -Iinclude example.c -o $@ -L. -lu8ident
 regen-u8idlint-test: u8idlint
-	-./u8idlint -xsafec26 texts/homo-sec-1.c >texts/homo-sec-1.tst
+	-./u8idlint -xtr39 texts/homo-sec-1.c >texts/homo-sec-1.tst
 	-./u8idlint -p1 -xc11 texts/homo-sec-1.c >texts/homo-sec-1-p1.tst
 	-./u8idlint -xc11 texts/homo-1.c >texts/homo-1.tst
 	-./u8idlint -xallowed texts/bidi-sec-1.c >texts/bidi-sec-1.tst
 	-./u8idlint -xc11 texts/bidi-sec-1.c >texts/bidi-sec-1-c11.tst
-	-./u8idlint -xsafec26 texts/bidi-sec-1.c >texts/bidi-sec-1-c26.tst
+	-./u8idlint -xtr39 texts/bidi-sec-1.c >texts/bidi-sec-1-c26.tst
 	-./u8idlint -xascii texts/bidi-sec-2.c >texts/bidi-sec-2-ascii.tst
 	-./u8idlint -xallowed texts/bidi-sec-2.c >texts/bidi-sec-2-allowed.tst
 	-./u8idlint -xid texts/bidi-sec-2.c >texts/bidi-sec-2.tst
@@ -227,7 +227,7 @@ regen-u8idlint-test: u8idlint
 c11-all.h unic26.h: mkc26 scripts.h mark.h medial.h
 	./mkc26
 mkc26: mkc26.c $(SRC) $(HEADER) $(HDRS)
-	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_SAFEC26 -I. -Iinclude mkc26.c $(SRC) -o $@
+	$(CC) $(CFLAGS_DBG) -O1 $(DEFINES) -DU8ID_PROFILE_TR39 -I. -Iinclude mkc26.c $(SRC) -o $@
 check-asan: test.c $(SRC) $(HEADER) $(ALLHDRS)
 	$(CC) $(CFLAGS_DBG) $(DEFINES) -fsanitize=address -I. -Iinclude test.c $(SRC) -o test-asan
 	./test-asan
@@ -245,7 +245,7 @@ clean:
 	-rm -f u8ident.o u8idnorm.o u8idscr.o u8idroar.o $(LIB) $(SOLIB) \
 	       perf mkroar mkc26 u8idlint example \
 	       test test-texts test-asan test-tr31 \
-	       test-prof{2,3,4,5,6,C26_4,C11_6,SAFEC26,C11STD} \
+	       test-prof{2,3,4,5,6,TR39_4,C11_6,TR39,C11STD} \
 	       test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD} \
 
 # Maintainer-only
@@ -260,20 +260,20 @@ check-norms: $(SRC) $(HEADER) $(ALLHDRS)
 	    if ./test-norm-$$n norm; then rm test-norm-$$n; else exit; fi; \
         done
 check-profiles: $(SRC) $(HEADER) $(ALLHDRS)
-	for n in 2 3 4 5 6 C11_6 C26_4; do \
+	for n in 2 3 4 5 6 C11_6 TR39_4; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE=$$n -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && \
 	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
-	for n in SAFEC26 C11STD; do \
+	for n in TR39 C11STD; do \
             echo PROFILE_$${n}; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_PROFILE_$${n} -I. -Iinclude test.c $(SRC) \
 	      -o test-prof$$n && \
 	    if ./test-prof$$n profile; then rm test-prof$$n; else exit; fi; \
         done
 check-tr31: $(SRC) $(HEADER) $(ALLHDRS)
-	for x in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
+	for x in ALLOWED TR39 ID XID C11 C23 ALLUTF8 NONE; do \
             echo U8ID_TR31_$$x; \
 	    $(CC) $(CFLAGS_DBG) $(DEFINES) -DU8ID_TR31=$$x -I. -Iinclude test.c $(SRC) \
 	      -o test-xid-$$x && \
@@ -281,9 +281,9 @@ check-tr31: $(SRC) $(HEADER) $(ALLHDRS)
         done
 check-all-combinations: $(SRC) $(HEADER) $(ALLHDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
-	  for p in 2 3 4 5 6 C11_6 C26_4; do \
-	    for x in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
-	      if [ $$n != NFC ] && [ $$p = C26_4 -o $$x = SAFEC26 -o $$x = C23 ]; then \
+	  for p in 2 3 4 5 6 C11_6 TR39_4; do \
+	    for x in ALLOWED TR39 ID XID C11 C23 ALLUTF8 NONE; do \
+	      if [ $$n != NFC ] && [ $$p = TR39_4 -o $$x = TR39 -o $$x = C23 ]; then \
 		echo "skip -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
               else \
 	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \

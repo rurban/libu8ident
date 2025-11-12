@@ -35,7 +35,7 @@ static inline bool is_profile_6(void) {
   return u8ident_profile() == 6 || u8ident_profile() == C11_6;
 }
 //static inline bool is_profile_4(void) {
-//  return u8ident_profile() == 4 || u8ident_profile() == C26_4;
+//  return u8ident_profile() == 4 || u8ident_profile() == TR39_4;
 //}
 
 // check if the library can be used without init: script lookups, default checks
@@ -81,7 +81,7 @@ void test_scripts_no_init(void) {
 #if !defined U8ID_NORM || U8ID_NORM == NFC
   assert(!isC23_start('0'));
 #endif
-  assert(!isSAFEC26_start('0'));
+  assert(!isTR39_start('0'));
   assert(!isALLUTF8_start('0'));
   assert(!isASCII_start('0'));
   assert(isID_cont('0'));
@@ -91,7 +91,7 @@ void test_scripts_no_init(void) {
 #if !defined U8ID_NORM || U8ID_NORM == NFC
   assert(isC23_cont('0'));
 #endif
-  assert(isSAFEC26_cont('0'));
+  assert(isTR39_cont('0'));
   assert(isALLUTF8_cont('0'));
   assert(isASCII_cont('0'));
 
@@ -316,7 +316,7 @@ void test_norm_nfkc(void) {
 
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
-  if (u8ident_tr31() != U8ID_TR31_SAFEC26 &&
+  if (u8ident_tr31() != U8ID_TR31_TR39 &&
       u8ident_tr31() != U8ID_TR31_C23) { // which demand NFC already
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
     assert(strEQc(norm, "Caf\xc3\xa9"));
@@ -340,7 +340,7 @@ void test_norm_nfc(void) {
   testnorm("NFC", testids);
 
   // which demands NFC already, so fails on XID earlier
-  if (u8ident_tr31() != U8ID_TR31_SAFEC26 && u8ident_tr31() != U8ID_TR31_C23) {
+  if (u8ident_tr31() != U8ID_TR31_TR39 && u8ident_tr31() != U8ID_TR31_C23) {
     char *norm = NULL;
     int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
@@ -466,7 +466,7 @@ void test_mixed_scripts(int xid_check) {
 #endif
 
   ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
-  if (xid == U8ID_TR31_SAFEC26 && !is_profile_6())
+  if (xid == U8ID_TR31_TR39 && !is_profile_6())
     CHECK_RET(ret, U8ID_ERR_XID, 0);
   // C23 cannot check XID alone with NFC_M, but fails NORM later.
   else if (xid == U8ID_TR31_C23 && !is_profile_6())
@@ -495,8 +495,8 @@ void test_mixed_scripts(int xid_check) {
     } else {
       CHECK_RET(ret, U8ID_EOK, 0);
       ret = u8ident_check((const uint8_t *)"\xe1\xac\x85", NULL);
-      // Balinese U+1B05 is limited. so SAFEC26 should fail earlier
-      if (u8ident_tr31() == U8ID_TR31_SAFEC26)
+      // Balinese U+1B05 is limited. so TR39 should fail earlier
+      if (u8ident_tr31() == U8ID_TR31_TR39)
         CHECK_RET(ret, U8ID_ERR_XID, 0);
       else if (!is_profile_6())
         CHECK_RET(ret, U8ID_ERR_SCRIPT, 0);
@@ -528,7 +528,7 @@ void test_mixed_scripts(int xid_check) {
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   ret = u8ident_check((const uint8_t *)"abcλѝ", NULL); // Greek + Cyrillic
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C26_4
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
     U8ID_NORM == FCC
@@ -551,7 +551,7 @@ void test_mixed_scripts(int xid_check) {
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   ret = u8ident_check((const uint8_t *)"abcΔѝ", NULL); // Greek + Cyrillic
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C26_4
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
     U8ID_NORM == FCC
@@ -566,7 +566,7 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#elif U8ID_PROFILE == C26_4 && U8ID_UNICODE_MAJOR < 16
+#elif U8ID_PROFILE == TR39_4 && U8ID_UNICODE_MAJOR < 16
   CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // multi-scripts allowed in 5 and 6
@@ -602,7 +602,7 @@ void test_mixed_scripts_with_ctx(void) {
 
   // back to old empty ctx 0
   ret = u8ident_check((const uint8_t *)"aηώ", NULL);
-  // C26_4 allows Greek (not confusable)
+  // TR39_4 allows Greek (not confusable)
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0); // Latin + Greek disallowed in 2-4
 #elif U8ID_NORM == NFKD || U8ID_NORM == NFD || U8ID_NORM == FCD
@@ -614,8 +614,8 @@ void test_mixed_scripts_with_ctx(void) {
 
   ctx = u8ident_new_ctx(); // new ctx
   ret = u8ident_check((const uint8_t *)"\u0710", NULL);
-  if (tr31 != U8ID_TR31_ALLOWED && tr31 != U8ID_TR31_SAFEC26) {
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == C26_4
+  if (tr31 != U8ID_TR31_ALLOWED && tr31 != U8ID_TR31_TR39) {
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 6 || U8ID_PROFILE == TR39_4
     CHECK_RET(ret, U8ID_ERR_SCRIPT, ctx); // U+0710 Syriac is limited use
 #else
     CHECK_RET(ret, U8ID_EOK, ctx); // 6 allows even these
@@ -638,7 +638,7 @@ void test_mixed_scripts_with_ctx(void) {
 
   // disallow Latin + 0x30FC
   ret = u8ident_check((const uint8_t *)"a\u30fc", NULL);
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == C26_4
+#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #else
   CHECK_RET(ret, U8ID_EOK, 0);
@@ -665,7 +665,7 @@ void test_mixed_scripts_with_ctx(void) {
   // huh? 6 norms, but 5 not?
   if (is_profile_6())
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
-  else if (tr31 == U8ID_TR31_SAFEC26)
+  else if (tr31 == U8ID_TR31_TR39)
     CHECK_RET(ret, U8ID_ERR_XID, 0);
   else {
 #if U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
@@ -683,7 +683,7 @@ void test_combine() {
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   int tr31 = u8ident_tr31();
   // these have safe XIDs, disallowing combiners
-  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_SAFEC26 || tr31 == U8ID_TR31_C23)
+  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_TR39 || tr31 == U8ID_TR31_C23)
     return;
   if (is_profile_6()) // this bypasses combiner checks
     return;
@@ -730,8 +730,8 @@ void test_combine() {
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 8
-    // U8ID_TR31_SAFEC26 disallows combiners at all
-    u8ident_init(U8ID_PROFILE_C26_4, U8ID_NORM_DEFAULT, 0);
+    // U8ID_TR31_TR39 disallows combiners at all
+    u8ident_init(U8ID_PROFILE_TR39_4, U8ID_NORM_DEFAULT, 0);
     // \UXXXXXXXXX letter support
     u8ident_add_script(SC_Yezidi); // EXCLUDED_SCRIPT only addable with profile 6
     ret = u8ident_check((const uint8_t *)"\U00010EB0\u0307", NULL);
@@ -849,7 +849,7 @@ void test_medial(void) {
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else
     CHECK_RET(ret, U8ID_EOK, 0);
-  if (u8ident_tr31() == U8ID_TR31_SAFEC26 || u8ident_tr31() == U8ID_TR31_C23)
+  if (u8ident_tr31() == U8ID_TR31_TR39 || u8ident_tr31() == U8ID_TR31_C23)
     return; // FB8A is disallowed
   // medial at medial
   ret = u8ident_check((const uint8_t *)"\u06A2\uFB8A\uFB91\uFB51", NULL);
@@ -859,9 +859,9 @@ void test_medial(void) {
     CHECK_RET(ret, U8ID_EOK, 0);
   // medial at start
   ret = u8ident_check((const uint8_t *)"\uFB91\uFB51", NULL);
-  // which tr31 is not broken and detects medial at start? Only SAFEC26 so far.
+  // which tr31 is not broken and detects medial at start? Only TR39 so far.
   // unicode bug filed for UCD versions 1-14. v15 might have it fixed.
-  if (u8ident_tr31() == U8ID_TR31_SAFEC26)
+  if (u8ident_tr31() == U8ID_TR31_TR39)
     CHECK_RET(ret, U8ID_ERR_XID, 0);
   else if (norm == U8ID_NFKC || norm == U8ID_NFKD)
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
@@ -871,32 +871,32 @@ void test_medial(void) {
 #endif
 }
 
-void test_safec26(void) {
-  // check consecutive and alternating scripts and safec26 ranges
-  // assert(safec26_start_list[0].from == 0);
-  for (size_t i = 1; i < ARRAY_SIZE(safec26_start_list); i++) {
-    if (safec26_start_list[i - 1].to >= safec26_start_list[i].from)
+void test_tr39(void) {
+  // check consecutive and alternating scripts and tr39 ranges
+  // assert(tr39_start_list[0].from == 0);
+  for (size_t i = 1; i < ARRAY_SIZE(tr39_start_list); i++) {
+    if (tr39_start_list[i - 1].to >= tr39_start_list[i].from)
       printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
-             safec26_start_list[i - 1].to, i, safec26_start_list[i].from);
-    assert(safec26_start_list[i - 1].to < safec26_start_list[i].from);
-    if (safec26_start_list[i - 1].sc == safec26_start_list[i].sc) {
-      if (safec26_start_list[i - 1].to >= safec26_start_list[i].from)
+             tr39_start_list[i - 1].to, i, tr39_start_list[i].from);
+    assert(tr39_start_list[i - 1].to < tr39_start_list[i].from);
+    if (tr39_start_list[i - 1].sc == tr39_start_list[i].sc) {
+      if (tr39_start_list[i - 1].to >= tr39_start_list[i].from)
         printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
-               safec26_start_list[i - 1].to, i, safec26_start_list[i].from);
-      assert(safec26_start_list[i - 1].to < safec26_start_list[i].from);
+               tr39_start_list[i - 1].to, i, tr39_start_list[i].from);
+      assert(tr39_start_list[i - 1].to < tr39_start_list[i].from);
     }
-    if (safec26_start_list[i - 1].gc == safec26_start_list[i].gc)
-      assert(safec26_start_list[i - 1].to < safec26_start_list[i].from);
+    if (tr39_start_list[i - 1].gc == tr39_start_list[i].gc)
+      assert(tr39_start_list[i - 1].to < tr39_start_list[i].from);
   }
-  for (size_t i = 1; i < ARRAY_SIZE(safec26_cont_list); i++) {
-    if (safec26_cont_list[i - 1].to >= safec26_cont_list[i].from)
+  for (size_t i = 1; i < ARRAY_SIZE(tr39_cont_list); i++) {
+    if (tr39_cont_list[i - 1].to >= tr39_cont_list[i].from)
       printf("[%lu].to U+%X >= [%lu].from U+%X\n", i - 1,
-             safec26_cont_list[i - 1].to, i, safec26_cont_list[i].from);
-    assert(safec26_cont_list[i - 1].to < safec26_cont_list[i].from);
-    if (safec26_cont_list[i - 1].sc == safec26_cont_list[i].sc)
-      assert(safec26_cont_list[i - 1].to + 1 < safec26_cont_list[i].from);
-    if (safec26_cont_list[i - 1].gc == safec26_cont_list[i].gc)
-      assert(safec26_cont_list[i - 1].to + 1 < safec26_cont_list[i].from);
+             tr39_cont_list[i - 1].to, i, tr39_cont_list[i].from);
+    assert(tr39_cont_list[i - 1].to < tr39_cont_list[i].from);
+    if (tr39_cont_list[i - 1].sc == tr39_cont_list[i].sc)
+      assert(tr39_cont_list[i - 1].to + 1 < tr39_cont_list[i].from);
+    if (tr39_cont_list[i - 1].gc == tr39_cont_list[i].gc)
+      assert(tr39_cont_list[i - 1].to + 1 < tr39_cont_list[i].from);
   }
 }
 
@@ -909,7 +909,7 @@ void test_greek(void) {
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_TR31_ID);
   int ret = u8ident_check((const uint8_t *)"a", NULL);
   // allow some greek with latin
-  if (u8ident_profile() == C26_4) {
+  if (u8ident_profile() == TR39_4) {
     ret = u8ident_check((const uint8_t *)"θ", NULL); // U+38B not confus
     CHECK_RET(ret, U8ID_EOK, 0);
     ret = u8ident_check((const uint8_t *)"Α", NULL); // U+391 confus
@@ -961,7 +961,7 @@ void test_confus(void) {
   }
   //
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, U8ID_WARN_CONFUSABLE);
-  if (u8ident_tr31() != U8ID_TR31_SAFEC26 && u8ident_tr31() != U8ID_TR31_C23) {
+  if (u8ident_tr31() != U8ID_TR31_TR39 && u8ident_tr31() != U8ID_TR31_C23) {
     ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", NULL);
     assert(!(ret & U8ID_EOK_WARN_CONFUS));
   }
@@ -1041,7 +1041,7 @@ int main(int argc, char **argv) {
     test_init();
     test_gc();
     test_medial();
-    test_safec26();
+    test_tr39();
     test_greek();
     test_script();
   }

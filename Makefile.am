@@ -277,13 +277,13 @@ check-norms:
 	done; \
 	rm test-norm$(EXEEXT)
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in 2 3 4 5 6 C11_6 C26_4; do \
+	for n in 2 3 4 5 6 C11_6 TR39_4; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
 	done
-	for n in SAFEC26 C11STD; do \
+	for n in TR39 C11STD; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-profiles$(EXEEXT) && \
@@ -291,7 +291,7 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	done; \
 	rm test-profiles$(EXEEXT)
 check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
-	for n in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
+	for n in ALLOWED TR39 ID XID C11 C23 ALLUTF8 NONE; do \
 	    echo U8ID_TR31=$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_TR31=$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-tr31$(EXEEXT) && \
@@ -300,9 +300,9 @@ check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	rm test-tr31$(EXEEXT)
 check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
-	  for p in 2 3 4 5 6 C11_6 C26_4; do \
-	    for x in ALLOWED SAFEC26 ID XID C11 C23 ALLUTF8 NONE; do \
-	      if [ $$n != NFC ] && [ $$p = C26_4 -o $$x = SAFEC26 -o $$x = C23 ]; then \
+	  for p in 2 3 4 5 6 C11_6 TR39_4; do \
+	    for x in ALLOWED TR39 ID XID C11 C23 ALLUTF8 NONE; do \
+	      if [ $$n != NFC ] && [ $$p = TR39_4 -o $$x = TR39 -o $$x = C23 ]; then \
 		echo "skip -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
               else \
 	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
@@ -345,7 +345,7 @@ dist-hook:
 	echo $(VERSION) > $(distdir)/.version
 
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
-	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,C26_4,C11_6,SAFEC26,C11STD}$(EXEEXT) \
+	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,TR39_4,C11_6,TR39,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) perf$(EXEEXT) \
 	     texts.tst mkc26$(EXEEXT) example$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst \

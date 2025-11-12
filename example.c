@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   unsigned linenr = 0U;
   enum u8id_options xid = U8ID_TR31_XID;
   enum u8id_norm norm = U8ID_NFC;
-  enum u8id_profile profile = U8ID_PROFILE_C26_4;
+  enum u8id_profile profile = U8ID_PROFILE_TR39_4;
   unsigned u8idopts = (unsigned)xid;
 
   char path[256] = {0};

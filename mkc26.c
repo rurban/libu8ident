@@ -2,9 +2,9 @@
    Copyright 2021, 2022 Reini Urban
    SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
-   Create and test a secure variant of C11 identifiers, the SAFEC26 profile:
+   Create and test a secure variant of C11 identifiers, the TR39 profile:
    * TR39#5.2 Mixed-Scripts Moderately Restrictive (4), but allow Greek scripts
-     (hence C26_4),
+     (hence TR39_4),
    * Disallow all Limited_Use and Excluded scripts,
    * Only allow TR 39#1 Recommended, Inclusion, and not-confusable Technical
      Identifier Type properties,
@@ -448,7 +448,7 @@ static void gen_c26_safe(void) {
       "NFC\n"
       "*/\n"
       "\n"
-      "struct sc_c26 {\n"
+      "struct sc_tr39 {\n"
       "    uint32_t from;\n"
       "    uint32_t to;\n"
       "    enum u8id_sc sc;\n"
@@ -464,7 +464,7 @@ static void gen_c26_safe(void) {
         f);
   fputs("// Ranges split on GC and SCX changes\n", f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("const struct sc_c26 safec26_start_list[] = {\n"
+  fputs("const struct sc_tr39 tr39_start_list[] = {\n"
         "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
         "    {'A', 'Z', SC_Latin, GC_Lu, NULL},\n"  // 41-5a
         "    {'_', '_', SC_Latin, GC_Pc, NULL},\n"  // 5f
@@ -474,10 +474,10 @@ static void gen_c26_safe(void) {
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fputs("#else\n", f);
-  fprintf(f, "extern const struct sc_c26 safec26_start_list[%u];\n",
+  fprintf(f, "extern const struct sc_tr39 tr39_start_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
-  printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec26_start_list",
+  printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "tr39_start_list",
          stats.ranges, stats.singles, stats.codepoints);
 
   memset(&stats, 0, sizeof(stats));
@@ -532,15 +532,15 @@ static void gen_c26_safe(void) {
       "// MEDIAL from XID_Start and !MARK. Split on GC and SCX\n",
       f);
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("const struct sc_c26 safec26_cont_list[] = {\n", f);
+  fputs("const struct sc_tr39 tr39_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fputs("#else\n", f);
-  fprintf(f, "extern const struct sc_c26 safec26_cont_list[%u];\n",
+  fprintf(f, "extern const struct sc_tr39 tr39_cont_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
-  printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "safec26_cont_list",
+  printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "tr39_cont_list",
          stats.ranges, stats.singles, stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
@@ -570,16 +570,16 @@ static void gen_c26_safe(void) {
     }
   }
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("const struct sc_c26 safec26_excl_start_list[] = {\n", f);
+  fputs("const struct sc_tr39 tr39_excl_start_list[] = {\n", f);
   emit_ranges(f, 0x7a, u, true);
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fputs("#else\n", f);
-  fprintf(f, "extern const struct sc_c26 safec26_excl_start_list[%u];\n",
+  fprintf(f, "extern const struct sc_tr39 tr39_excl_start_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
-         "safec26_excl_start_list", stats.ranges, stats.singles,
+         "tr39_excl_start_list", stats.ranges, stats.singles,
          stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
@@ -625,20 +625,20 @@ static void gen_c26_safe(void) {
   }
 
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
-  fputs("const struct sc_c26 safec26_excl_cont_list[] = {\n", f);
+  fputs("const struct sc_tr39 tr39_excl_cont_list[] = {\n", f);
   emit_ranges(f, 0x23, c, true);
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fputs("#else\n", f);
-  fprintf(f, "extern const struct sc_c26 safec26_excl_cont_list[%u];\n",
+  fprintf(f, "extern const struct sc_tr39 tr39_excl_cont_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
-         "safec26_excl_cont_list", stats.ranges, stats.singles,
+         "tr39_excl_cont_list", stats.ranges, stats.singles,
          stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
-  // get safec26_medial. Empty for v14
+  // get tr39_medial. Empty for v14
   memset(c, 0, sizeof(c));
   for (size_t i = 0; i < ARRAY_SIZE(xid_start_list); i++) {
     struct range_bool r = xid_start_list[i];
@@ -676,20 +676,20 @@ static void gen_c26_safe(void) {
   BITCLR(c, 0xB7);
 
   fputs("\n// Currently empty MEDIAL list for safec26.\n", f);
-  fputs("// safec26_start/cont + MEDIAL\n", f);
+  fputs("// tr39_start/cont + MEDIAL\n", f);
   fputs("#if 0\n", f);
   fputs("#  ifndef EXTERN_SCRIPTS\n", f);
-  fputs("const struct range_bool safec26_medial_list[] = {\n", f);
+  fputs("const struct range_bool tr39_medial_list[] = {\n", f);
   emit_ranges(f, 0x27, c, false);
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
   fputs("#  else\n", f);
-  fprintf(f, "extern const struct range_bool safec26_medial_list[%u];\n",
+  fprintf(f, "extern const struct range_bool tr39_medial_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#  endif\n", f);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
-         "safec26_medial_list", stats.ranges, stats.singles,
+         "tr39_medial_list", stats.ranges, stats.singles,
          stats.codepoints);
 
   fclose(f);
@@ -702,7 +702,7 @@ static void gen_c26_safe(void) {
 }
 
 int main(/*int argc, char **argv*/) {
-  u8ident_init(U8ID_PROFILE_C26_4, U8ID_NFC, 0);
+  u8ident_init(U8ID_PROFILE_TR39_4, U8ID_NFC, 0);
 
   gen_c11_all();
   gen_c26_safe();

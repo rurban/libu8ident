@@ -169,7 +169,7 @@ ICU library would need an identifier check API at least.
 
 There used to be no linter, but there is now one: My **u8idlint** from
 <https://github.com/rurban/libu8ident>, which can be used to check for
-ALLOWED,SAFEC26,C23,ID,XID,C11 or ALLUTF8 TR31 profiles, for various TR39
+ALLOWED,TR39,C23,ID,XID,C11 or ALLUTF8 TR31 profiles, for various TR39
 mixed script profile violations, confusables, invalid combining marks
 and TR15 normalization problems. Go also came up with a unicode
 spoofing linter lately: <https://github.com/NebulousLabs/glyphcheck>
@@ -736,7 +736,7 @@ identifiable.
 
 We want to choose a variant of the **Moderately Restrictive** profile,
 with an exception for non-confusable Greek.  I called this profile
-C26_4 or SAFEC26 in libu8ident.
+TR39_4 or TR39 in libu8ident.
 
 * All identifiers in a document qualify as Single Script, or
 * All identifiers in a document are covered by any of the following
@@ -804,7 +804,7 @@ TR39 also compiles a convenient
 list. But all the math letters with Script=Common from U+2100 to
 U+2200 are restricted, as Greek is forbidden mixed with Latin in the
 original TR39 Moderately Restrictive profile.  Most are allowed
-according to the TR31 and TR39 rules of SAFEC26, so we need to come up
+according to the TR31 and TR39 rules of TR39, so we need to come up
 with our own list of `XID_Start/XID_Continue` codepoints, excluding
 the Limited Use and Excluded scripts. And if an implementation choses
 to allow Excluded scripts with more logic to allow only this script.

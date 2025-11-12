@@ -4,7 +4,7 @@ Copyright (C) 2022 Reini Urban
 libu8ident 0.3 - 2022-12-03
 
 Fixed a bug with excluded scripts which are only now addable.
-Change is_greek_latin_confus violations with C26_4 to return ERR_CONFUS,
+Change is_greek_latin_confus violations with TR39_4 to return ERR_CONFUS,
 not ERR_SCRIPTS (GH #12).
 Add more combining marks checks (GH #7): TR39#5.5 "Forbid sequences of base character
 + nonspacing mark that look the same as or confusingly similar to the base character
@@ -22,7 +22,7 @@ libu8ident 0.2 - 2022-02-12:
 Bump SOLIB MAJOR to 1
 The C++23 deadline is gone, rename all c23 to c26. Esp. command-line
 and configure options.
-Fixed SAFEC26 to exclude confusable Technical, and to skip a lot of
+Fixed TR39 to exclude confusable Technical, and to skip a lot of
 not Allowed ID_Start ranges.
 
 libu8ident 0.1 - 2022-01-24:

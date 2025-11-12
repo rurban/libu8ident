@@ -52,7 +52,7 @@ confusable with common operators.
 TR39 IdentifierTypes.txt lists the three ǃ U+1C3 "LATIN LETTER
 ALVEOLAR CLICK" ǀ U+1C0 "LATIN LETTER DENTAL CLICK" and ǁ U+1C1 "LATIN
 LETTER LATERAL CLICK" as Technical. So for normal IdentifierStatus
-Allowed these would be excluded.  But C26/C++26 whishes to add Technical
+Allowed these would be excluded.  But TR39 for C/C++ whishes to add Technical
 also. Add at least an Exclusion, if not the Non_XID property for XID
 stability concerns. But security bugs should trump stability
 guarantees.

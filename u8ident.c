@@ -52,8 +52,8 @@ LOCAL const char *u8ident_errstr(int errcode) {
                scripts.
     ALLOWED  - TR31 ID with only recommended scripts. Allowed
                IdentifierStatus.
-    SAFEC26  - see P2528R1. XID minus exotic scripts, filtered by NFC and
-               IdentifierType.
+    TR39     - see P2528R1. XID minus exotic scripts, filtered by NFC and
+               IdentifierType. Previously wrongly called SAFEC26. There is no safe C26.
     C23      - XID plus NFC requirement. http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html
     C11      - the AltId ranges from the C11 standard
     ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
@@ -63,7 +63,7 @@ LOCAL const char *u8ident_errstr(int errcode) {
 #ifndef DISABLE_CHECK_XID
 static struct func_tr31_s tr31_funcs[] = {
     {isXID_start, isXID_cont},         {isID_start, isID_cont},
-    {isALLOWED_start, isALLOWED_cont}, {isSAFEC26_start, isSAFEC26_cont},
+    {isALLOWED_start, isALLOWED_cont}, {isTR39_start, isTR39_cont},
     {isC23_start, isC23_cont},         {isC11_start, isC11_cont},
     {isALLUTF8_start, isALLUTF8_cont}, {isASCII_start, isASCII_cont},
 };
@@ -78,7 +78,7 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
   u8ident_free(); // clear and reset the ctx
   if (options > 1023)
     return -1;
-  if (profile < U8ID_PROFILE_1 || profile > U8ID_PROFILE_C26_4)
+  if (profile < U8ID_PROFILE_1 || profile > U8ID_PROFILE_TR39_4)
     return -1;
   if (norm > U8ID_FCC)
     return -1;
@@ -111,8 +111,8 @@ EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
 #endif
   s_u8id_norm = norm;
 
-#if defined U8ID_PROFILE_SAFEC26
-  s_u8id_profile = U8ID_PROFILE_C26_4;
+#if defined U8ID_PROFILE_TR39
+  s_u8id_profile = U8ID_PROFILE_TR39_4;
 #elif defined U8ID_PROFILE_C11STD
   s_u8id_profile = U8ID_PROFILE_C11_6;
 #else
@@ -232,8 +232,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       (unlikely(!isALLOWED_start(cp)))
 #  elif U8ID_TR31 == ASCII
       (unlikely(!isASCII_start(cp)))
-#  elif U8ID_TR31 == SAFEC26
-      (unlikely(!isSAFEC26_start(cp)))
+#  elif U8ID_TR31 == TR39
+      (unlikely(!isTR39_start(cp)))
 #  elif U8ID_TR31 == C23
       (unlikely(!isC23_start(cp)))
 #  elif U8ID_TR31 == C11
@@ -322,7 +322,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
         scx = (char *)this_scx->scx;
         const enum u8id_gc gc = (const enum u8id_gc)this_scx->gc;
         int n = 0;
-        if (ctx->count && (s_u8id_profile < 5 || s_u8id_profile == C26_4)) {
+        if (ctx->count && (s_u8id_profile < 5 || s_u8id_profile == TR39_4)) {
           // Special-case for runs: only after japanese.
           // This is the only context dependent Lm case.
           // All others are Combining Marks.
@@ -418,7 +418,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       // if Limited Use it must have been already manually added
       if (unlikely(scr >= FIRST_LIMITED_USE_SCRIPT &&
                    (s_u8id_profile < U8ID_PROFILE_5 ||
-                    s_u8id_profile == U8ID_PROFILE_C26_4))) {
+                    s_u8id_profile == U8ID_PROFILE_TR39_4))) {
         ctx->last_cp = cp;
         return U8ID_ERR_SCRIPT;
       }
@@ -462,15 +462,15 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
           return U8ID_ERR_SCRIPTS;
         }
 #endif
-#if !defined U8ID_PROFILE || U8ID_PROFILE == C26_4
-        else if (s_u8id_profile == U8ID_PROFILE_C26_4) {
+#if !defined U8ID_PROFILE || U8ID_PROFILE == TR39_4
+        else if (s_u8id_profile == U8ID_PROFILE_TR39_4) {
           if (ctx->count >= 2 || scr == SC_Cyrillic) { // not more than 2
             ctx->last_cp = cp;
             return U8ID_ERR_SCRIPTS;
           }
           // some Greek may mix with Latin
           if (scr == SC_Greek && has_latin) {
-            assert(s_u8id_profile == U8ID_PROFILE_C26_4);
+            assert(s_u8id_profile == U8ID_PROFILE_TR39_4);
             // only not confusables
             if (u8ident_is_greek_latin_confus(cp)) {
               ctx->last_cp = cp;
@@ -502,7 +502,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       basesc = scr;
       u8ident_add_script_ctx(scr, ctx);
       // not is new, but still a possible greek confusable
-    } else if (s_u8id_profile == U8ID_PROFILE_C26_4 && scr == SC_Greek &&
+    } else if (s_u8id_profile == U8ID_PROFILE_TR39_4 && scr == SC_Greek &&
                has_latin && u8ident_is_greek_latin_confus(cp)) {
       ctx->last_cp = cp;
       return U8ID_ERR_CONFUS;
@@ -514,8 +514,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       // is_MARK(cp) is too slow, and we need the full GC for all cases
 #ifndef DISABLE_CHECK_XID
 #  if !defined U8ID_PROFILE
-      if (s_u8id_profile < 5 || s_u8id_profile == U8ID_PROFILE_C26_4)
-#  elif (U8ID_PROFILE < 5 || U8ID_PROFILE == C26_4)
+      if (s_u8id_profile < 5 || s_u8id_profile == U8ID_PROFILE_TR39_4)
+#  elif (U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4)
       if (1)
 #  else
       if (0)

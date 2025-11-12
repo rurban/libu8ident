@@ -214,17 +214,17 @@ LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
   return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
 }
-/* Search for safec26 XID entry, in start or cont lists */
-LOCAL const struct sc_c26 *u8ident_get_safec26(const uint32_t cp) {
+/* Search for TR39 XID entry, in start or cont lists */
+LOCAL const struct sc_c26 *u8ident_get_tr39(const uint32_t cp) {
   const struct sc_c26 *sc = (const struct sc_c26 *)binary_search(
-      cp, (char *)safec26_start_list, ARRAY_SIZE(safec26_start_list),
-      sizeof(*safec26_start_list));
+      cp, (char *)tr39_start_list, ARRAY_SIZE(tr39_start_list),
+      sizeof(*tr39_start_list));
   if (sc)
     return sc;
   else
-    return (const struct sc_c26 *)binary_search(cp, (char *)safec26_cont_list,
-                                                ARRAY_SIZE(safec26_cont_list),
-                                                sizeof(*safec26_cont_list));
+    return (const struct sc_c26 *)binary_search(cp, (char *)tr39_cont_list,
+                                                ARRAY_SIZE(tr39_cont_list),
+                                                sizeof(*tr39_cont_list));
 }
 
 LOCAL bool u8ident_is_MARK(uint32_t cp) {
@@ -259,17 +259,17 @@ LOCAL bool isALLOWED_start(const uint32_t cp) {
 LOCAL bool isALLOWED_cont(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
-LOCAL bool isSAFEC26_start(const uint32_t cp) {
-  return binary_search(cp, (char *)safec26_start_list,
-                       ARRAY_SIZE(safec26_start_list),
-                       sizeof(*safec26_start_list))
+LOCAL bool isTR39_start(const uint32_t cp) {
+  return binary_search(cp, (char *)tr39_start_list,
+                       ARRAY_SIZE(tr39_start_list),
+                       sizeof(*tr39_start_list))
              ? true
              : false;
 }
-LOCAL bool isSAFEC26_cont(const uint32_t cp) {
-  return binary_search(cp, (char *)safec26_cont_list,
-                       ARRAY_SIZE(safec26_cont_list),
-                       sizeof(*safec26_cont_list))
+LOCAL bool isTR39_cont(const uint32_t cp) {
+  return binary_search(cp, (char *)tr39_cont_list,
+                       ARRAY_SIZE(tr39_cont_list),
+                       sizeof(*tr39_cont_list))
              ? true
              : false;
 }
