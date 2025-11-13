@@ -6,7 +6,7 @@ on: [push, pull_request]
 #    os: [ubuntu-14.04, ubuntu-18.04, ubuntu-20.04, ubuntu-latest]
 jobs:
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -146,7 +146,9 @@ jobs:
     - run: cmake .
     - run: cmake --build . --config Release --verbose
     - run: cmake --build . --target RUN_TESTS --config Release --verbose
+    # TODO requires now makensis
     - run: cmake --build . --target package --config Release
+    # or just: cpack --preset dev-zip
     # currently -G for "Visual Studio 16 2019"
     #- run: msbuild libu8ident.sln
     #- run: Debug\u8idtest
@@ -155,4 +157,4 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
-          libu8ident-*-win64.exe
+          libu8ident-*-win64.zip

@@ -1,5 +1,5 @@
 project(libu8ident C)
-cmake_minimum_required(VERSION 2.9)
+cmake_minimum_required(VERSION 3.5)
 # Supported options:
 #  -DBUILD_SHARED_LIBS=ON,OFF
 #  -DU8ID_NORM=NFC,NFKC,NFD,NFKD
@@ -312,4 +312,7 @@ set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
 set(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
+if(MSVC)
+  set(CPACK_GENERATOR "ZIP")
+endif()
 include(CPack)
