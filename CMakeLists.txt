@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 2.9)
 #  -DU8ID_TR31=ALLOWED,TR39,ID,XID,C11,ALLUTF8,NONE
 #  -DHAVE_CONFUS=ON
 #  -DHAVE_CROARING=ON
+#  -DALLOW_DOLLAR=OFF
 # for smaller builds and lib.
 
 if (EXISTS ".version")
@@ -48,7 +49,6 @@ include(CheckTypeSize)
 check_type_size(size_t SIZE_T)
 #check_type_size(wchar_t WCHAR_T)
 #include(CheckCCompilerFlag)
-configure_file(cmakeconfig.h.in config.h)
 if(CMAKE_MAJOR_VERSION GREATER 2)
   include(TestBigEndian)
   test_big_endian(IS_BIG_ENDIAN)
@@ -74,6 +74,7 @@ option(U8ID_PROFILE "force a single profile: 2-6,TR39_4,C11_6" OFF)
 option(U8ID_TR31 "force TR31 charset: ALLOWED,TR39,ID,XID,C11,ALLUTF8,NONE" OFF)
 option(HAVE_CONFUS "add confusables API" OFF)
 option(HAVE_CROARING "use CRoaring bitsets" ON)
+option(ALLOW_DOLLAR "allow the dollar sign in our profiles" ON)
 
 if (HAVE_CONFUS)
   if (HAVE_CROARING)
@@ -86,6 +87,9 @@ if (HAVE_CONFUS)
       unset(HAVE_CROARING)
     endif()
   endif()
+endif()
+if (WITH_DOLLAR)
+  add_definitions(-DALLOW_DOLLAR)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -107,6 +111,8 @@ if(ipo_supported)
 else()
   message(STATUS "IPO / LTO not supported: <${error}>")
 endif()
+
+configure_file(cmakeconfig.h.in config.h)
 
 set(libu8ident_DOCS
   README.md doc/c11.md doc/n2916.md doc/P2528R0.md doc/P2528R1.md
@@ -297,7 +303,7 @@ endif()
 # make package_source (only after distclean or git clean -dxf)
 set(CPACK_PACKAGE_VENDOR "Reini Urban")
 set(CPACK_PACKAGE_CONTACT "rurban@cpan.org")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Check unicode security guidelines for identifiers")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Check unicode TR39 security guidelines for identifiers")
 #set(CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION_MAJOR})
 #set(CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION_MINOR})
 #set(CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION_PATCH})

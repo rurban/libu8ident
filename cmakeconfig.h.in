@@ -23,14 +23,17 @@
 #  undef U8ID_PROFILE
 #endif   
 
-/* Define to force a single check_xid option. */
+/* Defined to force a single check_xid option. */
 #cmakedefine ENABLE_CHECK_XID
 #cmakedefine DISABLE_CHECK_XID
 
-/* Define to enable confus.h. */
+/* Defined to enable confus.h. */
 #cmakedefine HAVE_CONFUS
 
-/* Define if a shared library will be built */
+/* Defined to enable $ in identifiers */
+#cmakedefine ALLOW_DOLLAR
+
+/* Defined if a shared library will be built */
 #define ENABLE_SHARED @BUILD_SHARED_LIBS@
 
 /* TODO Defined to 1 when the compiler supports c11 */
