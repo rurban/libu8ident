@@ -268,10 +268,10 @@ check-asan: test_asan
 check-norms:
 	for n in NFKC NFC FCC NFKD NFD FCD; do \
 	  echo $$n; \
-	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Os -Wfatal-errors \
+	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -UU8ID_NORM -DU8ID_NORM=$$n -Os -Wfatal-errors \
 		-c $(srcdir)/u8idnorm.c -o u8idnorm.o && \
 	  ls -gGh u8idnorm.o; \
-	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_NORM=$$n -Wfatal-errors $(srcdir)/test.c \
+	  $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -UU8ID_NORM -DU8ID_NORM=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-norm$(EXEEXT) && \
 	  ./test-norm$(EXEEXT) norm || exit; \
 	done; \
@@ -279,13 +279,13 @@ check-norms:
 check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in 2 3 4 5 6 C11_6 TR39_4; do \
 	    echo PROFILE_$${n}; \
-	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
+	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -UU8ID_PROFILE -DU8ID_PROFILE=$$n -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
 	done
 	for n in TR39 C11STD; do \
 	    echo PROFILE_$${n}; \
-	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
+	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -UU8ID_PROFILE -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
 	done; \
@@ -293,7 +293,7 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 check-tr31: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in ALLOWED TR39 ID XID C11 C23 ALLUTF8 NONE; do \
 	    echo U8ID_TR31=$${n}; \
-	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -DU8ID_TR31=$${n} -Wfatal-errors $(srcdir)/test.c \
+	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -UU8ID_TR31 -DU8ID_TR31=$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-tr31$(EXEEXT) && \
 	    ./test-tr31$(EXEEXT) xid || exit; \
 	done; \

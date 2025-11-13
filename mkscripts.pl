@@ -327,13 +327,13 @@ while (<$SC>) {
 }
 close $SC;
 
-# needed for the SCX short -> name lookup
+# PropertyValueAliases.txt needed for the SCX short -> name lookup
 my %PVA;
 $started = 0;
 open my $PVA, "<", $pva or die "$pva $!";
 while (<$PVA>) {
   if (/^# Script \(sc\)/) { $started++; }
-  if (/^sc ; (\w+?)\s+; (\w+)/) {
+  if (/^sc\s;\s(\w+?)\s+; (\w+)/) {
     $PVA{$1} = $2; # Zinh is not in SCX
   }
 }
@@ -855,7 +855,8 @@ for my $r (@SCXR) {
   my @list = split " ", $r->[2];
   for my $short (@list) {
     my $long = @list == 1 ? $short : $PVA{$short};
-    warn "Wrong $short at U+".sprintf("%X",$r->[0]) unless $SC{$long};
+    $long = $PVA{$short} unless $SC{$long};
+    die "Wrong $short at U+".sprintf("%X",$r->[0]) unless $SC{$long};
     $code .= sprintf("\\x%02x", $SC{$long});
   }
   if ($r->[0] == $r->[1]) {

@@ -584,8 +584,8 @@ void test_mixed_scripts(int xid_check) {
   u8ident_free();
 #endif
 
-  // U+37B Greek, U+985 Bengali. 37B confusable with latin
-  ret = u8ident_check((const uint8_t *)"ͻঅ", NULL);
+  // U+386 Greek, U+985 Bengali. 37B confusable with latin
+  ret = u8ident_check((const uint8_t *)"Άঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #elif U8ID_PROFILE == TR39_4 && U8ID_UNICODE_MAJOR < 16
@@ -603,8 +603,8 @@ void test_mixed_scripts(int xid_check) {
 // check if mixed scripts per ctx work
 void test_mixed_scripts_with_ctx(void) {
   int ctx = u8ident_new_ctx(); // new ctx 1 (no Latin)
-  // U+37B Greek confusable
-  int ret = u8ident_check((const uint8_t *)"ͻ", NULL);
+  // U+37B Greek confusable,  but not Allowed anymore. Replaced by U+386
+  int ret = u8ident_check((const uint8_t *)"Ά", NULL);
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
   assert(u8ident_free_ctx(ctx) == 0);
 
@@ -612,8 +612,8 @@ void test_mixed_scripts_with_ctx(void) {
   int tr31 = u8ident_tr31();
   ctx = u8ident_new_ctx();
   assert(ctx == 1);
-  // U+45D
-  ret = u8ident_check((const uint8_t *)"ѝ", NULL); // Cyrillic alone
+  // U+45D, replaced by U+45C
+  ret = u8ident_check((const uint8_t *)"ќ", NULL); // Cyrillic alone
   // NFD to U+438,U+300 (d0b8cc800a)
 #if U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, ctx);
