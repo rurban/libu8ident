@@ -8,11 +8,14 @@
 use strict;
 use Config;
 my $ucd = "UnicodeData.txt";
+my $mark_h = "mark.h";
 if (!-e $ucd) {
   system("wget -N https://www.unicode.org/Public/UNIDATA/$ucd");
+  if (!-e $ucd && -e $mark_h) {
+    die "Cannot download $ucd, but have $mark_h\n";
+  }
 }
 
-my $mark_h = "mark.h";
 my $doc = "doc/appendix-h.md";
 my (@MARK, @NSM, %NSM);
 open my $UCD, "<", $ucd or die "$ucd $!";

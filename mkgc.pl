@@ -9,12 +9,15 @@ use strict;
 use Config;
 use utf8;
 
+my $gc_h = "u8id_gc.h";
 my $ucd = "UnicodeData.txt";
 if (!-e $ucd) {
   system("wget -N https://www.unicode.org/Public/UNIDATA/$ucd");
+  if (!-e $ucd && -e $gc_h) {
+    die "Cannot download $ucd, but have $gc_h\n";
+  }
 }
 
-my $gc_h = "u8id_gc.h";
 my (@GC, %GC);
 open my $UCD, "<", $ucd or die "$ucd $!";
 my ($from, $to, $oldto, $oldgc, $gc) = (0,0,0,'Cc','');

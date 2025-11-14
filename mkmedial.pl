@@ -15,6 +15,10 @@ if (!-e $ucd) {
 }
 
 my $medial_h = "medial.h";
+if (!-e $ucd && -e $medial_h) {
+  die "Cannot download $ucd, but have $medial_h\n";
+}
+
 my @M;
 open my $UCD, "<", $ucd or die "$ucd $!";
 my ($from, $oldto, $to) = (0,0,0);

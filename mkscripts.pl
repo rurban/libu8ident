@@ -27,6 +27,7 @@
 # Eytzinger is an idea, but does not gain much here.
 
 use strict;
+my $scripts_h = "scripts.h";
 my $scn = "Scripts.txt";
 my $scxn = "ScriptExtensions.txt";
 my $pva = "PropertyValueAliases.txt";
@@ -39,11 +40,17 @@ my $confus = "confusables.txt";
 for ($scn, $scxn, $pva, $corep, $normp) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/UNIDATA/$_");
+    if (!-e $_ && -e $scripts_h) {
+        die "Cannot download $_, but have $scripts_h\n";
+    }
   }
 }
 for ($idtype, $idstat, $confus) {
   if (!-e $_) {
     system("wget -N https://www.unicode.org/Public/security/latest/$_");
+    if (!-e $_ && -e $scripts_h) {
+        die "Cannot download $_, but have $scripts_h\n";
+    }
   }
 }
 
@@ -551,7 +558,6 @@ for (@SCXR) {
 # We'd need optimized TR39 start/cont lists, with enforced
 # NFC. i.e. disallow scripts, and combining marks which do not compose
 # to NFC. Combine SC with SCX.  This is done in mkc23.c, not here.
-my $scripts_h = "scripts.h";
 my $scripts16_h = "scripts16.h";
 chmod 0644, $scripts_h unless -w $scripts_h;
 chmod 0644, $scripts16_h unless -w $scripts16_h;
