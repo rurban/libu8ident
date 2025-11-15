@@ -500,7 +500,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
       }
     ok:
       basesc = scr;
-      u8ident_add_script_ctx(scr, ctx);
+      if (!u8ident_has_script_ctx(scr, ctx))
+        u8ident_add_script_ctx(scr, ctx);
       // not is new, but still a possible greek confusable
     } else if (s_u8id_profile == U8ID_PROFILE_TR39_4 && scr == SC_Greek &&
                has_latin && u8ident_is_greek_latin_confus(cp)) {

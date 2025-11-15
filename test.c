@@ -582,7 +582,8 @@ void test_mixed_scripts(int xid_check) {
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #endif
   u8ident_free();
-#endif
+
+#endif // new UNICODE 16 confusables
 
   // U+386 Greek, U+985 Bengali. 37B confusable with latin
   ret = u8ident_check((const uint8_t *)"Άঅ", NULL);
