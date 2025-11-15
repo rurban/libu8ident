@@ -572,7 +572,8 @@ void test_mixed_scripts(int xid_check) {
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
-  ret = u8ident_check((const uint8_t *)"abcΔѝ", NULL); // Greek + Cyrillic
+  // Cyrillic U+45D not Allowed anymore. replaced by U+45C
+  ret = u8ident_check((const uint8_t *)"abcΔќ", NULL); // Greek + Cyrillic U+45C
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
 #elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
@@ -589,6 +590,8 @@ void test_mixed_scripts(int xid_check) {
   ret = u8ident_check((const uint8_t *)"Άঅ", NULL);
 #if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
+#elif U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
+  CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #elif U8ID_PROFILE == TR39_4 && U8ID_UNICODE_MAJOR < 16
   CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
 #else
@@ -604,9 +607,13 @@ void test_mixed_scripts(int xid_check) {
 // check if mixed scripts per ctx work
 void test_mixed_scripts_with_ctx(void) {
   int ctx = u8ident_new_ctx(); // new ctx 1 (no Latin)
-  // U+37B Greek confusable,  but not Allowed anymore. Replaced by U+386
+  // U+37B Greek confusable, but not Allowed anymore. Replaced by U+386
   int ret = u8ident_check((const uint8_t *)"Ά", NULL);
+#if U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
+  CHECK_RET(ret, U8ID_EOK_NORM, ctx);
+#else
   CHECK_RET(ret, U8ID_EOK, ctx); // Greek alone
+#endif
   assert(u8ident_free_ctx(ctx) == 0);
 
   assert(!u8ident_init(u8ident_profile(), u8ident_norm(), u8ident_options()));
