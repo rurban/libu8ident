@@ -1519,7 +1519,6 @@ const struct sc_tr39 tr39_start_list[] = {
     {0xA7FA, 0xA7FA, SC_Latin, GC_Ll, NULL}, //  ꟺ
     {0xAB68, 0xAB68, SC_Latin, GC_Ll, NULL}, //  ꭨ
     {0x10EC5, 0x10EC6, SC_Arabic, GC_Lo, NULL}, //  𐻅..𐻆
-    {0x16FF2, 0x16FF6, SC_Han, GC_Mc, NULL}, //  𖿲..𖿶
     {0x1DF00, 0x1DF1E, SC_Latin, GC_L, NULL}, //  𝼀..𝼞
     {0x1DF25, 0x1DF2A, SC_Latin, GC_Ll, NULL}, //  𝼥..𝼪
     {0x1E7E0, 0x1E7E6, SC_Ethiopic, GC_Lo, NULL}, //  𞟠..𞟦
@@ -1584,9 +1583,9 @@ const struct sc_tr39 tr39_start_list[] = {
     {0x28CCD, 0x28CCD, SC_Han, GC_Lo, NULL}, //  𨳍
     {0x28CD2, 0x28CD2, SC_Han, GC_Lo, NULL}, //  𨳒
     {0x29D98, 0x29D98, SC_Han, GC_Lo, NULL}, //  𩶘
-}; // 1277 ranges, 277 singles, 20914 codepoints
+}; // 1276 ranges, 277 singles, 20910 codepoints
 #else
-extern const struct sc_tr39 tr39_start_list[1554];
+extern const struct sc_tr39 tr39_start_list[1553];
 #endif
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC
@@ -1861,10 +1860,16 @@ const struct sc_tr39 tr39_excl_cont_list[] = {
     {0x1810, 0x1819, SC_Mongolian, GC_Nd, NULL}, //  (Excluded) ᠐..᠙
     {0x104A0, 0x104A9, SC_Osmanya, GC_Nd, NULL}, //  (Excluded) 𐒠..𐒩
     {0x10D40, 0x10D49, SC_Garay, GC_Nd, NULL}, //  (Excluded) 𐵀..𐵉
+    {0x10D69, 0x10D6D, SC_Garay, GC_Mn, NULL}, //  (Excluded) 𐵩..𐵭
     {0x11066, 0x1106F, SC_Brahmi, GC_Nd, NULL}, //  (Excluded) 𑁦..𑁯
     {0x110F0, 0x110F9, SC_Sora_Sompeng, GC_Nd, NULL}, //  (Excluded) 𑃰..𑃹
     {0x111D0, 0x111D9, SC_Sharada, GC_Nd, NULL}, //  (Excluded) 𑇐..𑇙
     {0x112F0, 0x112F9, SC_Khudawadi, GC_Nd, NULL}, //  (Excluded) 𑋰..𑋹
+    {0x113BB, 0x113C0, SC_Tulu_Tigalari, GC_Mn, NULL}, //  (Excluded) 𑎻..𑏀
+    {0x113CE, 0x113CE, SC_Tulu_Tigalari, GC_Mn, NULL}, //  (Excluded) 𑏎
+    {0x113D0, 0x113D0, SC_Tulu_Tigalari, GC_Mn, NULL}, //  (Excluded) 𑏐
+    {0x113D2, 0x113D2, SC_Tulu_Tigalari, GC_Mn, NULL}, //  (Excluded) 𑏒
+    {0x113E1, 0x113E2, SC_Tulu_Tigalari, GC_Mn, NULL}, //  (Excluded) 𑏡..𑏢
     {0x114D0, 0x114D9, SC_Tirhuta, GC_Nd, NULL}, //  (Excluded) 𑓐..𑓙
     {0x11650, 0x11659, SC_Modi, GC_Nd, NULL}, //  (Excluded) 𑙐..𑙙
     {0x116C0, 0x116C9, SC_Takri, GC_Nd, NULL}, //  (Excluded) 𑛀..𑛉
@@ -1877,20 +1882,24 @@ const struct sc_tr39 tr39_excl_cont_list[] = {
     {0x11D50, 0x11D59, SC_Masaram_Gondi, GC_Nd, NULL}, //  (Excluded) 𑵐..𑵙
     {0x11DA0, 0x11DA9, SC_Gunjala_Gondi, GC_Nd, NULL}, //  (Excluded) 𑶠..𑶩
     {0x11DE0, 0x11DE9, SC_Tolong_Siki, GC_Nd, NULL}, //  (Excluded) 𑷠..𑷩
-    {0x11F50, 0x11F59, SC_Kawi, GC_Nd, NULL}, //  (Excluded) 𑽐..𑽙
-    {0x16130, 0x16139, SC_Gurung_Khema, GC_Nd, NULL}, //  (Excluded) 𖄰..𖄹
+    // SPLIT on GC
+    {0x11F50, 0x11F59, SC_Kawi, GC_Nd, NULL},    {0x11F5A, 0x11F5A, SC_Kawi, GC_Nd, NULL}, //  (Excluded) 𑽐
+    {0x1611E, 0x16129, SC_Gurung_Khema, GC_Mn, NULL}, //  (Excluded) 𖄞..𖄩
+    // SPLIT on GC
+    {0x1612D, 0x1612F, SC_Gurung_Khema, GC_Mn, NULL},    {0x16130, 0x16139, SC_Gurung_Khema, GC_Mn, NULL}, //  (Excluded) 𖄭..𖄹
     {0x16AC0, 0x16AC9, SC_Tangsa, GC_Nd, NULL}, //  (Excluded) 𖫀..𖫉
     {0x16B50, 0x16B59, SC_Pahawh_Hmong, GC_Nd, NULL}, //  (Excluded) 𖭐..𖭙
     {0x16D70, 0x16D79, SC_Kirat_Rai, GC_Nd, NULL}, //  (Excluded) 𖵰..𖵹
     {0x1E4F0, 0x1E4F9, SC_Nag_Mundari, GC_Nd, NULL}, //  (Excluded) 𞓰..𞓹
+    {0x1E5EE, 0x1E5EF, SC_Ol_Onal, GC_Mn, NULL}, //  (Excluded) 𞗮..𞗯
     {0x1E5F1, 0x1E5FA, SC_Ol_Onal, GC_Nd, NULL}, //  (Excluded) 𞗱..𞗺
     {0x1E6E3, 0x1E6E3, SC_Tai_Yo, GC_Po, NULL}, //  (Excluded) 𞛣
     {0x1E6E6, 0x1E6E6, SC_Tai_Yo, GC_Po, NULL}, //  (Excluded) 𞛦
     {0x1E6EE, 0x1E6EF, SC_Tai_Yo, GC_Po, NULL}, //  (Excluded) 𞛮..𞛯
     {0x1E6F5, 0x1E6F5, SC_Tai_Yo, GC_Po, NULL}, //  (Excluded) 𞛵
-}; // 27 ranges, 3 singles, 233 codepoints
+}; // 33 ranges, 7 singles, 257 codepoints
 #else
-extern const struct sc_tr39 tr39_excl_cont_list[30];
+extern const struct sc_tr39 tr39_excl_cont_list[40];
 #endif
 
 // Currently empty MEDIAL list for safec26.

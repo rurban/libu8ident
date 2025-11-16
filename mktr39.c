@@ -423,8 +423,9 @@ static void gen_unitr39(void) {
     struct range_bool r = xid_start_list[i];
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
+      enum u8id_gc gc = u8ident_get_gc(cp);
       if (s < FIRST_EXCLUDED_SCRIPT &&
-          !u8ident_is_MARK(cp) &&
+          !u8ident_is_MARK(cp) && gc != GC_Mc &&
           !isSkipIdtype(cp) &&
           !isHalfwidthOrFullwidth(cp) &&
           !isArabicPresentationForm(cp) &&
@@ -498,8 +499,9 @@ static void gen_unitr39(void) {
       if (BITGET(u, cp))
         continue;
       uint8_t s = u8ident_get_script(cp);
+      enum u8id_gc gc = u8ident_get_gc(cp);
       if (s < FIRST_EXCLUDED_SCRIPT &&
-          !u8ident_is_MARK(cp) &&
+          !u8ident_is_MARK(cp) && gc != GC_Mc &&
           !isSkipIdtype(cp) &&
           !isArabicPresentationForm(cp) &&
           !isHalfwidthOrFullwidth(cp)) {
@@ -523,8 +525,10 @@ static void gen_unitr39(void) {
       if (BITGET(c, cp))
         continue;
       uint8_t s = u8ident_get_script(cp);
+      enum u8id_gc gc = u8ident_get_gc(cp);
       if (s < FIRST_EXCLUDED_SCRIPT && u8ident_is_MEDIAL(cp) &&
-          !u8ident_is_MARK(cp) && !isHalfwidthOrFullwidth(cp) &&
+          !u8ident_is_MARK(cp) && gc != GC_Mc &&
+          !isHalfwidthOrFullwidth(cp) &&
           !isArabicPresentationForm(cp)) {
         BITSET(c, cp);
       }
@@ -563,8 +567,10 @@ static void gen_unitr39(void) {
     struct range_bool r = xid_start_list[i];
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
+      enum u8id_gc gc = u8ident_get_gc(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
+          !u8ident_is_MARK(cp) && gc != GC_Mc &&
+          !isExcludedIdtype(cp) &&
           !isHalfwidthOrFullwidth(cp) &&
           !isArabicPresentationForm(cp) && !u8ident_is_MEDIAL(cp)) {
         size_t len;
@@ -603,8 +609,9 @@ static void gen_unitr39(void) {
       if (BITGET(u, cp))
         continue;
       uint8_t s = u8ident_get_script(cp);
+      enum u8id_gc gc = u8ident_get_gc(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          !u8ident_is_MARK(cp) && !isExcludedIdtype(cp) &&
+          !u8ident_is_MARK(cp) && gc != GC_Mc && !isExcludedIdtype(cp) &&
           !isHalfwidthOrFullwidth(cp) && !isArabicPresentationForm(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
@@ -625,9 +632,11 @@ static void gen_unitr39(void) {
       if (BITGET(c, cp))
         continue;
       uint8_t s = u8ident_get_script(cp);
+      enum u8id_gc gc = u8ident_get_gc(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          u8ident_is_MEDIAL(cp) && !u8ident_is_MARK(cp) &&
-          !isExcludedIdtype(cp) && !isHalfwidthOrFullwidth(cp) && !isArabicPresentationForm(cp)) {
+          u8ident_is_MEDIAL(cp) && !u8ident_is_MARK(cp) && gc != GC_Mc &&
+          !isExcludedIdtype(cp) && !isHalfwidthOrFullwidth(cp) &&
+          !isArabicPresentationForm(cp)) {
         BITSET(c, cp);
       }
     }
@@ -656,8 +665,9 @@ static void gen_unitr39(void) {
         continue;
       if (u8ident_is_MEDIAL(cp)) {
         uint8_t s = u8ident_get_script(cp);
+        enum u8id_gc gc = u8ident_get_gc(cp);
         if (s < FIRST_LIMITED_USE_SCRIPT &&
-            !u8ident_is_MARK(cp) &&
+            !u8ident_is_MARK(cp) && gc != GC_Mc &&
             !isExcludedIdtype(cp) &&
             !isHalfwidthOrFullwidth(cp)) {
           BITSET(c, cp);
@@ -672,8 +682,9 @@ static void gen_unitr39(void) {
         continue;
       if (u8ident_is_MEDIAL(cp)) {
         uint8_t s = u8ident_get_script(cp);
+        enum u8id_gc gc = u8ident_get_gc(cp);
         if (s < FIRST_LIMITED_USE_SCRIPT &&
-            !u8ident_is_MARK(cp) &&
+            !u8ident_is_MARK(cp) && gc != GC_Mc &&
             !isExcludedIdtype(cp) &&
             !isArabicPresentationForm(cp) &&
             !isHalfwidthOrFullwidth(cp)) {
