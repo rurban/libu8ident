@@ -3,7 +3,7 @@ libu8ident - Check unicode security guidelines for identifiers
 
 without adding the full Unicode database.
 
-This library does the unicode identifier security checks needed for
+This library does the TR39 unicode identifier security checks needed for
 all the compilers, interpreters, filesystems and login systems, which
 do support for whatever reason unicode identifiers ("names"), and wish
 to avoid the various unicode security loopholes, like bidi- or
@@ -95,7 +95,7 @@ them there, and not in X?ID\_Continue btw.
 **ALLUTF8**. (sorted from most secure to most insecure).  ASCII
 ignores all utf8 word boundaries. TR39 is the optimized proposal
 for the C26 charset. ALLOWED, allows only TR39 IdentifierStatus
-Allowed characters. C23 is from the upcoming C23 standard with NFC and
+Allowed characters. C23 is from the C23 standard with NFC and
 a maximal sequence length. ID allows all letters, plus numbers,
 punctuation and marks, including all exotic scripts. XID is ID plus
 some special exceptions to avoid the NFKC quirks, because NFKC has a
@@ -107,11 +107,12 @@ Normalization
 -------------
 
 All utf8 identifiers and literals are parsed and stored as normalized
-NFC variants (unlike Python 3), which prevents from various TR31, TR36 and TR39
-unicode confusable and spoofing security problems with identifiers. See
-<http://www.unicode.org/reports/tr31/>, <http://www.unicode.org/reports/tr36/>
-and <http://www.unicode.org/reports/tr39>
-Optionally we also support the NFKC, NFKD and NFD methods.
+NFC variants (unlike Python 3), which prevents from various TR31, TR36
+and TR39 unicode confusable and spoofing security problems with
+identifiers. See <http://www.unicode.org/reports/tr31/>,
+<http://www.unicode.org/reports/tr36/> and
+<http://www.unicode.org/reports/tr39> Optionally we also support the
+NFKC, NFKD and NFD methods.
 
 For example with NFKC the following two characters would be equal:
 ℌ => H, Ⅸ => IX, ℯ => e, ℨ => Z (and not 3), ⒛ => 20, µ (Math) => μ (Greek) ...
@@ -167,9 +168,9 @@ This is the recommended profile, don't fall into the unicode identifier trap.
 * The string is covered by any of the following sets of scripts,
   according to the definition in Mixed Scripts:
 
-  * Latin + Han + Hiragana + Katakana; or equivalently: Latn + Jpan
-  * Latin + Han + Bopomofo; or equivalently: Latn + Hanb
-  * Latin + Han + Hangul; or equivalently: Latn + Kore
+  - Latin + Han + Hiragana + Katakana; or equivalently: Latn + Jpan
+  - Latin + Han + Bopomofo; or equivalently: Latn + Hanb
+  - Latin + Han + Hangul; or equivalently: Latn + Kore
 
 `4`. **Moderately Restrictive**
 
@@ -196,7 +197,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   value indicating that the string does not match any of the levels
   1-5.
 
-`c26_4`. **TR39**
+`tr39_4`. **TR39**
 
 * We also provide a special profile, called **`U8ID_PROFILE_TR39_4`**,
   also defined by `-DU8ID_PROFILE_TR39`. This is an extended
@@ -205,7 +206,7 @@ This is the recommended profile, don't fall into the unicode identifier trap.
   extension over C11, disallowing the restricted and limited_use
   scripts and identifiers, arbitrary rtl and ltr overrides, and all
   the insecure mixed scripts combinations.  See `unitr39.h`, and the
-  C++26 paper [D2528R1](doc/D2528R1.md).
+  C++26 proposal [D2528R1](doc/D2528R1.md).
 
 `c11_6`. **C11STD**
 
@@ -225,14 +226,14 @@ Non-spacing Combining marks
 ---------------------------
 
 * Forbid starting combining marks.
-* Forbid sequences of the same nonspacing mark. (TR39#5.4)
-* Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me). (TR39#5.4)
+* Forbid sequences of the same nonspacing mark. ([TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection))
+* Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me). ([TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection))
 * Forbid sequences of base character + nonspacing mark that look the
   same as or confusingly similar to the base character alone (because
   the nonspacing mark overlays a portion of the base character). An
-  example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE. (TR39#5.5)
+  example is U+0069 LOWERCASE LETTER I + U+0307 COMBINING DOT ABOVE. ([TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection))
 * Forbid non-spacing marks with base chars already including the non-spacing
-  mark, like Ä with DIAERESIS. (TR39#5.5)
+  mark, like Ä with DIAERESIS. ([TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection))
 
 Confusables
 -----------
@@ -343,8 +344,8 @@ e.g codesizes for u8idnorm.o with -Os
 
 default: 365K with -g on amd64-gcc
 
-For `-DU8ID_PROFILE_TR39` see above. `c26_4` is also called
-**TR39**, previously SAFEC23, `c11_6` is the std insecure C11 profile.
+For `-DU8ID_PROFILE_TR39` see above. `tr39_4` is also called
+**TR39**, previously SAFEC26, `c11_6` is the std insecure C11 profile.
 
 With `confus` enabled, the confusable API is added.
 With `croaring` the confus API is about twice as fast, and needs half the size.
@@ -390,7 +391,7 @@ enum u8id_options: [TR31](http://www.unicode.org/reports/tr31/)
     U8ID_TR31_XID = 64,     // without NFKC quirks, labelled stable
     U8ID_TR31_ID = 65,      // The usual tr31 variants
     U8ID_TR31_ALLOWED = 66, // The UCD IdentifierStatus.txt (default)
-    U8ID_TR31_TR39 = 67, // safer XID's, without Limited_Use and Excluded Scripts
+    U8ID_TR31_TR39 = 67,    // safer XID's, without Limited_Use and Excluded Scripts
     U8ID_TR31_C23 = 68,     // XID with NFC from the C23 standard
     U8ID_TR31_C11 = 69,     // stable insecure AltId ranges from C11 Annex D
     U8ID_TR31_ALLUTF8 = 70, // allow all > 128, e.g. D, php, nim, crystal
@@ -460,11 +461,10 @@ twice as fast, and needs half the size.
 
 `enum u8id_errors u8ident_check (const u8* string, char** outnorm)`
 
-`enum u8id_errors u8ident_check_buf (const char* buf, int len, char** outnorm)`
+`enum u8id_errors u8ident_check_buf (const char* buf, int bufsize, char** outnorm)`
 
 Two variants to check if this identifier is valid. u8ident_check_buf
-avoids allocating a fresh string from the parsed input.  outnorm is
-set to a fresh normalized string if valid.
+avoids a strlen call.  outnorm is set to a fresh normalized string if valid.
 
 Return values (`enum u8id_errors`):
 
@@ -490,7 +490,7 @@ identifier is stored in two dynamic hash tables, and for each
 confusable match, normalized to NFC, the first wins. Only with
 `--enable-confus / -DHAVE_CONFUS`.
 
-`char * u8ident_normalize (const char* buf, int len)`
+`char * u8ident_normalize (const char* buf, int bufsz)`
 
 Returns a freshly allocated normalized string, with the options defined at
 `u8ident_init`.
@@ -632,7 +632,9 @@ TODO
 * **FCD**: This normalization is broken.
 
 * **gperf** for integer keys: Check perfect hash performance for some
-  sparse tables, such as i.e. confusables. See my gperf intkeys branch on [gitlab](https://gitlab.com/rurban/gperf/commits/intkeys). Or my [nbperf](https://github.com/rurban/nbperf/) intkey support.
+  sparse tables, such as i.e. confusables. See my gperf intkeys branch on
+  [gitlab](https://gitlab.com/rurban/gperf/commits/intkeys).
+  Or my [nbperf](https://github.com/rurban/nbperf/) intkey support.
 
 * Eventually provide **wchar** support. Technically easy, even easier than UTF-8.
 

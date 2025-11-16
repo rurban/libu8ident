@@ -195,13 +195,13 @@ bool nsm_check(const uint32_t base_cp, const uint32_t cp) {
 }
 
 /* Two variants to check if this identifier is valid. The second avoids
-   allocating a fresh string from the parsed input.
+   a strlen call.
 */
-EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
+EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
                                           char **outnorm) {
   int ret = U8ID_EOK;
   char *s = (char *)buf;
-  const char *e = (char *)&buf[len];
+  const char *e = (char *)&buf[bufsz];
   bool need_normalize = false;
   struct ctx_t *ctx = u8ident_ctx();
   enum u8id_sc scr;
@@ -573,7 +573,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
 norm:
 #endif
   if (need_normalize) {
-    char *norm = u8ident_normalize((char *)buf, len);
+    char *norm = u8ident_normalize((char *)buf, bufsz);
     if (!norm || strcmp(norm, buf)) {
       ctx->last_cp = 0;
       ret = U8ID_EOK_NORM | ret;
@@ -593,10 +593,10 @@ EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
 #define ERR_NOSPACE -2
 
 /* The other primitive variant without mixed-sripts checks. */
-EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len) {
+EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int bufsz) {
 #ifndef HAVE_CONFUS
   (void)buf;
-  (void)len;
+  (void)bufsz;
   fprintf(stderr, "Unsupported u8ident_check_confusables(), need --enable-confus\n");
   return -1;
 #else
@@ -605,7 +605,7 @@ EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len
   char *nfc = NULL;
   char *found;
 
-  if (!len)
+  if (!bufsz)
     return U8ID_EOK;
   if (!ctx->htab) {
     ctx->htab = new_htab(16);
@@ -620,15 +620,15 @@ EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len
   // convert to NFC
   enum u8id_norm norm = s_u8id_norm;
   s_u8id_norm = U8ID_NFC;
-  nfc = u8ident_normalize(buf, len);
+  nfc = u8ident_normalize(buf, bufsz);
   if (!nfc)
     return U8ID_EOK_NORM;
   {
     char *s = (char *)buf;
-    const char *e = &buf[len];
+    const char *e = &buf[bufsz];
     // lookup the codepoints in confusables
     bool found_gperf = false;
-    size_t nfcsz = len * 2;
+    size_t nfcsz = bufsz * 2;
     char *confus = calloc(nfcsz, 1);
     do {
       char *os = s;
@@ -662,9 +662,9 @@ EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int len
     //fprintf(stderr, "found confus %s -> %s\n", buf, found);
     // add the result for diagnostics
     int diff = strcmp(found, buf);
-    if (diff < 0 && -diff < len)
+    if (diff < 0 && -diff < bufsz)
       ctx->last_cp = nfc[-diff];
-    else if (diff < len)
+    else if (diff < bufsz)
       ctx->last_cp = nfc[diff];
     free (nfc);
     return U8ID_ERR_CONFUS;

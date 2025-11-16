@@ -819,7 +819,7 @@ static int u8id_compose_s(char *restrict dest, long dmax,
 // clang-format off
 GCC_DIAG_IGNORE(-Wreturn-local-addr)
 // clang-format on
-EXTERN char *u8ident_normalize(const char *src, int len) {
+EXTERN char *u8ident_normalize(const char *src, int srcsz) {
 #if !defined U8ID_NORM || U8ID_NORM != FCD
   char *tmp_ptr;
   char *tmp = NULL;
@@ -828,7 +828,7 @@ EXTERN char *u8ident_normalize(const char *src, int len) {
   const enum u8id_norm mode = u8ident_norm();
   const bool iscompat = (mode == U8ID_NFKC || mode == U8ID_NFKD);
 
-  size_t dmax = len;
+  size_t dmax = srcsz;
   char *dest = NULL;
   size_t destlen;
   int err;
