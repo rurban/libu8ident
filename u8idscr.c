@@ -539,8 +539,9 @@ LOCAL bool u8ident_maybe_normalized(const uint32_t cp) {
 
 bool isC23_start(const uint32_t cp) {
   bool ret = range_bool_search(cp, xid_start_list, ARRAY_SIZE(xid_start_list));
-  if (!ret)
-    return false;
+  if (!ret) {
+    return cp == '_' ? true : false;
+  }
 #if !defined U8ID_NORM || U8ID_NORM == NFC
   // if member of NFC_N it's not
   if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))

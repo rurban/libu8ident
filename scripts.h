@@ -5078,6 +5078,7 @@ extern const struct range_bool id_cont_list[642];
 
 // If you use NFKC you'd need the xid lists instead
 // NFKC has many special cases, and does not roundtrip.
+// Note that '_' U+5F is missing here and checked extra.
 #  ifndef EXTERN_SCRIPTS
 LOCAL const struct range_bool xid_start_list[] = {
     // clang-format off
