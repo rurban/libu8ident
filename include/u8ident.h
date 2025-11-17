@@ -168,9 +168,8 @@ enum u8id_errors {
   U8ID_ERR_CONFUS = -6, /* invalid because confusable */
 };
 
-/* Two variants to check if this identifier is valid. u8ident_check_buf avoids
-   allocating a fresh string from the parsed input. buf must not be
-   zero-terminated.
+/* Two variants to check if this identifier is valid. With u8ident_check_buf
+   buf does not need to be zero-terminated.
 
    Return values (enum u8id_errors):
     * 0   - valid without need to normalize.
