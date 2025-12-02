@@ -128,6 +128,7 @@ regen-norm: Unicode-Normalize un8ifcan.h
 	  cd - && cp Unicode-Normalize/un8if*.h .
 # Download some UCD files and create scripts.h
 regen-scripts:
+	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/UnicodeData.txt
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/Scripts.txt
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
@@ -135,9 +136,9 @@ regen-scripts:
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
 	-$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
 	-$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
-	$(PERL) mkscripts.pl
-	$(PERL) mkgc.pl
 	$(PERL) mkmark.pl
+	$(PERL) mkgc.pl
+	$(PERL) mkscripts.pl
 	-$(MAKE) unitr39.h
 # Download some UCD files and create confus.h
 regen-confus:
