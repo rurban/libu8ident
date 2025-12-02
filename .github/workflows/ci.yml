@@ -39,7 +39,7 @@ jobs:
       run: make dist pkg && echo ${{ github.sha }} > Release.txt; sha256sum libu8ident-*-x86_64-pc-linux-gnu.tar.gz > linux.sha256
     - name: Release
       continue-on-error: true
-      uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2.4.2
+      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
       if: matrix.CFLAGS == '' && matrix.CC == 'gcc' && startsWith(github.ref, 'refs/tags/')
       with:
         files: |
@@ -109,7 +109,7 @@ jobs:
       run: make pkg; sha256sum libu8ident-*-x86_64-w64-mingw32.zip > mingw.sha256
       continue-on-error: true
     - name: Release
-      uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2.4.2
+      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
@@ -153,7 +153,7 @@ jobs:
     #- run: msbuild libu8ident.sln
     #- run: Debug\u8idtest
     - name: Release
-      uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2.4.2
+      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
