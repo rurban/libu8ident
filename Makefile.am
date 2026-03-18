@@ -242,8 +242,9 @@ mkroar: mkroar.c
 	@echo "ERROR mkroar requires roaring.c (--with-croaring)"
 endif
 
-c11-all.h unitr39.h: mktr39$(EXEEXT) scripts.h mark.h medial.h
-	./mktr39$(EXEXT)
+c11-all.h unitr39.h: scripts.h mark.h medial.h
+	$(MAKE) mktr39$(EXEEXT)
+	./mktr39$(EXEEXT)
 if !HAVE_WINDOWS
 	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unitr39.h $(srcdir)/
 else
