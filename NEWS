@@ -1,5 +1,23 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
-Copyright (C) 2022 Reini Urban
+Copyright (C) 2022, 2026 Reini Urban
+
+libu8ident 0.4 - 2026-03-18
+
+Update to Unicode version 16.0 and 17.0:
+  - New scripts and mark ranges.
+  - Updated normalization, confusable, and script tables.
+Rename c26 helpers and headers to tr39 (the TR39 standard they implement).
+Rename outdated TR31/PROFILE names; remove SAFEC26 alias.
+Add --disable-dollar / -DALLOW_DOLLAR=OFF configure option (GH #25)
+  to exclude U+0024 $ from identifier characters.
+Add _ U+005F to the TR31 C23 identifier list.
+Fix multiple scripts detection issues.
+Fix invalid GC_Mc splits in unitr39.h.
+Fix wrong check_buf and u8id_errors documentation.
+Fix -Wreturn-local-addr warning.
+Fix make regen-norm on pristine checkout.
+cmake: bump versions, fix Windows CPack packaging.
+Upgrade to autoconf 2.72.
 
 libu8ident 0.3 - 2022-12-03
 
