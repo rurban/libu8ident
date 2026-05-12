@@ -23,8 +23,9 @@ libu8ident_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
+U8IFDEF = -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 -UHAVE_CROARING -UHAVE_CONFUS -DENABLE_CHECK_XID -UDISABLE_CHECK_XID -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31 -DU8ID_PROFILE=8 -UHAVE_CONFIG_H
 libu8ident_c_la_SOURCES = u8ident-tr39.c u8idnorm-tr39.c u8idscr-tr39.c
-libu8ident_c_la_CFLAGS = $(AM_CFLAGS) -DU8ID_TR31=TR39 -DU8ID_PROFILE_TR39 -DU8ID_NORM=NFC
+libu8ident_c_la_CFLAGS = $(AM_CFLAGS) $(U8IFDEF)
 libu8ident_c_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
 	-no-undefined \
@@ -113,7 +114,6 @@ else
 	-copy /y c11-all.h unitr39.h $(srcdir)/
 endif
 
-U8IFDEF = -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 -UHAVE_CROARING -UHAVE_CONFUS -DENABLE_CHECK_XID -UDISABLE_CHECK_XID -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31 -DU8ID_PROFILE=8
 $(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
 	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8ident.c >$@
 $(srcdir)/u8idnorm-tr39.c: $(srcdir)/u8idnorm.c
@@ -132,7 +132,7 @@ check-syntax:
 clang-format:
 	clang-format -i $(srcdir)/*.c $(srcdir)/include/*.h $(srcdir)/scripts.h $(srcdir)/confus.h $(srcdir)/u8id*.h
 
-$(dist_man1_MANS) regen-man: $(bin_PROGRAMS)
+regen-man: $(bin_PROGRAMS)
 	-for p in $(dist_man1_MANS); do \
 	  base=`basename $$p .1`; \
 	  LC_ALL=C help2man -N -s1 -p $(PACKAGE_NAME) --manual "U8IDENT Manual $(VERSION)" -o $$p ./$$base$(EXEEXT); done
