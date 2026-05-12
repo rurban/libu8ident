@@ -20,6 +20,13 @@ else()
 endif()
 string(STRIP "${NL_PACKAGE_VERSION}" PACKAGE_VERSION)
 
+find_program(UNIFDEF unifdef)
+if(UNIFDEF)
+  message(STATUS "Found unifdef: ${UNIFDEF}")
+else()
+  message(STATUS "unifdef not found (only needed for maintainer builds)")
+endif()
+
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("dlfcn.h" HAVE_DLFCN_H)
 CHECK_INCLUDE_FILE("dirent.h" HAVE_DIRENT_H)
@@ -204,6 +211,32 @@ target_include_directories(u8ident PRIVATE
 target_include_directories(u8ident PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# libu8ident_c: C/C++ variant with TR39 profile, TR31=TR39, NFC norm
+set(libu8ident_c_SOURCES
+    u8ident.c
+    u8idnorm.c
+    u8idscr.c)
+
+add_library(u8ident_c_static STATIC
+  ${libu8ident_HEADERS}
+  ${libu8ident_c_SOURCES}
+  ${private_HEADERS})
+add_library(u8ident_c SHARED
+  ${libu8ident_HEADERS}
+  ${libu8ident_c_SOURCES}
+  ${private_HEADERS})
+
+target_compile_definitions(u8ident_c PRIVATE U8ID_TR31=TR39 U8ID_PROFILE_TR39 U8ID_NORM=NFC)
+target_compile_definitions(u8ident_c_static PRIVATE U8ID_TR31=TR39 U8ID_PROFILE_TR39 U8ID_NORM=NFC)
+
+set_target_properties(u8ident_c PROPERTIES PUBLIC_HEADER include/u8ident.h)
+
+target_include_directories(u8ident_c PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(u8ident_c PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 if (CRoaring_FOUND)
   add_executable(perf perf.c u8idroar.c)
   set_source_files_properties(perf.c
@@ -233,6 +266,12 @@ if(NOT CMAKE_CROSSCOMPILING)
   set_source_files_properties(mktr39
     PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_TR39)
   add_test(mktr39 ./mktr39)
+  add_executable(u8idtest_c test.c ${libu8ident_c_SOURCES})
+  target_compile_definitions(u8idtest_c PRIVATE U8ID_TR31=TR39 U8ID_PROFILE_TR39 U8ID_NORM=NFC)
+  add_test(test_c ./u8idtest_c)
+  add_executable(test-texts_c test-texts.c ${libu8ident_c_SOURCES})
+  target_compile_definitions(test-texts_c PRIVATE U8ID_TR31=TR39 U8ID_PROFILE_TR39 U8ID_NORM=NFC)
+  add_test(test-texts_c ./test-texts_c)
 endif(NOT CMAKE_CROSSCOMPILING)
 
 add_custom_target(
@@ -282,12 +321,29 @@ if(MSVC)
   #untested
   install(TARGETS u8ident RUNTIME PUBLIC_HEADER
           DESTINATION libu8ident-${PACKAGE_VERSION})
+  install(TARGETS u8ident_c RUNTIME PUBLIC_HEADER
+          DESTINATION libu8ident-${PACKAGE_VERSION})
 else()
   include(GNUInstallDirs)
+  set(prefix ${CMAKE_INSTALL_PREFIX})
+  set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+  set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+  set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+  set(PACKAGE ${PROJECT_NAME})
+  set(VERSION ${PACKAGE_VERSION})
+  set(PACKAGE_URL "https://github.com/rurban/libu8ident")
+  configure_file(libu8ident.pc.in libu8ident.pc @ONLY)
+  configure_file(libu8ident_c.pc.in libu8ident_c.pc @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libu8ident.pc
+                ${CMAKE_CURRENT_BINARY_DIR}/libu8ident_c.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endif()
 install(TARGETS u8ident
   LIBRARY
   COMPONENT u8ident)
+install(TARGETS u8ident_c
+  LIBRARY
+  COMPONENT u8ident_c)
 install(TARGETS RUNTIME)
 install(TARGETS u8idlint)
 

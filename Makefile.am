@@ -36,7 +36,7 @@ u8idlint_LDADD = $(u8idlint_LIBS)
 EXTRA_HEADERS = c11-safe.h unitr39.h
 
 pcdatadir = $(libdir)/pkgconfig
-pcdata_DATA = libu8ident.pc
+pcdata_DATA = libu8ident.pc libu8ident_c.pc
 dist_man1_MANS = u8idlint.1
 dist_man3_MANS = u8ident.3
 docdir = $(datadir)/libu8ident
@@ -114,11 +114,11 @@ else
 endif
 
 $(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
-	unifdef -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8ident.c >$@
+	$(UNIFDEF) -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8ident.c >$@
 $(srcdir)/u8idnorm-tr39.c: $(srcdir)/u8idnorm.c
-	unifdef -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idnorm.c >$@
+	$(UNIFDEF) -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idnorm.c >$@
 $(srcdir)/u8idscr-tr39.c: $(srcdir)/u8idscr.c
-	unifdef -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idscr.c >$@
+	$(UNIFDEF) -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idscr.c >$@
 
 # emacs flymake-mode
 check-syntax:

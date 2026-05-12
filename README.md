@@ -529,12 +529,14 @@ and needed options, and this is in the hot path of a parser.
 A shared library needs to provide all the options at run-time,
 i.e. empty configure options.
 
-Build dependencies: ronn (`dnf install rubygem-ronn-ng`)
+Build dependencies: ronn (`dnf install rubygem-ronn-ng`), unifdef (for `libu8ident_c` sources from git)
 
 Optional dependencies:
 
 - CRoaring (the two amalgamated sources only).
   autotools downloads it automatically with `--enable-confus --with-roaring`.
+- pandoc (for PDF docs)
+- gperf (for confusables with `--enable-confus`)
 
 Maintainer dependencies: wget, perl, xxd. Needed every year when the UCD changes.
 
