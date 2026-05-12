@@ -7,7 +7,7 @@ GPERF = @GPERF@
 WARN_CFLAGS = @WARN_CFLAGS@
 CROARING_PATH = @CROARING_PATH@
 AM_CFLAGS = -I$(srcdir)/include -I$(builddir) -I$(srcdir) $(WARN_CFLAGS)
-lib_LTLIBRARIES = libu8ident.la
+lib_LTLIBRARIES = libu8ident.la libu8ident_c.la
 include_HEADERS = include/u8ident.h
 c_sources = $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c
 libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
@@ -20,6 +20,12 @@ AM_CFLAGS += -I$(CROARING_PATH)
 libu8ident_la_SOURCES += u8idroar.c
 endif
 libu8ident_la_LDFLAGS = \
+	-version-info $(LIBU8IDENT_SO_VERSION) \
+	-no-undefined \
+	$(LDFLAGS) $(AM_LDFLAGS)
+libu8ident_c_la_SOURCES = u8ident-tr39.c u8idnorm-tr39.c u8idscr-tr39.c
+libu8ident_c_la_CFLAGS = $(AM_CFLAGS) -DU8ID_TR31=TR39 -DU8ID_PROFILE_TR39 -DU8ID_NORM=NFC
+libu8ident_c_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
@@ -42,7 +48,7 @@ PDF = doc/$(PCXX).pdf doc/$(DCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
 	   doc/c11.md doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).md \
 	   doc/$(NCURC).md doc/$(NCURC).patch \
-	   doc/tr31-bugs.md 
+	   doc/tr31-bugs.md
 if HAVE_PANDOC
 doc_DATA += $(PDF)
 html_DATA = doc/$(DCURCXX).html doc/$(NCURC).html
@@ -98,6 +104,22 @@ $(srcdir)/su8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkgc.pl
 $(srcdir)/gconfus.h: $(srcdir)/gconfus.h.in
 	-if test -n "$(GPERF)"; then cd $(srcdir) && $(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp; fi
+
+c11-all.h unitr39.h: scripts.h mark.h medial.h
+	$(MAKE) mktr39$(EXEEXT)
+	./mktr39$(EXEEXT)
+if !HAVE_WINDOWS
+	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unitr39.h $(srcdir)/
+else
+	-copy /y c11-all.h unitr39.h $(srcdir)/
+endif
+
+$(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
+	unifdef -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8ident.c >$@
+$(srcdir)/u8idnorm-tr39.c: $(srcdir)/u8idnorm.c
+	unifdef -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idnorm.c >$@
+$(srcdir)/u8idscr-tr39.c: $(srcdir)/u8idscr.c
+	unifdef -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idscr.c >$@
 
 # emacs flymake-mode
 check-syntax:
@@ -204,11 +226,11 @@ regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(DCU
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man \
 	pkg docs patch-c-doc regen-c-patch docker-html docker-pdf
 
-EXTRA_PROGRAMS = mktr39 test test-texts example
-TESTS = test example
+EXTRA_PROGRAMS = mktr39 test test-texts example test_c test_texts_c example_c
+TESTS = test example test_c example_c
 if !HAVE_WINDOWS
 EXTRA_PROGRAMS += test_asan
-TESTS += test-texts.test u8idlint.test
+TESTS += test-texts.test u8idlint.test test_texts_c
 endif
 test_SOURCES = test.c $(libu8ident_la_SOURCES)
 test_CFLAGS = $(AM_CFLAGS)
@@ -219,6 +241,13 @@ mktr39_SOURCES = mktr39.c $(libu8ident_la_SOURCES)
 mktr39_CFLAGS = $(AM_CFLAGS)
 example_SOURCES = example.c
 example_LDADD = libu8ident.la
+test_c_SOURCES = test.c $(libu8ident_c_la_SOURCES)
+test_c_CFLAGS = $(libu8ident_c_la_CFLAGS)
+test_texts_c_SOURCES = test-texts.c $(libu8ident_c_la_SOURCES)
+test_texts_c_CFLAGS = $(libu8ident_c_la_CFLAGS) $(U8IDLINT_CFLAGS)
+test_texts_c_LDADD = $(u8idlint_LIBS)
+example_c_SOURCES = example.c
+example_c_LDADD = libu8ident_c.la
 test_asan_CFLAGS = $(AM_CFLAGS) -g -fsanitize=address
 test_asan_SOURCES = test.c $(libu8ident_la_SOURCES)
 
@@ -240,15 +269,6 @@ perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
 mkroar: mkroar.c
 	@echo "ERROR mkroar requires roaring.c (--with-croaring)"
-endif
-
-c11-all.h unitr39.h: scripts.h mark.h medial.h
-	$(MAKE) mktr39$(EXEEXT)
-	./mktr39$(EXEEXT)
-if !HAVE_WINDOWS
-	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unitr39.h $(srcdir)/
-else
-	-copy /y c11-all.h unitr39.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
@@ -285,7 +305,7 @@ check-profiles: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	      $(c_sources) -o test-profiles$(EXEEXT) && \
 	    ./test-profiles$(EXEEXT) profile || exit; \
 	done
-	for n in TR39 C11STD; do \
+	for n in TR39_4 C11STD; do \
 	    echo PROFILE_$${n}; \
 	    $(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) -UU8ID_PROFILE -DU8ID_PROFILE_$${n} -Wfatal-errors $(srcdir)/test.c \
 	      $(c_sources) -o test-profiles$(EXEEXT) && \
@@ -349,7 +369,8 @@ dist-hook:
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,TR39_4,C11_6,TR39,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) perf$(EXEEXT) \
-	     texts.tst mktr39$(EXEEXT) example$(EXEEXT)
+	     texts.tst mktr39$(EXEEXT) example$(EXEEXT) \
+	     test_c$(EXEEXT) test_texts_c$(EXEEXT) example_c$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst \
 	     test-texts.test doc/$(NCURC).pdf
 distclean-compile:
