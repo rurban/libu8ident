@@ -179,7 +179,9 @@ enum xid_e {
 #  endif
 #endif
 
+#ifdef HAVE_CONFUS
 #include "htable.h"
+#endif
 
 #define U8ID_CTX_TRESH 5
 #define U8ID_SCR_TRESH 8
@@ -198,8 +200,10 @@ struct ctx_t {
     // profiles, or when we manually add extra scripts.
     uint8_t *u8p; // or if count > 8
   };
+#ifdef HAVE_CONFUS
   struct htable *htab;
   struct htable *htab1;
+#endif
 };
 
 // clang-format off
