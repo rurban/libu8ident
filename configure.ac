@@ -24,6 +24,7 @@ LT_INIT
 AC_CHECK_TOOLS([AR], [gcc-ar ar])
 AC_CHECK_TOOLS([RANLIB], [gcc-ranlib ranlib])
 AC_CHECK_TOOLS([NM], [gcc-nm nm])
+AC_CHECK_PROG([UNIFDEF], [unifdef], [unifdef])
 #dnl Initialize pkg-config since we are installing a .pc file
 PKG_INSTALLDIR
 AM_CPPFLAGS="-I\$(top_srcdir)/include"
@@ -322,6 +323,7 @@ AC_SUBST(LTEXEC)
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([libu8ident.pc
+                 libu8ident_c.pc
                  Makefile])
 AC_CONFIG_FILES([test-texts.test], [chmod +x test-texts.test])
 AC_OUTPUT
