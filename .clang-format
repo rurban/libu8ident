@@ -5,4 +5,3 @@ IndentPPDirectives: AfterHash
 SortIncludes:    false
 SortUsingDeclarations: false
 ...
-
