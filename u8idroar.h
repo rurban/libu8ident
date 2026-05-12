@@ -9,7 +9,9 @@
 #include <stdbool.h>
 int u8ident_roar_init(void);
 int u8ident_roar_free(void);
+#ifdef HAVE_CONFUS
 EXTERN bool u8ident_is_confusable(const uint32_t cp);
+#endif
 
 #ifdef USE_ALLOWED_CROAR
 bool u8ident_roar_is_allowed(const uint32_t cp);

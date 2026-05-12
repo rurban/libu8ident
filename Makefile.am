@@ -113,12 +113,15 @@ else
 	-copy /y c11-all.h unitr39.h $(srcdir)/
 endif
 
+U8IFDEF = -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 -UHAVE_CROARING -UHAVE_CONFUS -DENABLE_CHECK_XID -UDISABLE_CHECK_XID -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31 -DU8ID_PROFILE=8
 $(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
-	$(UNIFDEF) -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8ident.c >$@
+	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8ident.c >$@
 $(srcdir)/u8idnorm-tr39.c: $(srcdir)/u8idnorm.c
-	$(UNIFDEF) -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idnorm.c >$@
+	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8idnorm.c >$@
 $(srcdir)/u8idscr-tr39.c: $(srcdir)/u8idscr.c
-	$(UNIFDEF) -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 $(srcdir)/u8idscr.c >$@
+	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8idscr.c >$@
+$(srcdir)/u8id_private-tr39.h: $(srcdir)/u8id_private.h
+	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8id_private.h >$@
 
 # emacs flymake-mode
 check-syntax:
