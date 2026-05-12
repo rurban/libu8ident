@@ -321,7 +321,7 @@ while (<$SC>) {
     next;
   }
   # only if the Sc is new or there is a hole
-  if (($from != $oldto + 1) or ($oldsc ne $sc)) { 
+  if (($from != $oldto + 1) or ($oldsc ne $sc)) {
     push @SCR, [$from, $to, $sc];
     $scripts{$sc}++;
     $oldsc = $sc;

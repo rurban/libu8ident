@@ -270,4 +270,3 @@ close $DOC;
 chmod 0444, $mark_h;
 chmod 0444, $doc;
 print "Created mark.h and $doc\n";
-

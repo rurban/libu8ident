@@ -13,7 +13,7 @@
 #  define U8ID_NORM=@LIBU8IDENT_NORM@
 #else
 #  undef U8ID_NORM
-#endif   
+#endif
 
 /* Define to force a single profile. */
 #cmakedefine LIBU8IDENT_PROFILE
@@ -21,7 +21,7 @@
 #  define U8ID_PROFILE=@LIBU8IDENT_PROFILE@
 #else
 #  undef U8ID_PROFILE
-#endif   
+#endif
 
 /* Defined to force a single check_xid option. */
 #cmakedefine ENABLE_CHECK_XID
