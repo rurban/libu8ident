@@ -17,9 +17,9 @@ struct htable {
   char **values;
 };
 
-struct htable * new_htab(unsigned cap);
+struct htable *new_htab(unsigned cap);
 void free_htab(struct htable *htab);
 // adds a copy to the htable
 void add_htab(struct htable *htab, const char *key, const char *value);
 // return value
-char * find_htab(struct htable *htab, const char *key);
+char *find_htab(struct htable *htab, const char *key);

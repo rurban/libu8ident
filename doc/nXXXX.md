@@ -6,8 +6,7 @@
                 SG-16
     Reply-to:   Reini Urban <reini.urban@gmail.com>
 
-1 Abstract
-==========
+# 1 Abstract
 
 Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C26.
 
@@ -17,37 +16,35 @@ programmers are as it's impossible to detect such attacks without
 special tooling, preferably the compiler as the source of truth.
 And essentially confusable identifiers are not identifiable anymore.
 
-2 Changes
-=========
+# 2 Changes
 
 From [n2916](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2916.htm) 2022-01-22:
 
-* Rename C23 to C26, it's too late for C23, at least for C++23.
-* Disallow non-confusable `Technical` U+1C0..U+1C3
-* Fix a lot of not Allowed ID_Start ranges. safec26_start_list
+- Rename C23 to C26, it's too late for C23, at least for C++23.
+- Disallow non-confusable `Technical` U+1C0..U+1C3
+- Fix a lot of not Allowed ID_Start ranges. safec26_start_list
   from 355 ranges, 115 singles, 99350 codepoints
   to 243 ranges, 93 singles, 95986 codepoints
-* Inserted chapter [4 Motivation](#motivation) with links to spoofs.
+- Inserted chapter [4 Motivation](#motivation) with links to spoofs.
 
 From [n2932](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2932.htm) 2022-02-15:
 
-* Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU
+- Added U+3C3 GREEK SMALL LETTER SIGMA and U+3BD GREEK SMALL LETTER NU
   to the Greek confusable exceptions in 19.1.
-* Added Appendix G - Medial.
-* Change U+B7 Catalan MIDDLE DOT from Inclusion to Uncommon Use.
-* Disallow Arabic Presentation Forms-A: U+FB50–U+FDFF and
+- Added Appendix G - Medial.
+- Change U+B7 Catalan MIDDLE DOT from Inclusion to Uncommon Use.
+- Disallow Arabic Presentation Forms-A: U+FB50–U+FDFF and
   Arabic Presentation Forms-B: U+FE70–U+FEFF
-* Added wording feedback from the first SSRG discussion,
+- Added wording feedback from the first SSRG discussion,
   and restructure the paragraphs a bit to be less technical, and make it more
   readable to non-Unicode experts.
-* Added discussions of the gcc and clang-tidy -Whomoglyph approaches via
+- Added discussions of the gcc and clang-tidy -Whomoglyph approaches via
   confusables.
-* Extend 8.3 Combining marks script run detection for spoofing. Added Appendix H
+- Extend 8.3 Combining marks script run detection for spoofing. Added Appendix H
   with the list of affected letters.
-* Updates from Unicode 14 to 15
+- Updates from Unicode 14 to 15
 
-3 Introduction
-==============
+# 3 Introduction
 
 In response to
 [N2836](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2836.pdf),
@@ -57,29 +54,29 @@ for C++.
 
 Adopt Unicode Annex 39 "Unicode Security Mechanisms" as part of C26.
 
-* Comply to a variant of the [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
+- Comply to a variant of the [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
   Mixed-Scripts Moderately Restrictive profile, but allow some Greek letters without
   its confusables with Latin,
-* Disallow all Limited Use [TR31#Table_7](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
+- Disallow all Limited Use [TR31#Table_7](http://www.unicode.org/reports/tr31/#Table_Limited_Use_Scripts)
   and Excluded scripts [TR31#Table_4](https://www.unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers),
-* Only allow [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)
+- Only allow [TR39#Table 1](https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type)
   Recommended, Inclusion, Technical Identifier Type properties,
-* Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with
+- Reject illegal combining mark sequences (Sk, Cf, Mn, Me) with
   mixed-scripts (SCX) [TR39#5.4](https://www.unicode.org/reports/tr39/#Optional_Detection),
   if they are not already addressed by the NFC requirement from C++23, as of
   [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html).
 
 Optionally:
 
-* Implementations may allow an optional `#pragma unicode <LongScript>` that
+- Implementations may allow an optional `#pragma unicode <LongScript>` that
   Excluded scripts can be added to the allowed set of scripts per source file.
 
 Open points:
 
-* How to name the `#pragma unicode` extension.
-* Which context to use in C++: before-cpp, private (lexically scoped),
+- How to name the `#pragma unicode` extension.
+- Which context to use in C++: before-cpp, private (lexically scoped),
   after-cpp, or even within word-chunks only [TR55#5.1.2.1](https://unicode.org/reports/tr55/#Identifier-Chunks).
-* Go against TR39 recommendations and don't disallow Excluded Scripts.
+- Go against TR39 recommendations and don't disallow Excluded Scripts.
   This would require different initial XID tables, would enlarge the attack
   surface implementations and font designers have no experience with yet, but
   would simplify the implementations.
@@ -94,8 +91,7 @@ even TR31 has bugs still, to be hopefully fixed in the next Unicode versions.
 (_Unicode 15 did not_). TR55 was adressed to fix some parts, but leaves many
 open points.
 
-4 Motivation
-============
+# 4 Motivation
 
 One driving factor for addressing this now is that GCC has fixed their
 long standing bug 67224 "UTF-8 support for identifier names in
@@ -182,20 +178,19 @@ identifiers to "symbols".
 
 Links:
 
-* <https://unicode.org/reports/tr55/#Spoofing-confusables>
-* <https://cwe.mitre.org/data/definitions/1007.html> (_The gcc CWE-1007 -Whomoglyph
+- <https://unicode.org/reports/tr55/#Spoofing-confusables>
+- <https://cwe.mitre.org/data/definitions/1007.html> (_The gcc CWE-1007 -Whomoglyph
   warning is linking to it._)
-* <https://websec.github.io/unicode-security-guide/visual-spoofing/>
-* <http://www.unicode.org/reports/tr31/>, <http://www.unicode.org/reports/tr36/>
+- <https://websec.github.io/unicode-security-guide/visual-spoofing/>
+- <http://www.unicode.org/reports/tr31/>, <http://www.unicode.org/reports/tr36/>
   and <http://www.unicode.org/reports/tr39>
-* <https://twitter.com/zygoloid/status/1187150150835195905>,
+- <https://twitter.com/zygoloid/status/1187150150835195905>,
   <https://github.com/golang/go/issues/20209>,
   <https://twitter.com/jupenur/status/1244286243518713857>
-* <https://certitude.consulting/blog/en/invisible-backdoor/>
-* <https://github.com/rurban/libu8ident/tree/master/texts/> with \*-sec\*.c
+- <https://certitude.consulting/blog/en/invisible-backdoor/>
+- <https://github.com/rurban/libu8ident/tree/master/texts/> with \*-sec\*.c
 
-5 Design
-========
+# 5 Design
 
 First we are discussing two different approaches found in praxis:
 
@@ -210,17 +205,17 @@ identifiers. In praxis there are three successful usages of the
 mixed-script approach in java, cperl and rust, as specified here. No
 other language implemented TR39 since and uses it. Python tried the
 confusables approach optionally, and gcc and clang-tidy is trying it
-out now.  See [12 Implementations and
+out now. See [12 Implementations and
 Strategies](#12-implementations-and-strategies).
 
 GCC has a new **-Whomoglyph** warning patch at [PR
 103027](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103027) (see also
-my github for an updated version).  It implements the "skeleton"
+my github for an updated version). It implements the "skeleton"
 algorithm from
 [TR39#4](http://www.unicode.org/reports/tr39/#Confusable_Detection) so
 that every new identifier is mapped to a "skeleton", and if the
 skeleton is already in use by a different identifier, issue a
-`-Whomoglyph` diagnostic.  It uses the `security/confusables.txt`
+`-Whomoglyph` diagnostic. It uses the `security/confusables.txt`
 table to determine which characters are confusable. It uses a NFD
 lookup and three hash lookups per identifier. NFD is relatively cheap
 compared to NFC, mandatory since C23 and C++23, but much more
@@ -232,40 +227,40 @@ unsucessful so far, and used the similar confusables approach.
 
 Pros:
 
-* confusables need not to care about scripts, in which language, the
+- confusables need not to care about scripts, in which language, the
   document is written. The first variant of an identifier is the
   accepted one, and the subsequent ones with expanded confusable
   matches are invalid. First come, first serves.
 
-* Forbidding rarely used scripts can be seen as politically loaded.
+- Forbidding rarely used scripts can be seen as politically loaded.
 
 Cons:
 
-* `confusables.txt` has much more bugs and oddities than TR31, the
+- `confusables.txt` has much more bugs and oddities than TR31, the
   should-be stable list of XID identifiers. So far I've found 3 bugs
   in TR31 for Unicode v14. In confusables.txt ASCII has 12 exceptions
   to be ignored, Greek needs 12 exceptions out of 260, and I didn't
   check any other scripts.
 
-* Following TR39#5 Mixed Scripts would be easier to understand, as it
+- Following TR39#5 Mixed Scripts would be easier to understand, as it
   is defined by simple rules, and not a hand-curated, buggy and
   unstable table. Even the first violation is an error, thus no
   surprises when code moves around.
 
-* Implementing the `confusable.txt` checks only (as proposed in the
+- Implementing the `confusable.txt` checks only (as proposed in the
   two gcc and clang tickets) can be slow (as experienced in
   clang-tidy), and led to a huge number of warnings (over 100.000).
   The GCC implementation (see my github) is fast, but needs recursive
-  dynamic hash lookups.  Whilst implementing the mixed-scripts
+  dynamic hash lookups. Whilst implementing the mixed-scripts
   strategy as laid out here is extremely fast and led to no warnings
   so far in published code.
 
-* Mixed scripts are already successfully used in praxis for several
+- Mixed scripts are already successfully used in praxis for several
   years, without any complaints.
 
 There were a few more design decisions made, over TR39 recommendations:
 
-* Allow some Greek letters mixed with Latin, that are not confusable
+- Allow some Greek letters mixed with Latin, that are not confusable
   with Latin letters. The rationale is that the by far mostly used
   script is Greek, because of its mathematical symbols and physical
   constants actively used by C++ physicists. This is in fact the only
@@ -285,17 +280,16 @@ language, with much stricter performance restrictions than offline
 compilers or linters. There was no noticable compile-time performance
 degradation, as unicode identifiers are extremely rare, and the NFC
 check is by far slower than the mixed script and illegal combining
-mark checks.  NFC needs 183K alone, the mixed script check with the
+mark checks. NFC needs 183K alone, the mixed script check with the
 TR31, medial and mark tables 131K in my unoptimized, generic
 implementation. C++26 can do a bit better, but this is good enough.
 
-6 Summary
-=========
+# 6 Summary
 
 [P1949](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html)
 correctly detected that Unicode identifiers are still not
 identifiable, and are prone to bidi- and homoglyph attacks. But it
-stated that implementing TR39 would be too hard.  Having properly
+stated that implementing TR39 would be too hard. Having properly
 implemented the Unicode Security Guidelines for identifers for several
 years, plus pushed Rust to do so also, proves the contrary. TR39 would
 catch all known homoglyph and bidi identifier attacks.
@@ -324,41 +318,37 @@ with others. Identifiers are still identifiable.
 The question remains if TR39 security violations should be ill-formed
 (throw an compilation error or warning), or not. Since we do have the
 `-std=c++26` option, and the issues are security relevant,
-ill-formeded seems to be best.  Implementations might choose to go for
+ill-formeded seems to be best. Implementations might choose to go for
 compiler warnings or linters or just toolchain implementations, i.e.
 editors and reviewer tools.
 The practical security problems are not severe and are easy to fix, as
 we had none in the years clang allowed insecure unicode, and there
 were no major known problems on the easier to attack dynamic
-languages.  But gcc just added it now with gcc-10, so the impact might
-just come later.  TR39 is considered stable and not a moving
+languages. But gcc just added it now with gcc-10, so the impact might
+just come later. TR39 is considered stable and not a moving
 target. There were no impactful changes in the last 10 years.
 
-7 What will this proposal change
-================================
+# 7 What will this proposal change
 
-7.1 The set of TR31 XID characters will become much smaller
------------------------------------------------------------
+## 7.1 The set of TR31 XID characters will become much smaller
 
 Restricting the **Identifier Type** plus the Recommended Scripts,
 will shrink the original XID set from 971267 codepoints
-to 99350 codepoints.  The ranges expand from 36 to 426. (when split by
+to 99350 codepoints. The ranges expand from 36 to 426. (when split by
 scripts already, 25 splits happen).
 Additionally the Halfwidth and Fullwidth Forms, U+FF00..U+FFEF, the
 Arabic Presentation Forms-A: U+FB50–U+FDFF and
 Arabic Presentation Forms-B: U+FE70–U+FEFF are now forbidden.
 
-`ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +`Other_ID_Start`,
- -`Pattern_Syntax`, -`Pattern_White_Space`
+`ID_Start` consists of Lu + Ll + Lt + Lm + Lo + Nl, +`Other_ID_Start`, -`Pattern_Syntax`, -`Pattern_White_Space`
 
 131899 codepoints
 
-`ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc,
-+`Other_ID_Continue`, -`Pattern_Syntax`, -`Pattern_White_Space`.
+`ID_Continue` consists of `ID_Start`, + Mn + Mc + Nd + Pc, +`Other_ID_Continue`, -`Pattern_Syntax`, -`Pattern_White_Space`.
 
 135072 codepoints (= ID_Start + 3173)
 
-`XID_Start` and  `XID_Continue` ensure that `isIdentifer(string)` then
+`XID_Start` and `XID_Continue` ensure that `isIdentifer(string)` then
 `isIdentifier(NFKx(string))` (_removing the NFKC quirks_)
 
 `XID_Start`: 131876 codepoints,
@@ -372,8 +362,7 @@ They are not allowed as first nor as last character in a word, but
 this set of identifiers contain none, as we disallow the legacy Arabic
 Presentation forms.
 
-7.2 Script restrictions
------------------------
+## 7.2 Script restrictions
 
 [P1949R7](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html#xid_continue-does-not-include-layout-and-format-control-characters)
 for C++23 previously stated: _"This paper also does not propose
@@ -427,7 +416,7 @@ Limited Use Scripts are now disallowed
     Tai_Viet Tifinagh Vai Wancho Yi Unknown
 
 This recommendation follows TR39, to recommended scripts only,
-Excluded and Limited Use not.  For some years until Unicode 10 there
+Excluded and Limited Use not. For some years until Unicode 10 there
 was a "Aspirational Use Scripts" table, which included a subset of the
 optional Limited Use scripts to be allowed in identifiers. But _"this
 has not proven to be productive for the derivation of
@@ -449,35 +438,33 @@ be fixed. I have no idea about the TR39 confusables.txt bugs, as there
 is no categorization yet.
 
 The script property and its name are defined in
-[TR24](https://www.unicode.org/reports/tr24/).  We use the long
+[TR24](https://www.unicode.org/reports/tr24/). We use the long
 Unicode Script property value, not the abbrevated 4-letter short name,
 which maps somehow to the 4-letter [ISO 15924
 Codes](https://www.unicode.org/reports/tr24/#Relation_To_ISO15924).
 
-7.3 Documents with identifiers in many multiple scripts/languages will become illegal
--------------------------------------------------------------------------------------
+## 7.3 Documents with identifiers in many multiple scripts/languages will become illegal
 
 C26 (and C++26) will follow the TR39 Security Profile 4 **Moderately
 Restrictive**, with an exception for Greek.
 
-* All identifiers in a document qualify as Single Script, or
-* All identifiers in a document are covered by any of the following sets of
+- All identifiers in a document qualify as Single Script, or
+- All identifiers in a document are covered by any of the following sets of
   scripts, according to the definition in Mixed Scripts:
   - Latin + Han + Hiragana + Katakana (Japanese)
   - Latin + Han + Bopomofo (Chinese)
   - Latin + Han + Hangul (Korean), or
-* All identifiers in a document are covered by Latin and any one other
+- All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
-* Allow some Greek letters mixed with Latin, that are not confusable
+- Allow some Greek letters mixed with Latin, that are not confusable
   with Latin letters.
 
 See Section 10 [TR39 Mixed Scripts](#10-tr39-mixed-scripts).
 
-7.4 Mixed-script runs with combining marks will become illegal
---------------------------------------------------------------
+## 7.4 Mixed-script runs with combining marks will become illegal
 
 C++26 (and C26) will check for unlikely sequences of **combining
-marks**, and reject some.  Combining Marks have no script property per
+marks**, and reject some. Combining Marks have no script property per
 se, but a variable list of allowed SCX scripts, which need to be
 checked against the base character. Also 4 Japanese KATAKANA-HIRAGANA
 PROLONGED SOUND MARK modifier letters.
@@ -489,14 +476,12 @@ See [8.2 "SCX Extensions"](#8.2-scx-extensions) and [8.3 "Combining marks
 script run detection for spoofing"](#8.3-combining-marks-script-run-detection-for-spoofing)
 below.
 
-8 TR24 Scripts, the SC and SCX properties
-=========================================
+# 8 TR24 Scripts, the SC and SCX properties
 
-8.1 SC
-------
+## 8.1 SC
 
 C++ only needs to map unicode characters to a script property via a
-single byte.  There are currently 161 scripts assigned, 32 of them are
+single byte. There are currently 161 scripts assigned, 32 of them are
 in common use as identifiers, hence called **Recommended** scripts. The
 rest is split up into 127-31 **Excluded** scripts, which are not in common
 use, and 161-127 **Limited_Use** scripts, which are not to be used in
@@ -532,16 +517,15 @@ identifier profile by scripts, rather went with insecure identifiers.
 For error messages and an optional pragma to allow certain Exluded
 scripts, we use the long **Script property value**. Do not use the
 term "script name", as this is ambigious and
-[misused](https://www.unicode.org/reports/tr24/#Script_Names).  The
+[misused](https://www.unicode.org/reports/tr24/#Script_Names). The
 Script Property Value is the titlecased name of the script from the
 UCD, with spaces replaced by underscores. They are defined in the
 yearly updated
 [Scripts](https://www.unicode.org/Public/UNIDATA/Scripts.txt).
 
-8.2 SCX Extensions
-------------------
+## 8.2 SCX Extensions
 
-Not all characters are uniquely used in a single script only.  Many
+Not all characters are uniquely used in a single script only. Many
 are used in a variable numbers of scripts. These are assigned to the
 Common or Inherited script, and are exactly specified in the
 [ScriptExtensions](https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt),
@@ -577,20 +561,19 @@ possibility. Thus for SCX=(Arab Syrc) we need to check if Arabic or
 Syriac was already seen. If not, the new character with that SCX is
 illegal, violating our Mixed Script profile.
 
-8.3 Combining marks script run detection for spoofing
------------------------------------------------------
+## 8.3 Combining marks script run detection for spoofing
 
 Check for unlikely sequences of **combining marks**:
 
-* Forbid starting combining marks.
-* Forbid sequences of the same nonspacing mark.
-* Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).
-* Optionally forbid sequences of base character + nonspacing mark that
+- Forbid starting combining marks.
+- Forbid sequences of the same nonspacing mark.
+- Forbid sequences of more than 4 nonspacing marks (gc=Mn or gc=Me).
+- Optionally forbid sequences of base character + nonspacing mark that
   look the same as or confusingly similar to the base character alone
   (because the nonspacing mark overlays a portion of the base
   character). Examples are U+0069 LOWERCASE LETTER I or U+0131 LATIN SMALL
   LETTER DOTLESS I combined with U+0307 COMBINING DOT ABOVE.
-* Optionally forbid non-spacing marks with base chars already including
+- Optionally forbid non-spacing marks with base chars already including
   the non-spacing mark, like Ä with DIAERESIS.
 
 Since we disallow already most combining marks (at least the Latin
@@ -616,7 +599,7 @@ Cf are not part of XIDs.
 69 matches for "XID_Continue # Lm" in buffer: DerivedCoreProperties.txt
 See [Appendix C](#appendix-c---xid_continue-lm) for all.
 
-``` txt
+```txt
 02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..
                                         MODIFIER LETTER REVERSED GLOTTAL STOP
 02C6..02D1    ; XID_Continue # Lm  [12] MODIFIER LETTER CIRCUMFLEX ACCENT..
@@ -628,7 +611,7 @@ See [Appendix C](#appendix-c---xid_continue-lm) for all.
 528 matches for "XID_Continue # M" in buffer: DerivedCoreProperties.txt
 See [Appendix D](#appendix-d---xid_continue-m) for all.
 
-``` txt
+```txt
 0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..
                                         COMBINING LATIN SMALL LETTER X
 0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..
@@ -651,20 +634,20 @@ Most Lm Modifier Letters (besides the 4 Japanese PROLONGED SOUND
 MARKs) are freestanding base characters, which can be combined with
 any other letter.
 
-See [TR31#2.1 Combining\_Marks](https://www.unicode.org/reports/tr31/#Combining_Marks)
-and [TR31#2.2 Modifier\_Letters](https://www.unicode.org/reports/tr31/#Modifier_Letters)
+See [TR31#2.1 Combining_Marks](https://www.unicode.org/reports/tr31/#Combining_Marks)
+and [TR31#2.2 Modifier_Letters](https://www.unicode.org/reports/tr31/#Modifier_Letters)
 
 Most of the Combining Marks are caught by the NFC requirement from
 C++23 (P1949r7), but some optional checks for gc=Mn against base chars still
 might be added:
 
-* Forbid U+0069 LOWERCASE LETTER I or the DOTLESS letters i and j
+- Forbid U+0069 LOWERCASE LETTER I or the DOTLESS letters i and j
   combined with U+0307 COMBINING DOT ABOVE as special-cases.
 
-* Forbid non-spacing marks with base chars already including the
+- Forbid non-spacing marks with base chars already including the
   non-spacing mark. They would be rendered either indistuinguishable
   or with the combining mark doubled. There are currently 82
-  non-spacing marks, e.g. GRAVE, DOT ABOVE, ...  most of them in the
+  non-spacing marks, e.g. GRAVE, DOT ABOVE, ... most of them in the
   U+0300-U+0341 range, but some also in U+20D0-U+20E1 and
   U+3099-U+309A ranges. From these there exist 31 with a list of letters
   which already include those non-spacing marks. See [Appendix
@@ -674,8 +657,7 @@ See also [TR24#5.1 Handling Characters with the Common Script
 Property](https://www.unicode.org/reports/tr24/#Common) and [TR24#5.2
 Handling Combining Marks](https://www.unicode.org/reports/tr24/#Nonspacing_Marks).
 
-9 TR39 Identifier Type
-======================
+# 9 TR39 Identifier Type
 
 TR39 recommends to disable some characters from recommended scripts:
 _"Some characters used with recommended scripts may still be problematic
@@ -708,9 +690,9 @@ forbidden, even if allowed in TR31. They are confusable with the Latin
 base alphabet A-Z.
 
 Additionally the Arabic Presentation Forms-A: U+FB50–U+FDFF and Arabic
-Presentation Forms-B: U+FE70–U+FEFF are now forbidden.  Forms-A
+Presentation Forms-B: U+FE70–U+FEFF are now forbidden. Forms-A
 contains a list of Arabic presentation forms encoded as characters
-primarily for compatibility reasons.  Forms-B are for compatibility
+primarily for compatibility reasons. Forms-B are for compatibility
 with preexisting standards and legacy implementations that use these
 forms as character. Instead of these, letters from the Arabic block
 (U+0600..U+06FF) should be used for identifiers.
@@ -726,8 +708,7 @@ manually excluded.
 
 See [Appendix E - IDType Technical](#appendix-e---idtype-technical).
 
-10 TR39 Mixed Scripts
-=====================
+# 10 TR39 Mixed Scripts
 
 [TR39#5.2](https://www.unicode.org/reports/tr39/#Restriction_Level_Detection)
 defines some security profiles for identifers to avoid the most
@@ -735,18 +716,18 @@ common identifier insecurities, that identifiers will stay
 identifiable.
 
 We want to choose a variant of the **Moderately Restrictive** profile,
-with an exception for non-confusable Greek.  I called this profile
+with an exception for non-confusable Greek. I called this profile
 TR39_4 or TR39 in libu8ident.
 
-* All identifiers in a document qualify as Single Script, or
-* All identifiers in a document are covered by any of the following
+- All identifiers in a document qualify as Single Script, or
+- All identifiers in a document are covered by any of the following
   sets of scripts, according to the definition in Mixed Scripts:
   - Latin + Han + Hiragana + Katakana (Japanese),
   - Latin + Han + Bopomofo (Chinese),
   - Latin + Han + Hangul (Korean), or
-* All identifiers in a document are covered by Latin and any one other
+- All identifiers in a document are covered by Latin and any one other
   Recommended script, except Cyrillic.
-* Allow some Greek letters mixed with Latin, that are not confusable
+- Allow some Greek letters mixed with Latin, that are not confusable
   with Latin letters.
 
 Greek alone is always allowed, as Cyrillic, but wherever we have a
@@ -761,36 +742,36 @@ does allow any East-Asian CFK language, other common and widely used
 languages and Latin mixed with Greek, mainly used for its popular and
 actually used mathematical symbols. Many mathematical symbols already
 exists outside of Greek, but these are mainly used for operators in
-advanced programming languages, not as identifiers.  See also
+advanced programming languages, not as identifiers. See also
 <http://xahlee.info/comp/unicode_math_operators.html> for a nice
 overview.
 
 E.g. here we have some:
 
-* U+2217 (∗) ASTERISK OPERATOR (Script=Common). Not_XID
-* U+2107 (ℇ) EULER CONSTANT (Script=Common, Lu) is a proper letter,
-             but with Restricted IdentifierStatus.
-* U+2126 (Ω) OHM SIGN (Script=Greek, L&) is a greek letter,
-             but with Restricted IdentifierStatus.
-* U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete, Not_XID
-* U+0392 ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B
-             Greek confusable
-* U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C
-             Greek confusable
-* U+0381 ; ( α → a ) GREEK SMALL LETTER ALPHA. Not confusable
-* U+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P. Not confusable
-* U+03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA. Not confusable, but in the
+- U+2217 (∗) ASTERISK OPERATOR (Script=Common). Not_XID
+- U+2107 (ℇ) EULER CONSTANT (Script=Common, Lu) is a proper letter,
+  but with Restricted IdentifierStatus.
+- U+2126 (Ω) OHM SIGN (Script=Greek, L&) is a greek letter,
+  but with Restricted IdentifierStatus.
+- U+2127 (℧) INVERTED OHM SIGN (Script=Common, So). Obsolete, Not_XID
+- U+0392 ( Β → B ) GREEK CAPITAL LETTER BETA → LATIN CAPITAL LETTER B
+  Greek confusable
+- U+03F2 ( ϲ → c ) GREEK LUNATE SIGMA SYMBOL → LATIN SMALL LETTER C
+  Greek confusable
+- U+0381 ; ( α → a ) GREEK SMALL LETTER ALPHA. Not confusable
+- U+03F1 ; ( ϱ → p ) GREEK RHO SYMBOL → LATIN SMALL LETTER P. Not confusable
+- U+03C3 ; ( σ → o ) GREEK SMALL LETTER SIGMA. Not confusable, but in the
   confusables.txt list. Used for the Stefan-Boltzmann constant.
-* U+039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER K.
-             Confusable.
-* U+03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA.
-             Confusable even if nobody uses the Latin counterpart.
-* U+03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T.
-             Confusable even if nobody uses the Latin counterpart.
-* U+03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER ESH.
-             Confusable even if nobody uses the Latin counterpart.
-* U+03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER SHARP S.
-             Confusable and an edge-case.
+- U+039A ; ( Κ → K ) GREEK CAPITAL LETTER KAPPA → LATIN CAPITAL LETTER K.
+  Confusable.
+- U+03BA ; ( κ → ĸ ) GREEK SMALL LETTER KAPPA → LATIN SMALL LETTER KRA.
+  Confusable even if nobody uses the Latin counterpart.
+- U+03C4 ; ( τ → ᴛ ) GREEK SMALL LETTER TAU → LATIN LETTER SMALL CAPITAL T.
+  Confusable even if nobody uses the Latin counterpart.
+- U+03A3 ; ( Σ → Ʃ ) GREEK CAPITAL LETTER SIGMA → LATIN CAPITAL LETTER ESH.
+  Confusable even if nobody uses the Latin counterpart.
+- U+03B2 ; ( β → ß ) GREEK SMALL LETTER BETA → LATIN SMALL LETTER SHARP S.
+  Confusable and an edge-case.
 
 And some actual C++ user-code representing the epsilon transport equation:
 
@@ -803,7 +784,7 @@ TR39 also compiles a convenient
 [IdentifierStatus](https://www.unicode.org/Public/security/latest/IdentifierStatus.txt)
 list. But all the math letters with Script=Common from U+2100 to
 U+2200 are restricted, as Greek is forbidden mixed with Latin in the
-original TR39 Moderately Restrictive profile.  Most are allowed
+original TR39 Moderately Restrictive profile. Most are allowed
 according to the TR31 and TR39 rules of TR39, so we need to come up
 with our own list of `XID_Start/XID_Continue` codepoints, excluding
 the Limited Use and Excluded scripts. And if an implementation choses
@@ -816,7 +797,7 @@ fixup and generate the XID lists by ourselves.
 
 It is recommended to already exclude Limited Use and Excluded scripts
 from the initial list of identifier ranges, as this is the most common
-use-case, and shortens the common search paths.  Only with the
+use-case, and shortens the common search paths. Only with the
 `#pragma Unicode ExcludedScript` search the full XID lists and the full
 scripts list.
 
@@ -825,11 +806,10 @@ spoofing attacks, but the additional rules from [8.3 "Combining marks
 script run detection for spoofing"](#8.3-combining-marks-script-run-detection-for-spoofing)
 are kept tiny.
 
-11 Contexts (Scopes)
-====================
+# 11 Contexts (Scopes)
 
 This is not discussed in any of the unicode security guidelines for
-identifiers.  One could argue that a mixed-script profile is valid
+identifiers. One could argue that a mixed-script profile is valid
 only for a single identifier, or it is valid for the whole source file
 document. And there needs to be a definition if before or after the
 preprocessor, and if to treat names in private structs and local names
@@ -842,12 +822,12 @@ to the very same glyphs. Thus we adopt the notion of identifier
 contexts.
 
 With programming languages this is a source file, with objects files
-this is a module.  For identifiers in object files there are open
-issues with binutils, linkers, exported identifiers, encodings.  For
+this is a module. For identifiers in object files there are open
+issues with binutils, linkers, exported identifiers, encodings. For
 filesystems this would be a directory.
 
 For every source file we need to store a context with the list of
-already seen scripts and how many.  The maximal number of scripts is
+already seen scripts and how many. The maximal number of scripts is
 4, for the case of Japanese mixed with Latin. (`Katakana + Hiragana +`
 `Han + Latin`), thus we can save that list in a single 4-byte word, and
 the lookup and memory management is trivial.
@@ -860,39 +840,38 @@ similar to the problem with lexical variables a couple of decades
 ago.
 
 1. **before-cpp**: One could argue that the scope of a variable should
-  be contained in a lexical block, which can be statically determined
-  and safely enclosed.  With identifiers that would mean that the
-  preprocessor already should perform the TR31 lexer checks and TR39
-  security checks, and one could define Arabic headers using private
-  arabic fields, and include another header with Cyrillic only
-  names. This would allow confusables in the resulting object
-  file, and source files would be easy to check with external tools.
+   be contained in a lexical block, which can be statically determined
+   and safely enclosed. With identifiers that would mean that the
+   preprocessor already should perform the TR31 lexer checks and TR39
+   security checks, and one could define Arabic headers using private
+   arabic fields, and include another header with Cyrillic only
+   names. This would allow confusables in the resulting object
+   file, and source files would be easy to check with external tools.
 
 2. **private/scoped**: Another argument would be that all exported names end
-  up in the object files and library flat, which would support the
-  seperation of private and public name contexts, where to perform the
-  mixed-script checks. Private contexts (e.g. static structs fields or
-  local names in functions) should be seperated from the rest.  This
-  would prevent from confusables in struct fields/methods, and the
-  rest is seperated by the checks for the public names.
-  Jabuk Jelinek favored this approach to the GCC -Whomoglyph PR answer:
-  <https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html>
+   up in the object files and library flat, which would support the
+   seperation of private and public name contexts, where to perform the
+   mixed-script checks. Private contexts (e.g. static structs fields or
+   local names in functions) should be seperated from the rest. This
+   would prevent from confusables in struct fields/methods, and the
+   rest is seperated by the checks for the public names.
+   Jabuk Jelinek favored this approach to the GCC -Whomoglyph PR answer:
+   <https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583080.html>
 
 3. **after-cpp**: The third, strictest variant would define the context in
-  the file after cpp. You would not be able to include a Cyrillic-only
-  header, and you would not be able to use Cyrillic private
-  fields. This would be the least surprising and most secure
-  option. As long as the security risk lies ahead of us, one should go
-  for the strictest option. Cyrillic header projects should be
-  isolated and not used at all outside of non-cyrillic projects. I'm
-  pointing the fingers at Cyrillic because it has the biggest number
-  of confusables with Latin. Arabic headers e.g. are not all
-  confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic
-  speaker can identify and see differences in its names without long
-  training. Same for CFK and the other recommended scripts.
+   the file after cpp. You would not be able to include a Cyrillic-only
+   header, and you would not be able to use Cyrillic private
+   fields. This would be the least surprising and most secure
+   option. As long as the security risk lies ahead of us, one should go
+   for the strictest option. Cyrillic header projects should be
+   isolated and not used at all outside of non-cyrillic projects. I'm
+   pointing the fingers at Cyrillic because it has the biggest number
+   of confusables with Latin. Arabic headers e.g. are not all
+   confusable with Latin or CFK, but I doubt that any non Hebrew/Arabic
+   speaker can identify and see differences in its names without long
+   training. Same for CFK and the other recommended scripts.
 
-12 Implementations and Strategies
-=================================
+# 12 Implementations and Strategies
 
 I implemented for [cperl](https://github.com/perl11/cperl), a fork of
 perl5, the General Security profile "Moderately restrictive" (4) for
@@ -910,7 +889,7 @@ mixed-script security profiles, TR31 XID character sets and all TR15
 normalizations. There I tested various performance strategies of the
 unicode lookups. Tested was CRoaring, which was only useful for sets
 of single codepoints, the list of confusables. Most of the needed
-lists were best structured as binary-search in range pairs.  Most of
+lists were best structured as binary-search in range pairs. Most of
 them were fastest with special-casing the codepoints below U+128 with
 a simple linear search. Binary search in an Eytzinger layout was not
 convincibly faster, neither hybrid searches by 1. splitting up ranges
@@ -942,14 +921,13 @@ e.g. <https://programming.sirrida.de/hashsuper.pdf>, which becomes a
 bottleneck just now with adopting large and sparse unicode switch
 statements, here with decompositions and confusables.
 
-13 Appendix A - C26XID_Start
-============================
+# 13 Appendix A - C26XID_Start
 
 Created with mkc26 from libu8ident.
 _The SCX is modelled as if your compiler would allow static initialization
 of strings as {char,...,0}._
 
-``` c
+```c
 
 struct sc {
     uint32_t from;
@@ -1310,14 +1288,13 @@ const struct sc safec_start_list[339] = {
 // 245 ranges, 94 singles, 100181 codepoints
 ```
 
-14 Appendix B - C26XID_Continue
-===============================
+# 14 Appendix B - C26XID_Continue
 
 Created with mkc26 from libu8ident.
 _The SCX is modelled as if your compiler would allow static initialization
 of strings as {char,...,0}._
 
-``` c
+```c
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC,
 // and !MARK. Split on GC and SCX
 const struct sc safec_cont_list[21] = {
@@ -1348,8 +1325,7 @@ const struct sc safec_cont_list[21] = {
 // 20 ranges, 1 singles, 172 codepoints
 ```
 
-15 Appendix C - XID_Continue # Lm
-=================================
+# 15 Appendix C - XID_Continue # Lm
 
 Needed for the combining marks special-cases in Section 8.3 [8.3
 Combining marks script run detection for
@@ -1366,7 +1342,7 @@ letter.
 
 69 matches for "XID_Continue # Lm" in buffer: DerivedCoreProperties.txt
 
-``` txt
+```txt
 02B0..02C1    ; XID_Continue # Lm  [18] MODIFIER LETTER SMALL H..
                                         MODIFIER LETTER REVERSED GLOTTAL STOP
 02C6..02D1    ; XID_Continue # Lm  [12] MODIFIER LETTER CIRCUMFLEX ACCENT..
@@ -1470,8 +1446,7 @@ FF9E..FF9F    ; XID_Continue # Lm   [2] HALFWIDTH KATAKANA VOICED SOUND MARK..
 1E94B         ; XID_Continue # Lm       ADLAM NASALIZATION MARK
 ```
 
-16 Appendix D - XID_Continue # M
-=================================
+# 16 Appendix D - XID_Continue # M
 
 Needed for the combining marks checks in Section 8.3 [8.3 Combining
 marks script run detection for
@@ -1479,7 +1454,7 @@ spoofing](#8.3-combining-marks-script-run-detection-for-spoofing).
 
 528 matches for "XID_Continue # M" in buffer: DerivedCoreProperties.txt
 
-``` txt
+```txt
 0300..036F    ; XID_Continue # Mn [112] COMBINING GRAVE ACCENT..
                                         COMBINING LATIN SMALL LETTER X
 0483..0487    ; XID_Continue # Mn   [5] COMBINING CYRILLIC TITLO..
@@ -2102,8 +2077,7 @@ FE20..FE2F    ; XID_Continue # Mn  [16] COMBINING LIGATURE LEFT HALF..
 E0100..E01EF  ; XID_Continue # Mn [240] VARIATION SELECTOR-17..-256
 ```
 
-17 Appendix E - IDType Technical
-=================================
+# 17 Appendix E - IDType Technical
 
 Needed for Section 9 [TR39 Identifier Type](#9-tr39-identifier-type).
 List of Technical ID characters, added to the TR39 Recommended and Inclusion
@@ -2121,7 +2095,7 @@ are excluded here.
     grep ' Technical ' IdentifierType.txt |
       egrep -v 'Not_XID|Obsolete|Exclusion|Uncommon_Use|Limited_Use'
 
-``` txt
+```txt
 0180          ; Technical  # 1.1        LATIN SMALL LETTER B WITH STROKE
 0234..0236    ; Technical  # 4.0    [3] LATIN SMALL LETTER L WITH CURL..
                                         T WITH CURL
@@ -2277,25 +2251,23 @@ FE73          ; Technical  # 3.2        ARABIC TAIL FRAGMENT
                                         MUSICAL SYMBOL COMBINING SNAP PIZZICATO
 ```
 
-18 Appendix F - Greek Confusables
-=================================
+# 18 Appendix F - Greek Confusables
 
 Needed for exclusion in the Section 9 [TR39 Mixed
-Scripts](#tr39-mixed-scripts) Greek rule.  Where-ever we have a Greek
+Scripts](#tr39-mixed-scripts) Greek rule. Where-ever we have a Greek
 letter confusable with Latin, and we already saw Latin, forbid the
 Greek letter in favor of the Latin letter. See TR39
 [confusables](https://www.unicode.org/Public/security/latest/confusables.txt).
 Note that these confusables cannot be excluded upfront in the TR31
 identifier parsing, as Greek alone is allowed.
 
-18.1 Exceptions
-----------------
+## 18.1 Exceptions
 
 Allow these 12 Greek letters and symbols to be confusable with Latin:
 `037A, 0381, 0398, 03B5, 03B7, 03B8, 03B9, 03BD, 03C3, 03D1, 03F1, 03F4`.
 The confusables.txt list is extremely buggy.
 
-``` txt
+```txt
 037A ; ( ͺ → i ) GREEK YPOGEGRAMMENI → LATIN SMALL LETTER I
 0381 ; ( α → a ) GREEK SMALL LETTER ALPHA
 0398 ; ( Θ → O̵ ) GREEK CAPITAL LETTER THETA → LATIN CAPITAL LETTER O, ...
@@ -2311,15 +2283,14 @@ The confusables.txt list is extremely buggy.
 03F4 ; ( ϴ → O̵ ) GREEK CAPITAL THETA SYMBOL → LATIN CAPITAL LETTER O, ...
 ```
 
-18.2 Confusables
-----------------
+## 18.2 Confusables
 
 List of all the 72 Greek-Latin confusables: Note, these still include the
 exceptions above.
 
     grep GREEK confusables.txt | grep LETTER | grep LATIN
 
-``` txt
+```txt
 03B1 ; ( α → a ) GREEK SMALL LETTER ALPHA → LATIN SMALL LETTER A
 0391 ; ( Α → A ) GREEK CAPITAL LETTER ALPHA → LATIN CAPITAL LETTER A
 1D217; ( 𝈗 → Ɐ ) GREEK VOCAL NOTATION SYMBOL-24 → LATIN CAPITAL LETTER TURNED A
@@ -2399,11 +2370,10 @@ exceptions above.
 03C9 ; ( ꞷ → ω ) LATIN SMALL LETTER OMEGA → GREEK SMALL LETTER OMEGA
 ```
 
-19 Appendix G - Medial
-======================
+# 19 Appendix G - Medial
 
-List of all the medial letter and mark ranges.  These characters are
-treated wrongly in all programming languages I checked.  In the UCD
+List of all the medial letter and mark ranges. These characters are
+treated wrongly in all programming languages I checked. In the UCD
 Standard some are wrongly in `XID_Start`, but must be treated as
 `XID_Continue`, with a special check that they must not be in the
 final position of an identifier.
@@ -2412,7 +2382,7 @@ because we restrict our TR31 set.
 
     grep "; XID_Start " DerivedCoreProperties.txt | grep MEDIAL
 
-``` txt
+```txt
 FE77          ; XID_Start # Lo       ARABIC FATHA MEDIAL FORM
 FE79          ; XID_Start # Lo       ARABIC DAMMA MEDIAL FORM
 FE7B          ; XID_Start # Lo       ARABIC KASRA MEDIAL FORM
@@ -2428,7 +2398,7 @@ The ones which are correctly in XID_Continue:
 
     grep "; XID_Continue " DerivedCoreProperties.txt | grep MEDIAL
 
-``` txt
+```txt
 103B..103C    ; XID_Continue # Mc   [2] MYANMAR CONSONANT SIGN MEDIAL YA
                                         ..MYANMAR CONSONANT SIGN MEDIAL RA
 103D..103E    ; XID_Continue # Mn   [2] MYANMAR CONSONANT SIGN MEDIAL WA
@@ -2478,282 +2448,280 @@ Use Script), and the Latin U+A78F (Uncommon Use).
 So there is no medial character to consider, also no initial, isolated,
 nor final positions in the Arabic presentation forms.
 
-20 Appendix H - Letters with non-spacing marks
-==============================================
+# 20 Appendix H - Letters with non-spacing marks
 
 From all 82 non-spacing marks,
 the list of letters already including its 31 non-spacing marks:
 
 - NSM: GRAVE 0300
 
-    00C0, 00C8, 00CC, 00D2, 00D9, 00E0, 00E8, 00EC
-    00F2, 00F9, 01DB, 01DC, 01F8, 01F9, 0400, 040D
-    0450, 045D, 1E14, 1E15, 1E50, 1E51, 1E80, 1E81
-    1EA6, 1EA7, 1EB0, 1EB1, 1EC0, 1EC1, 1ED2, 1ED3
-    1EDC, 1EDD, 1EEA, 1EEB, 1EF2, 1EF3, 1F02, 1F03
-    1F0A, 1F0B, 1F12, 1F13, 1F1A, 1F1B, 1F22, 1F23
-    1F2A, 1F2B, 1F32, 1F33, 1F3A, 1F3B, 1F42, 1F43
-    1F4A, 1F4B, 1F52, 1F53, 1F5B, 1F62, 1F63, 1F6A
-    1F6B, 1F70, 1F72, 1F74, 1F76, 1F78, 1F7A, 1F7C
-    1FBA, 1FC8, 1FCA, 1FD2, 1FDA, 1FE2, 1FEA, 1FF8
-    1FFA
+  00C0, 00C8, 00CC, 00D2, 00D9, 00E0, 00E8, 00EC
+  00F2, 00F9, 01DB, 01DC, 01F8, 01F9, 0400, 040D
+  0450, 045D, 1E14, 1E15, 1E50, 1E51, 1E80, 1E81
+  1EA6, 1EA7, 1EB0, 1EB1, 1EC0, 1EC1, 1ED2, 1ED3
+  1EDC, 1EDD, 1EEA, 1EEB, 1EF2, 1EF3, 1F02, 1F03
+  1F0A, 1F0B, 1F12, 1F13, 1F1A, 1F1B, 1F22, 1F23
+  1F2A, 1F2B, 1F32, 1F33, 1F3A, 1F3B, 1F42, 1F43
+  1F4A, 1F4B, 1F52, 1F53, 1F5B, 1F62, 1F63, 1F6A
+  1F6B, 1F70, 1F72, 1F74, 1F76, 1F78, 1F7A, 1F7C
+  1FBA, 1FC8, 1FCA, 1FD2, 1FDA, 1FE2, 1FEA, 1FF8
+  1FFA
 
   "ÀÈÌÒÙàèìòùǛǜǸǹЀЍѐѝḔḕṐṑẀẁẦầẰằỀềỒồỜờỪừỲỳἂἃἊἋἒἓἚἛἢἣἪἫἲἳἺἻὂὃὊὋὒὓὛὢὣὪὫὰὲὴὶὸὺὼᾺῈῊῒῚῢῪῸῺ"
 
 - NSM: ACUTE 0301
 
-    00C1, 00C9, 00CD, 00D3, 00DA, 00DD, 00E1, 00E9
-    00ED, 00F3, 00FA, 00FD, 0106, 0107, 0139, 013A
-    0143, 0144, 0154, 0155, 015A, 015B, 0179, 017A
-    01D7, 01D8, 01F4, 01F5, 01FA, 01FB, 01FC, 01FD
-    01FE, 01FF, 0386, 0388, 0389, 038A, 038C, 038E
-    038F, 0390, 03AC, 03AD, 03AE, 03AF, 03B0, 03CC
-    03CD, 03CE, 03D3, 0403, 040C, 0453, 045C, 1E08
-    1E09, 1E16, 1E17, 1E2E, 1E2F, 1E30, 1E31, 1E3E
-    1E3F, 1E4C, 1E4D, 1E52, 1E53, 1E54, 1E55, 1E78
-    1E79, 1E82, 1E83, 1EA4, 1EA5, 1EAE, 1EAF, 1EBE
-    1EBF, 1ED0, 1ED1, 1EDA, 1EDB, 1EE8, 1EE9, 1F04
-    1F05, 1F0C, 1F0D, 1F14, 1F15, 1F1C, 1F1D, 1F24
-    1F25, 1F2C, 1F2D, 1F34, 1F35, 1F3C, 1F3D, 1F44
-    1F45, 1F4C, 1F4D, 1F54, 1F55, 1F5D, 1F64, 1F65
-    1F6C, 1F6D
+  00C1, 00C9, 00CD, 00D3, 00DA, 00DD, 00E1, 00E9
+  00ED, 00F3, 00FA, 00FD, 0106, 0107, 0139, 013A
+  0143, 0144, 0154, 0155, 015A, 015B, 0179, 017A
+  01D7, 01D8, 01F4, 01F5, 01FA, 01FB, 01FC, 01FD
+  01FE, 01FF, 0386, 0388, 0389, 038A, 038C, 038E
+  038F, 0390, 03AC, 03AD, 03AE, 03AF, 03B0, 03CC
+  03CD, 03CE, 03D3, 0403, 040C, 0453, 045C, 1E08
+  1E09, 1E16, 1E17, 1E2E, 1E2F, 1E30, 1E31, 1E3E
+  1E3F, 1E4C, 1E4D, 1E52, 1E53, 1E54, 1E55, 1E78
+  1E79, 1E82, 1E83, 1EA4, 1EA5, 1EAE, 1EAF, 1EBE
+  1EBF, 1ED0, 1ED1, 1EDA, 1EDB, 1EE8, 1EE9, 1F04
+  1F05, 1F0C, 1F0D, 1F14, 1F15, 1F1C, 1F1D, 1F24
+  1F25, 1F2C, 1F2D, 1F34, 1F35, 1F3C, 1F3D, 1F44
+  1F45, 1F4C, 1F4D, 1F54, 1F55, 1F5D, 1F64, 1F65
+  1F6C, 1F6D
 
   "ÁÉÍÓÚÝáéíóúýĆćĹĺŃńŔŕŚśŹźǗǘǴǵǺǻǼǽǾǿΆΈΉΊΌΎΏΐάέήίΰόύώϓЃЌѓќḈḉḖḗḮḯḰḱḾḿṌṍṒṓṔṕṸṹẂẃẤấẮắẾếỐốỚớỨứἄἅἌἍἔἕἜἝἤἥἬἭἴἵἼἽὄὅὌὍὔὕὝὤὥὬὭ"
 
 - NSM: CIRCUMFLEX 0302
 
-    00C2, 00CA, 00CE, 00D4, 00DB, 00E2, 00EA, 00EE
-    00F4, 00FB, 0108, 0109, 011C, 011D, 0124, 0125
-    0134, 0135, 015C, 015D, 0174, 0175, 0176, 0177
-    1E90, 1E91, 1EAC, 1EAD, 1EC6, 1EC7, 1ED8, 1ED9
+  00C2, 00CA, 00CE, 00D4, 00DB, 00E2, 00EA, 00EE
+  00F4, 00FB, 0108, 0109, 011C, 011D, 0124, 0125
+  0134, 0135, 015C, 015D, 0174, 0175, 0176, 0177
+  1E90, 1E91, 1EAC, 1EAD, 1EC6, 1EC7, 1ED8, 1ED9
 
   "ÂÊÎÔÛâêîôûĈĉĜĝĤĥĴĵŜŝŴŵŶŷẐẑẬậỆệỘộ"
 
 - NSM: TILDE 0303
 
-    00C3, 00D1, 00D5, 00E3, 00F1, 00F5, 0128, 0129
-    0168, 0169, 1E7C, 1E7D, 1EAA, 1EAB, 1EB4, 1EB5
-    1EBC, 1EBD, 1EC4, 1EC5, 1ED6, 1ED7, 1EE0, 1EE1
-    1EEE, 1EEF, 1EF8, 1EF9
+  00C3, 00D1, 00D5, 00E3, 00F1, 00F5, 0128, 0129
+  0168, 0169, 1E7C, 1E7D, 1EAA, 1EAB, 1EB4, 1EB5
+  1EBC, 1EBD, 1EC4, 1EC5, 1ED6, 1ED7, 1EE0, 1EE1
+  1EEE, 1EEF, 1EF8, 1EF9
 
   "ÃÑÕãñõĨĩŨũṼṽẪẫẴẵẼẽỄễỖỗỠỡỮữỸỹ"
 
 - NSM: MACRON 0304
 
-    0100, 0101, 0112, 0113, 012A, 012B, 014C, 014D
-    016A, 016B, 01D5, 01D6, 01DE, 01DF, 01E0, 01E1
-    01E2, 01E3, 01EC, 01ED, 022A, 022B, 022C, 022D
-    0230, 0231, 0232, 0233, 04E2, 04E3, 04EE, 04EF
-    1E20, 1E21, 1E38, 1E39, 1E5C, 1E5D, 1FB1, 1FB9
-    1FD1, 1FD9, 1FE1, 1FE9
+  0100, 0101, 0112, 0113, 012A, 012B, 014C, 014D
+  016A, 016B, 01D5, 01D6, 01DE, 01DF, 01E0, 01E1
+  01E2, 01E3, 01EC, 01ED, 022A, 022B, 022C, 022D
+  0230, 0231, 0232, 0233, 04E2, 04E3, 04EE, 04EF
+  1E20, 1E21, 1E38, 1E39, 1E5C, 1E5D, 1FB1, 1FB9
+  1FD1, 1FD9, 1FE1, 1FE9
 
   "ĀāĒēĪīŌōŪūǕǖǞǟǠǡǢǣǬǭȪȫȬȭȰȱȲȳӢӣӮӯḠḡḸḹṜṝᾱᾹῑῙῡῩ"
 
 - NSM: BREVE 0306
 
-    0102, 0103, 0114, 0115, 011E, 011F, 012C, 012D
-    014E, 014F, 016C, 016D, 040E, 0419, 0439, 045E
-    04C1, 04C2, 04D0, 04D1, 04D6, 04D7, 1E1C, 1E1D
-    1EB6, 1EB7, 1FB0, 1FB8, 1FD0, 1FD8, 1FE0, 1FE8
+  0102, 0103, 0114, 0115, 011E, 011F, 012C, 012D
+  014E, 014F, 016C, 016D, 040E, 0419, 0439, 045E
+  04C1, 04C2, 04D0, 04D1, 04D6, 04D7, 1E1C, 1E1D
+  1EB6, 1EB7, 1FB0, 1FB8, 1FD0, 1FD8, 1FE0, 1FE8
 
   "ĂăĔĕĞğĬĭŎŏŬŭЎЙйўӁӂӐӑӖӗḜḝẶặᾰᾸῐῘῠῨ"
 
 - NSM: DOT ABOVE 0307
 
-    010A, 010B, 0116, 0117, 0120, 0121, 0130, 017B
-    017C, 0226, 0227, 022E, 022F, 06A7, 06AC, 06B6
-    06BF, 06CF, 0762, 0765, 087A, 1DA1, 1E02, 1E03
-    1E0A, 1E0B, 1E1E, 1E1F, 1E22, 1E23, 1E40, 1E41
-    1E44, 1E45, 1E56, 1E57, 1E58, 1E59, 1E60, 1E61
-    1E64, 1E65, 1E66, 1E67, 1E68, 1E69, 1E6A, 1E6B
-    1E86, 1E87, 1E8A, 1E8B, 1E8E, 1E8F, 1E9B, 312E
-    10798, 10EB0
+  010A, 010B, 0116, 0117, 0120, 0121, 0130, 017B
+  017C, 0226, 0227, 022E, 022F, 06A7, 06AC, 06B6
+  06BF, 06CF, 0762, 0765, 087A, 1DA1, 1E02, 1E03
+  1E0A, 1E0B, 1E1E, 1E1F, 1E22, 1E23, 1E40, 1E41
+  1E44, 1E45, 1E56, 1E57, 1E58, 1E59, 1E60, 1E61
+  1E64, 1E65, 1E66, 1E67, 1E68, 1E69, 1E6A, 1E6B
+  1E86, 1E87, 1E8A, 1E8B, 1E8E, 1E8F, 1E9B, 312E
+  10798, 10EB0
 
   "ĊċĖėĠġİŻżȦȧȮȯڧڬڶڿۏݢݥࡺᶡḂḃḊḋḞḟḢḣṀṁṄṅṖṗṘṙṠṡṤṥṦṧṨṩṪṫẆẇẊẋẎẏẛㄮ𐞘𐺰"
 
 - NSM: DIAERESIS 0308
 
-    00C4, 00CB, 00CF, 00D6, 00DC, 00E4, 00EB, 00EF
-    00F6, 00FC, 00FF, 0178, 03AA, 03AB, 03CA, 03CB
-    03D4, 0401, 0407, 0451, 0457, 04D2, 04D3, 04DA
-    04DB, 04DC, 04DD, 04DE, 04DF, 04E4, 04E5, 04E6
-    04E7, 04EA, 04EB, 04EC, 04ED, 04F0, 04F1, 04F4
-    04F5, 04F8, 04F9, 1DF2, 1DF3, 1DF4, 1E26, 1E27
-    1E4E, 1E4F, 1E7A, 1E7B, 1E84, 1E85, 1E8C, 1E8D
-    1E97
+  00C4, 00CB, 00CF, 00D6, 00DC, 00E4, 00EB, 00EF
+  00F6, 00FC, 00FF, 0178, 03AA, 03AB, 03CA, 03CB
+  03D4, 0401, 0407, 0451, 0457, 04D2, 04D3, 04DA
+  04DB, 04DC, 04DD, 04DE, 04DF, 04E4, 04E5, 04E6
+  04E7, 04EA, 04EB, 04EC, 04ED, 04F0, 04F1, 04F4
+  04F5, 04F8, 04F9, 1DF2, 1DF3, 1DF4, 1E26, 1E27
+  1E4E, 1E4F, 1E7A, 1E7B, 1E84, 1E85, 1E8C, 1E8D
+  1E97
 
   "ÄËÏÖÜäëïöüÿŸΪΫϊϋϔЁЇёїӒӓӚӛӜӝӞӟӤӥӦӧӪӫӬӭӰӱӴӵӸӹᷲᷳᷴḦḧṎṏṺṻẄẅẌẍẗ"
 
 - NSM: HOOK ABOVE 0309
 
-    1EA2, 1EA3, 1EA8, 1EA9, 1EB2, 1EB3, 1EBA, 1EBB
-    1EC2, 1EC3, 1EC8, 1EC9, 1ECE, 1ECF, 1ED4, 1ED5
-    1EDE, 1EDF, 1EE6, 1EE7, 1EEC, 1EED, 1EF6, 1EF7
+  1EA2, 1EA3, 1EA8, 1EA9, 1EB2, 1EB3, 1EBA, 1EBB
+  1EC2, 1EC3, 1EC8, 1EC9, 1ECE, 1ECF, 1ED4, 1ED5
+  1EDE, 1EDF, 1EE6, 1EE7, 1EEC, 1EED, 1EF6, 1EF7
 
   "ẢảẨẩẲẳẺẻỂểỈỉỎỏỔổỞởỦủỬửỶỷ"
 
 - NSM: RING ABOVE 030A
 
-    00C5, 00E5, 016E, 016F, 1E98, 1E99
+  00C5, 00E5, 016E, 016F, 1E98, 1E99
 
   "ÅåŮůẘẙ"
 
 - NSM: DOUBLE ACUTE 030B
 
-    0150, 0151, 0170, 0171, 04F2, 04F3
+  0150, 0151, 0170, 0171, 04F2, 04F3
 
   "ŐőŰűӲӳ"
 
 - NSM: HACEK 030C
 
-    010C, 010D, 010E, 010F, 011A, 011B, 013D, 013E
-    0147, 0148, 0158, 0159, 0160, 0161, 0164, 0165
-    017D, 017E, 01CD, 01CE, 01CF, 01D0, 01D1, 01D2
-    01D3, 01D4, 01D9, 01DA, 01E6, 01E7, 01E8, 01E9
-    01EE, 01EF, 01F0, 021E, 021F
+  010C, 010D, 010E, 010F, 011A, 011B, 013D, 013E
+  0147, 0148, 0158, 0159, 0160, 0161, 0164, 0165
+  017D, 017E, 01CD, 01CE, 01CF, 01D0, 01D1, 01D2
+  01D3, 01D4, 01D9, 01DA, 01E6, 01E7, 01E8, 01E9
+  01EE, 01EF, 01F0, 021E, 021F
 
   "ČčĎďĚěĽľŇňŘřŠšŤťŽžǍǎǏǐǑǒǓǔǙǚǦǧǨǩǮǯǰȞȟ"
 
 - NSM: DOUBLE GRAVE 030F
 
-    0200, 0201, 0204, 0205, 0208, 0209, 020C, 020D
-    0210, 0211, 0214, 0215, 0476, 0477
+  0200, 0201, 0204, 0205, 0208, 0209, 020C, 020D
+  0210, 0211, 0214, 0215, 0476, 0477
 
   "ȀȁȄȅȈȉȌȍȐȑȔȕѶѷ"
 
 - NSM: INVERTED BREVE 0311
 
-    0202, 0203, 0206, 0207, 020A, 020B, 020E, 020F
-    0212, 0213, 0216, 0217
+  0202, 0203, 0206, 0207, 020A, 020B, 020E, 020F
+  0212, 0213, 0216, 0217
 
   "ȂȃȆȇȊȋȎȏȒȓȖȗ"
 
 - NSM: COMMA ABOVE 0313
 
-    1F00, 1F08, 1F10, 1F18, 1F20, 1F28, 1F30, 1F38
-    1F40, 1F48, 1F50, 1F60, 1F68, 1FE4
+  1F00, 1F08, 1F10, 1F18, 1F20, 1F28, 1F30, 1F38
+  1F40, 1F48, 1F50, 1F60, 1F68, 1FE4
 
   "ἀἈἐἘἠἨἰἸὀὈὐὠὨῤ"
 
 - NSM: REVERSED COMMA ABOVE 0314
 
-    1F01, 1F09, 1F11, 1F19, 1F21, 1F29, 1F31, 1F39
-    1F41, 1F49, 1F51, 1F59, 1F61, 1F69, 1FE5, 1FEC
+  1F01, 1F09, 1F11, 1F19, 1F21, 1F29, 1F31, 1F39
+  1F41, 1F49, 1F51, 1F59, 1F61, 1F69, 1FE5, 1FEC
 
   "ἁἉἑἙἡἩἱἹὁὉὑὙὡὩῥῬ"
 
 - NSM: HORN 031B
 
-    01A0, 01A1, 01AF, 01B0
+  01A0, 01A1, 01AF, 01B0
 
   "ƠơƯư"
 
 - NSM: DOT BELOW 0323
 
-    068A, 0694, 06A3, 06B9, 06FA, 06FB, 06FC, 0766
-    088B, 08A5, 08B4, 1E04, 1E05, 1E0C, 1E0D, 1E24
-    1E25, 1E32, 1E33, 1E36, 1E37, 1E42, 1E43, 1E46
-    1E47, 1E5A, 1E5B, 1E62, 1E63, 1E6C, 1E6D, 1E7E
-    1E7F, 1E88, 1E89, 1E92, 1E93, 1EA0, 1EA1, 1EB8
-    1EB9, 1ECA, 1ECB, 1ECC, 1ECD, 1EE2, 1EE3, 1EE4
-    1EE5, 1EF0, 1EF1, 1EF4, 1EF5, 1BC26
+  068A, 0694, 06A3, 06B9, 06FA, 06FB, 06FC, 0766
+  088B, 08A5, 08B4, 1E04, 1E05, 1E0C, 1E0D, 1E24
+  1E25, 1E32, 1E33, 1E36, 1E37, 1E42, 1E43, 1E46
+  1E47, 1E5A, 1E5B, 1E62, 1E63, 1E6C, 1E6D, 1E7E
+  1E7F, 1E88, 1E89, 1E92, 1E93, 1EA0, 1EA1, 1EB8
+  1EB9, 1ECA, 1ECB, 1ECC, 1ECD, 1EE2, 1EE3, 1EE4
+  1EE5, 1EF0, 1EF1, 1EF4, 1EF5, 1BC26
 
   "ڊڔڣڹۺۻۼݦࢋࢥࢴḄḅḌḍḤḥḲḳḶḷṂṃṆṇṚṛṢṣṬṭṾṿẈẉẒẓẠạẸẹỊịỌọỢợỤụỰựỴỵ𛰦"
 
 - NSM: DOUBLE DOT BELOW 0324
 
-    1E72, 1E73
+  1E72, 1E73
 
   "Ṳṳ"
 
 - NSM: RING BELOW 0325
 
-    1E00, 1E01
+  1E00, 1E01
 
   "Ḁḁ"
 
 - NSM: COMMA BELOW 0326
 
-    0218, 0219, 021A, 021B
+  0218, 0219, 021A, 021B
 
   "ȘșȚț"
 
 - NSM: CEDILLA 0327
 
-    00C7, 00E7, 0122, 0123, 0136, 0137, 013B, 013C
-    0145, 0146, 0156, 0157, 015E, 015F, 0162, 0163
-    0228, 0229, 1E10, 1E11, 1E28, 1E29
+  00C7, 00E7, 0122, 0123, 0136, 0137, 013B, 013C
+  0145, 0146, 0156, 0157, 015E, 015F, 0162, 0163
+  0228, 0229, 1E10, 1E11, 1E28, 1E29
 
   "ÇçĢģĶķĻļŅņŖŗŞşŢţȨȩḐḑḨḩ"
 
 - NSM: OGONEK 0328
 
-    0104, 0105, 0118, 0119, 012E, 012F, 0172, 0173
-    01EA, 01EB
+  0104, 0105, 0118, 0119, 012E, 012F, 0172, 0173
+  01EA, 01EB
 
   "ĄąĘęĮįŲųǪǫ"
 
 - NSM: CIRCUMFLEX BELOW 032D
 
-    1E12, 1E13, 1E18, 1E19, 1E3C, 1E3D, 1E4A, 1E4B
-    1E70, 1E71, 1E76, 1E77
+  1E12, 1E13, 1E18, 1E19, 1E3C, 1E3D, 1E4A, 1E4B
+  1E70, 1E71, 1E76, 1E77
 
   "ḒḓḘḙḼḽṊṋṰṱṶṷ"
 
 - NSM: BREVE BELOW 032E
 
-    1E2A, 1E2B
+  1E2A, 1E2B
 
   "Ḫḫ"
 
 - NSM: TILDE BELOW 0330
 
-    1E1A, 1E1B, 1E2C, 1E2D, 1E74, 1E75
+  1E1A, 1E1B, 1E2C, 1E2D, 1E74, 1E75
 
   "ḚḛḬḭṴṵ"
 
 - NSM: MACRON BELOW 0331
 
-    1E06, 1E07, 1E0E, 1E0F, 1E34, 1E35, 1E3A, 1E3B
-    1E48, 1E49, 1E5E, 1E5F, 1E6E, 1E6F, 1E94, 1E95
-    1E96
+  1E06, 1E07, 1E0E, 1E0F, 1E34, 1E35, 1E3A, 1E3B
+  1E48, 1E49, 1E5E, 1E5F, 1E6E, 1E6F, 1E94, 1E95
+  1E96
 
   "ḆḇḎḏḴḵḺḻṈṉṞṟṮṯẔẕẖ"
 
 - NSM: THREE DOTS ABOVE 20DB
 
-    063F, 0685, 069E, 069F, 06A0, 06A8, 06B4, 06B7
-    06BD, 0763, 08A7, 08C3, 08C4, 08C5
+  063F, 0685, 069E, 069F, 06A0, 06A8, 06B4, 06B7
+  06BD, 0763, 08A7, 08C3, 08C4, 08C5
 
   "ؿڅڞڟڠڨڴڷڽݣࢧࣃࣄࣅ"
 
 - NSM: FOUR DOTS ABOVE 20DC
 
-    0690, 0699, 075C
+  0690, 0699, 075C
 
   "ڐڙݜ"
 
 - NSM: KATAKANA-HIRAGANA VOICED SOUND MARK 3099
 
-    304C, 304E, 3050, 3052, 3054, 3056, 3058, 305A
-    305C, 305E, 3060, 3062, 3065, 3067, 3069, 3070
-    3073, 3076, 3079, 307C, 3094, 309E, 30AC, 30AE
-    30B0, 30B2, 30B4, 30B6, 30B8, 30BA, 30BC, 30BE
-    30C0, 30C2, 30C5, 30C7, 30C9, 30D0, 30D3, 30D6
-    30D9, 30DC, 30F4, 30F7, 30F8, 30F9, 30FA, 30FE
-    FF9E
+  304C, 304E, 3050, 3052, 3054, 3056, 3058, 305A
+  305C, 305E, 3060, 3062, 3065, 3067, 3069, 3070
+  3073, 3076, 3079, 307C, 3094, 309E, 30AC, 30AE
+  30B0, 30B2, 30B4, 30B6, 30B8, 30BA, 30BC, 30BE
+  30C0, 30C2, 30C5, 30C7, 30C9, 30D0, 30D3, 30D6
+  30D9, 30DC, 30F4, 30F7, 30F8, 30F9, 30FA, 30FE
+  FF9E
 
   "がぎぐげござじずぜぞだぢづでどばびぶべぼゔゞガギグゲゴザジズゼゾダヂヅデドバビブベボヴヷヸヹヺヾﾞ"
 
 - NSM: KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK 309A
 
-    3071, 3074, 3077, 307A, 307D, 30D1, 30D4, 30D7
-    30DA, 30DD, FF9F
+  3071, 3074, 3077, 307A, 307D, 30D1, 30D4, 30D7
+  30DA, 30DD, FF9F
 
   "ぱぴぷぺぽパピプペポﾟ"
 
-21 References
-=============
+# 21 References
 
 [AltId] Unicode Standard Annex
 
@@ -2827,7 +2795,7 @@ Standard Annex 31.
 
 [TR39#Table 1] Identifier Status and Type Table 1.
 
-  <https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type>
+<https://www.unicode.org/reports/tr39/#Identifier_Status_and_Type>
 
 [TR39#4] Confusable Detection.
 

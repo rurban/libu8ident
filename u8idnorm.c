@@ -29,17 +29,17 @@
 char tmp_stack[128];
 #endif
 
-//#pragma message "U8ID_NORM="_XSTR(U8ID_NORM)
-//#pragma message "U8ID_NORM_DEFAULT="_XSTR(U8ID_NORM_DEFAULT)
-//#if !defined U8ID_NORM || U8ID_NORM == NFKD
-//#pragma message "NFKD"_XSTR(U8ID_NORM)
-//#endif
-//#if !defined U8ID_NORM || U8ID_NORM == NFD
-//#pragma message "NFD:"_XSTR(U8ID_NORM)
-//#endif
-//#if !defined U8ID_NORM || U8ID_NORM_DEFAULT == U8ID_NFD
-//#pragma message "NFD1:"_XSTR(U8ID_NORM_DEFAULT)
-//#endif
+// #pragma message "U8ID_NORM="_XSTR(U8ID_NORM)
+// #pragma message "U8ID_NORM_DEFAULT="_XSTR(U8ID_NORM_DEFAULT)
+// #if !defined U8ID_NORM || U8ID_NORM == NFKD
+// #pragma message "NFKD"_XSTR(U8ID_NORM)
+// #endif
+// #if !defined U8ID_NORM || U8ID_NORM == NFD
+// #pragma message "NFD:"_XSTR(U8ID_NORM)
+// #endif
+// #if !defined U8ID_NORM || U8ID_NORM_DEFAULT == U8ID_NFD
+// #pragma message "NFD1:"_XSTR(U8ID_NORM_DEFAULT)
+// #endif
 
 #if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD ||              \
     U8ID_NORM == FCC || U8ID_NORM == FCD
@@ -622,7 +622,7 @@ static int u8id_reorder_s(unsigned char *restrict dest, long dmax,
 
 #if !defined U8ID_NORM ||                                                      \
     !(U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD)
-//#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == FCC
+// #if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == FCC
 
 static uint32_t _composite_cp(uint32_t cp, uint32_t cp2) {
   const UN8IF_complist_s ***plane, **row, *cell;

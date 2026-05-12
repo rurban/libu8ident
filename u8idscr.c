@@ -260,15 +260,13 @@ LOCAL bool isALLOWED_cont(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
 LOCAL bool isTR39_start(const uint32_t cp) {
-  return binary_search(cp, (char *)tr39_start_list,
-                       ARRAY_SIZE(tr39_start_list),
+  return binary_search(cp, (char *)tr39_start_list, ARRAY_SIZE(tr39_start_list),
                        sizeof(*tr39_start_list))
              ? true
              : false;
 }
 LOCAL bool isTR39_cont(const uint32_t cp) {
-  return binary_search(cp, (char *)tr39_cont_list,
-                       ARRAY_SIZE(tr39_cont_list),
+  return binary_search(cp, (char *)tr39_cont_list, ARRAY_SIZE(tr39_cont_list),
                        sizeof(*tr39_cont_list))
              ? true
              : false;
@@ -542,11 +540,11 @@ bool isC23_start(const uint32_t cp) {
   if (!ret) {
     return cp == '_' ? true : false;
   }
-#if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if !defined U8ID_NORM || U8ID_NORM == NFC
   // if member of NFC_N it's not
   if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
     return false;
-#endif
+#  endif
   // if member of NFC_M we need to check further. if not a member it is.
   return true;
 }
@@ -555,12 +553,13 @@ bool isC23_cont(const uint32_t cp) {
   bool ret = range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
   if (!ret)
     return false;
-#if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if !defined U8ID_NORM || U8ID_NORM == NFC
   // if member of NFC_N it's not
   if (range_bool_search(cp, NFC_N_list, ARRAY_SIZE(NFC_N_list)))
     return false;
-#endif  
-  // if member of NFC_M we need to check further (in u8ident_check_buf). if not a member it is.
+#  endif
+  // if member of NFC_M we need to check further (in u8ident_check_buf). if not
+  // a member it is.
   return true;
 }
 
