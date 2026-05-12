@@ -105,8 +105,7 @@ $(srcdir)/su8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 $(srcdir)/gconfus.h: $(srcdir)/gconfus.h.in
 	-if test -n "$(GPERF)"; then cd $(srcdir) && $(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp; fi
 
-c11-all.h unitr39.h: scripts.h mark.h medial.h
-	$(MAKE) mktr39$(EXEEXT)
+c11-all.h unitr39.h: mktr39$(EXEEXT) scripts.h mark.h medial.h
 	./mktr39$(EXEEXT)
 if !HAVE_WINDOWS
 	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unitr39.h $(srcdir)/
