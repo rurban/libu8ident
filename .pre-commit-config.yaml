@@ -44,7 +44,7 @@ repos:
     hooks:
       - id: clang-format
         entry: ./clang-format.sh
-        exclude: CRoaring/|texts/|c11-all\.h|confus\.h|gconfus\.h\.in
+        exclude: CRoaring/|texts/|c11-all\.h|confus\.h|gconfus\.h\.in|confus_croar\.h|un8if.*\.h|mark\.h
 
   - repo: local
     hooks:

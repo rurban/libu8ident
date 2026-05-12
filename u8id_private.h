@@ -58,10 +58,10 @@
 // allowed set of identifiers. TR31 --xid tokenizer options
 // we need XID, the default, as first for uninitialized options.
 enum xid_e {
-  XID,     // ID minus NFKC quirks, labelled stable, the default.
-  ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  XID, // ID minus NFKC quirks, labelled stable, the default.
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
   ALLOWED, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
-  TR39, // practical XID with TR39 security measures, see P2528R1.
+  TR39,    // practical XID with TR39 security measures, see P2528R1.
   C23,     // XID with NFC requirement from C23 (P1949, N2828).
   C11,     // the stable insecure AltId ranges from the C11 standard, Annex D.
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal.
@@ -145,7 +145,7 @@ enum xid_e {
 #  undef ENABLE_CHECK_XID
 #endif
 #ifdef U8ID_TR31
-//#  pragma message("U8ID_TR31=" _XSTR(U8ID_TR31))
+// #  pragma message("U8ID_TR31=" _XSTR(U8ID_TR31))
 #  if U8ID_TR31 == NONE
 #    define DISABLE_CHECK_XID
 #    define U8ID_TR31_DEFAULT 0

@@ -35,7 +35,7 @@
 #  include "uniwbrk.h"
 #endif
 #include "u8idscr.h"
-//#undef EXTERN_SCRIPTS
+// #undef EXTERN_SCRIPTS
 #include "unic11.h"
 
 int verbose = 0;

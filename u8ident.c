@@ -53,11 +53,11 @@ LOCAL const char *u8ident_errstr(int errcode) {
     ALLOWED  - TR31 ID with only recommended scripts. Allowed
                IdentifierStatus.
     TR39     - see P2528R1. XID minus exotic scripts, filtered by NFC and
-               IdentifierType. Previously wrongly called SAFEC26. There is no safe C26.
-    C23      - XID plus NFC requirement. http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html
-    C11      - the AltId ranges from the C11 standard
-    ALLUTF8  - all > 128, e.g. D, php, nim, crystal.
-    ASCII    - only ASCII letters
+               IdentifierType. Previously wrongly called SAFEC26. There is no
+   safe C26. C23      - XID plus NFC requirement.
+   http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p1949r7.html C11 -
+   the AltId ranges from the C11 standard ALLUTF8  - all > 128, e.g. D, php,
+   nim, crystal. ASCII    - only ASCII letters
 
 */
 #ifndef DISABLE_CHECK_XID
@@ -165,22 +165,24 @@ bool in_SCX(const enum u8id_sc scr, const char *scx) {
 }
 
 /* TR39#5.5 "Forbid sequences of base character + nonspacing mark that look the
-   same as or confusingly similar to the base character alone", like i + DOT ABOVE  */
-/* Also forbid non-spacing marks with base chars already including the non-spacing
-   mark, like Ä with DIAERESIS.
+   same as or confusingly similar to the base character alone", like i + DOT
+   ABOVE  */
+/* Also forbid non-spacing marks with base chars already including the
+   non-spacing mark, like Ä with DIAERESIS.
  */
 bool nsm_check(const uint32_t base_cp, const uint32_t cp) {
   if (cp == 0x307 && (base_cp == 'i' || base_cp == 0x131 // dotless i
                       || base_cp == 0x237                // dotless j
-                      || base_cp == 0x25F                // dotless j with stroke
-                      || base_cp == 0x284                // dotless j with stroke and hook
-                      || base_cp == 0x1DA1               // dotless j with stroke
-                      || base_cp == 0x10798              // dotless i
-                      || base_cp == 0x1D6A4              // dotless j
-                      || base_cp == 0x1D645))            // dotless j
+                      || base_cp == 0x25F     // dotless j with stroke
+                      || base_cp == 0x284     // dotless j with stroke and hook
+                      || base_cp == 0x1DA1    // dotless j with stroke
+                      || base_cp == 0x10798   // dotless i
+                      || base_cp == 0x1D6A4   // dotless j
+                      || base_cp == 0x1D645)) // dotless j
     return false;
-  // Todo: check the 10 different STROKE Mn's: SHORT BAR OVERLAY, LONG BAR OVERLAY,
-  // LIGHT CENTRALIZATION STROKE BELOW, STRONG CENTRALIZATION STROKE BELOW, ...
+  // Todo: check the 10 different STROKE Mn's: SHORT BAR OVERLAY, LONG BAR
+  // OVERLAY, LIGHT CENTRALIZATION STROKE BELOW, STRONG CENTRALIZATION STROKE
+  // BELOW, ...
 
   for (unsigned i = 0; i < ARRAY_SIZE(nsm_letters); i++) {
     const struct nsm_ws *l = &nsm_letters[i];
@@ -258,7 +260,8 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
 
 #ifdef HAVE_CONFUS
     /* allow some latin confusables: 0 1 I ` | U+30, U+31, U+49, U+60, U+7C */
-    /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6, 0x03BB (λ) */
+    /* what about: 0x00A0, 0x00AF, 0x00B4, 0x00B5, 0x00B8, 0x00D7, 0x00F6,
+     * 0x03BB (λ) */
     if (unlikely(s_u8id_options &
                      (U8ID_WARN_CONFUSABLE | U8ID_ERROR_CONFUSABLE) &&
                  cp > 0x7C)) {
@@ -367,8 +370,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
           } else if (!nsm_check(base_cp, cp)) {
-            // TR39#5.5 "Forbid sequences of base character + nonspacing mark that look the
-            // same as or confusingly similar to the base character alone"
+            // TR39#5.5 "Forbid sequences of base character + nonspacing mark
+            // that look the same as or confusingly similar to the base
+            // character alone"
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
           }
@@ -534,8 +538,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
           } else if (!nsm_check(base_cp, cp)) {
-            // TR39#5.5 "Forbid sequences of base character + nonspacing mark that look the
-            // same as or confusingly similar to the base character alone"
+            // TR39#5.5 "Forbid sequences of base character + nonspacing mark
+            // that look the same as or confusingly similar to the base
+            // character alone"
             ctx->last_cp = cp;
             return U8ID_ERR_COMBINE;
           }
@@ -593,11 +598,13 @@ EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
 #define ERR_NOSPACE -2
 
 /* The other primitive variant without mixed-sripts checks. */
-EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int bufsz) {
+EXTERN enum u8id_errors u8ident_check_confusables(const char *buf,
+                                                  const int bufsz) {
 #ifndef HAVE_CONFUS
   (void)buf;
   (void)bufsz;
-  fprintf(stderr, "Unsupported u8ident_check_confusables(), need --enable-confus\n");
+  fprintf(stderr,
+          "Unsupported u8ident_check_confusables(), need --enable-confus\n");
   return -1;
 #else
   int ret = U8ID_EOK;
@@ -612,7 +619,7 @@ EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int buf
     ctx->htab1 = new_htab(16);
   } else {
     if (find_htab(ctx->htab, buf)) { // already handled
-      //fprintf(stderr, "already seen %s\n", buf);
+      // fprintf(stderr, "already seen %s\n", buf);
       return U8ID_EOK;
     }
   }
@@ -649,30 +656,30 @@ EXTERN enum u8id_errors u8ident_check_confusables(const char *buf, const int buf
       }
     } while (s <= e);
     if (found_gperf) {
-      free (nfc);
+      free(nfc);
       nfc = u8ident_normalize(confus, strlen(confus));
-      //fprintf(stderr, "confus: nfc %s (%s) -> %s\n", buf, confus, nfc);
+      // fprintf(stderr, "confus: nfc %s (%s) -> %s\n", buf, confus, nfc);
     }
-    free (confus);
+    free(confus);
   }
   s_u8id_norm = norm;
 
   add_htab(ctx->htab, buf, nfc);
   if ((found = find_htab(ctx->htab1, nfc))) {
-    //fprintf(stderr, "found confus %s -> %s\n", buf, found);
-    // add the result for diagnostics
+    // fprintf(stderr, "found confus %s -> %s\n", buf, found);
+    //  add the result for diagnostics
     int diff = strcmp(found, buf);
     if (diff < 0 && -diff < bufsz)
       ctx->last_cp = nfc[-diff];
     else if (diff < bufsz)
       ctx->last_cp = nfc[diff];
-    free (nfc);
+    free(nfc);
     return U8ID_ERR_CONFUS;
   } else {
-    //fprintf(stderr, "first use of %s -> %s\n", nfc, buf);
+    // fprintf(stderr, "first use of %s -> %s\n", nfc, buf);
     add_htab(ctx->htab1, nfc, buf); // first use
   }
-  free (nfc);
+  free(nfc);
   return ret;
 #endif
 }

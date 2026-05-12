@@ -1,4 +1,4 @@
-/* 
+/*
  * This file is built by cperl regen/regcharclass-safec.pl.
  * cp_high means only codepoints > 0xff
  */
@@ -7,7 +7,7 @@
 #define H_HANGUL 1
 
 /*
-	HANGUL (Korean) has special normalization rules.
+        HANGUL (Korean) has special normalization rules.
         Unicode 9.0
 */
 // clang-format off
