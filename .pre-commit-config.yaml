@@ -1,0 +1,92 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# generated read-only files
+exclude: '^(c11-all\.h|confus\.h|gconfus\.h\.in)$'
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # see https://github.com/pre-commit/pre-commit-hooks/
+      - id: check-added-large-files # prevents giant files from being committed.
+      - id: check-case-conflict # checks for files that would conflict in case-insensitive filesystems.
+      - id: check-merge-conflict # checks for files that contain merge conflict strings.
+      - id: check-json # checks json for syntax errors and duplicate keys
+      - id: check-yaml # checks yaml files for parseable syntax.
+      - id: detect-private-key # detects the presence of private keys.
+      - id: end-of-file-fixer # ensures that a file is either empty, or ends with one newline.
+        exclude: c11-all\.h|confus\.h|gconfus\.h\.in|un8if.*
+      - id: fix-byte-order-marker # removes utf-8 byte order marker.
+      - id: mixed-line-ending # replaces or checks mixed line ending.
+      - id: requirements-txt-fixer # sorts entries in requirements.txt.
+      - id: trailing-whitespace # trims trailing whitespace.
+        exclude: ^(c11-all\.h|confus\.h|gconfus\.h\.in)$
+      - id: check-executables-have-shebangs
+      - id: check-symlinks
+      - id: destroyed-symlinks
+      - id: check-vcs-permalinks
+      - id: file-contents-sorter
+
+  - repo: https://github.com/pycontribs/mirrors-prettier
+    rev: v3.6.2
+    hooks:
+      - id: prettier
+        types: ["markdown"]
+        exclude: CRoaring/|c11-all\.h|confus\.h|gconfus\.h\.in
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        exclude: build-aux/git-version-gen
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v22.1.4
+    hooks:
+      - id: clang-format
+        entry: ./clang-format.sh
+        exclude: CRoaring/|texts/|c11-all\.h|confus\.h|gconfus\.h\.in
+
+  - repo: local
+    hooks:
+      - id: cppcheck
+        name: cppcheck
+        entry: cppcheck
+        language: system
+        args:
+          [
+            -j4,
+            --inline-suppr,
+            #--check-level=exhaustive,
+            --suppress=unusedFunction,
+            --suppress=unmatchedSuppression,
+            --suppress=missingIncludeSystem,
+            --suppress=toomanyconfigs,
+            --suppress=constParameterPointer,
+            --suppress=constVariablePointer,
+            --suppress=staticFunction,
+            --suppress=unusedStructMember,
+            --suppress=shadowVariable,
+            --suppress=variableScope,
+            --suppress=redundantAssignment,
+            --suppress=unreadVariable,
+            --suppress=invalidscanf,
+            --suppress=knownConditionTrueFalse,
+            --suppress=suspiciousFloatingPointCast,
+            --suppress=nullPointerRedundantCheck,
+            --suppress=nullPointerOutOfMemory,
+            --suppress=nullPointerOutOfResources,
+            --suppress=va_end_missing,
+            --suppress=uninitvar,
+            --suppress=normalCheckLevelMaxBranches,
+            --suppress=checkLevelNormal,
+          ]
+        files: \.(c|h)$
+        exclude: CRoaring/|texts/|^(c11-all\.h|confus\.h|gconfus\.h\.in)$
+
+  - repo: https://github.com/henryykt/pre-commit-perl
+    rev: v0.0.5
+    hooks:
+    #- id: perlcritic
+    - id: perltidy
+    - id: perlimports
+    - id: perlimports-lint
