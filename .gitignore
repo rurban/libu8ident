@@ -29,6 +29,7 @@ libtool
 stamp-h1
 Makefile
 libu8ident.pc
+libu8ident_c.pc
 a.out
 u8idlint
 /test
