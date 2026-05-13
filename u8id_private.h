@@ -120,7 +120,9 @@ enum xid_e {
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_6
 #  elif U8ID_PROFILE == TR39_4
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_TR39_4
-#    define U8ID_PROFILE_TR39
+#    ifndef U8ID_PROFILE_TR39
+#      define U8ID_PROFILE_TR39
+#    endif
 #  elif U8ID_PROFILE == C11_6
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
 #    define U8ID_PROFILE_C11STD
@@ -150,7 +152,9 @@ enum xid_e {
 #    define DISABLE_CHECK_XID
 #    define U8ID_TR31_DEFAULT 0
 #  else
-#    define ENABLE_CHECK_XID
+#    ifndef ENABLE_CHECK_XID
+#      define ENABLE_CHECK_XID
+#    endif
 #    if U8ID_TR31 == ALLOWED
 #      define U8ID_TR31_DEFAULT U8ID_TR31_ALLOWED
 #    elif U8ID_TR31 == ASCII

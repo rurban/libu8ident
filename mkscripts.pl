@@ -690,11 +690,11 @@ for my $sc (@limited) {
 }
 $i--;
 $defines .= "#define LAST_SCRIPT $i\n";
-printf $H <<"EOF", $i;
+printf $H <<'EOF';
     // clang-format on
 };
 #else
-extern const char *const all_scripts[%u];
+extern const char *const all_scripts[];
 #endif
 
 EOF
