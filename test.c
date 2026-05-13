@@ -859,6 +859,56 @@ void test_scx_singles(void) {
   u8ident_free_ctx(c);
 }
 
+void test_scx_crosscheck(void) {
+  // Cross-check tr39_*_list NULL scx against scx_list[].
+  // Every NULL scx in tr39 lists should NOT be in scx_list,
+  // and every scx_list entry overlapping tr39 lists must match.
+  const struct sc_tr39 *lists[] = {tr39_start_list, tr39_cont_list};
+  size_t list_sizes[] = {
+      ARRAY_SIZE(tr39_start_list),
+      ARRAY_SIZE(tr39_cont_list),
+  };
+
+  // Check 1: NULL scx in tr39 lists => not in scx_list
+  for (int li = 0; li < 2; li++) {
+    for (size_t i = 0; i < list_sizes[li]; i++) {
+      const struct sc_tr39 *e = &lists[li][i];
+      if (e->scx != NULL)
+        continue;
+      for (uint32_t cp = e->from; cp <= e->to; cp++) {
+        const struct scx *sc = u8ident_get_scx(cp);
+        assert(!sc);
+      }
+    }
+  }
+
+  // Check 2: scx_list entries in tr39 lists must match
+  for (size_t i = 0; i < ARRAY_SIZE(scx_list); i++) {
+    const struct scx *sc = &scx_list[i];
+    for (uint32_t cp = sc->from; cp <= sc->to; cp++) {
+      const struct sc_tr39 *tr = NULL;
+      for (size_t j = 0; j < ARRAY_SIZE(tr39_start_list); j++) {
+        if (cp >= tr39_start_list[j].from && cp <= tr39_start_list[j].to) {
+          tr = &tr39_start_list[j];
+          break;
+        }
+      }
+      if (!tr) {
+        for (size_t j = 0; j < ARRAY_SIZE(tr39_cont_list); j++) {
+          if (cp >= tr39_cont_list[j].from && cp <= tr39_cont_list[j].to) {
+            tr = &tr39_cont_list[j];
+            break;
+          }
+        }
+      }
+      if (!tr)
+        continue; // filtered out of tr39 lists, OK
+      assert(tr->scx != NULL);
+      assert(strEQ(tr->scx, sc->scx));
+    }
+  }
+}
+
 void test_gc(void) {
   // check consecutive and alternating GC ranges
   assert(gc_list[0].from == 0);
@@ -1147,6 +1197,7 @@ int main(int argc, char **argv) {
 
   if (scx || argc == 1) {
     test_scx_singles();
+    test_scx_crosscheck();
     test_add_scripts();
   }
 

@@ -65,10 +65,24 @@ const struct sc_tr39 tr39_start_list[] = {
     {0x278, 0x27B, SC_Latin, GC_Ll, NULL}, //  ɸ..ɻ
     {0x27D, 0x29D, SC_Latin, GC_L, NULL}, //  ɽ..ʝ
     {0x29F, 0x2AF, SC_Latin, GC_Ll, NULL}, //  ʟ..ʯ
-    {0x2B9, 0x2C1, SC_Common, GC_Lm, NULL}, //  ʹ..ˁ
+    // SPLIT on SCX (prev to U+2C1)
+    {0x2B9, 0x2BB, SC_Common, GC_Lm, NULL}, //  ʹ..ʻ
+    // SPLIT on SCX (prev to U+2C1)
+    {0x2BC, 0x2BC, SC_Common, GC_Lm, "\x05\x07\x08\x02\x99\x1d\x85"}, //Bengali,Cyrillic,Devanagari,Latin,Lisu,Thai,Toto //  ʼ
+    {0x2BD, 0x2C1, SC_Common, GC_Lm, NULL}, //  ʽ..ˁ
     // SPLIT on SCX (prev to U+2D1)
     {0x2C6, 0x2C6, SC_Common, GC_Lm, NULL}, //  ˆ
-    {0x2C7, 0x2D1, SC_Common, GC_Lm, "\x06\x02"}, //Bopomofo,Latin //  ˇ..ˑ
+    // SPLIT on SCX (prev to U+2D1)
+    {0x2C7, 0x2C7, SC_Common, GC_Lm, "\x06\x02"}, //Bopomofo,Latin //  ˇ
+    // SPLIT on SCX (prev to U+2D1)
+    {0x2C8, 0x2C8, SC_Common, GC_Lm, NULL}, //  ˈ
+    // SPLIT on SCX (prev to U+2D1)
+    {0x2C9, 0x2CB, SC_Common, GC_Lm, "\x06\x02"}, //Bopomofo,Latin //  ˉ..ˋ
+    // SPLIT on SCX (prev to U+2D1)
+    {0x2CC, 0x2CC, SC_Common, GC_Lm, NULL}, //  ˌ
+    // SPLIT on SCX (prev to U+2D1)
+    {0x2CD, 0x2CD, SC_Common, GC_Lm, "\x02\x99"}, //Latin,Lisu //  ˍ
+    {0x2CE, 0x2D1, SC_Common, GC_Lm, NULL}, //  ˎ..ˑ
     {0x2EC, 0x2EC, SC_Common, GC_Lm, NULL}, //  ˬ
     {0x2EE, 0x2EE, SC_Common, GC_Lm, NULL}, //  ˮ
     {0x386, 0x386, SC_Greek, GC_Lu, NULL}, //  Ά
@@ -1584,9 +1598,9 @@ const struct sc_tr39 tr39_start_list[] = {
     {0x28CCD, 0x28CCD, SC_Han, GC_Lo, NULL}, //  𨳍
     {0x28CD2, 0x28CD2, SC_Han, GC_Lo, NULL}, //  𨳒
     {0x29D98, 0x29D98, SC_Han, GC_Lo, NULL}, //  𩶘
-}; // 1277 ranges, 277 singles, 20914 codepoints
+}; // 1279 ranges, 282 singles, 20907 codepoints
 #else
-extern const struct sc_tr39 tr39_start_list[1554];
+extern const struct sc_tr39 tr39_start_list[1561];
 #endif
 
 // Filtering allowed scripts, XID_Continue,!XID_Start, safe IDTypes, NFC
@@ -1884,15 +1898,11 @@ const struct sc_tr39 tr39_excl_cont_list[] = {
 #else
 extern const struct sc_tr39 tr39_excl_cont_list[25];
 #endif
-
-// Currently empty MEDIAL list for safec26.
 // tr39_start/cont + MEDIAL
-#if 0
-#  ifndef EXTERN_SCRIPTS
+#ifndef EXTERN_SCRIPTS
 const struct range_bool tr39_medial_list[] = {
     {0x30FB, 0x30FB}, // Common ・
 }; // 0 ranges, 1 singles, 0 codepoints
-#  else
+#else
 extern const struct range_bool tr39_medial_list[1];
-#  endif
 #endif
