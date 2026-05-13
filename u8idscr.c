@@ -39,7 +39,9 @@
 // we are the owner of these lists
 #undef EXTERN_SCRIPTS
 #include "unic11.h"
-#include "unitr39.h"
+#ifndef NO_UNITR39
+#  include "unitr39.h"
+#endif
 #include "medial.h"
 
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
@@ -214,6 +216,7 @@ LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
   return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
 }
+#ifndef NO_UNITR39
 /* Search for TR39 XID entry, in start or cont lists */
 LOCAL const struct sc_c26 *u8ident_get_tr39(const uint32_t cp) {
   const struct sc_c26 *sc = (const struct sc_c26 *)binary_search(
@@ -226,6 +229,7 @@ LOCAL const struct sc_c26 *u8ident_get_tr39(const uint32_t cp) {
                                                 ARRAY_SIZE(tr39_cont_list),
                                                 sizeof(*tr39_cont_list));
 }
+#endif
 
 LOCAL bool u8ident_is_MARK(uint32_t cp) {
   return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
@@ -259,6 +263,7 @@ LOCAL bool isALLOWED_start(const uint32_t cp) {
 LOCAL bool isALLOWED_cont(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
+#ifndef NO_UNITR39
 LOCAL bool isTR39_start(const uint32_t cp) {
   return binary_search(cp, (char *)tr39_start_list, ARRAY_SIZE(tr39_start_list),
                        sizeof(*tr39_start_list))
@@ -271,6 +276,10 @@ LOCAL bool isTR39_cont(const uint32_t cp) {
              ? true
              : false;
 }
+#else
+LOCAL bool isTR39_start(const uint32_t cp) { return false; }
+LOCAL bool isTR39_cont(const uint32_t cp) { return false; }
+#endif
 LOCAL bool isID_start(const uint32_t cp) {
   return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
 }

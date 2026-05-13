@@ -115,13 +115,13 @@ else
 endif
 
 $(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
-	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8ident.c >$@
+	-$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8ident.c >$@
 $(srcdir)/u8idnorm-tr39.c: $(srcdir)/u8idnorm.c
-	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8idnorm.c >$@
+	-$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8idnorm.c >$@
 $(srcdir)/u8idscr-tr39.c: $(srcdir)/u8idscr.c
-	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8idscr.c >$@
+	-$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8idscr.c >$@
 $(srcdir)/u8id_private-tr39.h: $(srcdir)/u8id_private.h
-	$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8id_private.h >$@
+	-$(UNIFDEF) $(U8IFDEF) $(srcdir)/u8id_private.h >$@
 
 # emacs flymake-mode
 check-syntax:
@@ -240,7 +240,7 @@ test_texts_SOURCES = test-texts.c $(libu8ident_la_SOURCES)
 test_texts_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_LDADD = $(u8idlint_LIBS)
 mktr39_SOURCES = mktr39.c $(libu8ident_la_SOURCES)
-mktr39_CFLAGS = $(AM_CFLAGS)
+mktr39_CFLAGS = $(AM_CFLAGS) -DNO_UNITR39
 example_SOURCES = example.c
 example_LDADD = libu8ident.la
 test_c_SOURCES = test.c $(libu8ident_c_la_SOURCES)
