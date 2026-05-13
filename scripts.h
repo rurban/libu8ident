@@ -200,7 +200,7 @@ LOCAL const char *const all_scripts[] = {
     // clang-format on
 };
 #else
-extern const char *const all_scripts[174];
+extern const char *const all_scripts[];
 #endif
 
 enum u8id_sc {

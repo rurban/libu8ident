@@ -51,6 +51,169 @@
 #define EXTERN_SCRIPTS
 #include "unic11.h"
 
+// Local SCX data, parsed directly from ScriptExtensions.txt and
+// PropertyValueAliases.txt.  This avoids depending on scripts.h scx_list.
+#define MAX_LOCAL_SCX 512
+#define MAX_SCX_SCRIPTS 16
+
+static struct {
+  char short_name[32];
+  char long_name[64];
+} pva_map[256];
+static int pva_count = 0;
+
+static struct local_scx {
+  uint32_t from;
+  uint32_t to;
+  char scx[MAX_SCX_SCRIPTS + 1];
+} local_scx_list[MAX_LOCAL_SCX];
+static int local_scx_count = 0;
+
+static void read_pva(void) {
+  FILE *fp = fopen("PropertyValueAliases.txt", "r");
+  if (!fp) {
+    fprintf(stderr, "Cannot open PropertyValueAliases.txt\n");
+    return;
+  }
+  char line[256];
+  while (fgets(line, sizeof(line), fp)) {
+    char short_name[32], long_name[64];
+    if (sscanf(line, "sc ; %31s ; %63s", short_name, long_name) == 2) {
+      strcpy(pva_map[pva_count].short_name, short_name);
+      strcpy(pva_map[pva_count].long_name, long_name);
+      pva_count++;
+    }
+  }
+  fclose(fp);
+}
+
+static const char *pva_lookup(const char *short_name) {
+  for (int i = 0; i < pva_count; i++) {
+    if (strcmp(pva_map[i].short_name, short_name) == 0)
+      return pva_map[i].long_name;
+  }
+  return short_name;
+}
+
+static int script_name_to_enum(const char *name) {
+  if (!name)
+    return -1;
+  for (int i = 0; i <= LAST_SCRIPT; i++) {
+    if (!all_scripts[i])
+      continue;
+    if (strcmp(all_scripts[i], name) == 0)
+      return i;
+  }
+  return -1;
+}
+
+static void read_scx(void) {
+  fprintf(stderr, "read_scx: starting\n");
+  FILE *fp = fopen("ScriptExtensions.txt", "r");
+  if (!fp) {
+    fprintf(stderr, "Cannot open ScriptExtensions.txt\n");
+    return;
+  }
+  char line[512];
+  uint32_t prev_to = 0;
+  const char *prev_scx_str = NULL;
+  while (fgets(line, sizeof(line), fp)) {
+    if (line[0] == '#' || line[0] == '\n')
+      continue;
+    if (strncmp(line, "# @", 3) == 0)
+      continue;
+    char *p = line;
+    char *endptr;
+    uint32_t from = strtoul(p, &endptr, 16);
+    if (endptr == p)
+      continue;
+    p = endptr;
+    uint32_t to = from;
+    if (*p == '.' && p[1] == '.') {
+      p += 2;
+      to = strtoul(p, &endptr, 16);
+      p = endptr;
+    }
+    while (*p == ' ' || *p == '\t')
+      p++;
+    if (*p != ';')
+      continue;
+    p++;
+    while (*p == ' ' || *p == '\t')
+      p++;
+    char *scripts_start = p;
+    char *hash = strchr(p, '#');
+    if (!hash)
+      continue;
+    *hash = '\0';
+
+    // UCD bug workaround for 0x0345
+    if (from == 0x0345) {
+      from = 0x342;
+      prev_to = 0x341;
+    }
+
+    char scx_bytes[MAX_SCX_SCRIPTS + 1] = {0};
+    int scx_len = 0;
+    char *saveptr;
+    char *tok = strtok_r(scripts_start, " \t\r\n", &saveptr);
+    while (tok && scx_len < MAX_SCX_SCRIPTS) {
+      int sc_enum = script_name_to_enum(tok);
+      if (sc_enum < 0) {
+        const char *long_name = pva_lookup(tok);
+        sc_enum = script_name_to_enum(long_name);
+      }
+      if (sc_enum < 0) {
+        fprintf(stderr, "Unknown script %s at U+%04X\n", tok, from);
+      } else {
+        scx_bytes[scx_len++] = (char)sc_enum;
+      }
+      tok = strtok_r(NULL, " \t\r\n", &saveptr);
+    }
+    scx_bytes[scx_len] = '\0';
+
+    // Merge with previous range if contiguous and same scx
+    if (prev_to + 1 == from && prev_scx_str && strEQ(prev_scx_str, scx_bytes) &&
+        local_scx_count > 0) {
+      local_scx_list[local_scx_count - 1].to = to;
+    } else {
+      if (local_scx_count >= MAX_LOCAL_SCX) {
+        fprintf(stderr, "Too many SCX ranges\n");
+        break;
+      }
+      local_scx_list[local_scx_count].from = from;
+      local_scx_list[local_scx_count].to = to;
+      memcpy(local_scx_list[local_scx_count].scx, scx_bytes, scx_len + 1);
+      local_scx_count++;
+    }
+    prev_to = to;
+    prev_scx_str = local_scx_list[local_scx_count - 1].scx;
+  }
+  fprintf(stderr, "read_scx: loaded %d ranges\n", local_scx_count);
+  for (int j = 0; j < local_scx_count; j++) {
+    fprintf(stderr, "  scx[%d]: 0x%04X-0x%04X\n", j, local_scx_list[j].from, local_scx_list[j].to);
+  }
+  fclose(fp);
+}
+
+static const struct local_scx *local_get_scx(const uint32_t cp) {
+  int n = local_scx_count;
+  const char *p = (char *)local_scx_list;
+  const size_t size = sizeof(local_scx_list[0]);
+  while (n > 0) {
+    const struct local_scx *pos = (const struct local_scx *)(p + size * (n / 2));
+    if ((cp - pos->from) <= (pos->to - pos->from))
+      return pos;
+    else if (cp < pos->from)
+      n /= 2;
+    else {
+      p = (char *)pos + size;
+      n -= (n / 2) + 1;
+    }
+  }
+  return NULL;
+}
+
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
   int n = (int)len;
@@ -162,9 +325,9 @@ static unsigned first_major_gc_change(const uint32_t from, const uint32_t to,
 static unsigned first_scx_change(const uint32_t from, const uint32_t to) {
   if (from == to)
     return 0U;
-  const struct scx *s1 = u8ident_get_scx(from);
+  const struct local_scx *s1 = local_get_scx(from);
   for (uint32_t i = from + 1; i <= to; i++) {
-    const struct scx *s2 = u8ident_get_scx(i);
+    const struct local_scx *s2 = local_get_scx(i);
     // if both are NULL or both are defined and equal, it's equal.
     if (!((!s1 && !s2) || ((s1 && s2) && strEQ(s1->scx, s2->scx))))
       return i;
@@ -205,7 +368,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
             unsigned gc_split, scx_split;
             enum u8id_gc gc = u8ident_get_gc(from);
             char *gcname = (char *)u8ident_gc_name(gc);
-            struct scx *this_scx = (struct scx *)u8ident_get_scx(from);
+            struct local_scx *this_scx = (struct local_scx *)local_get_scx(from);
             char mgcname[3]; // a copy because the original is read-only
             char minor[1];   // if a change is not major, but only minor
             *minor = '\0';
@@ -239,7 +402,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
               from = gc_split;
               gc = u8ident_get_gc(from);
               gcname = (char *)u8ident_gc_name(gc);
-              this_scx = (struct scx *)u8ident_get_scx(from);
+              this_scx = (struct local_scx *)local_get_scx(from);
             } else {
               if (*minor) {
                 mgcname[0] = *minor;
@@ -249,9 +412,9 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
                         mgcname);
               }
             }
-            if ((scx_split = first_scx_change(from, to))) {
-              fprintf(stderr, "U+%X: split SCX changed at U+%X\n", from,
-                      scx_split);
+            while ((scx_split = first_scx_change(from, to))) {
+              fprintf(stderr, "U+%X: split SCX changed at U+%X (s1=%p, s2=%p)\n", from,
+                      scx_split, (void*)local_get_scx(from), (void*)local_get_scx(scx_split));
               fprintf(f, "    // SPLIT on SCX (prev to U+%X)\n", to);
               fprintf(f, "    {0x%X, 0x%X", from, scx_split - 1);
               if (this_scx) {
@@ -282,7 +445,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
               }
               stats.codepoints += (scx_split - from - 1);
               from = scx_split;
-              this_scx = (struct scx *)u8ident_get_scx(from);
+              this_scx = (struct local_scx *)local_get_scx(from);
               enc_utf8(tmp, &len, from);
             }
             fprintf(f, "    {0x%X, 0x%X", from, to);
@@ -684,19 +847,19 @@ static void gen_unitr39(void) {
   }
   BITCLR(c, 0xB7);
 
-  fputs("\n// Currently empty MEDIAL list for safec26.\n", f);
+  //fputs("\n// Currently empty MEDIAL list for tr39.\n", f);
   fputs("// tr39_start/cont + MEDIAL\n", f);
-  fputs("#if 0\n", f);
-  fputs("#  ifndef EXTERN_SCRIPTS\n", f);
+  //fputs("#if 0\n", f);
+  fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct range_bool tr39_medial_list[] = {\n", f);
   emit_ranges(f, 0x27, c, false);
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
-  fputs("#  else\n", f);
+  fputs("#else\n", f);
   fprintf(f, "extern const struct range_bool tr39_medial_list[%u];\n",
           stats.ranges + stats.singles);
-  fputs("#  endif\n", f);
   fputs("#endif\n", f);
+  //fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "tr39_medial_list",
          stats.ranges, stats.singles, stats.codepoints);
 
@@ -713,6 +876,8 @@ int main(/*int argc, char **argv*/) {
   u8ident_init(U8ID_PROFILE_TR39_4, U8ID_NFC, 0);
 
   gen_c11_all();
+  read_pva();
+  read_scx();
   gen_unitr39();
 
   u8ident_free();

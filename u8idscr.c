@@ -277,8 +277,8 @@ LOCAL bool isTR39_cont(const uint32_t cp) {
              : false;
 }
 #else
-LOCAL bool isTR39_start(const uint32_t cp) { return false; }
-LOCAL bool isTR39_cont(const uint32_t cp) { return false; }
+LOCAL bool isTR39_start(const uint32_t cp) { (void)cp; return false; }
+LOCAL bool isTR39_cont(const uint32_t cp) { (void)cp; return false; }
 #endif
 LOCAL bool isID_start(const uint32_t cp) {
   return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
