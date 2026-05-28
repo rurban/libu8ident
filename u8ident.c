@@ -196,6 +196,71 @@ bool nsm_check(const uint32_t base_cp, const uint32_t cp) {
   return true;
 }
 
+#if U8ID_TR31 == 3 /* TR39: provide dec_utf8 and u8ident_normalize inline */
+#include <errno.h>
+
+typedef struct {
+  uint8_t mask;
+  uint8_t lead;
+  uint32_t beg;
+  uint32_t end;
+  int bits_stored;
+} _utf_t;
+
+static const _utf_t *utf[] = {
+    // clang-format off
+  [0] = &(_utf_t){0x3f/*0b00111111*/, 0x80/*0b10000000*/, 0,       0,        6},
+  [1] = &(_utf_t){0x7f/*0b01111111*/, 0x00/*0b00000000*/, 0000,    0177,     7},
+  [2] = &(_utf_t){0x1f/*0b00011111*/, 0xc0/*0b11000000*/, 0200,    03777,    5},
+  [3] = &(_utf_t){0x0f/*0b00001111*/, 0xe0/*0b11100000*/, 04000,   0177777,  4},
+  [4] = &(_utf_t){0x07/*0b00000111*/, 0xf0/*0b11110000*/, 0200000, 04177777, 3},
+  &(_utf_t){0},
+    // clang-format on
+};
+
+static int utf8_len(const unsigned char ch) {
+  int len = 0;
+  for (_utf_t **u = (_utf_t **)utf; *u; ++u) {
+    if ((ch & ~(*u)->mask) == (*u)->lead) {
+      break;
+    }
+    ++len;
+  }
+  return len;
+}
+
+LOCAL uint32_t dec_utf8(char **strp) {
+  const unsigned char *str = (const unsigned char *)*strp;
+  int bytes = utf8_len(*str);
+  int shift;
+  uint32_t cp;
+
+  if (bytes > 4) {
+    errno = EILSEQ;
+    return 0;
+  }
+  shift = utf[0]->bits_stored * (bytes - 1);
+  assert(shift >= 0);
+  cp = (*str++ & utf[bytes]->mask) << shift;
+  for (int i = 1; i < bytes; ++i, ++str) {
+    shift -= utf[0]->bits_stored;
+    assert(shift >= 0);
+    cp |= (*str & utf[0]->mask) << shift;
+  }
+  *strp = (char *)str;
+  return cp;
+}
+
+EXTERN char *u8ident_normalize(const char *src, int srcsz) {
+  char *dest = malloc(srcsz + 1);
+  if (dest) {
+    memcpy(dest, src, srcsz);
+    dest[srcsz] = '\0';
+  }
+  return dest;
+}
+#endif /* U8ID_TR31 == 3 */
+
 /* Two variants to check if this identifier is valid. The second avoids
    a strlen call.
 */
