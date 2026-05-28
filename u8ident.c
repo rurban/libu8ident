@@ -204,13 +204,18 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
   int ret = U8ID_EOK;
   char *s = (char *)buf;
   const char *e = (char *)&buf[bufsz];
+#if U8ID_TR31 != 3 /* != TR39 */
   bool need_normalize = false;
+#endif
   struct ctx_t *ctx = u8ident_ctx();
   enum u8id_sc scr;
   enum u8id_sc basesc = SC_Unknown;
   const unsigned xid_mask = s_u8id_options & U8ID_TR31_MASK;
   // default to XID (0)
   const enum xid_e xid = xid_mask > 64 ? xid_mask - 64 : XID;
+#if U8ID_TR31 == 3 /* TR39 */
+  (void)outnorm;
+#endif
   char *scx = NULL;
   assert(xid >= 0 && xid <= LAST_XID_E);
 #ifndef DISABLE_CHECK_XID
@@ -280,7 +285,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
     // advance to normalize checks
 #if defined U8ID_PROFILE && (U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6) &&    \
     defined(DISABLE_CHECK_XID)
+#if U8ID_TR31 != 3 /* != TR39 */
     need_normalize = true;
+#endif
     // if (scr != SC_Common && scr != SC_Inherited)
     //   basesc = scr;
     goto norm;
@@ -288,7 +295,9 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
 #else
     if (s_u8id_profile == U8ID_PROFILE_6 ||
         s_u8id_profile == U8ID_PROFILE_C11_6) {
+#if U8ID_TR31 != 3 /* != TR39 */
       need_normalize = true;
+#endif
       if (!((s_u8id_options & U8ID_TR31_MASK) == U8ID_TR31_ALLOWED))
         goto norm;
       else {
@@ -311,9 +320,11 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
       ctx->last_cp = cp;
       return U8ID_ERR_SCRIPT;
     }
+#if U8ID_TR31 != 3 /* != TR39 */
     if (!need_normalize) {
       need_normalize = u8ident_maybe_normalized(cp);
     }
+#endif
 
     bool is_new = false;
     // check scx on Common or Inherited.
@@ -581,6 +592,7 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
 #if !defined U8ID_PROFILE || U8ID_PROFILE == 6 || U8ID_PROFILE == C11_6
 norm:
 #endif
+#if U8ID_TR31 != 3 /* != TR39 */
   if (need_normalize) {
     char *norm = u8ident_normalize((char *)buf, bufsz);
     if (!norm || strcmp(norm, buf)) {
@@ -592,6 +604,7 @@ norm:
     else
       free(norm);
   }
+#endif
   return ret;
 }
 
