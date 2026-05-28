@@ -528,7 +528,9 @@ void test_mixed_scripts(int xid_check) {
   else if (xid == U8ID_TR31_C23 && !is_profile_6())
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else {
-#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||             \
+#if U8ID_TR31 == 3
+    CHECK_RET(ret, U8ID_EOK, 0); // TR39 has no NFC engine
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
     U8ID_NORM == FCC
     CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
 #else

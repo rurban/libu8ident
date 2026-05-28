@@ -65,6 +65,8 @@ unsigned u8ident_maxlength(void);
 
 #define _UNICODE_MAX 0x10ffff
 
+#if U8ID_TR31 != 3 /* != TR39: dec_utf8 and u8ident_normalize provided by u8ident.c */
+
 // UTF-8 helpers
 
 /* from https://rosettacode.org/wiki/UTF-8_encode_and_decode#C
@@ -106,7 +108,6 @@ static int utf8_len(const unsigned char ch) {
   return len;
 }
 
-#if U8ID_TR31 != 3 /* != TR39 */
 static int cp_len(const uint32_t cp) {
   int len = 0;
   for (_utf_t **u = (_utf_t **)utf; *u; ++u) {
@@ -122,7 +123,6 @@ static int cp_len(const uint32_t cp) {
 #endif
   return len;
 }
-#endif
 
 /* convert utf8 to unicode codepoint (to_cp) */
 LOCAL uint32_t dec_utf8(char **strp) {
@@ -146,6 +146,7 @@ LOCAL uint32_t dec_utf8(char **strp) {
   *strp = (char *)str;
   return cp;
 }
+#endif /* U8ID_TR31 != 3: dec_utf8 */
 
 /* convert unicode codepoint to utf8 (to_utf8) */
 #if U8ID_TR31 != 3 /* != TR39 */
@@ -909,16 +910,3 @@ EXTERN char *u8ident_normalize(const char *src, int srcsz) {
   return dest;
 }
 #endif // U8ID_TR31 != 3
-
-#if U8ID_TR31 == 3 /* TR39 */
-/* Returns a freshly allocated normalized string, in the option defined at
- * `u8ident_init`. For TR39 all valid codepoints are already NFC stable. */
-EXTERN char *u8ident_normalize(const char *src, int srcsz) {
-  char *dest = malloc(srcsz + 1);
-  if (dest) {
-    memcpy(dest, src, srcsz);
-    dest[srcsz] = '\0';
-  }
-  return dest;
-}
-#endif
