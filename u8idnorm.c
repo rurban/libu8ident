@@ -25,7 +25,7 @@
 #define TRUE true
 #define FALSE false
 
-#if !defined U8ID_NORM || (U8ID_NORM != FCD)
+#if U8ID_TR31 != 3 /* != TR39 */ && (!defined U8ID_NORM || U8ID_NORM != FCD)
 char tmp_stack[128];
 #endif
 
@@ -41,6 +41,7 @@ char tmp_stack[128];
 // #pragma message "NFD1:"_XSTR(U8ID_NORM_DEFAULT)
 // #endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
 #if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD ||              \
     U8ID_NORM == FCC || U8ID_NORM == FCD
 #  include "un8ifcan.h" /* for NFD Canonical Decomposition */
@@ -57,6 +58,7 @@ char tmp_stack[128];
 #  include "un8ifcmp.h" /* for NFC Canonical Composition lists */
 #endif
 #include "hangul.h" /* Korean/Hangul has special (easy) normalization rules */
+#endif
 
 unsigned u8ident_options(void);
 unsigned u8ident_maxlength(void);
@@ -104,6 +106,7 @@ static int utf8_len(const unsigned char ch) {
   return len;
 }
 
+#if U8ID_TR31 != 3 /* != TR39 */
 static int cp_len(const uint32_t cp) {
   int len = 0;
   for (_utf_t **u = (_utf_t **)utf; *u; ++u) {
@@ -119,6 +122,7 @@ static int cp_len(const uint32_t cp) {
 #endif
   return len;
 }
+#endif
 
 /* convert utf8 to unicode codepoint (to_cp) */
 LOCAL uint32_t dec_utf8(char **strp) {
@@ -144,6 +148,7 @@ LOCAL uint32_t dec_utf8(char **strp) {
 }
 
 /* convert unicode codepoint to utf8 (to_utf8) */
+#if U8ID_TR31 != 3 /* != TR39 */
 LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
   if (cp > _UNICODE_MAX) {
     errno = EILSEQ;
@@ -903,3 +908,17 @@ EXTERN char *u8ident_normalize(const char *src, int srcsz) {
 #endif   // !FCD
   return dest;
 }
+#endif // U8ID_TR31 != 3
+
+#if U8ID_TR31 == 3 /* TR39 */
+/* Returns a freshly allocated normalized string, in the option defined at
+ * `u8ident_init`. For TR39 all valid codepoints are already NFC stable. */
+EXTERN char *u8ident_normalize(const char *src, int srcsz) {
+  char *dest = malloc(srcsz + 1);
+  if (dest) {
+    memcpy(dest, src, srcsz);
+    dest[srcsz] = '\0';
+  }
+  return dest;
+}
+#endif

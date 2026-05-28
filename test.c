@@ -24,7 +24,9 @@
 #  include "confus.h"
 #endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
 static char buf[128]; // for hex display
+#endif
 
 // private access
 unsigned u8ident_options(void);
@@ -173,6 +175,7 @@ void test_scripts_no_init(void) {
 #endif
 }
 
+#if U8ID_TR31 != 3 /* != TR39 */
 static int sign(int i) { return (i < 0) ? -1 : (i == 0) ? 0 : 1; }
 static char *xstr(const char *s) {
   unsigned i;
@@ -183,6 +186,7 @@ static char *xstr(const char *s) {
   // buf[i] = 0;
   return buf;
 }
+#endif
 #define CHECK_RET(ret, wanted, ctx)                                            \
   do {                                                                         \
     check_ret(ret, wanted, ctx);                                               \
@@ -244,6 +248,7 @@ struct norms_t {
   const int result;
 };
 
+#if U8ID_TR31 != 3 /* != TR39 */
 static void testnorm(const char *name, const struct norms_t *testids) {
   struct norms_t *p;
   for (p = (struct norms_t *)testids; p->id; p++) {
@@ -264,6 +269,7 @@ static void testnorm(const char *name, const struct norms_t *testids) {
     free(norm);
   }
 }
+#endif
 
 /*
   all differences: unichars -a '\pL' 'NFC ne NFKC'
@@ -322,6 +328,7 @@ static void testnorm(const char *name, const struct norms_t *testids) {
 */
 #if !defined U8ID_NORM || U8ID_NORM == NFKC
 void test_norm_nfkc(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -333,8 +340,11 @@ void test_norm_nfkc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFKC, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFKC", testids);
+#endif
 
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
@@ -348,6 +358,7 @@ void test_norm_nfkc(void) {
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFC
 void test_norm_nfc(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -358,8 +369,11 @@ void test_norm_nfc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFC, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFC", testids);
+#endif
 
   // which demands NFC already, so fails on XID earlier
   if (u8ident_tr31() != U8ID_TR31_TR39 && u8ident_tr31() != U8ID_TR31_C23) {
@@ -373,6 +387,7 @@ void test_norm_nfc(void) {
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == FCC
 void test_norm_fcc(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -383,12 +398,16 @@ void test_norm_fcc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_FCC, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("FCC", testids);
+#endif
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKD
 void test_norm_nfkd(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -400,18 +419,24 @@ void test_norm_nfkd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFKD, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFKD", testids);
+#endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strEQc(norm, "Cafe\xcc\x81"));
   free(norm);
+#endif
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFD
 void test_norm_nfd(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -423,18 +448,24 @@ void test_norm_nfd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFD, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFD", testids);
+#endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strEQc(norm, "Cafe\xcc\x81"));
   free(norm);
+#endif
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == FCD
 void test_norm_fcd(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -447,7 +478,10 @@ void test_norm_fcd(void) {
       // clang-format on
   };
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_FCD, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("FCD", testids);
+#endif
+#endif
   u8ident_free();
 }
 #endif
