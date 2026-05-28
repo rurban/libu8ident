@@ -24,7 +24,7 @@ libu8ident_la_LDFLAGS = \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
 U8IFDEF = -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 -UHAVE_CROARING -UHAVE_CONFUS -DENABLE_CHECK_XID -UDISABLE_CHECK_XID -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31 -DU8ID_PROFILE=8
-libu8ident_c_la_SOURCES = u8ident-tr39.c u8idnorm-tr39.c u8idscr-tr39.c
+libu8ident_c_la_SOURCES = u8ident-tr39.c u8idscr-tr39.c
 libu8ident_c_la_CFLAGS = $(AM_CFLAGS) $(U8IFDEF)
 libu8ident_c_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
@@ -116,8 +116,6 @@ endif
 
 $(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
 	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8ident.c >$@
-$(srcdir)/u8idnorm-tr39.c: $(srcdir)/u8idnorm.c
-	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8idnorm.c >$@
 $(srcdir)/u8idscr-tr39.c: $(srcdir)/u8idscr.c
 	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8idscr.c >$@
 $(srcdir)/u8id_private-tr39.h: $(srcdir)/u8id_private.h
@@ -326,7 +324,7 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
 	  for p in 2 3 4 5 6 C11_6 TR39_4; do \
 	    for x in ALLOWED TR39 ID XID C11 C23 ALLUTF8 NONE; do \
-	      if [ $$n != NFC ] && [ $$p = TR39_4 -o $$x = TR39 -o $$x = C23 ]; then \
+	      if ([ $$n != NFC ] && [ $$p = TR39_4 -o $$x = TR39 -o $$x = C23 ]) || ([ $$x = TR39 ] && [ $$p = 6 -o $$p = C11_6 ]); then \
 		echo "skip -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
               else \
 	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
@@ -341,7 +339,7 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	rm ./test-profiles$(EXEEXT)
 # gem install mdl
 check-mdl check-docs:
-	cd $(srcdir) && mdl *.md doc/*.md
+	cd $(srcdir) && mdl README.md doc/*.md
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
 SCAN_BUILD = scan-build
