@@ -1,5 +1,5 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021,2022 Reini Urban
+   Copyright 2021,2022,2026 Reini Urban
    SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 */
 #include <stdlib.h>
@@ -1024,6 +1024,58 @@ void test_tr39(void) {
   }
 }
 
+/* Verify that every codepoint in the TR39 lists is NFC-stable.
+   This is the key invariant that allows stripping the NFC normalization
+   engine from the TR39 build (commit 002b4a4).  If any TR39 codepoint
+   is not NFC-stable, the TR39 memcpy stub for u8ident_normalize is wrong
+   and mixed-script / confusable checks that depend on normalized forms
+   would silently break.
+
+   This test must run in the full (non-TR39) build where the real NFC
+   engine is linked.  The TR39 build only has the memcpy stub. */
+#if U8ID_TR31 != 3 /* != TR39 */
+static void check_tr39_list_nfc(const char *name,
+                                const struct sc_tr39 *list, size_t len) {
+  char tmp[8];
+  unsigned failures = 0;
+  u8ident_init(U8ID_PROFILE_4, U8ID_NFC, 0);
+  for (size_t i = 0; i < len; i++) {
+    for (uint32_t cp = list[i].from; cp <= list[i].to; cp++) {
+      size_t n;
+      if (!enc_utf8(tmp, &n, cp))
+        continue;
+      char *norm = u8ident_normalize(tmp, (int)n);
+      if (!norm) {
+        printf("FAIL %s U+%04X: normalize returned NULL\n", name, cp);
+        failures++;
+        continue;
+      }
+      if (n != strlen(norm) || memcmp(tmp, norm, n) != 0) {
+        printf("FAIL %s U+%04X: not NFC-stable (got %s)\n", name, cp,
+               xstr(norm));
+        failures++;
+      }
+      free(norm);
+    }
+  }
+  u8ident_free();
+  if (failures)
+    printf("FAIL %s: %u codepoints are not NFC-stable\n", name, failures);
+  assert(failures == 0);
+}
+
+void test_tr39_nfc_stable(void) {
+  check_tr39_list_nfc("tr39_start_list", tr39_start_list,
+                       ARRAY_SIZE(tr39_start_list));
+  check_tr39_list_nfc("tr39_cont_list", tr39_cont_list,
+                       ARRAY_SIZE(tr39_cont_list));
+  check_tr39_list_nfc("tr39_excl_start_list", tr39_excl_start_list,
+                       ARRAY_SIZE(tr39_excl_start_list));
+  check_tr39_list_nfc("tr39_excl_cont_list", tr39_excl_cont_list,
+                       ARRAY_SIZE(tr39_excl_cont_list));
+}
+#endif /* U8ID_TR31 != 3 */
+
 void test_greek(void) {
   // check consecutive greek_confus_list
   for (size_t i = 1; i < ARRAY_SIZE(greek_confus_list); i++) {
@@ -1171,6 +1223,9 @@ int main(int argc, char **argv) {
     test_gc();
     test_medial();
     test_tr39();
+#if U8ID_TR31 != 3
+    test_tr39_nfc_stable();
+#endif
     test_greek();
     test_script();
   }
