@@ -8,7 +8,604 @@
    Filtered XID_Start/Continue with allowed scripts, safe IDTypes and NFC
 */
 
-#include "config.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <wchar.h>
+
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
+#endif
+
+#ifndef HAVE_CONFIG_H
+
+enum u8id_sc {
+// clang-format off
+#define FIRST_RECOMMENDED_SCRIPT 0
+  SC_Common     = 0,
+  SC_Inherited  = 1,
+  SC_Latin      = 2,
+  SC_Arabic     = 3,
+  SC_Armenian   = 4,
+  SC_Bengali    = 5,
+  SC_Bopomofo   = 6,
+  SC_Cyrillic   = 7,
+  SC_Devanagari = 8,
+  SC_Ethiopic   = 9,
+  SC_Georgian   = 10,
+  SC_Greek      = 11,
+  SC_Gujarati   = 12,
+  SC_Gurmukhi   = 13,
+  SC_Hangul     = 14,
+  SC_Han        = 15,
+  SC_Hebrew     = 16,
+  SC_Hiragana   = 17,
+  SC_Katakana   = 18,
+  SC_Kannada    = 19,
+  SC_Khmer      = 20,
+  SC_Lao        = 21,
+  SC_Malayalam  = 22,
+  SC_Myanmar    = 23,
+  SC_Oriya      = 24,
+  SC_Sinhala    = 25,
+  SC_Tamil      = 26,
+  SC_Telugu     = 27,
+  SC_Thaana     = 28,
+  SC_Thai       = 29,
+  SC_Tibetan    = 30,
+#define FIRST_EXCLUDED_SCRIPT 31
+  SC_Ahom       = 31,
+  SC_Anatolian_Hieroglyphs = 32,
+  SC_Avestan    = 33,
+  SC_Bassa_Vah  = 34,
+  SC_Beria_Erfe = 35,
+  SC_Bhaiksuki  = 36,
+  SC_Brahmi     = 37,
+  SC_Braille    = 38,
+  SC_Buginese   = 39,
+  SC_Buhid      = 40,
+  SC_Carian     = 41,
+  SC_Caucasian_Albanian = 42,
+  SC_Chorasmian = 43,
+  SC_Coptic     = 44,
+  SC_Cuneiform  = 45,
+  SC_Cypriot    = 46,
+  SC_Cypro_Minoan = 47,
+  SC_Deseret    = 48,
+  SC_Dives_Akuru = 49,
+  SC_Dogra      = 50,
+  SC_Duployan   = 51,
+  SC_Egyptian_Hieroglyphs = 52,
+  SC_Elbasan    = 53,
+  SC_Elymaic    = 54,
+  SC_Garay      = 55,
+  SC_Glagolitic = 56,
+  SC_Gothic     = 57,
+  SC_Grantha    = 58,
+  SC_Gunjala_Gondi = 59,
+  SC_Gurung_Khema = 60,
+  SC_Hanunoo    = 61,
+  SC_Hatran     = 62,
+  SC_Imperial_Aramaic = 63,
+  SC_Inscriptional_Pahlavi = 64,
+  SC_Inscriptional_Parthian = 65,
+  SC_Kaithi     = 66,
+  SC_Kawi       = 67,
+  SC_Kharoshthi = 68,
+  SC_Khitan_Small_Script = 69,
+  SC_Khojki     = 70,
+  SC_Khudawadi  = 71,
+  SC_Kirat_Rai  = 72,
+  SC_Linear_A   = 73,
+  SC_Linear_B   = 74,
+  SC_Lycian     = 75,
+  SC_Lydian     = 76,
+  SC_Mahajani   = 77,
+  SC_Makasar    = 78,
+  SC_Manichaean = 79,
+  SC_Marchen    = 80,
+  SC_Masaram_Gondi = 81,
+  SC_Medefaidrin = 82,
+  SC_Mende_Kikakui = 83,
+  SC_Meroitic_Cursive = 84,
+  SC_Meroitic_Hieroglyphs = 85,
+  SC_Modi       = 86,
+  SC_Mongolian  = 87,
+  SC_Mro        = 88,
+  SC_Multani    = 89,
+  SC_Nabataean  = 90,
+  SC_Nag_Mundari = 91,
+  SC_Nandinagari = 92,
+  SC_Nushu      = 93,
+  SC_Ogham      = 94,
+  SC_Ol_Onal    = 95,
+  SC_Old_Hungarian = 96,
+  SC_Old_Italic = 97,
+  SC_Old_North_Arabian = 98,
+  SC_Old_Permic = 99,
+  SC_Old_Persian = 100,
+  SC_Old_Sogdian = 101,
+  SC_Old_South_Arabian = 102,
+  SC_Old_Turkic = 103,
+  SC_Old_Uyghur = 104,
+  SC_Osmanya    = 105,
+  SC_Pahawh_Hmong = 106,
+  SC_Palmyrene  = 107,
+  SC_Pau_Cin_Hau = 108,
+  SC_Phags_Pa   = 109,
+  SC_Phoenician = 110,
+  SC_Psalter_Pahlavi = 111,
+  SC_Rejang     = 112,
+  SC_Runic      = 113,
+  SC_Samaritan  = 114,
+  SC_Sharada    = 115,
+  SC_Shavian    = 116,
+  SC_Siddham    = 117,
+  SC_Sidetic    = 118,
+  SC_SignWriting = 119,
+  SC_Sogdian    = 120,
+  SC_Sora_Sompeng = 121,
+  SC_Soyombo    = 122,
+  SC_Sunuwar    = 123,
+  SC_Tagalog    = 124,
+  SC_Tagbanwa   = 125,
+  SC_Tai_Yo     = 126,
+  SC_Takri      = 127,
+  SC_Tangsa     = 128,
+  SC_Tangut     = 129,
+  SC_Tirhuta    = 130,
+  SC_Todhri     = 131,
+  SC_Tolong_Siki = 132,
+  SC_Toto       = 133,
+  SC_Tulu_Tigalari = 134,
+  SC_Ugaritic   = 135,
+  SC_Vithkuqi   = 136,
+  SC_Warang_Citi = 137,
+  SC_Yezidi     = 138,
+  SC_Zanabazar_Square = 139,
+#define FIRST_LIMITED_USE_SCRIPT 140
+  SC_Adlam      = 140,
+  SC_Balinese   = 141,
+  SC_Bamum      = 142,
+  SC_Batak      = 143,
+  SC_Canadian_Aboriginal = 144,
+  SC_Chakma     = 145,
+  SC_Cham       = 146,
+  SC_Cherokee   = 147,
+  SC_Hanifi_Rohingya = 148,
+  SC_Javanese   = 149,
+  SC_Kayah_Li   = 150,
+  SC_Lepcha     = 151,
+  SC_Limbu      = 152,
+  SC_Lisu       = 153,
+  SC_Mandaic    = 154,
+  SC_Meetei_Mayek = 155,
+  SC_Miao       = 156,
+  SC_New_Tai_Lue = 157,
+  SC_Newa       = 158,
+  SC_Nko        = 159,
+  SC_Nyiakeng_Puachue_Hmong = 160,
+  SC_Ol_Chiki   = 161,
+  SC_Osage      = 162,
+  SC_Saurashtra = 163,
+  SC_Sundanese  = 164,
+  SC_Syloti_Nagri = 165,
+  SC_Syriac     = 166,
+  SC_Tai_Le     = 167,
+  SC_Tai_Tham   = 168,
+  SC_Tai_Viet   = 169,
+  SC_Tifinagh   = 170,
+  SC_Vai        = 171,
+  SC_Wancho     = 172,
+  SC_Yi         = 173,
+  SC_Unknown    = 174,
+#define LAST_SCRIPT 174
+  // clang-format on
+};
+
+enum u8id_gc {
+  GC_Cc,
+  GC_Cf,
+  GC_Co,
+  GC_Cs,
+  GC_Ll,
+  GC_Lm,
+  GC_Lo,
+  GC_Lt,
+  GC_Lu,
+  GC_Mc,
+  GC_Me,
+  GC_Mn,
+  GC_Nd,
+  GC_Nl,
+  GC_No,
+  GC_Pc,
+  GC_Pd,
+  GC_Pe,
+  GC_Pf,
+  GC_Pi,
+  GC_Po,
+  GC_Ps,
+  GC_Sc,
+  GC_Sk,
+  GC_Sm,
+  GC_So,
+  GC_Zl,
+  GC_Zp,
+  GC_Zs,
+  GC_L, // is L&, all letters. (for unitr39.h only)
+  GC_V, // is varying, eg L or S. (for unitr39.h only),
+  GC_INVALID,
+};
+
+struct range_bool { uint32_t from; uint32_t to; };
+
+struct sc {
+  uint32_t from;
+  uint32_t to;
+  enum u8id_sc scr;
+};
+
+static const char *const all_scripts[] = {
+    // clang-format off
+    // Recommended Scripts
+    "Common",	// 0
+    "Inherited",	// 1
+    "Latin",	// 2
+    "Arabic",	// 3
+    "Armenian",	// 4
+    "Bengali",	// 5
+    "Bopomofo",	// 6
+    "Cyrillic",	// 7
+    "Devanagari",	// 8
+    "Ethiopic",	// 9
+    "Georgian",	// 10
+    "Greek",	// 11
+    "Gujarati",	// 12
+    "Gurmukhi",	// 13
+    "Hangul",	// 14
+    "Han",	// 15
+    "Hebrew",	// 16
+    "Hiragana",	// 17
+    "Katakana",	// 18
+    "Kannada",	// 19
+    "Khmer",	// 20
+    "Lao",	// 21
+    "Malayalam",	// 22
+    "Myanmar",	// 23
+    "Oriya",	// 24
+    "Sinhala",	// 25
+    "Tamil",	// 26
+    "Telugu",	// 27
+    "Thaana",	// 28
+    "Thai",	// 29
+    "Tibetan",	// 30
+    // Excluded Scripts
+    "Ahom",	// 31
+    "Anatolian_Hieroglyphs",	// 32
+    "Avestan",	// 33
+    "Bassa_Vah",	// 34
+    "Beria_Erfe",	// 35
+    "Bhaiksuki",	// 36
+    "Brahmi",	// 37
+    "Braille",	// 38
+    "Buginese",	// 39
+    "Buhid",	// 40
+    "Carian",	// 41
+    "Caucasian_Albanian",	// 42
+    "Chorasmian",	// 43
+    "Coptic",	// 44
+    "Cuneiform",	// 45
+    "Cypriot",	// 46
+    "Cypro_Minoan",	// 47
+    "Deseret",	// 48
+    "Dives_Akuru",	// 49
+    "Dogra",	// 50
+    "Duployan",	// 51
+    "Egyptian_Hieroglyphs",	// 52
+    "Elbasan",	// 53
+    "Elymaic",	// 54
+    "Garay",	// 55
+    "Glagolitic",	// 56
+    "Gothic",	// 57
+    "Grantha",	// 58
+    "Gunjala_Gondi",	// 59
+    "Gurung_Khema",	// 60
+    "Hanunoo",	// 61
+    "Hatran",	// 62
+    "Imperial_Aramaic",	// 63
+    "Inscriptional_Pahlavi",	// 64
+    "Inscriptional_Parthian",	// 65
+    "Kaithi",	// 66
+    "Kawi",	// 67
+    "Kharoshthi",	// 68
+    "Khitan_Small_Script",	// 69
+    "Khojki",	// 70
+    "Khudawadi",	// 71
+    "Kirat_Rai",	// 72
+    "Linear_A",	// 73
+    "Linear_B",	// 74
+    "Lycian",	// 75
+    "Lydian",	// 76
+    "Mahajani",	// 77
+    "Makasar",	// 78
+    "Manichaean",	// 79
+    "Marchen",	// 80
+    "Masaram_Gondi",	// 81
+    "Medefaidrin",	// 82
+    "Mende_Kikakui",	// 83
+    "Meroitic_Cursive",	// 84
+    "Meroitic_Hieroglyphs",	// 85
+    "Modi",	// 86
+    "Mongolian",	// 87
+    "Mro",	// 88
+    "Multani",	// 89
+    "Nabataean",	// 90
+    "Nag_Mundari",	// 91
+    "Nandinagari",	// 92
+    "Nushu",	// 93
+    "Ogham",	// 94
+    "Ol_Onal",	// 95
+    "Old_Hungarian",	// 96
+    "Old_Italic",	// 97
+    "Old_North_Arabian",	// 98
+    "Old_Permic",	// 99
+    "Old_Persian",	// 100
+    "Old_Sogdian",	// 101
+    "Old_South_Arabian",	// 102
+    "Old_Turkic",	// 103
+    "Old_Uyghur",	// 104
+    "Osmanya",	// 105
+    "Pahawh_Hmong",	// 106
+    "Palmyrene",	// 107
+    "Pau_Cin_Hau",	// 108
+    "Phags_Pa",	// 109
+    "Phoenician",	// 110
+    "Psalter_Pahlavi",	// 111
+    "Rejang",	// 112
+    "Runic",	// 113
+    "Samaritan",	// 114
+    "Sharada",	// 115
+    "Shavian",	// 116
+    "Siddham",	// 117
+    "Sidetic",	// 118
+    "SignWriting",	// 119
+    "Sogdian",	// 120
+    "Sora_Sompeng",	// 121
+    "Soyombo",	// 122
+    "Sunuwar",	// 123
+    "Tagalog",	// 124
+    "Tagbanwa",	// 125
+    "Tai_Yo",	// 126
+    "Takri",	// 127
+    "Tangsa",	// 128
+    "Tangut",	// 129
+    "Tirhuta",	// 130
+    "Todhri",	// 131
+    "Tolong_Siki",	// 132
+    "Toto",	// 133
+    "Tulu_Tigalari",	// 134
+    "Ugaritic",	// 135
+    "Vithkuqi",	// 136
+    "Warang_Citi",	// 137
+    "Yezidi",	// 138
+    "Zanabazar_Square",	// 139
+    // Limited Use Scripts
+    "Adlam",	// 140
+    "Balinese",	// 141
+    "Bamum",	// 142
+    "Batak",	// 143
+    "Canadian_Aboriginal",	// 144
+    "Chakma",	// 145
+    "Cham",	// 146
+    "Cherokee",	// 147
+    "Hanifi_Rohingya",	// 148
+    "Javanese",	// 149
+    "Kayah_Li",	// 150
+    "Lepcha",	// 151
+    "Limbu",	// 152
+    "Lisu",	// 153
+    "Mandaic",	// 154
+    "Meetei_Mayek",	// 155
+    "Miao",	// 156
+    "New_Tai_Lue",	// 157
+    "Newa",	// 158
+    "Nko",	// 159
+    "Nyiakeng_Puachue_Hmong",	// 160
+    "Ol_Chiki",	// 161
+    "Osage",	// 162
+    "Saurashtra",	// 163
+    "Sundanese",	// 164
+    "Syloti_Nagri",	// 165
+    "Syriac",	// 166
+    "Tai_Le",	// 167
+    "Tai_Tham",	// 168
+    "Tai_Viet",	// 169
+    "Tifinagh",	// 170
+    "Vai",	// 171
+    "Wancho",	// 172
+    "Yi",	// 173
+    "Unknown",	// 174
+    // clang-format on
+};
+
+
+static const struct range_bool bidi_list[] = {
+    // clang-format off
+    {0x202A, 0x202E},
+    {0x2066, 0x2069},
+    // clang-format on
+};
+
+static const uint32_t greek_confus_list[] = {
+    // clang-format off
+    0x370,
+    0x377,
+    0x37B,
+    0x37D,
+    0x37F,
+    0x391,
+    0x392,
+    0x395,
+    0x396,
+    0x397,
+    0x399,
+    0x39A,
+    0x39B,
+    0x39C,
+    0x39D,
+    0x39F,
+    0x3A1,
+    0x3A3,
+    0x3A4,
+    0x3A5,
+    0x3A7,
+    0x3B1,
+    0x3B2,
+    0x3B3,
+    0x3B4,
+    0x3BA,
+    0x3BB,
+    0x3BF,
+    0x3C1,
+    0x3C4,
+    0x3C5,
+    0x3C6,
+    0x3C7,
+    0x3C9,
+    0x3D0,
+    0x3D2,
+    0x3D5,
+    0x3DC,
+    0x3F0,
+    0x3F2,
+    0x3F3,
+    0x3F5,
+    0x3F7,
+    0x3F8,
+    0x3F9,
+    0x3FA,
+    0x3FD,
+    0x3FF,
+    0x1D26,
+    0x1D27,
+    0x1D29,
+    0x1FBE,
+    0x2129,
+    0x1D20D,
+    0x1D213,
+    0x1D216,
+    0x1D217,
+    0x1D21A,
+    0x1D221,
+    0x1D22A,
+    0x1D230,
+    // clang-format on
+};
+
+struct nsm_ws {
+    uint32_t nsm;
+    wchar_t  *letters;
+};
+const struct nsm_ws nsm_letters[] = {
+    // clang-format off
+    { 0x0300,  /* NSM: GRAVE 300 */
+      L"\u00C0\u00C8\u00CC\u00D2\u00D9\u00E0\u00E8\u00EC\u00F2\u00F9\u01DB\u01DC\u01F8\u01F9\u0400\u040D\u0450\u045D\u1E14\u1E15\u1E50\u1E51\u1E80\u1E81\u1EA6\u1EA7\u1EB0\u1EB1\u1EC0\u1EC1\u1ED2\u1ED3\u1EDC\u1EDD\u1EEA\u1EEB\u1EF2\u1EF3\u1F02\u1F03\u1F0A\u1F0B\u1F12\u1F13\u1F1A\u1F1B\u1F22\u1F23\u1F2A\u1F2B\u1F32\u1F33\u1F3A\u1F3B\u1F42\u1F43\u1F4A\u1F4B\u1F52\u1F53\u1F5B\u1F62\u1F63\u1F6A\u1F6B\u1F70\u1F72\u1F74\u1F76\u1F78\u1F7A\u1F7C\u1FBA\u1FC8\u1FCA\u1FD2\u1FDA\u1FE2\u1FEA\u1FF8\u1FFA" },
+      /* ÀÈÌÒÙàèìòùǛǜǸǹЀЍѐѝḔḕṐṑẀẁẦầẰằỀềỒồỜờỪừỲỳἂἃἊἋἒἓἚἛἢἣἪἫἲἳἺἻὂὃὊὋὒὓὛὢὣὪὫὰὲὴὶὸὺὼᾺῈῊῒῚῢῪῸῺ */
+    { 0x0301,  /* NSM: ACUTE 301 */
+      L"\u00C1\u00C9\u00CD\u00D3\u00DA\u00DD\u00E1\u00E9\u00ED\u00F3\u00FA\u00FD\u0106\u0107\u0139\u013A\u0143\u0144\u0154\u0155\u015A\u015B\u0179\u017A\u01D7\u01D8\u01F4\u01F5\u01FA\u01FB\u01FC\u01FD\u01FE\u01FF\u0386\u0388\u0389\u038A\u038C\u038E\u038F\u0390\u03AC\u03AD\u03AE\u03AF\u03B0\u03CC\u03CD\u03CE\u03D3\u0403\u040C\u0453\u045C\u1E08\u1E09\u1E16\u1E17\u1E2E\u1E2F\u1E30\u1E31\u1E3E\u1E3F\u1E4C\u1E4D\u1E52\u1E53\u1E54\u1E55\u1E78\u1E79\u1E82\u1E83\u1EA4\u1EA5\u1EAE\u1EAF\u1EBE\u1EBF\u1ED0\u1ED1\u1EDA\u1EDB\u1EE8\u1EE9\u1F04\u1F05\u1F0C\u1F0D\u1F14\u1F15\u1F1C\u1F1D\u1F24\u1F25\u1F2C\u1F2D\u1F34\u1F35\u1F3C\u1F3D\u1F44\u1F45\u1F4C\u1F4D\u1F54\u1F55\u1F5D\u1F64\u1F65\u1F6C\u1F6D" },
+      /* ÁÉÍÓÚÝáéíóúýĆćĹĺŃńŔŕŚśŹźǗǘǴǵǺǻǼǽǾǿΆΈΉΊΌΎΏΐάέήίΰόύώϓЃЌѓќḈḉḖḗḮḯḰḱḾḿṌṍṒṓṔṕṸṹẂẃẤấẮắẾếỐốỚớỨứἄἅἌἍἔἕἜἝἤἥἬἭἴἵἼἽὄὅὌὍὔὕὝὤὥὬὭ */
+    { 0x0302,  /* NSM: CIRCUMFLEX 302 */
+      L"\u00C2\u00CA\u00CE\u00D4\u00DB\u00E2\u00EA\u00EE\u00F4\u00FB\u0108\u0109\u011C\u011D\u0124\u0125\u0134\u0135\u015C\u015D\u0174\u0175\u0176\u0177\u1E90\u1E91\u1EAC\u1EAD\u1EC6\u1EC7\u1ED8\u1ED9" },
+      /* ÂÊÎÔÛâêîôûĈĉĜĝĤĥĴĵŜŝŴŵŶŷẐẑẬậỆệỘộ */
+    { 0x0303,  /* NSM: TILDE 303 */
+      L"\u00C3\u00D1\u00D5\u00E3\u00F1\u00F5\u0128\u0129\u0168\u0169\u1E7C\u1E7D\u1EAA\u1EAB\u1EB4\u1EB5\u1EBC\u1EBD\u1EC4\u1EC5\u1ED6\u1ED7\u1EE0\u1EE1\u1EEE\u1EEF\u1EF8\u1EF9" },
+      /* ÃÑÕãñõĨĩŨũṼṽẪẫẴẵẼẽỄễỖỗỠỡỮữỸỹ */
+    { 0x0304,  /* NSM: MACRON 304 */
+      L"\u0100\u0101\u0112\u0113\u012A\u012B\u014C\u014D\u016A\u016B\u01D5\u01D6\u01DE\u01DF\u01E0\u01E1\u01E2\u01E3\u01EC\u01ED\u022A\u022B\u022C\u022D\u0230\u0231\u0232\u0233\u04E2\u04E3\u04EE\u04EF\u1E20\u1E21\u1E38\u1E39\u1E5C\u1E5D\u1FB1\u1FB9\u1FD1\u1FD9\u1FE1\u1FE9" },
+      /* ĀāĒēĪīŌōŪūǕǖǞǟǠǡǢǣǬǭȪȫȬȭȰȱȲȳӢӣӮӯḠḡḸḹṜṝᾱᾹῑῙῡῩ */
+    { 0x0306,  /* NSM: BREVE 306 */
+      L"\u0102\u0103\u0114\u0115\u011E\u011F\u012C\u012D\u014E\u014F\u016C\u016D\u040E\u0419\u0439\u045E\u04C1\u04C2\u04D0\u04D1\u04D6\u04D7\u1E1C\u1E1D\u1EB6\u1EB7\u1FB0\u1FB8\u1FD0\u1FD8\u1FE0\u1FE8" },
+      /* ĂăĔĕĞğĬĭŎŏŬŭЎЙйўӁӂӐӑӖӗḜḝẶặᾰᾸῐῘῠῨ */
+    { 0x0307,  /* NSM: DOT ABOVE 307 */
+      L"\u010A\u010B\u0116\u0117\u0120\u0121\u0130\u017B\u017C\u0226\u0227\u022E\u022F\u06A7\u06AC\u06B6\u06BF\u06CF\u0762\u0765\u087A\u1DA1\u1E02\u1E03\u1E0A\u1E0B\u1E1E\u1E1F\u1E22\u1E23\u1E40\u1E41\u1E44\u1E45\u1E56\u1E57\u1E58\u1E59\u1E60\u1E61\u1E64\u1E65\u1E66\u1E67\u1E68\u1E69\u1E6A\u1E6B\u1E86\u1E87\u1E8A\u1E8B\u1E8E\u1E8F\u1E9B\u312E\U000105C9\U000105E4\U00010798\U00010EB0" },
+      /* ĊċĖėĠġİŻżȦȧȮȯڧڬڶڿۏݢݥࡺᶡḂḃḊḋḞḟḢḣṀṁṄṅṖṗṘṙṠṡṤṥṦṧṨṩṪṫẆẇẊẋẎẏẛㄮ𐗉𐗤𐞘𐺰 */
+    { 0x0308,  /* NSM: DIAERESIS 308 */
+      L"\u00C4\u00CB\u00CF\u00D6\u00DC\u00E4\u00EB\u00EF\u00F6\u00FC\u00FF\u0178\u03AA\u03AB\u03CA\u03CB\u03D4\u0401\u0407\u0451\u0457\u04D2\u04D3\u04DA\u04DB\u04DC\u04DD\u04DE\u04DF\u04E4\u04E5\u04E6\u04E7\u04EA\u04EB\u04EC\u04ED\u04F0\u04F1\u04F4\u04F5\u04F8\u04F9\u1DF2\u1DF3\u1DF4\u1E26\u1E27\u1E4E\u1E4F\u1E7A\u1E7B\u1E84\u1E85\u1E8C\u1E8D\u1E97" },
+      /* ÄËÏÖÜäëïöüÿŸΪΫϊϋϔЁЇёїӒӓӚӛӜӝӞӟӤӥӦӧӪӫӬӭӰӱӴӵӸӹᷲᷳᷴḦḧṎṏṺṻẄẅẌẍẗ */
+    { 0x0309,  /* NSM: HOOK ABOVE 309 */
+      L"\u1EA2\u1EA3\u1EA8\u1EA9\u1EB2\u1EB3\u1EBA\u1EBB\u1EC2\u1EC3\u1EC8\u1EC9\u1ECE\u1ECF\u1ED4\u1ED5\u1EDE\u1EDF\u1EE6\u1EE7\u1EEC\u1EED\u1EF6\u1EF7" },
+      /* ẢảẨẩẲẳẺẻỂểỈỉỎỏỔổỞởỦủỬửỶỷ */
+    { 0x030A,  /* NSM: RING ABOVE 30A */
+      L"\u00C5\u00E5\u016E\u016F\u088F\u1E98\u1E99" },
+      /* ÅåŮů࢏ẘẙ */
+    { 0x030B,  /* NSM: DOUBLE ACUTE 30B */
+      L"\u0150\u0151\u0170\u0171\u04F2\u04F3" },
+      /* ŐőŰűӲӳ */
+    { 0x030C,  /* NSM: HACEK 30C */
+      L"\u010C\u010D\u010E\u010F\u011A\u011B\u013D\u013E\u0147\u0148\u0158\u0159\u0160\u0161\u0164\u0165\u017D\u017E\u01CD\u01CE\u01CF\u01D0\u01D1\u01D2\u01D3\u01D4\u01D9\u01DA\u01E6\u01E7\u01E8\u01E9\u01EE\u01EF\u01F0\u021E\u021F" },
+      /* ČčĎďĚěĽľŇňŘřŠšŤťŽžǍǎǏǐǑǒǓǔǙǚǦǧǨǩǮǯǰȞȟ */
+    { 0x030F,  /* NSM: DOUBLE GRAVE 30F */
+      L"\u0200\u0201\u0204\u0205\u0208\u0209\u020C\u020D\u0210\u0211\u0214\u0215\u0476\u0477" },
+      /* ȀȁȄȅȈȉȌȍȐȑȔȕѶѷ */
+    { 0x0311,  /* NSM: INVERTED BREVE 311 */
+      L"\u0202\u0203\u0206\u0207\u020A\u020B\u020E\u020F\u0212\u0213\u0216\u0217" },
+      /* ȂȃȆȇȊȋȎȏȒȓȖȗ */
+    { 0x0313,  /* NSM: COMMA ABOVE 313 */
+      L"\u1F00\u1F08\u1F10\u1F18\u1F20\u1F28\u1F30\u1F38\u1F40\u1F48\u1F50\u1F60\u1F68\u1FE4" },
+      /* ἀἈἐἘἠἨἰἸὀὈὐὠὨῤ */
+    { 0x0314,  /* NSM: REVERSED COMMA ABOVE 314 */
+      L"\u1F01\u1F09\u1F11\u1F19\u1F21\u1F29\u1F31\u1F39\u1F41\u1F49\u1F51\u1F59\u1F61\u1F69\u1FE5\u1FEC" },
+      /* ἁἉἑἙἡἩἱἹὁὉὑὙὡὩῥῬ */
+    { 0x031B,  /* NSM: HORN 31B */
+      L"\u01A0\u01A1\u01AF\u01B0" },
+      /* ƠơƯư */
+    { 0x0323,  /* NSM: DOT BELOW 323 */
+      L"\u068A\u0694\u06A3\u06B9\u06FA\u06FB\u06FC\u0766\u088B\u08A5\u08B4\u1E04\u1E05\u1E0C\u1E0D\u1E24\u1E25\u1E32\u1E33\u1E36\u1E37\u1E42\u1E43\u1E46\u1E47\u1E5A\u1E5B\u1E62\u1E63\u1E6C\u1E6D\u1E7E\u1E7F\u1E88\u1E89\u1E92\u1E93\u1EA0\u1EA1\u1EB8\u1EB9\u1ECA\u1ECB\u1ECC\u1ECD\u1EE2\u1EE3\u1EE4\u1EE5\u1EF0\u1EF1\u1EF4\u1EF5\U0001BC26" },
+      /* ڊڔڣڹۺۻۼݦࢋࢥࢴḄḅḌḍḤḥḲḳḶḷṂṃṆṇṚṛṢṣṬṭṾṿẈẉẒẓẠạẸẹỊịỌọỢợỤụỰựỴỵ𛰦 */
+    { 0x0324,  /* NSM: DOUBLE DOT BELOW 324 */
+      L"\u1E72\u1E73" },
+      /* Ṳṳ */
+    { 0x0325,  /* NSM: RING BELOW 325 */
+      L"\u1E00\u1E01" },
+      /* Ḁḁ */
+    { 0x0326,  /* NSM: COMMA BELOW 326 */
+      L"\u0218\u0219\u021A\u021B" },
+      /* ȘșȚț */
+    { 0x0327,  /* NSM: CEDILLA 327 */
+      L"\u00C7\u00E7\u0122\u0123\u0136\u0137\u013B\u013C\u0145\u0146\u0156\u0157\u015E\u015F\u0162\u0163\u0228\u0229\u1E10\u1E11\u1E28\u1E29" },
+      /* ÇçĢģĶķĻļŅņŖŗŞşŢţȨȩḐḑḨḩ */
+    { 0x0328,  /* NSM: OGONEK 328 */
+      L"\u0104\u0105\u0118\u0119\u012E\u012F\u0172\u0173\u01EA\u01EB" },
+      /* ĄąĘęĮįŲųǪǫ */
+    { 0x032D,  /* NSM: CIRCUMFLEX BELOW 32D */
+      L"\u1E12\u1E13\u1E18\u1E19\u1E3C\u1E3D\u1E4A\u1E4B\u1E70\u1E71\u1E76\u1E77" },
+      /* ḒḓḘḙḼḽṊṋṰṱṶṷ */
+    { 0x032E,  /* NSM: BREVE BELOW 32E */
+      L"\u1E2A\u1E2B" },
+      /* Ḫḫ */
+    { 0x0330,  /* NSM: TILDE BELOW 330 */
+      L"\u1E1A\u1E1B\u1E2C\u1E2D\u1E74\u1E75" },
+      /* ḚḛḬḭṴṵ */
+    { 0x0331,  /* NSM: MACRON BELOW 331 */
+      L"\u1E06\u1E07\u1E0E\u1E0F\u1E34\u1E35\u1E3A\u1E3B\u1E48\u1E49\u1E5E\u1E5F\u1E6E\u1E6F\u1E94\u1E95\u1E96" },
+      /* ḆḇḎḏḴḵḺḻṈṉṞṟṮṯẔẕẖ */
+    { 0x20DB,  /* NSM: THREE DOTS ABOVE 20DB */
+      L"\u063F\u0685\u069E\u069F\u06A0\u06A8\u06B4\u06B7\u06BD\u0763\u08A7\u08C3\u08C4\u08C5" },
+      /* ؿڅڞڟڠڨڴڷڽݣࢧࣃࣄࣅ */
+    { 0x20DC,  /* NSM: FOUR DOTS ABOVE 20DC */
+      L"\u0690\u0699\u075C" },
+      /* ڐڙݜ */
+    { 0x3099,  /* NSM: KATAKANA-HIRAGANA VOICED SOUND MARK 3099 */
+      L"\u304C\u304E\u3050\u3052\u3054\u3056\u3058\u305A\u305C\u305E\u3060\u3062\u3065\u3067\u3069\u3070\u3073\u3076\u3079\u307C\u3094\u309E\u30AC\u30AE\u30B0\u30B2\u30B4\u30B6\u30B8\u30BA\u30BC\u30BE\u30C0\u30C2\u30C5\u30C7\u30C9\u30D0\u30D3\u30D6\u30D9\u30DC\u30F4\u30F7\u30F8\u30F9\u30FA\u30FE\uFF9E" },
+      /* がぎぐげござじずぜぞだぢづでどばびぶべぼゔゞガギグゲゴザジズゼゾダヂヅデドバビブベボヴヷヸヹヺヾﾞ */
+    { 0x309A,  /* NSM: KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK 309A */
+      L"\u3071\u3074\u3077\u307A\u307D\u30D1\u30D4\u30D7\u30DA\u30DD\uFF9F" },
+      /* ぱぴぷぺぽパピプペポﾟ */
+    // clang-format on
+};
+
+#endif /* !HAVE_CONFIG_H */
+
 struct sc_tr39 {
     uint32_t from;
     uint32_t to;

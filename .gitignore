@@ -92,7 +92,7 @@ allowed_croar.bin
 confus_croar.bin
 nf*_croar.bin
 mark_croar.bin
-u8ident-tr39.c
+
 u8idnorm-tr39.c
 u8idscr-tr39.c
 libu8ident_tr39_la-*

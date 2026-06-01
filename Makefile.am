@@ -24,7 +24,7 @@ libu8ident_la_LDFLAGS = \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
 U8IFDEF = -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 -UHAVE_CROARING -UHAVE_CONFUS -DENABLE_CHECK_XID -UDISABLE_CHECK_XID -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31 -DU8ID_PROFILE=8
-libu8ident_c_la_SOURCES = u8ident-tr39.c u8idscr-tr39.c
+libu8ident_c_la_SOURCES = u8ident-tr39.c
 libu8ident_c_la_CFLAGS = $(AM_CFLAGS) $(U8IFDEF)
 libu8ident_c_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
@@ -114,12 +114,7 @@ else
 	-copy /y c11-all.h unitr39.h $(srcdir)/
 endif
 
-$(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
-	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8ident.c >$@
-$(srcdir)/u8idscr-tr39.c: $(srcdir)/u8idscr.c
-	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8idscr.c >$@
-$(srcdir)/u8id_private-tr39.h: $(srcdir)/u8id_private.h
-	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8id_private.h >$@
+
 
 # emacs flymake-mode
 check-syntax:
@@ -241,9 +236,9 @@ mktr39_SOURCES = mktr39.c $(libu8ident_la_SOURCES)
 mktr39_CFLAGS = $(AM_CFLAGS) -DNO_UNITR39
 example_SOURCES = example.c
 example_LDADD = libu8ident.la
-test_c_SOURCES = test.c $(libu8ident_c_la_SOURCES)
+test_c_SOURCES = test.c u8ident.c u8idscr.c
 test_c_CFLAGS = $(libu8ident_c_la_CFLAGS)
-test_texts_c_SOURCES = test-texts.c $(libu8ident_c_la_SOURCES)
+test_texts_c_SOURCES = test-texts.c u8ident.c u8idscr.c
 test_texts_c_CFLAGS = $(libu8ident_c_la_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_c_LDADD = $(u8idlint_LIBS)
 example_c_SOURCES = example.c
