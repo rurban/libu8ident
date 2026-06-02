@@ -16,13 +16,8 @@
 #include "u8id_private.h"
 #include <u8ident.h>
 
-/* Types normally from u8idscr.h — declared inline to avoid EXTERN_SCRIPTS conflict */
-typedef bool (*func_tr31)(uint32_t cp);
-struct func_tr31_s {
-    func_tr31 start;
-    func_tr31 cont;
-};
 
+/* Data headers with definitions (no EXTERN_SCRIPTS = define LOCAL arrays) */
 /* Data headers with definitions (no EXTERN_SCRIPTS = define LOCAL arrays) */
 #include "u8id_gc.h"
 #include "scripts.h"
@@ -391,13 +386,7 @@ EXTERN void u8ident_free(void) {
 
 /* ---- tr31 function table ---- */
 
-static struct func_tr31_s tr31_funcs[] = {
-    {isXID_start, isXID_cont},         {isID_start, isID_cont},
-    {isALLOWED_start, isALLOWED_cont}, {isTR39_start, isTR39_cont},
-    {isC23_start, isC23_cont},
-    {isC11_start, isC11_cont},
-    {isALLUTF8_start, isALLUTF8_cont}, {isASCII_start, isASCII_cont},
-};
+/* ---- tr31 options ---- */
 
 LOCAL enum u8id_options u8ident_tr31(void) {
   return U8ID_TR31_DEFAULT;
