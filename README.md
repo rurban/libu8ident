@@ -506,13 +506,143 @@ Usage:
          u8ident_failed_char(ctx), errstr);
       free(errstr);
     }
-
 ## libu8ident_c
 
-libu8ident_c is a shrinked library pre-configured for C and C++ compilers
-with the TR39 profile (`--with-profile=TR39 --with-tr31=TR39 --with-norm=NFC`).
-It consists of a single source file `u8ident-tr39.c` and the public header
-`u8ident_c.h`.
+`libu8ident_c` is a stripped-down variant of `libu8ident` for C and C++
+compilers.  It is pre-configured with the **TR39** profile (the safe subset
+defined in UTS#39 / P2528R1), NFC normalization (proven unnecessary for all
+TR39 codepoints, so replaced by a bare `memcpy`), and always-active
+Greek-Latin confusable detection.
+
+It consists of a **single source file** `u8ident-tr39.c` and the public
+header `u8ident_c.h` — no other headers are needed.  The amalgam has zero
+preprocessor conditionals in function bodies and uses struct-pointer returns
+from `isTR39_start`/`isTR39_cont` to elide redundant script, general-category,
+and SCX lookups.
+
+### API
+
+All public functions are declared in `u8ident_c.h`.  Include only this header;
+link with `-lu8ident_c`.
+
+```c
+#include <u8ident_c.h>
+```
+
+#### Initialization
+
+```c
+int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
+                 unsigned options);
+```
+
+Initializes the library.  In `libu8ident_c` the profile and normalization
+are hardcoded to `U8ID_PROFILE_TR39_4` and `U8ID_NFC` respectively; callers
+should pass `U8ID_PROFILE_TR39_4, U8ID_NFC, 0`.  Returns 0 on success,
+-1 if the arguments are out of range.
+
+```c
+void u8ident_free(void);
+```
+
+Frees all internal state.  Call once at program exit.
+
+#### Core check
+
+```c
+enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
+enum u8id_errors u8ident_check_buf(const char *buf, const int len,
+                                    char **outnorm);
+```
+
+Validate a NUL-terminated UTF-8 string or a length-delimited buffer.
+`outnorm` is always set to `NULL` in `libu8ident_c` (normalization is a
+no-op); the argument is kept for API compatibility.
+
+#### Error codes
+
+| Return value            | Meaning |
+|-------------------------|---------|
+| `U8ID_EOK` (0)          | Valid identifier |
+| `U8ID_ERR_XID` (-1)     | Not in XID (Identifier_Status / Identifier_Type) |
+| `U8ID_ERR_SCRIPT` (-2)  | Script not allowed (excluded or limited-use) |
+| `U8ID_ERR_SCRIPTS` (-3) | Mixed scripts violation |
+| `U8ID_ERR_ENCODING` (-4)| Invalid UTF-8 encoding |
+| `U8ID_ERR_COMBINE` (-5) | Invalid combining-mark sequence |
+| `U8ID_ERR_CONFUS` (-6)  | Confusable character (e.g. Greek-Latin homoglyph) |
+
+#### Diagnostics
+
+```c
+uint32_t u8ident_failed_char(u8id_ctx_t ctx);
+const char *u8ident_failed_script_name(u8id_ctx_t ctx);
+const char *u8ident_existing_scripts(u8id_ctx_t ctx);
+```
+
+After a failed check, retrieve the offending codepoint, its script name,
+and the list of scripts already seen in the context.  `u8ident_existing_scripts`
+returns a `malloc`'d string — free it after use.
+
+#### Script queries
+
+```c
+uint8_t u8ident_get_script(uint32_t cp);
+const char *u8ident_script_name(int scr);
+int u8ident_add_script(uint8_t script);
+```
+
+Look up the script of a codepoint, get its display name, or pre-declare
+a script as allowed (e.g. for `use utf8 "Greek"` in a compiler).
+
+### Example
+
+```c
+#include <stdio.h>
+#include <u8ident_c.h>
+
+int main(void) {
+    u8ident_init(U8ID_PROFILE_TR39_4, U8ID_NFC, 0);
+
+    enum u8id_errors r = u8ident_check((const uint8_t *)"café", NULL);
+    if (r == U8ID_EOK)
+        printf("OK\n");
+    else {
+        u8id_ctx_t ctx = u8ident_new_ctx();
+        printf("Error %d at U+%04X (%s)\n", r,
+               u8ident_failed_char(ctx),
+               u8ident_failed_script_name(ctx));
+    }
+
+    u8ident_free();
+    return 0;
+}
+```
+
+See `example_c.c` for a complete executable example with error diagnostics.
+
+### Integration
+
+**Direct source inclusion:**  Copy `u8ident-tr39.c`, `u8ident_c.h`, and
+the generated `unitr39.h` into your project.  Compile `u8ident-tr39.c`
+with `-DHAVE_CONFIG_H` and standard C99 flags.  No external dependencies.
+
+**CMake / submodule:**  Add `u8ident-tr39.c` to your target sources.
+The amalgam needs these data headers at include time (all are in the repo):
+`u8id_private.h`, `u8id_gc.h`, `scripts.h`, `mark.h`, `medial.h`,
+`unic11.h`, `unitr39.h`.
+
+**Static / shared library:**  `./configure && make libu8ident_c.la`
+produces both `.a` and `.so`.  The public API surface is minimal (one
+source file), so static linking is recommended for compiler integration.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `u8ident-tr39.c` | Single-file amalgam (no `#if`) |
+| `u8ident_c.h`    | Public API header |
+| `unitr39.h`      | Generated TR39 XID lists (self-contained) |
+| `mktr39.c`       | Generator for `unitr39.h` |
 
 ## u8idlint
 

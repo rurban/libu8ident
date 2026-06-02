@@ -39,7 +39,7 @@ EXTRA_HEADERS = c11-safe.h unitr39.h u8ident_c.h
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc libu8ident_c.pc
 dist_man1_MANS = u8idlint.1
-dist_man3_MANS = u8ident.3
+dist_man3_MANS = u8ident.3 u8ident_c.3
 docdir = $(datadir)/libu8ident
 PCXX = P2528R0
 NC   = n2932
@@ -49,7 +49,7 @@ PDF = doc/$(PCXX).pdf doc/$(DCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
 	   doc/c11.md doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).md \
 	   doc/$(NCURC).md doc/$(NCURC).patch \
-	   doc/tr31-bugs.md
+	   doc/tr31-bugs.md doc/u8ident_c.3.md
 if HAVE_PANDOC
 doc_DATA += $(PDF)
 html_DATA = doc/$(DCURCXX).html doc/$(NCURC).html
@@ -246,7 +246,8 @@ test_c_CFLAGS = $(libu8ident_c_la_CFLAGS)
 test_texts_c_SOURCES = test-texts.c $(libu8ident_c_la_SOURCES)
 test_texts_c_CFLAGS = $(libu8ident_c_la_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_c_LDADD = $(u8idlint_LIBS)
-example_c_SOURCES = example.c
+example_c_SOURCES = example_c.c
+example_c_CFLAGS = $(libu8ident_c_la_CFLAGS)
 example_c_LDADD = libu8ident_c.la
 test_asan_CFLAGS = $(AM_CFLAGS) -g -fsanitize=address
 test_asan_SOURCES = test.c $(libu8ident_la_SOURCES)
@@ -351,6 +352,8 @@ man: $(dist_man1_MANS) $(dist_man3_MANS)
 RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
 u8ident.3: README.md
 	$(RONN) $(RONN_ARGS) < $< > $@
+u8ident_c.3: doc/u8ident_c.3.md
+	$(RONN) $(RONN_ARGS) < $< > $@
 
 pkg:
 	-rm -rf inst
@@ -371,8 +374,8 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) perf$(EXEEXT) \
 	     texts.tst mktr39$(EXEEXT) example$(EXEEXT) \
 	     test_c$(EXEEXT) test_texts_c$(EXEEXT) example_c$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst \
-	     test-texts.test doc/$(NCURC).pdf c11-all.h unitr39.h
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 u8ident_c.3 $(html_DATA) \
+	     homo-sec-1.tst.rst test-texts.test doc/$(NCURC).pdf c11-all.h unitr39.h
 distclean-compile:
 	-rm -f *.tab.c
 	-rm -rf .deps
