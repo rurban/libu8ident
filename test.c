@@ -1095,11 +1095,7 @@ void test_greek(void) {
     ret = u8ident_check((const uint8_t *)"θ", NULL); // U+38B not confus
     CHECK_RET(ret, U8ID_EOK, 0);
     ret = u8ident_check((const uint8_t *)"Α", NULL); // U+391 confus
-#ifdef HAVE_CONFUS
-    CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
-#else
-    CHECK_RET(ret, U8ID_EOK, 0);
-#endif
+    CHECK_RET(ret, U8ID_EOK, 0); // already have Greek from θ above
   } else if (u8ident_profile() < 5) {
     ret = u8ident_check((const uint8_t *)"θ", NULL);
     CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
@@ -1163,6 +1159,7 @@ void test_confus(void) {
 
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     size_t len;
+    char buf[8];
     const uint32_t cp = confusables[i];
     if (cp > 0x7C) { // skip the latin confusables: 0 1 I ` |
       ret = u8ident_check((const uint8_t *)enc_utf8(buf, &len, cp), NULL);
