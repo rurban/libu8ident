@@ -70,6 +70,35 @@ EXTERN u8id_ctx_t u8ident_new_ctx(void) {
   return i_ctx;
 }
 
+LOCAL struct ctx_t *u8ident_ctx(void);
+
+/* Create a deep copy of the current context.  Useful when you need to
+   check the same identifier against different profiles without losing
+   the accumulated script list.  Returns a new context ID; the caller
+   must free it with u8ident_free_ctx when done.
+
+   Example — check one identifier against C23 and C11:
+
+       u8ident_init(TR39_4, NFC, C23);
+       enum u8id_errors ret_c23 = u8ident_check(id, NULL);
+       u8id_ctx_t saved = u8ident_copy_ctx();
+       u8ident_init(TR39_4, NFC, C11);
+       enum u8id_errors ret_c11 = u8ident_check(id, NULL);
+       u8ident_free_ctx(saved);
+*/
+EXTERN u8id_ctx_t u8ident_copy_ctx(void) {
+  const struct ctx_t *old = u8ident_ctx();
+  u8id_ctx_t new_i = u8ident_new_ctx();
+  struct ctx_t *newc =
+      (new_i < U8ID_CTX_TRESH) ? &ctx[new_i] : &ctxp[new_i];
+  memcpy(newc, old, sizeof(struct ctx_t));
+  if (old->count > 8 && old->u8p) {
+    newc->u8p = malloc(old->count);
+    memcpy(newc->u8p, old->u8p, old->count);
+  }
+  return new_i;
+}
+
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
 EXTERN int u8ident_set_ctx(u8id_ctx_t i) {
   if (i <= i_ctx) {

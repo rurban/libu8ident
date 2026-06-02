@@ -364,6 +364,20 @@ EXTERN int u8ident_add_script(uint8_t scr) {
   return u8ident_add_script_ctx(scr, u8ident_ctx());
 }
 
+
+EXTERN u8id_ctx_t u8ident_copy_ctx(void) {
+  const struct ctx_t *old = u8ident_ctx();
+  u8id_ctx_t new_i = u8ident_new_ctx();
+  struct ctx_t *newc =
+      (new_i < U8ID_CTX_TRESH) ? &ctx[new_i] : &ctxp[new_i];
+  memcpy(newc, old, sizeof(struct ctx_t));
+  if (old->count > 8 && old->u8p) {
+    newc->u8p = malloc(old->count);
+    memcpy(newc->u8p, old->u8p, old->count);
+  }
+  return new_i;
+}
+
 EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
   if (i_ctx < U8ID_CTX_TRESH)
     ctxp = &ctx[0];
