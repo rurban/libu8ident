@@ -372,7 +372,7 @@ CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$
 	     texts.tst mktr39$(EXEEXT) example$(EXEEXT) \
 	     test_c$(EXEEXT) test_texts_c$(EXEEXT) example_c$(EXEEXT)
 DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst \
-	     test-texts.test doc/$(NCURC).pdf
+	     test-texts.test doc/$(NCURC).pdf c11-all.h unitr39.h
 distclean-compile:
 	-rm -f *.tab.c
 	-rm -rf .deps
