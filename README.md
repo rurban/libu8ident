@@ -10,7 +10,8 @@ homoglyph attacks, mixed scripts, confusables, and support normalized
 storage. For the UTF-8 encoding only, wchar_t users are rare.
 
 Supporting the various Unicode security profiles for identifiers can
-be small, performant and easy. Still everybody (roughly 98 out of 100) are vulnerable to unicode identifier attacks. Since I implemented
+be small, performant and easy. Still everybody (roughly 98 out of 100)
+are vulnerable to unicode identifier attacks. Since I implemented
 proper unicode security in cperl in 2016, the 2nd language after Java
 which did so, I publish this little library so that others can follow.
 
@@ -508,10 +509,10 @@ Usage:
 
 ## libu8ident_c
 
-libu8ident_c is a shrinked library esp. pre-configured for most usages, esp. C and C++ compilers.
-It is generated with the configure options `--with-profile=4 --with-tr31=TR39 --with-norm=NFC`.
-and the source files `u8ident-tr39.c u8idnorm-tr39.c u8idscr-tr39.c` generated via
-`unifdef -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0`.
+libu8ident_c is a shrinked library pre-configured for C and C++ compilers
+with the TR39 profile (`--with-profile=TR39 --with-tr31=TR39 --with-norm=NFC`).
+It consists of a single source file `u8ident-tr39.c` and the public header
+`u8ident_c.h`.
 
 ## u8idlint
 
@@ -529,7 +530,7 @@ and needed options, and this is in the hot path of a parser.
 A shared library needs to provide all the options at run-time,
 i.e. empty configure options.
 
-Build dependencies: ronn (`dnf install rubygem-ronn-ng`), unifdef (for `libu8ident_c` sources from git)
+Build dependencies: ronn (`dnf install rubygem-ronn-ng`)
 
 Optional dependencies:
 
