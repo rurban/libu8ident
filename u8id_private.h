@@ -9,14 +9,14 @@
 #include <inttypes.h>
 
 #if defined _WIN32 || defined __CYGWIN__
-#  define EXTERN __declspec(dllexport)
-#  define LOCAL
+#  define U8IDENT_EXTERN __declspec(dllexport)
+#  define U8IDENT_LOCAL
 #elif __GNUC__ >= 4
-#  define EXTERN __attribute__((visibility("default")))
-#  define LOCAL __attribute__((visibility("hidden")))
+#  define U8IDENT_EXTERN __attribute__((visibility("default")))
+#  define U8IDENT_LOCAL __attribute__((visibility("hidden")))
 #else
-#  define EXTERN
-#  define LOCAL
+#  define U8IDENT_EXTERN
+#  define U8IDENT_LOCAL
 #endif
 
 #ifndef PERF_TEST
@@ -219,14 +219,14 @@ struct ctx_t {
 #  define GCC_DIAG_IGNORE(w)
 #endif
 
-LOCAL enum u8id_norm u8ident_norm(void);
-LOCAL enum u8id_profile u8ident_profile(void);
-LOCAL enum u8id_options u8ident_tr31(void);
-LOCAL unsigned u8ident_options(void);
-LOCAL unsigned u8ident_maxlength(void);
-LOCAL const char *u8ident_errstr(int errcode);
+U8IDENT_LOCAL enum u8id_norm u8ident_norm(void);
+U8IDENT_LOCAL enum u8id_profile u8ident_profile(void);
+U8IDENT_LOCAL enum u8id_options u8ident_tr31(void);
+U8IDENT_LOCAL unsigned u8ident_options(void);
+U8IDENT_LOCAL unsigned u8ident_maxlength(void);
+U8IDENT_LOCAL const char *u8ident_errstr(int errcode);
 // from u8idnorm.c
-LOCAL uint32_t dec_utf8(char **strp);
-LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+U8IDENT_LOCAL uint32_t dec_utf8(char **strp);
+U8IDENT_LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
 
 #endif // _U8ID_PRIVATE_H

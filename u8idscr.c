@@ -55,7 +55,7 @@ struct ctx_t *ctxp = NULL; // if more than 5 contexts
 
 /* Generates a new identifier document/context/directory, which
    initializes a new list of seen scripts. */
-EXTERN u8id_ctx_t u8ident_new_ctx(void) {
+U8IDENT_EXTERN u8id_ctx_t u8ident_new_ctx(void) {
   // thread-safety later
   u8id_ctx_t i = i_ctx + 1;
   i_ctx++;
@@ -70,7 +70,7 @@ EXTERN u8id_ctx_t u8ident_new_ctx(void) {
   return i_ctx;
 }
 
-LOCAL struct ctx_t *u8ident_ctx(void);
+U8IDENT_LOCAL struct ctx_t *u8ident_ctx(void);
 
 /* Create a deep copy of the current context.  Useful when you need to
    check the same identifier against different profiles without losing
@@ -86,7 +86,7 @@ LOCAL struct ctx_t *u8ident_ctx(void);
        enum u8id_errors ret_c11 = u8ident_check(id, NULL);
        u8ident_free_ctx(saved);
 */
-EXTERN u8id_ctx_t u8ident_copy_ctx(void) {
+U8IDENT_EXTERN u8id_ctx_t u8ident_copy_ctx(void) {
   const struct ctx_t *old = u8ident_ctx();
   u8id_ctx_t new_i = u8ident_new_ctx();
   struct ctx_t *newc =
@@ -100,7 +100,7 @@ EXTERN u8id_ctx_t u8ident_copy_ctx(void) {
 }
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
-EXTERN int u8ident_set_ctx(u8id_ctx_t i) {
+U8IDENT_EXTERN int u8ident_set_ctx(u8id_ctx_t i) {
   if (i <= i_ctx) {
     i_ctx = i;
     return 0;
@@ -109,12 +109,12 @@ EXTERN int u8ident_set_ctx(u8id_ctx_t i) {
 }
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
-LOCAL struct ctx_t *u8ident_ctx(void) {
+U8IDENT_LOCAL struct ctx_t *u8ident_ctx(void) {
   return (i_ctx < U8ID_CTX_TRESH) ? &ctx[i_ctx] : &ctxp[i_ctx];
 }
 
 // search in linear vector of scripts per ctx
-LOCAL bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
+U8IDENT_LOCAL bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
   if (!c->count)
     return false;
   const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
@@ -125,11 +125,11 @@ LOCAL bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
   return false;
 }
 
-LOCAL bool u8ident_has_script(const uint8_t scr) {
+U8IDENT_LOCAL bool u8ident_has_script(const uint8_t scr) {
   return u8ident_has_script_ctx(scr, u8ident_ctx());
 }
 
-LOCAL int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
+U8IDENT_LOCAL int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
   if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
     return -1;
   int i = c->count;
@@ -228,7 +228,7 @@ static inline bool range_bool_search(const uint32_t cp,
   return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
 }
 
-EXTERN uint8_t u8ident_get_script(const uint32_t cp) {
+U8IDENT_EXTERN uint8_t u8ident_get_script(const uint32_t cp) {
 #if defined DISABLE_CHECK_XID || defined ENABLE_CHECK_XID
   // faster check, as we have no NON-xid's
   return sc_search(cp, nonxid_script_list, ARRAY_SIZE(nonxid_script_list));
@@ -241,13 +241,13 @@ EXTERN uint8_t u8ident_get_script(const uint32_t cp) {
 }
 
 /* Search for list of script indices */
-LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
+U8IDENT_LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
   return (const struct scx *)binary_search(
       cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
 }
 #ifndef NO_UNITR39
 /* Search for TR39 XID entry, in start or cont lists */
-LOCAL const struct sc_c26 *u8ident_get_tr39(const uint32_t cp) {
+U8IDENT_LOCAL const struct sc_c26 *u8ident_get_tr39(const uint32_t cp) {
   const struct sc_c26 *sc = (const struct sc_c26 *)binary_search(
       cp, (char *)tr39_start_list, ARRAY_SIZE(tr39_start_list),
       sizeof(*tr39_start_list));
@@ -260,13 +260,13 @@ LOCAL const struct sc_c26 *u8ident_get_tr39(const uint32_t cp) {
 }
 #endif
 
-LOCAL bool u8ident_is_MARK(uint32_t cp) {
+U8IDENT_LOCAL bool u8ident_is_MARK(uint32_t cp) {
   return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
 }
-LOCAL bool u8ident_is_MEDIAL(uint32_t cp) {
+U8IDENT_LOCAL bool u8ident_is_MEDIAL(uint32_t cp) {
   return range_bool_search(cp, medial_list, ARRAY_SIZE(medial_list));
 }
-LOCAL bool u8ident_is_bidi(const uint32_t cp) {
+U8IDENT_LOCAL bool u8ident_is_bidi(const uint32_t cp) {
   return linear_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
 }
 
@@ -278,63 +278,63 @@ static const struct range_bool ascii_cont_list[] = {
     {'$', '$'},
     {'0', '9'},
 };
-LOCAL bool isASCII_start(const uint32_t cp) {
+U8IDENT_LOCAL bool isASCII_start(const uint32_t cp) {
   return range_bool_search(cp, ascii_start_list, ARRAY_SIZE(ascii_start_list));
 }
-LOCAL bool isASCII_cont(const uint32_t cp) {
+U8IDENT_LOCAL bool isASCII_cont(const uint32_t cp) {
   return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
 }
 // Note: This includes 0..9 already
-LOCAL bool isALLOWED_start(const uint32_t cp) {
+U8IDENT_LOCAL bool isALLOWED_start(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)) &&
          !(cp >= '0' && cp <= '9');
 }
-LOCAL bool isALLOWED_cont(const uint32_t cp) {
+U8IDENT_LOCAL bool isALLOWED_cont(const uint32_t cp) {
   return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
 }
 #ifndef NO_UNITR39
-LOCAL bool isTR39_start(const uint32_t cp) {
+U8IDENT_LOCAL bool isTR39_start(const uint32_t cp) {
   return binary_search(cp, (char *)tr39_start_list, ARRAY_SIZE(tr39_start_list),
                        sizeof(*tr39_start_list))
              ? true
              : false;
 }
-LOCAL bool isTR39_cont(const uint32_t cp) {
+U8IDENT_LOCAL bool isTR39_cont(const uint32_t cp) {
   return binary_search(cp, (char *)tr39_cont_list, ARRAY_SIZE(tr39_cont_list),
                        sizeof(*tr39_cont_list))
              ? true
              : false;
 }
 #else
-LOCAL bool isTR39_start(const uint32_t cp) { (void)cp; return false; }
-LOCAL bool isTR39_cont(const uint32_t cp) { (void)cp; return false; }
+U8IDENT_LOCAL bool isTR39_start(const uint32_t cp) { (void)cp; return false; }
+U8IDENT_LOCAL bool isTR39_cont(const uint32_t cp) { (void)cp; return false; }
 #endif
-LOCAL bool isID_start(const uint32_t cp) {
+U8IDENT_LOCAL bool isID_start(const uint32_t cp) {
   return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
 }
-LOCAL bool isID_cont(const uint32_t cp) {
+U8IDENT_LOCAL bool isID_cont(const uint32_t cp) {
   return range_bool_search(cp, id_cont_list, ARRAY_SIZE(id_cont_list));
 }
-LOCAL bool isXID_start(const uint32_t cp) {
+U8IDENT_LOCAL bool isXID_start(const uint32_t cp) {
   return range_bool_search(cp, xid_start_list, ARRAY_SIZE(xid_start_list));
 }
-LOCAL bool isXID_cont(const uint32_t cp) {
+U8IDENT_LOCAL bool isXID_cont(const uint32_t cp) {
   return range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
 }
-LOCAL bool isC11_start(const uint32_t cp) {
+U8IDENT_LOCAL bool isC11_start(const uint32_t cp) {
   return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
 }
-LOCAL bool isC11_cont(const uint32_t cp) {
+U8IDENT_LOCAL bool isC11_cont(const uint32_t cp) {
   return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
 }
-LOCAL bool isALLUTF8_start(const uint32_t cp) {
+U8IDENT_LOCAL bool isALLUTF8_start(const uint32_t cp) {
   return isASCII_start(cp) || cp > 127;
 }
-LOCAL bool isALLUTF8_cont(const uint32_t cp) {
+U8IDENT_LOCAL bool isALLUTF8_cont(const uint32_t cp) {
   return isASCII_cont(cp) || cp > 127;
 }
 
-LOCAL enum u8id_gc u8ident_get_gc(const uint32_t cp) {
+U8IDENT_LOCAL enum u8id_gc u8ident_get_gc(const uint32_t cp) {
   const struct gc *gc = (const struct gc *)binary_search(
       cp, (char *)gc_list, ARRAY_SIZE(gc_list), sizeof(*gc_list));
   if (gc)
@@ -342,7 +342,7 @@ LOCAL enum u8id_gc u8ident_get_gc(const uint32_t cp) {
   else
     return GC_INVALID;
 }
-LOCAL const char *u8ident_gc_name(const enum u8id_gc gc) {
+U8IDENT_LOCAL const char *u8ident_gc_name(const enum u8id_gc gc) {
   if (gc >= GC_INVALID)
     return NULL;
   assert(gc < GC_INVALID);
@@ -350,7 +350,7 @@ LOCAL const char *u8ident_gc_name(const enum u8id_gc gc) {
 }
 
 // bitmask of u8id_idtypes
-LOCAL uint16_t u8ident_get_idtypes(const uint32_t cp) {
+U8IDENT_LOCAL uint16_t u8ident_get_idtypes(const uint32_t cp) {
   const struct range_short *id = (struct range_short *)binary_search(
       cp, (char *)idtype_list, ARRAY_SIZE(idtype_list), sizeof(*idtype_list));
   return id ? id->types : 0;
@@ -364,7 +364,7 @@ static inline int compar32(const void *a, const void *b) {
 }
 
 #ifdef HAVE_CONFUS
-LOCAL bool u8ident_is_greek_latin_confus(const uint32_t cp) {
+U8IDENT_LOCAL bool u8ident_is_greek_latin_confus(const uint32_t cp) {
   return bsearch(&cp, greek_confus_list, ARRAY_SIZE(greek_confus_list), 4,
                  compar32) != NULL
              ? true
@@ -372,7 +372,7 @@ LOCAL bool u8ident_is_greek_latin_confus(const uint32_t cp) {
 }
 
 #if !defined HAVE_CROARING
-EXTERN bool u8ident_is_confusable(const uint32_t cp) {
+U8IDENT_EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32) != NULL
              ? true
              : false;
@@ -380,7 +380,7 @@ EXTERN bool u8ident_is_confusable(const uint32_t cp) {
 #endif
 #endif
 
-EXTERN const char *u8ident_script_name(const int scr) {
+U8IDENT_EXTERN const char *u8ident_script_name(const int scr) {
   if (scr < 0 || scr > LAST_SCRIPT)
     return NULL;
   assert(scr >= 0 && scr <= LAST_SCRIPT);
@@ -388,7 +388,7 @@ EXTERN const char *u8ident_script_name(const int scr) {
 }
 
 /* returns the failing codepoint, which failed in the last check. */
-EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t i) {
+U8IDENT_EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t i) {
   if (i <= i_ctx) {
     const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
     return c->last_cp;
@@ -397,7 +397,7 @@ EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t i) {
   }
 }
 /* returns the constant script name, which failed in the last check. */
-EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t i) {
+U8IDENT_EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t i) {
   if (i <= i_ctx) {
     const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
     const uint32_t cp = c->last_cp;
@@ -411,13 +411,13 @@ EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t i) {
    beforehand. Such as `use utf8 "Greek";` in cperl.
    0, 1, 2 are always included by default.
 */
-EXTERN int u8ident_add_script(uint8_t scr) {
+U8IDENT_EXTERN int u8ident_add_script(uint8_t scr) {
   return u8ident_add_script_ctx(scr, u8ident_ctx());
 }
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
    optional, all remaining contexts are deleted by `u8ident_free` */
-EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
+U8IDENT_EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
   if (i_ctx < U8ID_CTX_TRESH)
     ctxp = &ctx[0];
   if (i <= i_ctx) {
@@ -442,7 +442,7 @@ EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
 }
 
 /* End this library, cleaning up all internal structures. */
-EXTERN void u8ident_free(void) {
+U8IDENT_EXTERN void u8ident_free(void) {
   for (u8id_ctx_t i = 0; i <= i_ctx; i++) {
     u8ident_free_ctx(i);
   }
@@ -469,7 +469,7 @@ EXTERN void u8ident_free(void) {
      free(errstr);
    }
 */
-EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t i) {
+U8IDENT_EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t i) {
   if (unlikely(i > i_ctx))
     return NULL;
   const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
@@ -509,7 +509,7 @@ EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t i) {
   NFKC_QC_N
   NFKC_QC_M
  */
-LOCAL bool u8ident_maybe_normalized(const uint32_t cp) {
+U8IDENT_LOCAL bool u8ident_maybe_normalized(const uint32_t cp) {
 
 #if U8ID_NORM == FCC || U8ID_NORM == FCD
   (void)cp;
