@@ -114,10 +114,14 @@ else
 	-copy /y c11-all.h unitr39.h $(srcdir)/
 endif
 
-$(srcdir)/u8ident-tr39.c: $(srcdir)/u8ident.c
+# Generated -tr39 files: produced from the source .c files via unifdef.
+# The libu8ident_c amalgam (u8ident-tr39.c) is hand-written and replaces
+# the generated version, but the rules are kept for maintainability.
+$(srcdir)/u8ident-tr39-gen.c: $(srcdir)/u8ident.c
 	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8ident.c >$@
-$(srcdir)/u8idscr-tr39.c: $(srcdir)/u8idscr.c
+$(srcdir)/u8idscr-tr39-gen.c: $(srcdir)/u8idscr.c
 	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8idscr.c >$@
+
 $(srcdir)/u8id_private-tr39.h: $(srcdir)/u8id_private.h
 	-$(UNIFDEF) $(U8IFDEF) -UHAVE_CONFIG_H $(srcdir)/u8id_private.h >$@
 
