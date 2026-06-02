@@ -24,7 +24,7 @@ libu8ident_la_LDFLAGS = \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
 U8IFDEF = -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 -UHAVE_CROARING -UHAVE_CONFUS -DENABLE_CHECK_XID -UDISABLE_CHECK_XID -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31 -DU8ID_PROFILE=8
-libu8ident_c_la_SOURCES = u8ident-tr39.c u8idscr-tr39.c
+libu8ident_c_la_SOURCES = u8ident-tr39.c
 libu8ident_c_la_CFLAGS = $(AM_CFLAGS) $(U8IFDEF)
 libu8ident_c_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
@@ -34,7 +34,7 @@ bin_PROGRAMS = u8idlint
 u8idlint_SOURCES = u8idlint.c $(libu8ident_la_SOURCES)
 u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 u8idlint_LDADD = $(u8idlint_LIBS)
-EXTRA_HEADERS = c11-safe.h unitr39.h
+EXTRA_HEADERS = c11-safe.h unitr39.h u8ident_c.h
 
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc libu8ident_c.pc
