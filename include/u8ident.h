@@ -144,9 +144,22 @@ EXTERN int u8ident_free_ctx(u8id_ctx_t ctx);
 /* End this library, cleaning up all internal structures. */
 EXTERN void u8ident_free(void);
 
-/* Returns a freshly allocated normalized string, in the option defined at
-   `u8ident_init`. Defaults to U8ID_NFC. */
-EXTERN char *u8ident_normalize(const char *buf, int len);
+/* Normalize a UTF-8 string using the normalization form selected at
+   u8ident_init (defaults to NFC).
+
+   @param src      Input UTF-8 string.
+   @param src_len  Length of the input in bytes.  If <= 0, `src` is
+                   treated as NUL-terminated and length is computed
+                   with strlen.
+   @return         A freshly allocated normalized string.
+                   Returns NULL on memory allocation failure.
+                   The caller must free the returned string.
+
+   When the TR39 amalgam (libu8ident_c) is used, all TR39 codepoints
+   are NFC-stable and normalization is a no-op: the returned string
+   is a byte-for-byte copy of the input.
+*/
+EXTERN char *u8ident_normalize(const char *src, int src_len);
 
 #ifdef HAVE_CONFUS
 /*
