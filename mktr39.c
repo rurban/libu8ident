@@ -54,7 +54,7 @@
 // Local SCX data, parsed directly from ScriptExtensions.txt and
 // PropertyValueAliases.txt.  This avoids depending on scripts.h scx_list.
 #define MAX_LOCAL_SCX 512
-#define MAX_SCX_SCRIPTS 16
+#define MAX_SCX_SCRIPTS 32
 
 static struct {
   char short_name[32];
@@ -69,11 +69,11 @@ static struct local_scx {
 } local_scx_list[MAX_LOCAL_SCX];
 static int local_scx_count = 0;
 
-static void read_pva(void) {
+static int read_pva(void) {
   FILE *fp = fopen("PropertyValueAliases.txt", "r");
   if (!fp) {
     fprintf(stderr, "Cannot open PropertyValueAliases.txt\n");
-    return;
+    return -1;
   }
   char line[256];
   while (fgets(line, sizeof(line), fp)) {
@@ -85,6 +85,7 @@ static void read_pva(void) {
     }
   }
   fclose(fp);
+  return 0;
 }
 
 static const char *pva_lookup(const char *short_name) {
@@ -107,12 +108,11 @@ static int script_name_to_enum(const char *name) {
   return -1;
 }
 
-static void read_scx(void) {
-  fprintf(stderr, "read_scx: starting\n");
+static int read_scx(void) {
   FILE *fp = fopen("ScriptExtensions.txt", "r");
   if (!fp) {
     fprintf(stderr, "Cannot open ScriptExtensions.txt\n");
-    return;
+    return -1;
   }
   char line[512];
   uint32_t prev_to = 0;
@@ -157,7 +157,12 @@ static void read_scx(void) {
     int scx_len = 0;
     char *saveptr;
     char *tok = strtok_r(scripts_start, " \t\r\n", &saveptr);
-    while (tok && scx_len < MAX_SCX_SCRIPTS) {
+    while (tok) {
+      if (scx_len >= MAX_SCX_SCRIPTS) {
+        fprintf(stderr, "Too many scripts at U+%04X (max %d); increase MAX_SCX_SCRIPTS\n",
+                from, MAX_SCX_SCRIPTS);
+        break;
+      }
       int sc_enum = script_name_to_enum(tok);
       if (sc_enum < 0) {
         const char *long_name = pva_lookup(tok);
@@ -190,10 +195,8 @@ static void read_scx(void) {
     prev_scx_str = local_scx_list[local_scx_count - 1].scx;
   }
   fprintf(stderr, "read_scx: loaded %d ranges\n", local_scx_count);
-  for (int j = 0; j < local_scx_count; j++) {
-    fprintf(stderr, "  scx[%d]: 0x%04X-0x%04X\n", j, local_scx_list[j].from, local_scx_list[j].to);
-  }
   fclose(fp);
+  return 0;
 }
 
 static const struct local_scx *local_get_scx(const uint32_t cp) {
@@ -1121,8 +1124,12 @@ int main(/*int argc, char **argv*/) {
   u8ident_init(U8ID_PROFILE_TR39_4, U8ID_NFC, 0);
 
   gen_c11_all();
-  read_pva();
-  read_scx();
+  if (read_pva() != 0 || read_scx() != 0) {
+    fprintf(stderr, "Run: wget -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt"
+                    " https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt\n");
+    u8ident_free();
+    return 1;
+  }
   gen_unitr39();
 
   u8ident_free();
