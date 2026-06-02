@@ -6,7 +6,7 @@
 */
 
 #include <stdio.h>
-#include "roaring.c"
+#include <roaring.c>
 #include "u8id_private.h"
 #include "u8id_gc.h"
 #include "scripts.h"
