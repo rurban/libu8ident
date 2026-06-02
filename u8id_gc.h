@@ -13,7 +13,9 @@
 
 #include <stdint.h>
 
-enum u8id_gc {
+#ifndef U8ID_GC_ENUM
+#define U8ID_GC_ENUM
+ enum u8id_gc {
   GC_Cc,
   GC_Cf,
   GC_Co,
@@ -47,6 +49,7 @@ enum u8id_gc {
   GC_V, // is varying, eg L or S. (for unitr39.h only),
   GC_INVALID,
 };
+#endif /* U8ID_GC_ENUM */
 
 #ifdef EXTERN_SCRIPTS
 extern const char *const u8id_gc_names[32];
