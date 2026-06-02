@@ -203,7 +203,9 @@ LOCAL const char *const all_scripts[] = {
 extern const char *const all_scripts[];
 #endif
 
-enum u8id_sc {
+#ifndef U8ID_SC_ENUM
+#define U8ID_SC_ENUM
+ enum u8id_sc {
 // clang-format off
 #define FIRST_RECOMMENDED_SCRIPT 0
   SC_Common     = 0,
@@ -386,11 +388,15 @@ enum u8id_sc {
 #define LAST_SCRIPT 174
   // clang-format on
 };
-struct sc {
-  uint32_t from;
-  uint32_t to;
-  enum u8id_sc scr;
-};
+#endif /* U8ID_SC_ENUM */
+#ifndef _STRUCT_SC_DEFINED
+#define _STRUCT_SC_DEFINED
+ struct sc {
+   uint32_t from;
+   uint32_t to;
+   enum u8id_sc scr;
+ };
+#endif
 
 struct scx {
   uint32_t from;
@@ -399,10 +405,13 @@ struct scx {
   const char *scx; // indices into sc
 };
 
+#ifndef _STRUCT_RANGE_BOOL_DEFINED
+#define _STRUCT_RANGE_BOOL_DEFINED
 struct range_bool {
   uint32_t from;
   uint32_t to;
 };
+#endif
 
 struct range_short {
   uint32_t from;
