@@ -63,6 +63,7 @@ struct ctx_t {
 extern int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
                         unsigned options);
 extern u8id_ctx_t u8ident_new_ctx(void);
+extern u8id_ctx_t u8ident_copy_ctx(void);
 extern int u8ident_add_script(uint8_t script);
 extern int u8ident_free_ctx(u8id_ctx_t ctx);
 extern void u8ident_free(void);

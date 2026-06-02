@@ -142,6 +142,8 @@ U8ID_EXTERN const char *u8ident_script_name(const int scr);
 /* Deletes the context generated with `u8ident_new_ctx`. This is
    optional, all remaining contexts are deleted by `u8ident_free` */
 U8ID_EXTERN int u8ident_free_ctx(u8id_ctx_t ctx);
+/* Create a deep copy of the current context.  See `u8ident_new_ctx` */
+U8ID_EXTERN u8id_ctx_t u8ident_copy_ctx(void);
 
 /* End this library, cleaning up all internal structures. */
 U8ID_EXTERN void u8ident_free(void);
