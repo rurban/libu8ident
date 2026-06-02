@@ -116,7 +116,7 @@ fi
 AC_SUBST([HAVE_CONFUS])
 
 download_croaring() {
-  git clone https://github.com/RoaringBitmap/CRoaring
+  git clone --depth 1 https://github.com/RoaringBitmap/CRoaring
 }
 
 AC_MSG_CHECKING([for --with-croaring])
@@ -130,13 +130,22 @@ AC_ARG_WITH([croaring],
              # in a parallel dir?
              with_croaring="$srcdir/../CRoaring"
              if test -d "${with_croaring}" && \
-                test -e "${with_croaring}/roaring.c" && \
-                test -e "${with_croaring}/roaring.h"
+                test -e "${with_croaring}/src/roaring.c" && \
+                test -e "${with_croaring}/include/roaring/roaring.h"
              then
                CROARING_PATH="\"$srcdir/../CRoaring\""
                AC_MSG_RESULT([found "$srcdir/../CRoaring"])
+             elif test -d "$srcdir/CRoaring" && \
+                test -e "$srcdir/CRoaring/roaring.c" && \
+                test -e "$srcdir/CRoaring/roaring.h"
+             then
+               CROARING_PATH="\"$srcdir/CRoaring\""
+               AC_MSG_RESULT([found "$srcdir/CRoaring"])
              else
-               download_croaring && CROARING_PATH="CRoaring"
+               echo "srcdir=$srcdir"
+               download_croaring && CROARING_PATH="\"$srcdir/CRoaring\""
+               AC_MSG_RESULT([downloaded to CRoaring])
+               cd CRoaring && ./amalgamation.sh
              fi
              ;;
         *)   if test -d "${with_croaring}" && \
