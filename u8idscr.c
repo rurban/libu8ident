@@ -343,19 +343,16 @@ static inline int compar32(const void *a, const void *b) {
   return ai < bi ? -1 : ai == bi ? 0 : 1;
 }
 
-#ifdef HAVE_CONFUS
-LOCAL bool u8ident_is_greek_latin_confus(const uint32_t cp) {
-  return bsearch(&cp, greek_confus_list, ARRAY_SIZE(greek_confus_list), 4,
-                 compar32) != NULL
-             ? true
-             : false;
+EXTERN bool u8ident_is_greek_latin_confus(const uint32_t cp) {
+  return bsearch(&cp, greek_confus_list, ARRAY_SIZE(greek_confus_list),
+                 sizeof(*greek_confus_list), compar32) != NULL;
 }
 
+#if defined HAVE_CONFUS
 #if !defined HAVE_CROARING
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
-  return bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32) != NULL
-             ? true
-             : false;
+  return bsearch(&cp, confusables, ARRAY_SIZE(confusables),
+                 sizeof(*confusables), compar32) != NULL;
 }
 #endif
 #endif
