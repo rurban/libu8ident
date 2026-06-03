@@ -350,21 +350,32 @@ EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t i) {
     return NULL;
   const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
   const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
-  size_t len = c->count * 12;
-  char *res = malloc(len);
-  *res = 0;
+  /* First pass: compute exact allocation size. */
+  size_t len = 1; /* NUL terminator */
   for (int j = 0; j < c->count; j++) {
     const char *str = u8ident_script_name(u8p[j]);
-    if (!str) { free(res); return NULL; }
-    const size_t l = strlen(str);
-    if (*res) {
-      if (l + 3 > len) { len = l + 3; res = realloc(res, len); }
-      strcat(res, ", ");
-    } else {
-      if (l + 1 > len) { len = l + 1; res = realloc(res, len); }
-    }
-    strcat(res, str);
+    if (!str)
+      return NULL;
+    if (j > 0)
+      len += 2; /* ", " separator */
+    len += strlen(str);
   }
+  char *res = malloc(len);
+  if (!res)
+    return NULL;
+  /* Second pass: write into the exact-sized buffer. */
+  char *p = res;
+  for (int j = 0; j < c->count; j++) {
+    const char *str = u8ident_script_name(u8p[j]);
+    if (j > 0) {
+      memcpy(p, ", ", 2);
+      p += 2;
+    }
+    const size_t l = strlen(str);
+    memcpy(p, str, l);
+    p += l;
+  }
+  *p = '\0';
   return res;
 }
 
