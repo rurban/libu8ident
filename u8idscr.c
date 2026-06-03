@@ -161,7 +161,7 @@ static inline bool linear_search(const uint32_t cp,
   return false;
 }
 
-static inline struct sc *binary_search(const uint32_t cp, const char *list,
+static inline void *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
   int n = (int)len;
   const char *p = list;
@@ -227,14 +227,14 @@ LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
 }
 #ifndef NO_UNITR39
 /* Search for TR39 XID entry, in start or cont lists */
-LOCAL const struct sc_c26 *u8ident_get_tr39(const uint32_t cp) {
-  const struct sc_c26 *sc = (const struct sc_c26 *)binary_search(
+LOCAL const struct sc_tr39 *u8ident_get_tr39(const uint32_t cp) {
+  const struct sc_tr39 *sc = (const struct sc_tr39 *)binary_search(
       cp, (char *)tr39_start_list, ARRAY_SIZE(tr39_start_list),
       sizeof(*tr39_start_list));
   if (sc)
     return sc;
   else
-    return (const struct sc_c26 *)binary_search(cp, (char *)tr39_cont_list,
+    return (const struct sc_tr39 *)binary_search(cp, (char *)tr39_cont_list,
                                                 ARRAY_SIZE(tr39_cont_list),
                                                 sizeof(*tr39_cont_list));
 }
@@ -246,6 +246,11 @@ LOCAL bool u8ident_is_MARK(uint32_t cp) {
 LOCAL bool u8ident_is_MEDIAL(uint32_t cp) {
   return range_bool_search(cp, medial_list, ARRAY_SIZE(medial_list));
 }
+#ifndef NO_UNITR39
+LOCAL bool u8ident_is_tr39_MEDIAL(uint32_t cp) {
+  return range_bool_search(cp, tr39_medial_list, ARRAY_SIZE(tr39_medial_list));
+}
+#endif
 LOCAL bool u8ident_is_bidi(const uint32_t cp) {
   return linear_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
 }
