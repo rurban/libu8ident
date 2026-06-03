@@ -211,31 +211,24 @@ target_include_directories(u8ident PRIVATE
 target_include_directories(u8ident PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# libu8ident_c: C/C++ variant with TR39 profile, TR31=TR39, NFC norm
+# libu8ident_c: single-file TR39 amalgam for compiler integration
 set(libu8ident_c_SOURCES
-    u8ident.c
-    u8idnorm.c
-    u8idscr.c)
+    u8ident-tr39.c)
 
 add_library(u8ident_c_static STATIC
-  ${libu8ident_HEADERS}
   ${libu8ident_c_SOURCES}
   ${private_HEADERS})
 add_library(u8ident_c SHARED
-  ${libu8ident_HEADERS}
   ${libu8ident_c_SOURCES}
   ${private_HEADERS})
 
-target_compile_definitions(u8ident_c PRIVATE U8ID_TR31=TR39 U8ID_PROFILE_TR39 U8ID_NORM=NFC)
-target_compile_definitions(u8ident_c_static PRIVATE U8ID_TR31=TR39 U8ID_PROFILE_TR39 U8ID_NORM=NFC)
-
-set_target_properties(u8ident_c PROPERTIES PUBLIC_HEADER include/u8ident.h)
+set_target_properties(u8ident_c PROPERTIES PUBLIC_HEADER u8ident_c.h)
 
 target_include_directories(u8ident_c PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(u8ident_c PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (CRoaring_FOUND)
   add_executable(perf perf.c u8idroar.c)

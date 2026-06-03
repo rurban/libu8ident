@@ -1,3 +1,35 @@
+#!/usr/bin/perl
+# mk-tr39-amalgam.pl — regenerate u8ident-tr39.c from u8idscr.c
+# Usage: perl mk-tr39-amalgam.pl [srcdir]
+# Requires: unifdef in $PATH or $UNIFDEF env var.
+#
+# The amalgam is structured as:
+#   1. Fixed preamble  (license, includes, global state, errstr)
+#   2. Generated from u8idscr.c via unifdef + filtering:
+#        context management, search utilities, all lookup functions,
+#        plus injected isTR39_start_p / isTR39_cont_p pointer wrappers
+#   3. Fixed tail  (TR39-specific init, check_buf, stubs)
+#      — kept in this script; update when u8ident.c semantics change.
+
+use strict;
+use warnings;
+
+my $srcdir = $ARGV[0] // '.';
+my $UNIFDEF = $ENV{UNIFDEF} // 'unifdef';
+
+# Flags mirror Makefile.am U8IFDEF, plus -UNO_UNITR39 so unifdef collapses
+# the #ifndef NO_UNITR39 guards and we get the TR39-enabled code paths.
+my @flags = qw(
+    -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0
+    -UHAVE_CROARING -UHAVE_CONFUS
+    -DENABLE_CHECK_XID -UDISABLE_CHECK_XID
+    -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31
+    -DU8ID_PROFILE=8 -UHAVE_CONFIG_H -UNO_UNITR39
+);
+
+# ── 1. Fixed preamble ─────────────────────────────────────────────────────────
+
+print <<'PREAMBLE';
 /* libu8ident - Check unicode security guidelines for identifiers.
    Copyright 2021,2022,2025 Reini Urban
    SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
@@ -51,215 +83,80 @@ struct ctx_t ctx[U8ID_CTX_TRESH] = {{0}};
 static u8id_ctx_t i_ctx = 0;
 struct ctx_t *ctxp = NULL;
 
-/* Generates a new identifier document/context/directory, which
-   initializes a new list of seen scripts. */
-EXTERN u8id_ctx_t u8ident_new_ctx(void) {
-  // thread-safety later
-  u8id_ctx_t i = ++i_ctx;
-  if (i == U8ID_CTX_TRESH) {
-    ctxp = (struct ctx_t *)calloc(U8ID_CTX_TRESH + 1, sizeof(struct ctx_t));
-    if (!ctxp) {
-      fprintf(stderr, "u8ident: out of memory\n"); abort();
+PREAMBLE
+
+# ── 2. Generated section from u8idscr.c ──────────────────────────────────────
+
+my @src = `$UNIFDEF @flags "$srcdir/u8idscr.c" 2>/dev/null`;
+
+# Functions to skip entirely (not present in the TR39 amalgam):
+#   u8ident_gc_name    — debug helper, not in public API
+#   u8ident_is_MEDIAL  — uses medial_list; amalgam uses u8ident_is_tr39_MEDIAL
+#                        (which uses tr39_medial_list from unitr39.h)
+#   u8ident_get_tr39   — re-emitted in TR39_PTRS block using pointer helpers
+my %skip_fn = map { $_ => 1 } qw(
+    u8ident_gc_name
+    u8ident_is_MEDIAL
+    u8ident_get_tr39
+);
+
+my $in_body    = 0;  # 1 once we're past the file header
+my @skip_stack = (); # non-empty while inside a function we are skipping
+my $depth      = 0;  # brace depth inside the skipped function
+my $tr39cont   = 0;  # state: 0=before, 1=in isTR39_cont, 2=just closed it
+
+for my $line (@src) {
+
+    # ── Advance past the file header (license, includes, global state) ──────
+    # Skip until we reach the docstring comment before u8ident_new_ctx.
+    # Print the trigger line itself so it appears in the output, then
+    # continue processing normally.
+    unless ($in_body) {
+        if ($line =~ /^\/\* Generates a new identifier/) {
+            $in_body = 1;
+            print $line;   # emit the first line of the docstring
+        }
+        next;
     }
-    // extra work, just for debugging. we never access these
-    memcpy(ctxp, &ctx, U8ID_CTX_TRESH * sizeof(struct ctx_t));
-  } else if (i > U8ID_CTX_TRESH) {
-    struct ctx_t *p = (struct ctx_t *)realloc(ctxp, (i + 1) * sizeof(struct ctx_t));
-    if (!p) {
-      fprintf(stderr, "u8ident: out of memory\n"); abort();
+
+    # ── Stop before normalization helpers and trailing comment block ─────────
+    last if $line =~ /^\/\* quickcheck these lists/;
+    last if $line =~ /^LOCAL bool u8ident_maybe_normalized\b/;
+    last if $line =~ m{^// See also the Table 3};
+
+    # ── Enter skip mode when we hit a function we don't want ─────────────────
+    if (!@skip_stack) {
+        for my $fn (keys %skip_fn) {
+            if ($line =~ /\b\Q$fn\E\b/ && $line =~ /\(/) {
+                push @skip_stack, $fn;
+                $depth = ($line =~ tr/\{//) - ($line =~ tr/\}//);
+                last;
+            }
+        }
+        next if @skip_stack;
     }
-    ctxp = p;
-    memset(&ctxp[i], 0, sizeof(struct ctx_t));
-  } else {
-    ctxp = &ctx[i];
-  }
-  return i_ctx;
-}
 
-/* Changes to the context previously generated with `u8ident_new_ctx`. */
-EXTERN int u8ident_set_ctx(u8id_ctx_t i) {
-  if (i <= i_ctx) {
-    i_ctx = i;
-    return 0;
-  } else
-    return -1;
-}
-
-/* Changes to the context previously generated with `u8ident_new_ctx`. */
-LOCAL struct ctx_t *u8ident_ctx(void) {
-  return (i_ctx < U8ID_CTX_TRESH) ? &ctx[i_ctx] : &ctxp[i_ctx];
-}
-
-// search in linear vector of scripts per ctx
-LOCAL bool u8ident_has_script_ctx(const uint8_t scr, const struct ctx_t *c) {
-  if (!c->count)
-    return false;
-  const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
-  for (int i = 0; i < c->count; i++) {
-    if (scr == u8p[i])
-      return true;
-  }
-  return false;
-}
-
-LOCAL bool u8ident_has_script(const uint8_t scr) {
-  return u8ident_has_script_ctx(scr, u8ident_ctx());
-}
-
-LOCAL int u8ident_add_script_ctx(const uint8_t scr, struct ctx_t *c) {
-  if (scr < 2 || scr >= FIRST_LIMITED_USE_SCRIPT)
-    return -1;
-  int i = c->count;
-  if (unlikely(i == 8)) {
-    uint8_t *p = malloc(16);
-    memcpy(p, c->scr8, 8);
-    c->u8p = p;
-    c->u8p[i] = scr;
-  } else if (unlikely(i > 8 && (i & 7) == 7)) {
-    c->u8p = realloc(c->u8p, i + 8);
-    c->u8p[i] = scr;
-  } else {
-    if (i > 8) {
-      if (!c->u8p) {
-        c->u8p = calloc(16, 1);
-        memcpy(c->u8p, c->scr8, 8);
-      }
-      c->u8p[i] = scr;
-    } else {
-      c->scr8[i] = scr;
+    # ── While in skip mode, track braces ─────────────────────────────────────
+    if (@skip_stack) {
+        $depth += ($line =~ tr/\{//);
+        $depth -= ($line =~ tr/\}//);
+        if ($depth <= 0) { pop @skip_stack; $depth = 0; }
+        next;
     }
-  }
-  if (scr == SC_Han)
-    c->has_han = 1;
-  else if (scr == SC_Bopomofo)
-    c->is_chinese = 1;
-  else if (scr == SC_Katakana || scr == SC_Hiragana)
-    c->is_japanese = 1;
-  else if (scr == SC_Hangul)
-    c->is_korean = 1;
-  else if (scr == SC_Hebrew || scr == SC_Arabic)
-    c->is_rtl = 1;
-  c->count++;
-  return 0;
-}
 
-static inline bool linear_search(const uint32_t cp,
-                                 const struct range_bool *sc_list,
-                                 const int len) {
-  struct range_bool *s = (struct range_bool *)sc_list;
-  for (int i = 0; i < len; i++) {
-    assert(s->from <= s->to);
-    if ((cp - s->from) <= (s->to - s->from))
-      return true;
-    if (cp <= s->to) // s is sorted. not found
-      return false;
-    s++;
-  }
-  return false;
-}
-
-static inline void *binary_search(const uint32_t cp, const char *list,
-                                       const size_t len, const size_t size) {
-  int n = (int)len;
-  const char *p = list;
-  struct sc *pos;
-  while (n > 0) {
-    pos = (struct sc *)(p + size * (n / 2));
-    // hack: with unsigned wrapping max-cp is always higher, so false
-    // was: (cp >= pos->from && cp <= pos->to)
-    if ((cp - pos->from) <= (pos->to - pos->from))
-      return pos;
-    else if (cp < pos->from)
-      n /= 2;
-    else {
-      p = (char *)pos + size;
-      n -= (n / 2) + 1;
+    # ── Track isTR39_cont to inject pointer wrappers after it ────────────────
+    if ($tr39cont == 0 && $line =~ /^LOCAL bool isTR39_cont\b/) {
+        $tr39cont = 1;
+    } elsif ($tr39cont == 1 && $line =~ /^\}/) {
+        $tr39cont = 2;
     }
-  }
-  return NULL;
-}
 
-// hybrid search: linear or binary
-static inline uint8_t sc_search(const uint32_t cp, const struct sc *sc_list,
-                                const size_t len) {
-  if (cp < 255) { // 14 ranges a 9 byte (126 byte, i.e cache loads)
-    struct sc *s = (struct sc *)sc_list;
-    for (size_t i = 0; i < len; i++) {
-      if ((cp - s->from) <= (s->to - s->from)) // faster in-between trick
-        return s->scr;
-      if (cp <= s->to) // s is sorted. not found
-        return 255;
-      s++;
-    }
-    return 255;
-  } else {
-    const struct sc *sc =
-        (struct sc *)binary_search(cp, (char *)sc_list, len, sizeof(*sc_list));
-    return sc ? sc->scr : 255;
-  }
-}
+    print $line;
 
-static inline bool range_bool_search(const uint32_t cp,
-                                     const struct range_bool *list,
-                                     const size_t len) {
-  return binary_search(cp, (char *)list, len, sizeof(*list)) ? true : false;
-}
-
-EXTERN uint8_t u8ident_get_script(const uint32_t cp) {
-  // faster check, as we have no NON-xid's
-  return sc_search(cp, nonxid_script_list, ARRAY_SIZE(nonxid_script_list));
-}
-
-/* Search for list of script indices */
-LOCAL const struct scx *u8ident_get_scx(const uint32_t cp) {
-  return (const struct scx *)binary_search(
-      cp, (char *)scx_list, ARRAY_SIZE(scx_list), sizeof(*scx_list));
-}
-/* Search for TR39 XID entry, in start or cont lists */
-
-LOCAL bool u8ident_is_MARK(uint32_t cp) {
-  return range_bool_search(cp, mark_list, ARRAY_SIZE(mark_list));
-}
-LOCAL bool u8ident_is_tr39_MEDIAL(uint32_t cp) {
-  return range_bool_search(cp, tr39_medial_list, ARRAY_SIZE(tr39_medial_list));
-}
-LOCAL bool u8ident_is_bidi(const uint32_t cp) {
-  return linear_search(cp, bidi_list, ARRAY_SIZE(bidi_list));
-}
-
-
-static const struct range_bool ascii_start_list[] = {
-    {'$', '$'}, {'A', 'Z'}, {'_', '_'}, {'a', 'z'}};
-static const struct range_bool ascii_cont_list[] = {
-    {'$', '$'},
-    {'0', '9'},
-};
-LOCAL bool isASCII_start(const uint32_t cp) {
-  return range_bool_search(cp, ascii_start_list, ARRAY_SIZE(ascii_start_list));
-}
-LOCAL bool isASCII_cont(const uint32_t cp) {
-  return range_bool_search(cp, ascii_cont_list, ARRAY_SIZE(ascii_cont_list));
-}
-// Note: This includes 0..9 already
-LOCAL bool isALLOWED_start(const uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list)) &&
-         !(cp >= '0' && cp <= '9');
-}
-LOCAL bool isALLOWED_cont(const uint32_t cp) {
-  return range_bool_search(cp, allowed_id_list, ARRAY_SIZE(allowed_id_list));
-}
-LOCAL bool isTR39_start(const uint32_t cp) {
-  return binary_search(cp, (char *)tr39_start_list, ARRAY_SIZE(tr39_start_list),
-                       sizeof(*tr39_start_list))
-             ? true
-             : false;
-}
-LOCAL bool isTR39_cont(const uint32_t cp) {
-  return binary_search(cp, (char *)tr39_cont_list, ARRAY_SIZE(tr39_cont_list),
-                       sizeof(*tr39_cont_list))
-             ? true
-             : false;
-}
+    # ── Inject isTR39_start_p / isTR39_cont_p immediately after isTR39_cont ──
+    if ($tr39cont == 2) {
+        $tr39cont = 3;  # emit once only
+        print <<'TR39_PTRS';
 
 /* ---- TR39 lookup ---- */
 /* Internal: struct-pointer versions used by check_buf */
@@ -280,171 +177,14 @@ LOCAL const struct sc_tr39 *u8ident_get_tr39(const uint32_t cp) {
   return sc ? sc : isTR39_cont_p(cp);
 }
 
-LOCAL bool isID_start(const uint32_t cp) {
-  return range_bool_search(cp, id_start_list, ARRAY_SIZE(id_start_list));
-}
-LOCAL bool isID_cont(const uint32_t cp) {
-  return range_bool_search(cp, id_cont_list, ARRAY_SIZE(id_cont_list));
-}
-LOCAL bool isXID_start(const uint32_t cp) {
-  return range_bool_search(cp, xid_start_list, ARRAY_SIZE(xid_start_list));
-}
-LOCAL bool isXID_cont(const uint32_t cp) {
-  return range_bool_search(cp, xid_cont_list, ARRAY_SIZE(xid_cont_list));
-}
-LOCAL bool isC11_start(const uint32_t cp) {
-  return range_bool_search(cp, c11_start_list, ARRAY_SIZE(c11_start_list));
-}
-LOCAL bool isC11_cont(const uint32_t cp) {
-  return range_bool_search(cp, c11_cont_list, ARRAY_SIZE(c11_cont_list));
-}
-LOCAL bool isALLUTF8_start(const uint32_t cp) {
-  return isASCII_start(cp) || cp > 127;
-}
-LOCAL bool isALLUTF8_cont(const uint32_t cp) {
-  return isASCII_cont(cp) || cp > 127;
-}
-
-LOCAL enum u8id_gc u8ident_get_gc(const uint32_t cp) {
-  const struct gc *gc = (const struct gc *)binary_search(
-      cp, (char *)gc_list, ARRAY_SIZE(gc_list), sizeof(*gc_list));
-  if (gc)
-    return gc->gc;
-  else
-    return GC_INVALID;
-}
-
-// bitmask of u8id_idtypes
-LOCAL uint16_t u8ident_get_idtypes(const uint32_t cp) {
-  const struct range_short *id = (struct range_short *)binary_search(
-      cp, (char *)idtype_list, ARRAY_SIZE(idtype_list), sizeof(*idtype_list));
-  return id ? id->types : 0;
-}
-
-static inline int compar32(const void *a, const void *b) {
-  const uint32_t ai = *(const uint32_t *)a;
-  const uint32_t bi = *(const uint32_t *)b;
-  return ai < bi ? -1 : ai == bi ? 0 : 1;
-}
-
-EXTERN bool u8ident_is_greek_latin_confus(const uint32_t cp) {
-  return bsearch(&cp, greek_confus_list, ARRAY_SIZE(greek_confus_list),
-                 sizeof(*greek_confus_list), compar32) != NULL;
-}
-
-
-EXTERN const char *u8ident_script_name(const int scr) {
-  if (scr < 0 || scr > LAST_SCRIPT)
-    return NULL;
-  assert(scr >= 0 && scr <= LAST_SCRIPT);
-  return all_scripts[scr];
-}
-
-/* returns the failing codepoint, which failed in the last check. */
-EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t i) {
-  if (i <= i_ctx) {
-    const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
-    return c->last_cp;
-  } else {
-    return 0;
-  }
-}
-/* returns the constant script name, which failed in the last check. */
-EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t i) {
-  if (i <= i_ctx) {
-    const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
-    const uint32_t cp = c->last_cp;
-    if (cp > 0)
-      return u8ident_script_name(u8ident_get_script(cp));
-  }
-  return NULL;
-}
-
-/* Optionally adds a script to the context, if it's known or declared
-   beforehand. Such as `use utf8 "Greek";` in cperl.
-   0, 1, 2 are always included by default.
-*/
-EXTERN int u8ident_add_script(uint8_t scr) {
-  return u8ident_add_script_ctx(scr, u8ident_ctx());
-}
-
-/* Deletes the context generated with `u8ident_new_ctx`. This is
-   optional, all remaining contexts are deleted by `u8ident_free` */
-EXTERN int u8ident_free_ctx(u8id_ctx_t i) {
-  if (i_ctx < U8ID_CTX_TRESH)
-    ctxp = &ctx[0];
-  if (i <= i_ctx) {
-    if (ctxp[i].count > 8)
-      free(ctxp[i].u8p);
-    memset(&ctxp[i], 0, sizeof(u8id_ctx_t));
-    if (i > 0)
-      i_ctx = i - 1; // switch to the previous context
-    else
-      i_ctx = 0; // deleting 0 will lead to a reset
-    return 0;
-  } else
-    return -1;
-}
-
-/* End this library, cleaning up all internal structures. */
-EXTERN void u8ident_free(void) {
-  for (u8id_ctx_t i = 0; i <= i_ctx; i++) {
-    u8ident_free_ctx(i);
-  }
-  if (i_ctx >= U8ID_CTX_TRESH) {
-    free(ctxp);
-  }
-}
-
-/* Returns a fresh string of the list of the seen scripts in this
-   context whenever a mixed script error occurs. Needed for the error message
-   "Invalid script %s, already have %s", where the 2nd %s is returned by this
-   function. The returned string needs to be freed by the user.
-
-   Usage:
-
-   if (u8id_check("wrongᴧᴫ") == U8ID_ERR_SCRIPTS) {
-       const char *errstr = u8ident_existing_scripts(ctx);
-       fprintf(stdout, "Invalid script %s, already have %s\n",
-           u8ident_failed_script_name(ctx),
-           u8ident_existing_scripts(ctx));
-     free(errstr);
-   }
-*/
-EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t i) {
-  if (unlikely(i > i_ctx))
-    return NULL;
-  const struct ctx_t *c = (i_ctx < U8ID_CTX_TRESH) ? &ctx[i] : &ctxp[i];
-  const uint8_t *u8p = (c->count > 8) ? c->u8p : c->scr8;
-  /* First pass: compute exact allocation size. */
-  size_t len = 1; /* NUL terminator */
-  for (int j = 0; j < c->count; j++) {
-    const char *str = u8ident_script_name(u8p[j]);
-    if (!str)
-      return NULL;
-    if (j > 0)
-      len += 2; /* ", " separator */
-    len += strlen(str);
-  }
-  char *res = malloc(len);
-  if (!res)
-    return NULL;
-  /* Second pass: write into the exact-sized buffer. */
-  char *p = res;
-  for (int j = 0; j < c->count; j++) {
-    const char *str = u8ident_script_name(u8p[j]);
-    if (j > 0) {
-      memcpy(p, ", ", 2);
-      p += 2;
+TR39_PTRS
     }
-    const size_t l = strlen(str);
-    memcpy(p, str, l);
-    p += l;
-  }
-  *p = '\0';
-  return res;
 }
 
+# ── 3. Fixed TR39 tail (init, check_buf, stubs) ───────────────────────────────
+# Update this section when the core TR39 algorithm changes in u8ident.c.
+
+print <<'TAIL';
 
 /* ---- tr31 function table ---- */
 
@@ -795,3 +535,4 @@ EXTERN enum u8id_errors u8ident_check_confusables(const char *buf,
           "Unsupported u8ident_check_confusables(), need --enable-confus\n");
   return -1;
 }
+TAIL
