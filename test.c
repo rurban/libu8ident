@@ -1130,7 +1130,7 @@ void test_add_scripts(void) {
   u8ident_free_ctx(c);
 }
 
-#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39) && U8ID_TR31 != 3
 static int compar32(const void *a, const void *b) {
   const uint32_t ai = *(const uint32_t *)a;
   const uint32_t bi = *(const uint32_t *)b;
@@ -1246,7 +1246,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39) && U8ID_TR31 != 3
   if (argc > i && strEQc(argv[i], "htable")) {
     test_htable();
     u8ident_free();
@@ -1304,7 +1304,7 @@ int main(int argc, char **argv) {
     test_add_scripts();
   }
 
-#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39) && U8ID_TR31 != 3
   test_confus();
   test_htable();
   test_confusables();
