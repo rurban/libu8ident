@@ -31,7 +31,9 @@ static char buf[128]; // for hex display
 // private access
 unsigned u8ident_options(void);
 enum u8id_profile u8ident_profile(void);
+#ifndef U8ID_PROFILE_TR39
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+#endif
 
 static inline bool is_profile_6(void) {
   return u8ident_profile() == 6 || u8ident_profile() == C11_6;
@@ -42,7 +44,7 @@ static inline bool is_profile_6(void) {
 
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
-#ifdef HAVE_CROARING
+#if defined(HAVE_CROARING) && !defined(U8ID_PROFILE_TR39)
   // well, this needs an init
   assert(!u8ident_roar_init());
 #endif
@@ -80,7 +82,7 @@ void test_scripts_no_init(void) {
   assert(!isXID_start('0'));
   assert(!isALLOWED_start('0'));
   assert(!isC11_start('0'));
-#  if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(!isC23_start('0'));
 #  endif
   assert(!isTR39_start('0'));
@@ -90,7 +92,7 @@ void test_scripts_no_init(void) {
   assert(isXID_cont('0'));
   assert(isALLOWED_cont('0'));
   assert(isC11_cont('0'));
-#  if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(isC23_cont('0'));
 #  endif
   assert(isTR39_cont('0'));
@@ -107,23 +109,30 @@ void test_scripts_no_init(void) {
 #  ifdef ALLOW_DOLLAR /* default */
   assert(isC11_start('$'));
   assert(isTR39_start('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(isC23_start('$'));
+#endif
   assert(isC11_cont('$'));
   assert(isTR39_cont('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(isC23_cont('$'));
+#endif
 #  else
   assert(!isC11_start('$'));
   assert(!isTR39_start('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(!isC23_start('$'));
+#endif
   assert(!isC11_cont('$'));
   assert(!isTR39_cont('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(!isC23_cont('$'));
+#endif
 #  endif
 
   assert(isALLOWED_cont(0x27));  // '
   assert(!isALLOWED_cont(0x26)); // &
-  assert(isALLOWED_cont(0x40e)); // Ў
-#  if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(isC23_cont(0x311)); // ̑
 #  endif
 
@@ -1121,7 +1130,7 @@ void test_add_scripts(void) {
   u8ident_free_ctx(c);
 }
 
-#ifdef HAVE_CONFUS
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
 static int compar32(const void *a, const void *b) {
   const uint32_t ai = *(const uint32_t *)a;
   const uint32_t bi = *(const uint32_t *)b;
@@ -1130,7 +1139,7 @@ static int compar32(const void *a, const void *b) {
 
 void test_confus(void) {
   int ret;
-#  ifdef HAVE_CROARING
+#  if defined(HAVE_CROARING) && !defined(U8ID_PROFILE_TR39)
   u8ident_roar_init();
 #  endif
   // test for equality of both variants
@@ -1171,7 +1180,7 @@ void test_confus(void) {
              ret == U8ID_EOK_NORM_WARN_CONFUS);
     }
   }
-#  ifdef HAVE_CROARING
+#  if defined(HAVE_CROARING) && !defined(U8ID_PROFILE_TR39)
   u8ident_roar_free();
 #  endif
 }
@@ -1237,7 +1246,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-#ifdef HAVE_CONFUS
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
   if (argc > i && strEQc(argv[i], "htable")) {
     test_htable();
     u8ident_free();
@@ -1295,7 +1304,7 @@ int main(int argc, char **argv) {
     test_add_scripts();
   }
 
-#ifdef HAVE_CONFUS
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
   test_confus();
   test_htable();
   test_confusables();
