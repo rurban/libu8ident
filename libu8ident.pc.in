@@ -5,7 +5,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: @PACKAGE@
-Description: check unicode security guidelines for identifiers
+Description: check unicode security guidelines for identifiers, all profiles
 Version: @VERSION@
 URL: @PACKAGE_URL@
 Libs: -L${libdir} -lu8ident

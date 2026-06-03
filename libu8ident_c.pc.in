@@ -4,8 +4,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: @PACKAGE@
-Description: check unicode security guidelines for identifiers, for C/C++
+Name: libu8ident_c
+Description: TR39-specialized unicode security guidelines for identifiers, for C/C++
 Version: @VERSION@
 URL: @PACKAGE_URL@
 Libs: -L${libdir} -lu8ident_c
