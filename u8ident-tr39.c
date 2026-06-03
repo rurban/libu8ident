@@ -52,16 +52,24 @@ static u8id_ctx_t i_ctx = 0;
 struct ctx_t *ctxp = NULL;
 
 EXTERN u8id_ctx_t u8ident_new_ctx(void) {
-  u8id_ctx_t i = i_ctx + 1;
-  i_ctx++;
+  u8id_ctx_t i = ++i_ctx;
   if (i == U8ID_CTX_TRESH) {
-    ctxp = (struct ctx_t *)calloc(U8ID_CTX_TRESH, sizeof(struct ctx_t));
+    ctxp = (struct ctx_t *)calloc(U8ID_CTX_TRESH + 1, sizeof(struct ctx_t));
+    if (!ctxp) {
+      fprintf(stderr, "u8ident: out of memory\n"); abort();
+    }
+    // extra work, just for debugging. we never access these
+    memcpy(ctxp, &ctx, U8ID_CTX_TRESH * sizeof(struct ctx_t));
   } else if (i > U8ID_CTX_TRESH) {
-    ctxp = (struct ctx_t *)realloc(ctxp, i * sizeof(struct ctx_t));
+    struct ctx_t *p = (struct ctx_t *)realloc(ctxp, (i + 1) * sizeof(struct ctx_t));
+    if (!p) {
+      fprintf(stderr, "u8ident: out of memory\n"); abort();
+    }
+    ctxp = p;
+    memset(&ctxp[i], 0, sizeof(struct ctx_t));
   } else {
     ctxp = &ctx[i];
   }
-  memset(ctxp, 0, sizeof(struct ctx_t));
   return i_ctx;
 }
 
