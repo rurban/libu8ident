@@ -12,13 +12,111 @@
 #include <assert.h>
 #include <errno.h>
 #include <wchar.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#include "u8id_private.h"
-#include <u8ident.h>
+/* ---- Visibility and compiler hints (inlined from u8id_private.h) ---- */
+#if defined _WIN32 || defined __CYGWIN__
+#  define EXTERN __declspec(dllexport)
+#  define LOCAL
+#elif __GNUC__ >= 4
+#  define EXTERN __attribute__((visibility("default")))
+#  define LOCAL __attribute__((visibility("hidden")))
+#else
+#  define EXTERN
+#  define LOCAL
+#endif
 
+#if __GNUC__ >= 3
+#  define likely(expr)   __builtin_expect((long)((expr) != 0), 1)
+#  define unlikely(expr) __builtin_expect((long)((expr) != 0), 0)
+#  define INLINE static inline
+#else
+#  define likely(expr)   (expr)
+#  define unlikely(expr) (expr)
+#  define INLINE static
+#endif
 
-/* Data headers with definitions (no EXTERN_SCRIPTS = define LOCAL arrays) */
-/* Data headers with definitions (no EXTERN_SCRIPTS = define LOCAL arrays) */
+/* ---- Utility macros ---- */
+#define ARRAY_SIZE(x) sizeof(x) / sizeof(*x)
+#define strEQ(s1, s2) !strcmp((s1), (s2))
+#define strEQc(s1, s2) !strcmp((s1), s2 "")
+
+/* ---- Types and constants (inlined from u8id_private.h + u8ident.h) ---- */
+
+#define U8ID_CTX_TRESH 5
+#define U8ID_SCR_TRESH 8
+
+struct ctx_t {
+  uint8_t count;
+  uint8_t has_han : 1;
+  uint8_t is_japanese : 1;
+  uint8_t is_chinese : 1;
+  uint8_t is_korean : 1;
+  uint8_t is_rtl : 1;
+  uint32_t last_cp;
+  union {
+    uint64_t scr64;
+    uint8_t scr8[U8ID_SCR_TRESH];
+    uint8_t *u8p;
+  };
+};
+
+typedef unsigned u8id_ctx_t;
+
+enum u8id_norm {
+  U8ID_NFC = 0,
+  U8ID_NFD = 1,
+  U8ID_NFKC = 2,
+  U8ID_NFKD = 3,
+  U8ID_FCD = 4,
+  U8ID_FCC = 5
+};
+
+enum u8id_profile {
+  U8ID_PROFILE_1 = 1,
+  U8ID_PROFILE_2 = 2,
+  U8ID_PROFILE_3 = 3,
+  U8ID_PROFILE_4 = 4,
+  U8ID_PROFILE_5 = 5,
+  U8ID_PROFILE_6 = 6,
+  U8ID_PROFILE_C11_6 = 7,
+  U8ID_PROFILE_TR39_4 = 8,
+};
+
+enum u8id_options {
+  U8ID_TR31_XID = 64,
+  U8ID_TR31_ID = 65,
+  U8ID_TR31_ALLOWED = 66,
+  U8ID_TR31_TR39 = 67,
+  U8ID_TR31_C23 = 68,
+  U8ID_TR31_C11 = 69,
+  U8ID_TR31_ALLUTF8 = 70,
+  U8ID_TR31_ASCII = 71,
+  U8ID_FOLDCASE = 128,
+  U8ID_WARN_CONFUSABLE = 256,
+  U8ID_ERROR_CONFUSABLE = 512,
+};
+#define U8ID_TR31_MASK 127
+
+enum u8id_errors {
+  U8ID_EOK = 0,
+  U8ID_EOK_NORM = 1,
+  U8ID_EOK_WARN_CONFUS = 2,
+  U8ID_EOK_NORM_WARN_CONFUS = 3,
+  U8ID_ERR_XID = -1,
+  U8ID_ERR_SCRIPT = -2,
+  U8ID_ERR_SCRIPTS = -3,
+  U8ID_ERR_ENCODING = -4,
+  U8ID_ERR_COMBINE = -5,
+  U8ID_ERR_CONFUS = -6,
+};
+
+#define U8ID_NORM_DEFAULT U8ID_NFC
+#define U8ID_PROFILE_DEFAULT U8ID_PROFILE_TR39_4
+#define U8ID_TR31_DEFAULT U8ID_TR31_TR39
+
+/* ---- Data headers with definitions (no EXTERN_SCRIPTS = define LOCAL arrays) ---- */
 #include "u8id_gc.h"
 #include "scripts.h"
 #include "mark.h"
