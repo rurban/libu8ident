@@ -28,7 +28,7 @@ int u8id_decompose_s(char *restrict dest, long dmax, char *restrict src,
                      size_t *restrict lenp, const bool iscompat);
 #endif
 
-LOCAL const char *u8ident_errstr(int errcode) {
+U8ID_LOCAL const char *u8ident_errstr(int errcode) {
   static const char *const _str[] = {
       "ERR_CONFUS",           // -6
       "ERR_COMBINE",          // -5
@@ -229,7 +229,7 @@ static int utf8_len(const unsigned char ch) {
   return len;
 }
 
-LOCAL uint32_t dec_utf8(char **strp) {
+U8ID_LOCAL uint32_t dec_utf8(char **strp) {
   const unsigned char *str = (const unsigned char *)*strp;
   int bytes = utf8_len(*str);
   int shift;
