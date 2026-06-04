@@ -64,22 +64,22 @@ typedef unsigned u8id_ctx_t;
 #ifndef _U8ID_PRIVATE_H
 // from outside the dll
 #  if defined _WIN32 || defined __CYGWIN__
-#    define EXTERN __declspec(dllimport)
+#    define U8ID_EXTERN __declspec(dllimport)
 #  else
-#    define EXTERN extern
+#    define U8ID_EXTERN extern
 #  endif
-// #  define LOCAL
+// #  define U8ID_LOCAL
 #else
 // inside the dll
 #  if defined _WIN32 || defined __CYGWIN__
-#    define EXTERN __declspec(dllexport)
-#    define LOCAL
+#    define U8ID_EXTERN __declspec(dllexport)
+#    define U8ID_LOCAL
 #  elif __GNUC__ >= 4
-#    define EXTERN __attribute__((visibility("default")))
-#    define LOCAL __attribute__((visibility("hidden")))
+#    define U8ID_EXTERN __attribute__((visibility("default")))
+#    define U8ID_LOCAL __attribute__((visibility("hidden")))
 #  else
-#    define EXTERN
-#    define LOCAL
+#    define U8ID_EXTERN
+#    define U8ID_LOCAL
 #  endif
 #endif
 
@@ -88,13 +88,13 @@ typedef unsigned u8id_ctx_t;
    `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`. return -1 on error, 0 if
    options are valid.
 */
-EXTERN int u8ident_init(enum u8id_profile, enum u8id_norm, unsigned options);
+U8ID_EXTERN int u8ident_init(enum u8id_profile, enum u8id_norm, unsigned options);
 
 /* maxlength of an identifier. Default: 1024. Beware that such longs
    identifiers, are not really identifiable anymore, and keep them under 80 or
    even less. Some filesystems do allow now 32K identifiers, which is a glaring
    security hole, waiting to be exploited */
-EXTERN void u8ident_set_maxlength(unsigned maxlen);
+U8ID_EXTERN void u8ident_set_maxlength(unsigned maxlen);
 
 /* Generates a new identifier document/context/directory, which
    initializes a new list of seen scripts. Contexts are optional, by
@@ -104,10 +104,10 @@ EXTERN void u8ident_set_maxlength(unsigned maxlen);
    once.
    I cannot think of any such usage, so better avoid contexts with usernames to
    avoid mixups. */
-EXTERN u8id_ctx_t u8ident_new_ctx(void);
+U8ID_EXTERN u8id_ctx_t u8ident_new_ctx(void);
 
 /* Changes to the context previously generated with `u8ident_new_ctx`. */
-EXTERN int u8ident_set_ctx(u8id_ctx_t ctx);
+U8ID_EXTERN int u8ident_set_ctx(u8id_ctx_t ctx);
 
 /* Optionally adds a script to the context, if it's known or declared
    beforehand. Such as `use utf8 "Greek";` in cperl.
@@ -131,22 +131,22 @@ EXTERN int u8ident_set_ctx(u8id_ctx_t ctx);
 
    All others need to be added with u8ident_add_script_name().
 */
-EXTERN int u8ident_add_script_name(const char *name);
-EXTERN int u8ident_add_script(uint8_t script);
+U8ID_EXTERN int u8ident_add_script_name(const char *name);
+U8ID_EXTERN int u8ident_add_script(uint8_t script);
 
-EXTERN uint8_t u8ident_get_script(const uint32_t cp);
-EXTERN const char *u8ident_script_name(const int scr);
+U8ID_EXTERN uint8_t u8ident_get_script(const uint32_t cp);
+U8ID_EXTERN const char *u8ident_script_name(const int scr);
 
 /* Deletes the context generated with `u8ident_new_ctx`. This is
    optional, all remaining contexts are deleted by `u8ident_free` */
-EXTERN int u8ident_free_ctx(u8id_ctx_t ctx);
+U8ID_EXTERN int u8ident_free_ctx(u8id_ctx_t ctx);
 
 /* End this library, cleaning up all internal structures. */
-EXTERN void u8ident_free(void);
+U8ID_EXTERN void u8ident_free(void);
 
 /* Returns a freshly allocated normalized string, in the option defined at
    `u8ident_init`. Defaults to U8ID_NFC. */
-EXTERN char *u8ident_normalize(const char *buf, int len);
+U8ID_EXTERN char *u8ident_normalize(const char *buf, int len);
 
 #ifdef HAVE_CONFUS
 /*
@@ -154,7 +154,7 @@ EXTERN char *u8ident_normalize(const char *buf, int len);
   -DHAVE_CONFUS.  With --with-croaring -DHAVE_CROARING this is
   twice as fast, and needs half the size.
 */
-EXTERN bool u8ident_is_confusable(const uint32_t cp);
+U8ID_EXTERN bool u8ident_is_confusable(const uint32_t cp);
 #endif
 
 enum u8id_errors {
@@ -190,8 +190,8 @@ enum u8id_errors {
   Note that in the check we explicitly allow the Latin confusables: 0 1 I `
   i.e. U+30, U+31, U+49, U+60
 */
-EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
-EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
+U8ID_EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm);
+U8ID_EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
                                           char **outnorm);
 
 #ifdef HAVE_CONFUS
@@ -201,14 +201,14 @@ EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int len,
    and for each confusable match, normalized to NFC, the first
    wins. Only with `--enable-confus / -DHAVE_CONFUS`.
 */
-EXTERN enum u8id_errors u8ident_check_confusables(const char *buf,
+U8ID_EXTERN enum u8id_errors u8ident_check_confusables(const char *buf,
                                                   const int len);
 #endif
 
 /* returns the failing codepoint, which failed in the last check. */
-EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t ctx);
+U8ID_EXTERN uint32_t u8ident_failed_char(const u8id_ctx_t ctx);
 /* returns the constant script name, which failed in the last check. */
-EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t ctx);
+U8ID_EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t ctx);
 
 /* Returns a fresh string of the list of the seen scripts in this
    context whenever a mixed script error occurs. Needed for the error message
@@ -225,4 +225,4 @@ EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t ctx);
        free(scripts);
    }
 */
-EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t ctx);
+U8ID_EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t ctx);

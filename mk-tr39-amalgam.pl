@@ -1,15 +1,14 @@
 #!/usr/bin/perl
-# mk-tr39-amalgam.pl — regenerate u8ident-tr39.c from u8idscr.c
+# mk-tr39-amalgam.pl — regenerate self-contained u8ident-tr39.c
 # Usage: perl mk-tr39-amalgam.pl [srcdir]
 # Requires: unifdef in $PATH or $UNIFDEF env var.
 #
 # The amalgam is structured as:
-#   1. Fixed preamble  (license, includes, global state, errstr)
-#   2. Generated from u8idscr.c via unifdef + filtering:
-#        context management, search utilities, all lookup functions,
-#        plus injected isTR39_start_p / isTR39_cont_p pointer wrappers
-#   3. Fixed tail  (TR39-specific init, check_buf, stubs)
-#      — kept in this script; update when u8ident.c semantics change.
+#   1. Fixed preamble (license, standard includes, inline types + enums,
+#      unitr39.h, inlined data arrays, global state, errstr)
+#   2. Generated from u8idscr.c via unifdef + filtering (only TR39-relevant
+#      functions; skips everything that references XID/ID/ALLOWED/etc lists)
+#   3. Fixed tail (TR39-specific init, utf8 helpers, check_buf, stubs)
 
 use strict;
 use warnings;
@@ -30,8 +29,8 @@ my @flags = qw(
 # ── 1. Fixed preamble ─────────────────────────────────────────────────────────
 
 print <<'PREAMBLE';
-/* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021,2022,2025 Reini Urban
+/* libu8ident_c - TR39-limited unicode security guidelines for C/C++ identifiers.
+   Copyright 2021,2022,2025,2026 Reini Urban
    SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
    TR39 amalgam — single-file implementation for C compiler integration.
@@ -49,14 +48,14 @@ print <<'PREAMBLE';
 
 /* ---- Visibility and compiler hints (inlined from u8id_private.h) ---- */
 #if defined _WIN32 || defined __CYGWIN__
-#  define EXTERN __declspec(dllexport)
-#  define LOCAL
+#  define U8ID_EXTERN __declspec(dllexport)
+#  define U8ID_LOCAL
 #elif __GNUC__ >= 4
-#  define EXTERN __attribute__((visibility("default")))
-#  define LOCAL __attribute__((visibility("hidden")))
+#  define U8ID_EXTERN __attribute__((visibility("default")))
+#  define U8ID_LOCAL __attribute__((visibility("hidden")))
 #else
-#  define EXTERN
-#  define LOCAL
+#  define U8ID_EXTERN
+#  define U8ID_LOCAL
 #endif
 
 #if __GNUC__ >= 3
@@ -148,15 +147,41 @@ enum u8id_errors {
 #define U8ID_PROFILE_DEFAULT U8ID_PROFILE_TR39_4
 #define U8ID_TR31_DEFAULT U8ID_TR31_TR39
 
-/* ---- Data headers with definitions (no EXTERN_SCRIPTS = define LOCAL arrays) ---- */
-#include "u8id_gc.h"
-#include "scripts.h"
-#include "mark.h"
-#undef EXTERN_SCRIPTS
-#include "unic11.h"
+/* ---- Data (unitr39.h is self-contained; remaining data inlined below) ---- */
 #include "unitr39.h"
-#include "medial.h"
 
+PREAMBLE
+
+# ── Inline data arrays needed by the tail (from scripts.h, mark.h) ───────
+
+sub extract_array {
+    my ($file, $name) = @_;
+    open my $fh, '<', "$srcdir/$file" or die "$file: $!";
+    local $/;
+    my $text = <$fh>;
+    # Match: [LOCAL] const type name[] = { ... };
+    $text =~ /(?:(?:LOCAL|U8ID_LOCAL)\s+)?(const\s+\S+\s+\Q$name\E\[\]\s*=\s*\{.+?\};)/s
+        or die "Could not find $name in $file";
+    return $1;
+}
+
+sub inline_array {
+    my ($file, $name) = @_;
+    my $def = extract_array($file, $name);
+    # Strip LOCAL prefix if present
+    $def =~ s/^(?:LOCAL|U8ID_LOCAL)\s+//;
+    print "$def\n\n";
+}
+
+print "/* ---- Inlined data from scripts.h, mark.h ---- */\n\n";
+inline_array('scripts.h', 'bidi_list');
+inline_array('scripts.h', 'greek_confus_list');
+inline_array('scripts.h', 'nonxid_script_list');
+inline_array('scripts.h', 'scx_list');
+inline_array('scripts.h', 'all_scripts');
+inline_array('mark.h',   'nsm_letters');
+
+print <<'PREAMBLE2';
 /* ---- Global state ---- */
 
 unsigned s_u8id_options = U8ID_TR31_ALLOWED;
@@ -181,19 +206,7 @@ struct ctx_t ctx[U8ID_CTX_TRESH] = {{0}};
 static u8id_ctx_t i_ctx = 0;
 struct ctx_t *ctxp = NULL;
 
-PREAMBLE
-
-# ── 2. Generated section from u8idscr.c ──────────────────────────────────────
-
-my @src = `$UNIFDEF @flags "$srcdir/u8idscr.c" 2>/dev/null`;
-
-# Functions to skip entirely (not present in the TR39 amalgam):
-#   u8ident_gc_name    — debug helper, not in public API
-#   u8ident_is_MEDIAL  — uses medial_list; amalgam uses u8ident_is_tr39_MEDIAL
-#                        (which uses tr39_medial_list from unitr39.h)
-#   u8ident_get_tr39   — re-emitted in TR39_PTRS block using pointer helpers
-my %skip_fn = map { $_ => 1 } qw(
-    u8ident_gc_name
+PREAMBLE2
     u8ident_is_MEDIAL
     u8ident_get_tr39
 );
@@ -270,7 +283,7 @@ static const struct sc_tr39 *isTR39_cont_p(const uint32_t cp) {
       sizeof(*tr39_cont_list));
 }
 
-LOCAL const struct sc_tr39 *u8ident_get_tr39(const uint32_t cp) {
+U8ID_LOCAL const struct sc_tr39 *u8ident_get_tr39(const uint32_t cp) {
   const struct sc_tr39 *sc = isTR39_start_p(cp);
   return sc ? sc : isTR39_cont_p(cp);
 }
@@ -288,13 +301,13 @@ print <<'TAIL';
 
 /* ---- tr31 options ---- */
 
-LOCAL enum u8id_options u8ident_tr31(void) {
+U8ID_LOCAL enum u8id_options u8ident_tr31(void) {
   return U8ID_TR31_DEFAULT;
 }
 
 /* ---- Initialization  (hardcoded TR39_4) ---- */
 
-EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
+U8ID_EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
                         unsigned options) {
   if (options > 1023)
     return -1;
@@ -313,7 +326,7 @@ enum u8id_norm u8ident_norm(void) { return s_u8id_norm; }
 enum u8id_profile u8ident_profile(void) { return s_u8id_profile; }
 unsigned u8ident_options(void) { return s_u8id_options; }
 
-EXTERN void u8ident_set_maxlength(unsigned maxlen) {
+U8ID_EXTERN void u8ident_set_maxlength(unsigned maxlen) {
   if (maxlen > 1)
     s_maxlen = maxlen;
 }
@@ -381,7 +394,7 @@ static int utf8_len(const unsigned char ch) {
   return len;
 }
 
-LOCAL uint32_t dec_utf8(char **strp) {
+U8ID_LOCAL uint32_t dec_utf8(char **strp) {
   const unsigned char *str = (const unsigned char *)*strp;
   int bytes = utf8_len(*str);
   int shift;
@@ -400,20 +413,10 @@ LOCAL uint32_t dec_utf8(char **strp) {
   return cp;
 }
 
-/* ---- Normalization stub (all TR39 codepoints are NFC-stable) ---- */
-
-EXTERN char *u8ident_normalize(const char *src, int srcsz) {
-  char *dest = malloc(srcsz + 1);
-  if (dest) {
-    memcpy(dest, src, srcsz);
-    dest[srcsz] = '\0';
-  }
-  return dest;
-}
-
 /* ---- Core: check_buf (no #if, uses struct pointers) ---- */
+/* FXIME: update from unifdef u8ident.c */
 
-EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
+U8ID_EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
                                           char **outnorm) {
   char *s = (char *)buf;
   const char *e = (char *)&buf[bufsz];
@@ -619,18 +622,8 @@ next_cp:
 
 /* ---- String wrapper ---- */
 
-EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
+U8ID_EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
   return u8ident_check_buf((char *)string, strlen((char *)string), outnorm);
 }
 
-/* ---- Stub for confusable-only check ---- */
-
-EXTERN enum u8id_errors u8ident_check_confusables(const char *buf,
-                                                  const int bufsz) {
-  (void)buf;
-  (void)bufsz;
-  fprintf(stderr,
-          "Unsupported u8ident_check_confusables(), need --enable-confus\n");
-  return -1;
-}
 TAIL
