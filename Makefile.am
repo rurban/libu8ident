@@ -7,7 +7,7 @@ GPERF = @GPERF@
 WARN_CFLAGS = @WARN_CFLAGS@
 CROARING_PATH = @CROARING_PATH@
 AM_CFLAGS = -I$(srcdir)/include -I$(builddir) -I$(srcdir) $(WARN_CFLAGS)
-lib_LTLIBRARIES = libu8ident.la
+lib_LTLIBRARIES = libu8ident.la libu8ident_c.la
 include_HEADERS = include/u8ident.h
 c_sources = $(srcdir)/u8ident.c $(srcdir)/u8idnorm.c $(srcdir)/u8idscr.c $(srcdir)/u8idroar.c
 libu8ident_la_SOURCES = u8ident.c u8idnorm.c u8idscr.c
@@ -23,16 +23,23 @@ libu8ident_la_LDFLAGS = \
 	-version-info $(LIBU8IDENT_SO_VERSION) \
 	-no-undefined \
 	$(LDFLAGS) $(AM_LDFLAGS)
+U8IFDEF = -DU8ID_TR31=3 -DU8ID_PROFILE_TR39 -DU8ID_NORM=0 -UHAVE_CROARING -UHAVE_CONFUS -DENABLE_CHECK_XID -UDISABLE_CHECK_XID -UDEBUG -UPERF_TEST -UDISABLE_U8ID_TR31 -DU8ID_PROFILE=8 -UNO_UNITR39
+libu8ident_c_la_SOURCES = u8ident-tr39.c
+libu8ident_c_la_CFLAGS = $(AM_CFLAGS) $(U8IFDEF)
+libu8ident_c_la_LDFLAGS = \
+	-version-info $(LIBU8IDENT_SO_VERSION) \
+	-no-undefined \
+	$(LDFLAGS) $(AM_LDFLAGS)
 bin_PROGRAMS = u8idlint
 u8idlint_SOURCES = u8idlint.c $(libu8ident_la_SOURCES)
 u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 u8idlint_LDADD = $(u8idlint_LIBS)
-EXTRA_HEADERS = c11-safe.h unitr39.h
+EXTRA_HEADERS = c11-safe.h unitr39.h u8ident_c.h
 
 pcdatadir = $(libdir)/pkgconfig
-pcdata_DATA = libu8ident.pc
+pcdata_DATA = libu8ident.pc libu8ident_c.pc
 dist_man1_MANS = u8idlint.1
-dist_man3_MANS = u8ident.3
+dist_man3_MANS = u8ident.3 u8ident_c.3
 docdir = $(datadir)/libu8ident
 PCXX = P2528R0
 NC   = n2932
@@ -42,7 +49,7 @@ PDF = doc/$(PCXX).pdf doc/$(DCURCXX).pdf doc/$(NC).pdf doc/$(NCURC).pdf
 doc_DATA = README.md NEWS NOTICE LICENSE \
 	   doc/c11.md doc/$(PCXX).md doc/$(DCURCXX).md doc/$(NC).md \
 	   doc/$(NCURC).md doc/$(NCURC).patch \
-	   doc/tr31-bugs.md 
+	   doc/tr31-bugs.md doc/u8ident_c.3.md
 if HAVE_PANDOC
 doc_DATA += $(PDF)
 html_DATA = doc/$(DCURCXX).html doc/$(NCURC).html
@@ -99,6 +106,17 @@ $(srcdir)/su8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 $(srcdir)/gconfus.h: $(srcdir)/gconfus.h.in
 	-if test -n "$(GPERF)"; then cd $(srcdir) && $(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp; fi
 
+c11-all.h unitr39.h: mktr39$(EXEEXT) scripts.h mark.h medial.h
+	./mktr39$(EXEEXT)
+if !HAVE_WINDOWS
+	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unitr39.h $(srcdir)/
+else
+	-copy /y c11-all.h unitr39.h $(srcdir)/
+endif
+
+$(srcdir)/u8ident-tr39.c: $(srcdir)/u8idscr.c $(srcdir)/mk-tr39-amalgam.pl
+	$(PERL) $(srcdir)/mk-tr39-amalgam.pl $(srcdir) >$@
+
 # emacs flymake-mode
 check-syntax:
 	test -n "$(CHK_SOURCES)" && \
@@ -108,7 +126,7 @@ check-syntax:
 clang-format:
 	clang-format -i $(srcdir)/*.c $(srcdir)/include/*.h $(srcdir)/scripts.h $(srcdir)/confus.h $(srcdir)/u8id*.h
 
-$(dist_man1_MANS) regen-man: $(bin_PROGRAMS)
+regen-man: $(bin_PROGRAMS)
 	-for p in $(dist_man1_MANS); do \
 	  base=`basename $$p .1`; \
 	  LC_ALL=C help2man -N -s1 -p $(PACKAGE_NAME) --manual "U8IDENT Manual $(VERSION)" -o $$p ./$$base$(EXEEXT); done
@@ -204,11 +222,11 @@ regen-all: regen-scripts regen-norm regen-confus regen-man $(doc_DATA) doc/$(DCU
 .PHONY: regen-all regen-scripts regen-norm regen-confus check-asan check-norm scan-build man \
 	pkg docs patch-c-doc regen-c-patch docker-html docker-pdf
 
-EXTRA_PROGRAMS = mktr39 test test-texts example
-TESTS = test example
+EXTRA_PROGRAMS = mktr39 test test-texts example test_c test_texts_c example_c
+TESTS = test example test_c example_c
 if !HAVE_WINDOWS
 EXTRA_PROGRAMS += test_asan
-TESTS += test-texts.test u8idlint.test
+TESTS += test-texts.test u8idlint.test test_texts_c
 endif
 test_SOURCES = test.c $(libu8ident_la_SOURCES)
 test_CFLAGS = $(AM_CFLAGS)
@@ -216,9 +234,17 @@ test_texts_SOURCES = test-texts.c $(libu8ident_la_SOURCES)
 test_texts_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 test_texts_LDADD = $(u8idlint_LIBS)
 mktr39_SOURCES = mktr39.c $(libu8ident_la_SOURCES)
-mktr39_CFLAGS = $(AM_CFLAGS)
+mktr39_CFLAGS = $(AM_CFLAGS) -DNO_UNITR39
 example_SOURCES = example.c
 example_LDADD = libu8ident.la
+test_c_SOURCES = test.c $(libu8ident_c_la_SOURCES)
+test_c_CFLAGS = $(libu8ident_c_la_CFLAGS)
+test_texts_c_SOURCES = test-texts.c $(libu8ident_c_la_SOURCES)
+test_texts_c_CFLAGS = $(libu8ident_c_la_CFLAGS) $(U8IDLINT_CFLAGS)
+test_texts_c_LDADD = $(u8idlint_LIBS)
+example_c_SOURCES = example_c.c
+example_c_CFLAGS = $(libu8ident_c_la_CFLAGS)
+example_c_LDADD = libu8ident_c.la
 test_asan_CFLAGS = $(AM_CFLAGS) -g -fsanitize=address
 test_asan_SOURCES = test.c $(libu8ident_la_SOURCES)
 
@@ -240,15 +266,6 @@ perf: perf.c
 	@echo "ERROR perf requires roaring.c (--with-croaring)"
 mkroar: mkroar.c
 	@echo "ERROR mkroar requires roaring.c (--with-croaring)"
-endif
-
-c11-all.h unitr39.h: scripts.h mark.h medial.h
-	$(MAKE) mktr39$(EXEEXT)
-	./mktr39$(EXEEXT)
-if !HAVE_WINDOWS
-	-[ "$(srcdir)" != "." ] && mv -f c11-all.h unitr39.h $(srcdir)/
-else
-	-copy /y c11-all.h unitr39.h $(srcdir)/
 endif
 
 if !HAVE_WINDOWS
@@ -304,7 +321,7 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	for n in NFKC NFC NFKD NFD FCD FCC; do \
 	  for p in 2 3 4 5 6 C11_6 TR39_4; do \
 	    for x in ALLOWED TR39 ID XID C11 C23 ALLUTF8 NONE; do \
-	      if [ $$n != NFC ] && [ $$p = TR39_4 -o $$x = TR39 -o $$x = C23 ]; then \
+	      if ([ $$n != NFC ] && [ $$p = TR39_4 -o $$x = TR39 -o $$x = C23 ]) || ([ $$x = TR39 ] && [ $$p = 6 -o $$p = C11_6 ]); then \
 		echo "skip -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
               else \
 	        echo "check -DU8ID_NORM=$$n -DU8ID_PROFILE=$$p -DU8ID_TR31=$$x"; \
@@ -319,7 +336,7 @@ check-all-combinations: $(libu8ident_la_SOURCES) $(include_HEADERS) $(HDRS)
 	rm ./test-profiles$(EXEEXT)
 # gem install mdl
 check-mdl check-docs:
-	cd $(srcdir) && mdl *.md doc/*.md
+	cd $(srcdir) && mdl README.md doc/*.md
 
 # clang-analyzer.llvm.org, debian: clang-tools-{6.0,7}, redhat: clang-analyzer
 SCAN_BUILD = scan-build
@@ -330,6 +347,8 @@ man: $(dist_man1_MANS) $(dist_man3_MANS)
 
 RONN_ARGS=--roff --manual "u8ident Manual $(VERSION)" --organization=rurban/libu8ident
 u8ident.3: README.md
+	$(RONN) $(RONN_ARGS) < $< > $@
+u8ident_c.3: doc/u8ident_c.3.md
 	$(RONN) $(RONN_ARGS) < $< > $@
 
 pkg:
@@ -349,9 +368,10 @@ dist-hook:
 CLEANFILES = test$(EXEEXT) test-texts$(EXEEXT) test-asan$(EXEEXT) test-profiles$(EXEEXT) \
 	     test-tr31$(EXEEXT) test-prof{2,3,4,5,6,TR39_4,C11_6,TR39,C11STD}$(EXEEXT) \
 	     test-norm-{NFKC,NFC,FCC,NFKD,NFD,FCD}$(EXEEXT) mkroar$(EXEEXT) perf$(EXEEXT) \
-	     texts.tst mktr39$(EXEEXT) example$(EXEEXT)
-DISTCLEANFILES = config.log u8ident.3 u8idlint.1 $(html_DATA) homo-sec-1.tst.rst \
-	     test-texts.test doc/$(NCURC).pdf
+	     texts.tst mktr39$(EXEEXT) example$(EXEEXT) \
+	     test_c$(EXEEXT) test_texts_c$(EXEEXT) example_c$(EXEEXT)
+DISTCLEANFILES = config.log u8ident.3 u8idlint.1 u8ident_c.3 $(html_DATA) \
+	     homo-sec-1.tst.rst test-texts.test doc/$(NCURC).pdf c11-all.h unitr39.h
 distclean-compile:
 	-rm -f *.tab.c
 	-rm -rf .deps

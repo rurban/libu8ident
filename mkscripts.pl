@@ -321,7 +321,7 @@ while (<$SC>) {
     next;
   }
   # only if the Sc is new or there is a hole
-  if (($from != $oldto + 1) or ($oldsc ne $sc)) { 
+  if (($from != $oldto + 1) or ($oldsc ne $sc)) {
     push @SCR, [$from, $to, $sc];
     $scripts{$sc}++;
     $oldsc = $sc;
@@ -690,11 +690,11 @@ for my $sc (@limited) {
 }
 $i--;
 $defines .= "#define LAST_SCRIPT $i\n";
-printf $H <<"EOF", $i;
+printf $H <<'EOF';
     // clang-format on
 };
 #else
-extern const char *const all_scripts[%u];
+extern const char *const all_scripts[];
 #endif
 
 EOF

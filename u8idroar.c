@@ -11,9 +11,11 @@
 #  include <stdio.h>
 #  include <stdbool.h>
 #  include "roaring.c"
-#  include "confus_croar.h"
+#  ifdef HAVE_CONFUS
+#    include "confus_croar.h"
 
 static roaring_bitmap_t *rc = NULL;
+#  endif
 
 #  ifdef USE_ALLOWED_CROAR
 #    include "allowed_croar.h"
@@ -42,12 +44,14 @@ static roaring_bitmap_t *rnfd_n = NULL;
 #  endif
 
 int u8ident_roar_init(void) {
+#  ifdef HAVE_CONFUS
   if (!rc) {
     rc = roaring_bitmap_portable_deserialize_safe((char *)confus_croar_bin,
                                                   confus_croar_bin_len);
     if (!rc)
       return -1;
   }
+#  endif
 
   // These are disabled by default. Only used by perf
 #  ifdef USE_NORM_CROAR
@@ -84,7 +88,9 @@ void u8ident_roar_free(void) {
       roaring_bitmap_free(rc);                                                 \
     rc = NULL
 
+#  ifdef HAVE_CONFUS
   FREE_R(rc);
+#  endif
 
 #  ifdef USE_ALLOWED_CROAR
   FREE_R(ra);
@@ -103,9 +109,11 @@ void u8ident_roar_free(void) {
 #  undef FREE_R
 }
 
+#  ifdef HAVE_CONFUS
 EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return roaring_bitmap_contains(rc, cp);
 }
+#  endif
 
 #  ifdef USE_ALLOWED_CROAR
 bool u8ident_roar_is_allowed(const uint32_t cp) {

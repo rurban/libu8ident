@@ -1,5 +1,5 @@
 /* libu8ident - Check unicode security guidelines for identifiers.
-   Copyright 2021,2022 Reini Urban
+   Copyright 2021,2022,2026 Reini Urban
    SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 */
 #include <stdlib.h>
@@ -24,23 +24,27 @@
 #  include "confus.h"
 #endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
 static char buf[128]; // for hex display
+#endif
 
 // private access
 unsigned u8ident_options(void);
 enum u8id_profile u8ident_profile(void);
+#ifndef U8ID_PROFILE_TR39
 char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+#endif
 
 static inline bool is_profile_6(void) {
   return u8ident_profile() == 6 || u8ident_profile() == C11_6;
 }
-//static inline bool is_profile_4(void) {
-//  return u8ident_profile() == 4 || u8ident_profile() == TR39_4;
-//}
+// static inline bool is_profile_4(void) {
+//   return u8ident_profile() == 4 || u8ident_profile() == TR39_4;
+// }
 
 // check if the library can be used without init: script lookups, default checks
 void test_scripts_no_init(void) {
-#ifdef HAVE_CROARING
+#if defined(HAVE_CROARING) && !defined(U8ID_PROFILE_TR39)
   // well, this needs an init
   assert(!u8ident_roar_init());
 #endif
@@ -70,7 +74,7 @@ void test_scripts_no_init(void) {
   assert(scx);
   assert(scx->gc == GC_Mn);
   assert(strlen(scx->scx) == 2);
-  assert(scx->scx[0] == 0x03);   // Arab
+  assert(scx->scx[0] == 0x03); // Arab
   assert(strcmp(u8ident_script_name((uint8_t)scx->scx[0]), "Arabic") == 0);
   assert(strcmp(u8ident_script_name((uint8_t)scx->scx[1]), "Syriac") == 0);
 #ifndef DISABLE_CHECK_XID
@@ -78,9 +82,9 @@ void test_scripts_no_init(void) {
   assert(!isXID_start('0'));
   assert(!isALLOWED_start('0'));
   assert(!isC11_start('0'));
-#if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(!isC23_start('0'));
-#endif
+#  endif
   assert(!isTR39_start('0'));
   assert(!isALLUTF8_start('0'));
   assert(!isASCII_start('0'));
@@ -88,9 +92,9 @@ void test_scripts_no_init(void) {
   assert(isXID_cont('0'));
   assert(isALLOWED_cont('0'));
   assert(isC11_cont('0'));
-#if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(isC23_cont('0'));
-#endif
+#  endif
   assert(isTR39_cont('0'));
   assert(isALLUTF8_cont('0'));
   assert(isASCII_cont('0'));
@@ -102,29 +106,36 @@ void test_scripts_no_init(void) {
   assert(!isALLOWED_start('$'));
   assert(!isALLOWED_cont('$'));
   // GH #25: It is implementation-defined if $ is allowed in identifiers
-#ifdef ALLOW_DOLLAR /* default */
+#  ifdef ALLOW_DOLLAR /* default */
   assert(isC11_start('$'));
   assert(isTR39_start('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(isC23_start('$'));
+#endif
   assert(isC11_cont('$'));
   assert(isTR39_cont('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(isC23_cont('$'));
-#else
+#endif
+#  else
   assert(!isC11_start('$'));
   assert(!isTR39_start('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(!isC23_start('$'));
+#endif
   assert(!isC11_cont('$'));
   assert(!isTR39_cont('$'));
+#ifndef U8ID_PROFILE_TR39
   assert(!isC23_cont('$'));
 #endif
+#  endif
 
   assert(isALLOWED_cont(0x27));  // '
   assert(!isALLOWED_cont(0x26)); // &
-  assert(isALLOWED_cont(0x40e)); // Ў
-#if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(isC23_cont(0x311)); // ̑
-#endif
-  
+#  endif
+
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
 #endif
   // check that no list elements can be merged
@@ -173,6 +184,7 @@ void test_scripts_no_init(void) {
 #endif
 }
 
+#if U8ID_TR31 != 3 /* != TR39 */
 static int sign(int i) { return (i < 0) ? -1 : (i == 0) ? 0 : 1; }
 static char *xstr(const char *s) {
   unsigned i;
@@ -183,6 +195,7 @@ static char *xstr(const char *s) {
   // buf[i] = 0;
   return buf;
 }
+#endif
 #define CHECK_RET(ret, wanted, ctx)                                            \
   do {                                                                         \
     check_ret(ret, wanted, ctx);                                               \
@@ -244,6 +257,7 @@ struct norms_t {
   const int result;
 };
 
+#if U8ID_TR31 != 3 /* != TR39 */
 static void testnorm(const char *name, const struct norms_t *testids) {
   struct norms_t *p;
   for (p = (struct norms_t *)testids; p->id; p++) {
@@ -264,6 +278,7 @@ static void testnorm(const char *name, const struct norms_t *testids) {
     free(norm);
   }
 }
+#endif
 
 /*
   all differences: unichars -a '\pL' 'NFC ne NFKC'
@@ -322,6 +337,7 @@ static void testnorm(const char *name, const struct norms_t *testids) {
 */
 #if !defined U8ID_NORM || U8ID_NORM == NFKC
 void test_norm_nfkc(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -333,8 +349,11 @@ void test_norm_nfkc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFKC, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFKC", testids);
+#endif
 
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Cafe\xcc\x81", &norm);
@@ -348,6 +367,7 @@ void test_norm_nfkc(void) {
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFC
 void test_norm_nfc(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -358,8 +378,11 @@ void test_norm_nfc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFC, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFC", testids);
+#endif
 
   // which demands NFC already, so fails on XID earlier
   if (u8ident_tr31() != U8ID_TR31_TR39 && u8ident_tr31() != U8ID_TR31_C23) {
@@ -373,6 +396,7 @@ void test_norm_nfc(void) {
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == FCC
 void test_norm_fcc(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -383,12 +407,16 @@ void test_norm_fcc(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_FCC, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("FCC", testids);
+#endif
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFKD
 void test_norm_nfkd(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -400,18 +428,24 @@ void test_norm_nfkd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFKD, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFKD", testids);
+#endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strEQc(norm, "Cafe\xcc\x81"));
   free(norm);
+#endif
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == NFD
 void test_norm_nfd(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -423,18 +457,24 @@ void test_norm_nfd(void) {
     {NULL, NULL, 0},
       // clang-format on
   };
+#endif
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NFD, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("NFD", testids);
+#endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
   char *norm = NULL;
   int ret = u8ident_check((const uint8_t *)"Caf\xc3\xa9", &norm);
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
   assert(strEQc(norm, "Cafe\xcc\x81"));
   free(norm);
+#endif
 }
 #endif
 #if !defined U8ID_NORM || U8ID_NORM == FCD
 void test_norm_fcd(void) {
+#if U8ID_TR31 != 3 /* != TR39 */
   const struct norms_t testids[] = {
       // clang-format off
     {"abcd", "abcd", 0},
@@ -447,7 +487,10 @@ void test_norm_fcd(void) {
       // clang-format on
   };
   assert(!u8ident_init(U8ID_PROFILE_4, U8ID_FCD, 0));
+#if U8ID_TR31 != 3 /* != TR39 */
   testnorm("FCD", testids);
+#endif
+#endif
   u8ident_free();
 }
 #endif
@@ -494,7 +537,9 @@ void test_mixed_scripts(int xid_check) {
   else if (xid == U8ID_TR31_C23 && !is_profile_6())
     CHECK_RET(ret, U8ID_EOK_NORM, 0);
   else {
-#if !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||             \
+#if U8ID_TR31 == 3
+    CHECK_RET(ret, U8ID_EOK, 0); // TR39 has no NFC engine
+#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
     U8ID_NORM == FCC
     CHECK_RET(ret, U8ID_EOK_NORM, 0); // U+301
 #else
@@ -541,47 +586,47 @@ void test_mixed_scripts(int xid_check) {
 #if U8ID_UNICODE_MAJOR < 15
   // GREEK SMALL LETTER LAMDA did have no LATIN counter-part then (it has now)
   ret = u8ident_check((const uint8_t *)"abcλ", NULL); // Greek
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
+#  if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#else
+#  else
   CHECK_RET(ret, U8ID_EOK, 0);
-#endif
+#  endif
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   ret = u8ident_check((const uint8_t *)"abcλѝ", NULL); // Greek + Cyrillic
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
+#  if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
-    U8ID_NORM == FCC
+#  elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||         \
+      U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
-#else
+#  else
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
-#endif
+#  endif
   u8ident_free();
 
 #else // new UNICODE 16 confusables
 
   // Now confusable LATIN SMALL LETTER LAMBDA → GREEK SMALL LETTER LAMDA
   ret = u8ident_check((const uint8_t *)"abcΔ", NULL); // Greek
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5
+#  if !defined U8ID_PROFILE || U8ID_PROFILE < 5
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#else
+#  else
   CHECK_RET(ret, U8ID_EOK, 0);
-#endif
+#  endif
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, xid_check);
   // Cyrillic U+45D not Allowed anymore. replaced by U+45C
   ret = u8ident_check((const uint8_t *)"abcΔќ", NULL); // Greek + Cyrillic U+45C
-#if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
+#  if !defined U8ID_PROFILE || U8ID_PROFILE < 5 || U8ID_PROFILE == TR39_4
   CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
-#elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||           \
-    U8ID_NORM == FCC
+#  elif !defined U8ID_NORM || U8ID_NORM == NFKC || U8ID_NORM == NFC ||         \
+      U8ID_NORM == FCC
   CHECK_RET(ret, U8ID_EOK, 0);
-#else
+#  else
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
-#endif
+#  endif
   u8ident_free();
 
 #endif // new UNICODE 16 confusables
@@ -593,7 +638,11 @@ void test_mixed_scripts(int xid_check) {
 #elif U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD
   CHECK_RET(ret, U8ID_EOK_NORM, 0);
 #elif U8ID_PROFILE == TR39_4 && U8ID_UNICODE_MAJOR < 16
+#ifdef HAVE_CONFUS
   CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
+#else
+  CHECK_RET(ret, U8ID_EOK, 0);
+#endif
 #else
   CHECK_RET(ret, U8ID_EOK, 0); // multi-scripts allowed in 5 and 6
 #endif
@@ -713,7 +762,8 @@ void test_combine() {
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   int tr31 = u8ident_tr31();
   // these have safe XIDs, disallowing combiners
-  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_TR39 || tr31 == U8ID_TR31_C23)
+  if (tr31 == U8ID_TR31_ALLOWED || tr31 == U8ID_TR31_TR39 ||
+      tr31 == U8ID_TR31_C23)
     return;
   if (is_profile_6()) // this bypasses combiner checks
     return;
@@ -738,7 +788,8 @@ void test_combine() {
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
     // Disallow more then 4 combiners (Inherited, Recommended, Mn)
-    ret = u8ident_check((const uint8_t *)"a\u0300\u0301\u0302\u0303\u0304", NULL);
+    ret =
+        u8ident_check((const uint8_t *)"a\u0300\u0301\u0302\u0303\u0304", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
     // Special cases DOT ABOVE:
@@ -759,24 +810,26 @@ void test_combine() {
     ret = u8ident_check((const uint8_t *)"Å\u030a", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0);
 
-#if !defined U8ID_PROFILE || U8ID_PROFILE == 8
+#  if !defined U8ID_PROFILE || U8ID_PROFILE == 8
     // U8ID_TR31_TR39 disallows combiners at all
     u8ident_init(U8ID_PROFILE_TR39_4, U8ID_NORM_DEFAULT, 0);
     // \UXXXXXXXXX letter support
-    u8ident_add_script(SC_Yezidi); // EXCLUDED_SCRIPT only addable with profile 6
+    u8ident_add_script(
+        SC_Yezidi); // EXCLUDED_SCRIPT only addable with profile 6
     ret = u8ident_check((const uint8_t *)"\U00010EB0\u0307", NULL);
     CHECK_RET(ret, U8ID_ERR_COMBINE, 0); // FIXME
-#endif
+#  endif
   }
 #endif
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
   // But ignore spacing marks Mc (Devanagari)
   ret = u8ident_check((const uint8_t *)"\u0904\u0903\u0903", NULL);
-  //CHECK_RET(ret, U8ID_EOK or EOK_NORM, 0);
+  // CHECK_RET(ret, U8ID_EOK or EOK_NORM, 0);
   assert(ret >= 0);
-  ret = u8ident_check((const uint8_t *)"\u0904\u0903\u093b\u093e\u093b\u093e", NULL);
-  //CHECK_RET(ret, U8ID_EOK or EOK_NORM, 0);
+  ret = u8ident_check((const uint8_t *)"\u0904\u0903\u093b\u093e\u093b\u093e",
+                      NULL);
+  // CHECK_RET(ret, U8ID_EOK or EOK_NORM, 0);
   assert(ret >= 0);
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
@@ -785,7 +838,7 @@ void test_combine() {
   if (u8ident_profile() == 5)
     CHECK_RET(ret, U8ID_EOK, 0);
   else
-    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);  
+    CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
   u8ident_free();
 
   u8ident_init(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0);
@@ -849,6 +902,56 @@ void test_scx_singles(void) {
     }
   }
   u8ident_free_ctx(c);
+}
+
+void test_scx_crosscheck(void) {
+  // Cross-check tr39_*_list NULL scx against scx_list[].
+  // Every NULL scx in tr39 lists should NOT be in scx_list,
+  // and every scx_list entry overlapping tr39 lists must match.
+  const struct sc_tr39 *lists[] = {tr39_start_list, tr39_cont_list};
+  size_t list_sizes[] = {
+      ARRAY_SIZE(tr39_start_list),
+      ARRAY_SIZE(tr39_cont_list),
+  };
+
+  // Check 1: NULL scx in tr39 lists => not in scx_list
+  for (int li = 0; li < 2; li++) {
+    for (size_t i = 0; i < list_sizes[li]; i++) {
+      const struct sc_tr39 *e = &lists[li][i];
+      if (e->scx != NULL)
+        continue;
+      for (uint32_t cp = e->from; cp <= e->to; cp++) {
+        const struct scx *sc = u8ident_get_scx(cp);
+        assert(!sc);
+      }
+    }
+  }
+
+  // Check 2: scx_list entries in tr39 lists must match
+  for (size_t i = 0; i < ARRAY_SIZE(scx_list); i++) {
+    const struct scx *sc = &scx_list[i];
+    for (uint32_t cp = sc->from; cp <= sc->to; cp++) {
+      const struct sc_tr39 *tr = NULL;
+      for (size_t j = 0; j < ARRAY_SIZE(tr39_start_list); j++) {
+        if (cp >= tr39_start_list[j].from && cp <= tr39_start_list[j].to) {
+          tr = &tr39_start_list[j];
+          break;
+        }
+      }
+      if (!tr) {
+        for (size_t j = 0; j < ARRAY_SIZE(tr39_cont_list); j++) {
+          if (cp >= tr39_cont_list[j].from && cp <= tr39_cont_list[j].to) {
+            tr = &tr39_cont_list[j];
+            break;
+          }
+        }
+      }
+      if (!tr)
+        continue; // filtered out of tr39 lists, OK
+      assert(tr->scx != NULL);
+      assert(strEQ(tr->scx, sc->scx));
+    }
+  }
 }
 
 void test_gc(void) {
@@ -930,6 +1033,64 @@ void test_tr39(void) {
   }
 }
 
+/* Verify that every codepoint in the TR39 lists is NFC-stable.
+   This is the key invariant that allows stripping the NFC normalization
+   engine from the TR39 build (commit 002b4a4).  If any TR39 codepoint
+   is not NFC-stable, the TR39 memcpy stub for u8ident_normalize is wrong
+   and mixed-script / confusable checks that depend on normalized forms
+   would silently break.
+
+   This test must run in the full (non-TR39) build where the real NFC
+   engine is linked.  The TR39 build only has the memcpy stub. */
+#if U8ID_TR31 != 3 /* != TR39 */
+static void check_tr39_list_nfc(const char *name,
+                                const struct sc_tr39 *list, size_t len) {
+  char tmp[8];
+  unsigned failures = 0;
+  /* The test only works when the real NFC engine is compiled in. When
+     U8ID_NORM is a different normalization (e.g., NFKD), u8ident_init fails
+     and the normalize call uses the wrong engine. */
+  if (u8ident_init(U8ID_PROFILE_4, U8ID_NFC, 0) != 0) {
+    u8ident_free();
+    return;
+  }
+  for (size_t i = 0; i < len; i++) {
+    for (uint32_t cp = list[i].from; cp <= list[i].to; cp++) {
+      size_t n;
+      if (!enc_utf8(tmp, &n, cp))
+        continue;
+      char *norm = u8ident_normalize(tmp, (int)n);
+      if (!norm) {
+        printf("FAIL %s U+%04X: normalize returned NULL\n", name, cp);
+        failures++;
+        continue;
+      }
+      if (n != strlen(norm) || memcmp(tmp, norm, n) != 0) {
+        printf("FAIL %s U+%04X: not NFC-stable (got %s)\n", name, cp,
+               xstr(norm));
+        failures++;
+      }
+      free(norm);
+    }
+  }
+  u8ident_free();
+  if (failures)
+    printf("FAIL %s: %u codepoints are not NFC-stable\n", name, failures);
+  assert(failures == 0);
+}
+
+void test_tr39_nfc_stable(void) {
+  check_tr39_list_nfc("tr39_start_list", tr39_start_list,
+                       ARRAY_SIZE(tr39_start_list));
+  check_tr39_list_nfc("tr39_cont_list", tr39_cont_list,
+                       ARRAY_SIZE(tr39_cont_list));
+  check_tr39_list_nfc("tr39_excl_start_list", tr39_excl_start_list,
+                       ARRAY_SIZE(tr39_excl_start_list));
+  check_tr39_list_nfc("tr39_excl_cont_list", tr39_excl_cont_list,
+                       ARRAY_SIZE(tr39_excl_cont_list));
+}
+#endif /* U8ID_TR31 != 3 */
+
 void test_greek(void) {
   // check consecutive greek_confus_list
   for (size_t i = 1; i < ARRAY_SIZE(greek_confus_list); i++) {
@@ -943,7 +1104,7 @@ void test_greek(void) {
     ret = u8ident_check((const uint8_t *)"θ", NULL); // U+38B not confus
     CHECK_RET(ret, U8ID_EOK, 0);
     ret = u8ident_check((const uint8_t *)"Α", NULL); // U+391 confus
-    CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
+    CHECK_RET(ret, U8ID_EOK, 0); // already have Greek from θ above
   } else if (u8ident_profile() < 5) {
     ret = u8ident_check((const uint8_t *)"θ", NULL);
     CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);
@@ -969,7 +1130,7 @@ void test_add_scripts(void) {
   u8ident_free_ctx(c);
 }
 
-#ifdef HAVE_CONFUS
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39) && U8ID_TR31 != 3
 static int compar32(const void *a, const void *b) {
   const uint32_t ai = *(const uint32_t *)a;
   const uint32_t bi = *(const uint32_t *)b;
@@ -978,14 +1139,15 @@ static int compar32(const void *a, const void *b) {
 
 void test_confus(void) {
   int ret;
-#  ifdef HAVE_CROARING
+#  if defined(HAVE_CROARING) && !defined(U8ID_PROFILE_TR39)
   u8ident_roar_init();
 #  endif
   // test for equality of both variants
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     const uint32_t cp = confusables[i];
     assert(u8ident_is_confusable(cp));
-    uint32_t *x = (uint32_t *)bsearch(&cp, confusables, ARRAY_SIZE(confusables), 4, compar32);
+    uint32_t *x = (uint32_t *)bsearch(&cp, confusables, ARRAY_SIZE(confusables),
+                                      4, compar32);
     assert(x);
     assert(*x == cp);
   }
@@ -1006,6 +1168,7 @@ void test_confus(void) {
 
   for (size_t i = 0; i < ARRAY_SIZE(confusables); i++) {
     size_t len;
+    char buf[8];
     const uint32_t cp = confusables[i];
     if (cp > 0x7C) { // skip the latin confusables: 0 1 I ` |
       ret = u8ident_check((const uint8_t *)enc_utf8(buf, &len, cp), NULL);
@@ -1017,7 +1180,7 @@ void test_confus(void) {
              ret == U8ID_EOK_NORM_WARN_CONFUS);
     }
   }
-#  ifdef HAVE_CROARING
+#  if defined(HAVE_CROARING) && !defined(U8ID_PROFILE_TR39)
   u8ident_roar_free();
 #  endif
 }
@@ -1029,7 +1192,7 @@ void test_htable(void) {
   assert(find_htab(htab, "0"));
   assert(!find_htab(htab, "1"));
 
-  for (int i=1; i<1000; i++) {
+  for (int i = 1; i < 1000; i++) {
     char s[14];
     snprintf(s, 13, "%u", i);
     add_htab(htab, s, "x");
@@ -1042,7 +1205,7 @@ void test_htable(void) {
 
 void test_confusables(void) {
   // requires generic or NFC
-#if !defined U8ID_NORM || U8ID_NORM == NFC
+#  if !defined U8ID_NORM || U8ID_NORM == NFC
   int ret = u8ident_check_confusables("check", sizeof("check") - 1);
   assert(ret == 0);
   // Cyrillic c U+441, һ U+4bb, е U+435
@@ -1051,7 +1214,7 @@ void test_confusables(void) {
   // Latin c, Cyrillic һ U+4bb, е U+435
   ret = u8ident_check_confusables("cһесk", sizeof("cһесk") - 1);
   assert(ret == U8ID_ERR_CONFUS);
-#endif
+#  endif
 }
 
 #endif
@@ -1065,13 +1228,16 @@ int main(int argc, char **argv) {
 #endif
   const int scx = (argc > i && strEQc(argv[i], "scx") && i++);
   const int combine = (argc > i && strEQc(argv[i], "combine") && i++);
-  
+
   if (argc == 1) {
     test_scripts_no_init();
     test_init();
     test_gc();
     test_medial();
     test_tr39();
+#if U8ID_TR31 != 3
+    test_tr39_nfc_stable();
+#endif
     test_greek();
     test_script();
   }
@@ -1080,7 +1246,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-#ifdef HAVE_CONFUS
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39) && U8ID_TR31 != 3
   if (argc > i && strEQc(argv[i], "htable")) {
     test_htable();
     u8ident_free();
@@ -1134,10 +1300,11 @@ int main(int argc, char **argv) {
 
   if (scx || argc == 1) {
     test_scx_singles();
+    test_scx_crosscheck();
     test_add_scripts();
   }
 
-#ifdef HAVE_CONFUS
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39) && U8ID_TR31 != 3
   test_confus();
   test_htable();
   test_confusables();

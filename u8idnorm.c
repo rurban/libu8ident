@@ -25,22 +25,23 @@
 #define TRUE true
 #define FALSE false
 
-#if !defined U8ID_NORM || (U8ID_NORM != FCD)
+#if U8ID_TR31 != 3 /* != TR39 */ && (!defined U8ID_NORM || U8ID_NORM != FCD)
 char tmp_stack[128];
 #endif
 
-//#pragma message "U8ID_NORM="_XSTR(U8ID_NORM)
-//#pragma message "U8ID_NORM_DEFAULT="_XSTR(U8ID_NORM_DEFAULT)
-//#if !defined U8ID_NORM || U8ID_NORM == NFKD
-//#pragma message "NFKD"_XSTR(U8ID_NORM)
-//#endif
-//#if !defined U8ID_NORM || U8ID_NORM == NFD
-//#pragma message "NFD:"_XSTR(U8ID_NORM)
-//#endif
-//#if !defined U8ID_NORM || U8ID_NORM_DEFAULT == U8ID_NFD
-//#pragma message "NFD1:"_XSTR(U8ID_NORM_DEFAULT)
-//#endif
+// #pragma message "U8ID_NORM="_XSTR(U8ID_NORM)
+// #pragma message "U8ID_NORM_DEFAULT="_XSTR(U8ID_NORM_DEFAULT)
+// #if !defined U8ID_NORM || U8ID_NORM == NFKD
+// #pragma message "NFKD"_XSTR(U8ID_NORM)
+// #endif
+// #if !defined U8ID_NORM || U8ID_NORM == NFD
+// #pragma message "NFD:"_XSTR(U8ID_NORM)
+// #endif
+// #if !defined U8ID_NORM || U8ID_NORM_DEFAULT == U8ID_NFD
+// #pragma message "NFD1:"_XSTR(U8ID_NORM_DEFAULT)
+// #endif
 
+#if U8ID_TR31 != 3 /* != TR39 */
 #if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == NFD ||              \
     U8ID_NORM == FCC || U8ID_NORM == FCD
 #  include "un8ifcan.h" /* for NFD Canonical Decomposition */
@@ -57,11 +58,14 @@ char tmp_stack[128];
 #  include "un8ifcmp.h" /* for NFC Canonical Composition lists */
 #endif
 #include "hangul.h" /* Korean/Hangul has special (easy) normalization rules */
+#endif
 
 unsigned u8ident_options(void);
 unsigned u8ident_maxlength(void);
 
 #define _UNICODE_MAX 0x10ffff
+
+#if U8ID_TR31 != 3 /* != TR39: dec_utf8 and u8ident_normalize provided by u8ident.c */
 
 // UTF-8 helpers
 
@@ -142,8 +146,10 @@ LOCAL uint32_t dec_utf8(char **strp) {
   *strp = (char *)str;
   return cp;
 }
+#endif /* U8ID_TR31 != 3: dec_utf8 */
 
 /* convert unicode codepoint to utf8 (to_utf8) */
+#if U8ID_TR31 != 3 /* != TR39 */
 LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
   if (cp > _UNICODE_MAX) {
     errno = EILSEQ;
@@ -622,7 +628,7 @@ static int u8id_reorder_s(unsigned char *restrict dest, long dmax,
 
 #if !defined U8ID_NORM ||                                                      \
     !(U8ID_NORM == NFD || U8ID_NORM == NFKD || U8ID_NORM == FCD)
-//#if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == FCC
+// #if !defined U8ID_NORM || U8ID_NORM == NFC || U8ID_NORM == FCC
 
 static uint32_t _composite_cp(uint32_t cp, uint32_t cp2) {
   const UN8IF_complist_s ***plane, **row, *cell;
@@ -903,3 +909,4 @@ EXTERN char *u8ident_normalize(const char *src, int srcsz) {
 #endif   // !FCD
   return dest;
 }
+#endif // U8ID_TR31 != 3

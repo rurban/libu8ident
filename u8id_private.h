@@ -58,10 +58,10 @@
 // allowed set of identifiers. TR31 --xid tokenizer options
 // we need XID, the default, as first for uninitialized options.
 enum xid_e {
-  XID,     // ID minus NFKC quirks, labelled stable, the default.
-  ID,      // all letters, plus numbers, punctuation and marks. With exotic scripts.
+  XID, // ID minus NFKC quirks, labelled stable, the default.
+  ID,  // all letters, plus numbers, punctuation and marks. With exotic scripts.
   ALLOWED, // TR39 ID with only recommended scripts. Allowed IdentifierStatus.
-  TR39, // practical XID with TR39 security measures, see P2528R1.
+  TR39,    // practical XID with TR39 security measures, see P2528R1.
   C23,     // XID with NFC requirement from C23 (P1949, N2828).
   C11,     // the stable insecure AltId ranges from the C11 standard, Annex D.
   ALLUTF8, // all > 128, e.g. D, php, nim, crystal.
@@ -120,7 +120,9 @@ enum xid_e {
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_6
 #  elif U8ID_PROFILE == TR39_4
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_TR39_4
-#    define U8ID_PROFILE_TR39
+#    ifndef U8ID_PROFILE_TR39
+#      define U8ID_PROFILE_TR39
+#    endif
 #  elif U8ID_PROFILE == C11_6
 #    define U8ID_PROFILE_DEFAULT U8ID_PROFILE_C11_6
 #    define U8ID_PROFILE_C11STD
@@ -145,12 +147,14 @@ enum xid_e {
 #  undef ENABLE_CHECK_XID
 #endif
 #ifdef U8ID_TR31
-//#  pragma message("U8ID_TR31=" _XSTR(U8ID_TR31))
+// #  pragma message("U8ID_TR31=" _XSTR(U8ID_TR31))
 #  if U8ID_TR31 == NONE
 #    define DISABLE_CHECK_XID
 #    define U8ID_TR31_DEFAULT 0
 #  else
-#    define ENABLE_CHECK_XID
+#    ifndef ENABLE_CHECK_XID
+#      define ENABLE_CHECK_XID
+#    endif
 #    if U8ID_TR31 == ALLOWED
 #      define U8ID_TR31_DEFAULT U8ID_TR31_ALLOWED
 #    elif U8ID_TR31 == ASCII
@@ -179,7 +183,9 @@ enum xid_e {
 #  endif
 #endif
 
+#ifdef HAVE_CONFUS
 #include "htable.h"
+#endif
 
 #define U8ID_CTX_TRESH 5
 #define U8ID_SCR_TRESH 8
@@ -198,8 +204,10 @@ struct ctx_t {
     // profiles, or when we manually add extra scripts.
     uint8_t *u8p; // or if count > 8
   };
+#ifdef HAVE_CONFUS
   struct htable *htab;
   struct htable *htab1;
+#endif
 };
 
 // clang-format off

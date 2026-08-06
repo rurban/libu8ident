@@ -8,8 +8,9 @@
    * Disallow all Limited_Use and Excluded scripts,
    * Only allow TR 39#1 Recommended, Inclusion, and not-confusable Technical
      Identifier Type properties,
-     Forbid confusables in Technical, such as ǃ U+1C3 "LATIN LETTER ALVEOLAR CLICK"
-     ǀ U+1C0 "LATIN LETTER DENTAL CLICK" and ǁ U+1C1 "LATIN LETTER LATERAL CLICK"
+     Forbid confusables in Technical, such as ǃ U+1C3 "LATIN LETTER ALVEOLAR
+   CLICK" ǀ U+1C0 "LATIN LETTER DENTAL CLICK" and ǁ U+1C1 "LATIN LETTER LATERAL
+   CLICK"
    * Demand NFC normalization. Reject all composable sequences as ill-formed.
    * Reject illegal mark sequences (Lm, Mn, Mc) with mixed-scripts (SCX) as
      ill-formed.
@@ -49,6 +50,172 @@
 #include "u8idscr.h"
 #define EXTERN_SCRIPTS
 #include "unic11.h"
+
+// Local SCX data, parsed directly from ScriptExtensions.txt and
+// PropertyValueAliases.txt.  This avoids depending on scripts.h scx_list.
+#define MAX_LOCAL_SCX 512
+#define MAX_SCX_SCRIPTS 32
+
+static struct {
+  char short_name[32];
+  char long_name[64];
+} pva_map[256];
+static int pva_count = 0;
+
+static struct local_scx {
+  uint32_t from;
+  uint32_t to;
+  char scx[MAX_SCX_SCRIPTS + 1];
+} local_scx_list[MAX_LOCAL_SCX];
+static int local_scx_count = 0;
+
+static int read_pva(void) {
+  FILE *fp = fopen("PropertyValueAliases.txt", "r");
+  if (!fp) {
+    fprintf(stderr, "Cannot open PropertyValueAliases.txt\n");
+    return -1;
+  }
+  char line[256];
+  while (fgets(line, sizeof(line), fp)) {
+    char short_name[32], long_name[64];
+    if (sscanf(line, "sc ; %31s ; %63s", short_name, long_name) == 2) {
+      strcpy(pva_map[pva_count].short_name, short_name);
+      strcpy(pva_map[pva_count].long_name, long_name);
+      pva_count++;
+    }
+  }
+  fclose(fp);
+  return 0;
+}
+
+static const char *pva_lookup(const char *short_name) {
+  for (int i = 0; i < pva_count; i++) {
+    if (strcmp(pva_map[i].short_name, short_name) == 0)
+      return pva_map[i].long_name;
+  }
+  return short_name;
+}
+
+static int script_name_to_enum(const char *name) {
+  if (!name)
+    return -1;
+  for (int i = 0; i <= LAST_SCRIPT; i++) {
+    if (!all_scripts[i])
+      continue;
+    if (strcmp(all_scripts[i], name) == 0)
+      return i;
+  }
+  return -1;
+}
+
+static int read_scx(void) {
+  FILE *fp = fopen("ScriptExtensions.txt", "r");
+  if (!fp) {
+    fprintf(stderr, "Cannot open ScriptExtensions.txt\n");
+    return -1;
+  }
+  char line[512];
+  uint32_t prev_to = 0;
+  const char *prev_scx_str = NULL;
+  while (fgets(line, sizeof(line), fp)) {
+    if (line[0] == '#' || line[0] == '\n')
+      continue;
+    if (strncmp(line, "# @", 3) == 0)
+      continue;
+    char *p = line;
+    char *endptr;
+    uint32_t from = strtoul(p, &endptr, 16);
+    if (endptr == p)
+      continue;
+    p = endptr;
+    uint32_t to = from;
+    if (*p == '.' && p[1] == '.') {
+      p += 2;
+      to = strtoul(p, &endptr, 16);
+      p = endptr;
+    }
+    while (*p == ' ' || *p == '\t')
+      p++;
+    if (*p != ';')
+      continue;
+    p++;
+    while (*p == ' ' || *p == '\t')
+      p++;
+    char *scripts_start = p;
+    char *hash = strchr(p, '#');
+    if (!hash)
+      continue;
+    *hash = '\0';
+
+    // UCD bug workaround for 0x0345
+    if (from == 0x0345) {
+      from = 0x342;
+      prev_to = 0x341;
+    }
+
+    char scx_bytes[MAX_SCX_SCRIPTS + 1] = {0};
+    int scx_len = 0;
+    char *saveptr;
+    char *tok = strtok_r(scripts_start, " \t\r\n", &saveptr);
+    while (tok) {
+      if (scx_len >= MAX_SCX_SCRIPTS) {
+        fprintf(stderr, "Too many scripts at U+%04X (max %d); increase MAX_SCX_SCRIPTS\n",
+                from, MAX_SCX_SCRIPTS);
+        break;
+      }
+      int sc_enum = script_name_to_enum(tok);
+      if (sc_enum < 0) {
+        const char *long_name = pva_lookup(tok);
+        sc_enum = script_name_to_enum(long_name);
+      }
+      if (sc_enum < 0) {
+        fprintf(stderr, "Unknown script %s at U+%04X\n", tok, from);
+      } else {
+        scx_bytes[scx_len++] = (char)sc_enum;
+      }
+      tok = strtok_r(NULL, " \t\r\n", &saveptr);
+    }
+    scx_bytes[scx_len] = '\0';
+
+    // Merge with previous range if contiguous and same scx
+    if (prev_to + 1 == from && prev_scx_str && strEQ(prev_scx_str, scx_bytes) &&
+        local_scx_count > 0) {
+      local_scx_list[local_scx_count - 1].to = to;
+    } else {
+      if (local_scx_count >= MAX_LOCAL_SCX) {
+        fprintf(stderr, "Too many SCX ranges\n");
+        break;
+      }
+      local_scx_list[local_scx_count].from = from;
+      local_scx_list[local_scx_count].to = to;
+      memcpy(local_scx_list[local_scx_count].scx, scx_bytes, scx_len + 1);
+      local_scx_count++;
+    }
+    prev_to = to;
+    prev_scx_str = local_scx_list[local_scx_count - 1].scx;
+  }
+  fprintf(stderr, "read_scx: loaded %d ranges\n", local_scx_count);
+  fclose(fp);
+  return 0;
+}
+
+static const struct local_scx *local_get_scx(const uint32_t cp) {
+  int n = local_scx_count;
+  const char *p = (char *)local_scx_list;
+  const size_t size = sizeof(local_scx_list[0]);
+  while (n > 0) {
+    const struct local_scx *pos = (const struct local_scx *)(p + size * (n / 2));
+    if ((cp - pos->from) <= (pos->to - pos->from))
+      return pos;
+    else if (cp < pos->from)
+      n /= 2;
+    else {
+      p = (char *)pos + size;
+      n -= (n / 2) + 1;
+    }
+  }
+  return NULL;
+}
 
 static inline struct sc *binary_search(const uint32_t cp, const char *list,
                                        const size_t len, const size_t size) {
@@ -102,8 +269,7 @@ static inline bool isHalfwidthOrFullwidth(const uint32_t cp) {
 
 // disallow Arabic Presentation Forms-A and B
 static inline bool isArabicPresentationForm(const uint32_t cp) {
-  return (cp >= 0xFB50 && cp <= 0xFDFF) ||
-         (cp >= 0xFE70 && cp <= 0xFEFF);
+  return (cp >= 0xFB50 && cp <= 0xFDFF) || (cp >= 0xFE70 && cp <= 0xFEFF);
 }
 
 // uint8_t[10FFFF/8]
@@ -162,9 +328,9 @@ static unsigned first_major_gc_change(const uint32_t from, const uint32_t to,
 static unsigned first_scx_change(const uint32_t from, const uint32_t to) {
   if (from == to)
     return 0U;
-  const struct scx *s1 = u8ident_get_scx(from);
+  const struct local_scx *s1 = local_get_scx(from);
   for (uint32_t i = from + 1; i <= to; i++) {
-    const struct scx *s2 = u8ident_get_scx(i);
+    const struct local_scx *s2 = local_get_scx(i);
     // if both are NULL or both are defined and equal, it's equal.
     if (!((!s1 && !s2) || ((s1 && s2) && strEQ(s1->scx, s2->scx))))
       return i;
@@ -205,7 +371,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
             unsigned gc_split, scx_split;
             enum u8id_gc gc = u8ident_get_gc(from);
             char *gcname = (char *)u8ident_gc_name(gc);
-            struct scx *this_scx = (struct scx *)u8ident_get_scx(from);
+            struct local_scx *this_scx = (struct local_scx *)local_get_scx(from);
             char mgcname[3]; // a copy because the original is read-only
             char minor[1];   // if a change is not major, but only minor
             *minor = '\0';
@@ -239,7 +405,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
               from = gc_split;
               gc = u8ident_get_gc(from);
               gcname = (char *)u8ident_gc_name(gc);
-              this_scx = (struct scx *)u8ident_get_scx(from);
+              this_scx = (struct local_scx *)local_get_scx(from);
             } else {
               if (*minor) {
                 mgcname[0] = *minor;
@@ -249,9 +415,9 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
                         mgcname);
               }
             }
-            if ((scx_split = first_scx_change(from, to))) {
-              fprintf(stderr, "U+%X: split SCX changed at U+%X\n", from,
-                      scx_split);
+            while ((scx_split = first_scx_change(from, to))) {
+              fprintf(stderr, "U+%X: split SCX changed at U+%X (s1=%p, s2=%p)\n", from,
+                      scx_split, (void*)local_get_scx(from), (void*)local_get_scx(scx_split));
               fprintf(f, "    // SPLIT on SCX (prev to U+%X)\n", to);
               fprintf(f, "    {0x%X, 0x%X", from, scx_split - 1);
               if (this_scx) {
@@ -282,7 +448,7 @@ void emit_ranges(FILE *f, size_t start, uint8_t *u, bool with_sc) {
               }
               stats.codepoints += (scx_split - from - 1);
               from = scx_split;
-              this_scx = (struct scx *)u8ident_get_scx(from);
+              this_scx = (struct local_scx *)local_get_scx(from);
               enc_utf8(tmp, &len, from);
             }
             fprintf(f, "    {0x%X, 0x%X", from, to);
@@ -356,7 +522,8 @@ static void gen_c11_all(void) {
           "   Copyright 2021,2022,2025 Reini Urban\n"
           "   SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later\n"
           "\n"
-          "   Generated by mktr29 from unic11.h. Do not modify. Modify mktr39.c instead..\n"
+          "   Generated by mktr29 from unic11.h. Do not modify. Modify "
+          "mktr39.c instead..\n"
           "   UNICODE version %d.%d\n"
           "*/\n",
           U8ID_UNICODE_MAJOR, U8ID_UNICODE_MINOR);
@@ -424,12 +591,9 @@ static void gen_unitr39(void) {
     for (uint32_t cp = r.from; cp <= r.to; cp++) {
       uint8_t s = u8ident_get_script(cp);
       enum u8id_gc gc = u8ident_get_gc(cp);
-      if (s < FIRST_EXCLUDED_SCRIPT &&
-          !u8ident_is_MARK(cp) && gc != GC_Mc &&
-          !isSkipIdtype(cp) &&
-          !isHalfwidthOrFullwidth(cp) &&
-          !isArabicPresentationForm(cp) &&
-          !u8ident_is_MEDIAL(cp)) {
+      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) && gc != GC_Mc &&
+          !isSkipIdtype(cp) && !isHalfwidthOrFullwidth(cp) &&
+          !isArabicPresentationForm(cp) && !u8ident_is_MEDIAL(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -455,7 +619,252 @@ static void gen_unitr39(void) {
       "NFC\n"
       "*/\n"
       "\n"
-      "#include \"config.h\"\n"
+      "#include <stdint.h>\n"
+      "#include <stdbool.h>\n"
+      "\n"
+      "#ifndef ARRAY_SIZE\n"
+      "# define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))\n"
+      "#endif\n"
+      "#ifndef U8ID_SC_ENUM\n"
+      "#define U8ID_SC_ENUM\n"
+      "enum u8id_sc {\n"
+      "#define FIRST_RECOMMENDED_SCRIPT 0\n"
+      "  SC_Common     = 0,\n"
+      "  SC_Inherited  = 1,\n"
+      "  SC_Latin      = 2,\n"
+      "  SC_Arabic     = 3,\n"
+      "  SC_Armenian   = 4,\n"
+      "  SC_Bengali    = 5,\n"
+      "  SC_Bopomofo   = 6,\n"
+      "  SC_Cyrillic   = 7,\n"
+      "  SC_Devanagari = 8,\n"
+      "  SC_Ethiopic   = 9,\n"
+      "  SC_Georgian   = 10,\n"
+      "  SC_Greek      = 11,\n"
+      "  SC_Gujarati   = 12,\n"
+      "  SC_Gurmukhi   = 13,\n"
+      "  SC_Hangul     = 14,\n"
+      "  SC_Han        = 15,\n"
+      "  SC_Hebrew     = 16,\n"
+      "  SC_Hiragana   = 17,\n"
+      "  SC_Katakana   = 18,\n"
+      "  SC_Kannada    = 19,\n"
+      "  SC_Khmer      = 20,\n"
+      "  SC_Lao        = 21,\n"
+      "  SC_Malayalam  = 22,\n"
+      "  SC_Myanmar    = 23,\n"
+      "  SC_Oriya      = 24,\n"
+      "  SC_Sinhala    = 25,\n"
+      "  SC_Tamil      = 26,\n"
+      "  SC_Telugu     = 27,\n"
+      "  SC_Thaana     = 28,\n"
+      "  SC_Thai       = 29,\n"
+      "  SC_Tibetan    = 30,\n"
+      "#define FIRST_EXCLUDED_SCRIPT 31\n"
+      "  SC_Ahom       = 31,\n"
+      "  SC_Anatolian_Hieroglyphs = 32,\n"
+      "  SC_Avestan    = 33,\n"
+      "  SC_Bassa_Vah  = 34,\n"
+      "  SC_Beria_Erfe = 35,\n"
+      "  SC_Bhaiksuki  = 36,\n"
+      "  SC_Brahmi     = 37,\n"
+      "  SC_Braille    = 38,\n"
+      "  SC_Buginese   = 39,\n"
+      "  SC_Buhid      = 40,\n"
+      "  SC_Carian     = 41,\n"
+      "  SC_Caucasian_Albanian = 42,\n"
+      "  SC_Chorasmian = 43,\n"
+      "  SC_Coptic     = 44,\n"
+      "  SC_Cuneiform  = 45,\n"
+      "  SC_Cypriot    = 46,\n"
+      "  SC_Cypro_Minoan = 47,\n"
+      "  SC_Deseret    = 48,\n"
+      "  SC_Dives_Akuru = 49,\n"
+      "  SC_Dogra      = 50,\n"
+      "  SC_Duployan   = 51,\n"
+      "  SC_Egyptian_Hieroglyphs = 52,\n"
+      "  SC_Elbasan    = 53,\n"
+      "  SC_Elymaic    = 54,\n"
+      "  SC_Garay      = 55,\n"
+      "  SC_Glagolitic = 56,\n"
+      "  SC_Gothic     = 57,\n"
+      "  SC_Grantha    = 58,\n"
+      "  SC_Gunjala_Gondi = 59,\n"
+      "  SC_Gurung_Khema = 60,\n"
+      "  SC_Hanunoo    = 61,\n"
+      "  SC_Hatran     = 62,\n"
+      "  SC_Imperial_Aramaic = 63,\n"
+      "  SC_Inscriptional_Pahlavi = 64,\n"
+      "  SC_Inscriptional_Parthian = 65,\n"
+      "  SC_Kaithi     = 66,\n"
+      "  SC_Kawi       = 67,\n"
+      "  SC_Kharoshthi = 68,\n"
+      "  SC_Khitan_Small_Script = 69,\n"
+      "  SC_Khojki     = 70,\n"
+      "  SC_Khudawadi  = 71,\n"
+      "  SC_Kirat_Rai  = 72,\n"
+      "  SC_Linear_A   = 73,\n"
+      "  SC_Linear_B   = 74,\n"
+      "  SC_Lycian     = 75,\n"
+      "  SC_Lydian     = 76,\n"
+      "  SC_Mahajani   = 77,\n"
+      "  SC_Makasar    = 78,\n"
+      "  SC_Manichaean = 79,\n"
+      "  SC_Marchen    = 80,\n"
+      "  SC_Masaram_Gondi = 81,\n"
+      "  SC_Medefaidrin = 82,\n"
+      "  SC_Mende_Kikakui = 83,\n"
+      "  SC_Meroitic_Cursive = 84,\n"
+      "  SC_Meroitic_Hieroglyphs = 85,\n"
+      "  SC_Modi       = 86,\n"
+      "  SC_Mongolian  = 87,\n"
+      "  SC_Mro        = 88,\n"
+      "  SC_Multani    = 89,\n"
+      "  SC_Nabataean  = 90,\n"
+      "  SC_Nag_Mundari = 91,\n"
+      "  SC_Nandinagari = 92,\n"
+      "  SC_Nushu      = 93,\n"
+      "  SC_Ogham      = 94,\n"
+      "  SC_Ol_Onal    = 95,\n"
+      "  SC_Old_Hungarian = 96,\n"
+      "  SC_Old_Italic = 97,\n"
+      "  SC_Old_North_Arabian = 98,\n"
+      "  SC_Old_Permic = 99,\n"
+      "  SC_Old_Persian = 100,\n"
+      "  SC_Old_Sogdian = 101,\n"
+      "  SC_Old_South_Arabian = 102,\n"
+      "  SC_Old_Turkic = 103,\n"
+      "  SC_Old_Uyghur = 104,\n"
+      "  SC_Osmanya    = 105,\n"
+      "  SC_Pahawh_Hmong = 106,\n"
+      "  SC_Palmyrene  = 107,\n"
+      "  SC_Pau_Cin_Hau = 108,\n"
+      "  SC_Phags_Pa   = 109,\n"
+      "  SC_Phoenician = 110,\n"
+      "  SC_Psalter_Pahlavi = 111,\n"
+      "  SC_Rejang     = 112,\n"
+      "  SC_Runic      = 113,\n"
+      "  SC_Samaritan  = 114,\n"
+      "  SC_Sharada    = 115,\n"
+      "  SC_Shavian    = 116,\n"
+      "  SC_Siddham    = 117,\n"
+      "  SC_Sidetic    = 118,\n"
+      "  SC_SignWriting = 119,\n"
+      "  SC_Sogdian    = 120,\n"
+      "  SC_Sora_Sompeng = 121,\n"
+      "  SC_Soyombo    = 122,\n"
+      "  SC_Sunuwar    = 123,\n"
+      "  SC_Tagalog    = 124,\n"
+      "  SC_Tagbanwa   = 125,\n"
+      "  SC_Tai_Yo     = 126,\n"
+      "  SC_Takri      = 127,\n"
+      "  SC_Tangsa     = 128,\n"
+      "  SC_Tangut     = 129,\n"
+      "  SC_Tirhuta    = 130,\n"
+      "  SC_Todhri     = 131,\n"
+      "  SC_Tolong_Siki = 132,\n"
+      "  SC_Toto       = 133,\n"
+      "  SC_Tulu_Tigalari = 134,\n"
+      "  SC_Ugaritic   = 135,\n"
+      "  SC_Vithkuqi   = 136,\n"
+      "  SC_Warang_Citi = 137,\n"
+      "  SC_Yezidi     = 138,\n"
+      "  SC_Zanabazar_Square = 139,\n"
+      "#define FIRST_LIMITED_USE_SCRIPT 140\n"
+      "  SC_Adlam      = 140,\n"
+      "  SC_Balinese   = 141,\n"
+      "  SC_Bamum      = 142,\n"
+      "  SC_Batak      = 143,\n"
+      "  SC_Canadian_Aboriginal = 144,\n"
+      "  SC_Chakma     = 145,\n"
+      "  SC_Cham       = 146,\n"
+      "  SC_Cherokee   = 147,\n"
+      "  SC_Hanifi_Rohingya = 148,\n"
+      "  SC_Javanese   = 149,\n"
+      "  SC_Kayah_Li   = 150,\n"
+      "  SC_Lepcha     = 151,\n"
+      "  SC_Limbu      = 152,\n"
+      "  SC_Lisu       = 153,\n"
+      "  SC_Mandaic    = 154,\n"
+      "  SC_Meetei_Mayek = 155,\n"
+      "  SC_Miao       = 156,\n"
+      "  SC_New_Tai_Lue = 157,\n"
+      "  SC_Newa       = 158,\n"
+      "  SC_Nko        = 159,\n"
+      "  SC_Nyiakeng_Puachue_Hmong = 160,\n"
+      "  SC_Ol_Chiki   = 161,\n"
+      "  SC_Osage      = 162,\n"
+      "  SC_Saurashtra = 163,\n"
+      "  SC_Sundanese  = 164,\n"
+      "  SC_Syloti_Nagri = 165,\n"
+      "  SC_Syriac     = 166,\n"
+      "  SC_Tai_Le     = 167,\n"
+      "  SC_Tai_Tham   = 168,\n"
+      "  SC_Tai_Viet   = 169,\n"
+      "  SC_Tifinagh   = 170,\n"
+      "  SC_Vai        = 171,\n"
+      "  SC_Wancho     = 172,\n"
+      "  SC_Yi         = 173,\n"
+      "  SC_Unknown    = 174,\n"
+      "#define LAST_SCRIPT 174\n"
+      "};\n"
+      "#endif /* U8ID_SC_ENUM */\n"
+      "\n"
+      "#ifndef U8ID_GC_ENUM\n"
+      "#define U8ID_GC_ENUM\n"
+      "enum u8id_gc {\n"
+      "  GC_Cc,\n"
+      "  GC_Cf,\n"
+      "  GC_Co,\n"
+      "  GC_Cs,\n"
+      "  GC_Ll,\n"
+      "  GC_Lm,\n"
+      "  GC_Lo,\n"
+      "  GC_Lt,\n"
+      "  GC_Lu,\n"
+      "  GC_Mc,\n"
+      "  GC_Me,\n"
+      "  GC_Mn,\n"
+      "  GC_Nd,\n"
+      "  GC_Nl,\n"
+      "  GC_No,\n"
+      "  GC_Pc,\n"
+      "  GC_Pd,\n"
+      "  GC_Pe,\n"
+      "  GC_Pf,\n"
+      "  GC_Pi,\n"
+      "  GC_Po,\n"
+      "  GC_Ps,\n"
+      "  GC_Sc,\n"
+      "  GC_Sk,\n"
+      "  GC_Sm,\n"
+      "  GC_So,\n"
+      "  GC_Zl,\n"
+      "  GC_Zp,\n"
+      "  GC_Zs,\n"
+      "  GC_L,\n"
+      "  GC_V,\n"
+      "  GC_INVALID,\n"
+      "};\n"
+      "#endif /* U8ID_GC_ENUM */\n"
+      "\n"
+      "#ifndef _STRUCT_RANGE_BOOL_DEFINED\n"
+      "#define _STRUCT_RANGE_BOOL_DEFINED\n"
+      "struct range_bool {\n"
+      "    uint32_t from;\n"
+      "    uint32_t to;\n"
+      "};\n"
+      "#endif\n"
+      "\n"
+      "#ifndef _STRUCT_SC_DEFINED\n"
+      "#define _STRUCT_SC_DEFINED\n"
+      "struct sc {\n"
+      "    uint32_t from;\n"
+      "    uint32_t to;\n"
+      "    enum u8id_sc scr;\n"
+      "};\n"
+      "#endif\n"
+      "\n"
       "struct sc_tr39 {\n"
       "    uint32_t from;\n"
       "    uint32_t to;\n"
@@ -474,7 +883,7 @@ static void gen_unitr39(void) {
   fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct sc_tr39 tr39_start_list[] = {\n"
         "#ifdef ALLOW_DOLLAR\n"
-        "    {'$', '$', SC_Latin, GC_Sc, NULL},\n"  // 24
+        "    {'$', '$', SC_Latin, GC_Sc, NULL},\n" // 24
         "#endif\n"
         "    {'A', 'Z', SC_Latin, GC_Lu, NULL},\n"  // 41-5a
         "    {'_', '_', SC_Latin, GC_Pc, NULL},\n"  // 5f
@@ -500,10 +909,8 @@ static void gen_unitr39(void) {
         continue;
       uint8_t s = u8ident_get_script(cp);
       enum u8id_gc gc = u8ident_get_gc(cp);
-      if (s < FIRST_EXCLUDED_SCRIPT &&
-          !u8ident_is_MARK(cp) && gc != GC_Mc &&
-          !isSkipIdtype(cp) &&
-          !isArabicPresentationForm(cp) &&
+      if (s < FIRST_EXCLUDED_SCRIPT && !u8ident_is_MARK(cp) && gc != GC_Mc &&
+          !isSkipIdtype(cp) && !isArabicPresentationForm(cp) &&
           !isHalfwidthOrFullwidth(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
@@ -527,8 +934,7 @@ static void gen_unitr39(void) {
       uint8_t s = u8ident_get_script(cp);
       enum u8id_gc gc = u8ident_get_gc(cp);
       if (s < FIRST_EXCLUDED_SCRIPT && u8ident_is_MEDIAL(cp) &&
-          !u8ident_is_MARK(cp) && gc != GC_Mc &&
-          !isHalfwidthOrFullwidth(cp) &&
+          !u8ident_is_MARK(cp) && gc != GC_Mc && !isHalfwidthOrFullwidth(cp) &&
           !isArabicPresentationForm(cp)) {
         BITSET(c, cp);
       }
@@ -569,10 +975,9 @@ static void gen_unitr39(void) {
       uint8_t s = u8ident_get_script(cp);
       enum u8id_gc gc = u8ident_get_gc(cp);
       if (s >= FIRST_EXCLUDED_SCRIPT && s < FIRST_LIMITED_USE_SCRIPT &&
-          !u8ident_is_MARK(cp) && gc != GC_Mc &&
-          !isExcludedIdtype(cp) &&
-          !isHalfwidthOrFullwidth(cp) &&
-          !isArabicPresentationForm(cp) && !u8ident_is_MEDIAL(cp)) {
+          !u8ident_is_MARK(cp) && gc != GC_Mc && !isExcludedIdtype(cp) &&
+          !isHalfwidthOrFullwidth(cp) && !isArabicPresentationForm(cp) &&
+          !u8ident_is_MEDIAL(cp)) {
         size_t len;
         if (enc_utf8(tmp, &len, cp)) {
           char *norm = u8ident_normalize(tmp, sizeof(tmp));
@@ -594,8 +999,7 @@ static void gen_unitr39(void) {
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
   printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
-         "tr39_excl_start_list", stats.ranges, stats.singles,
-         stats.codepoints);
+         "tr39_excl_start_list", stats.ranges, stats.singles, stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
   fputs(
@@ -651,9 +1055,8 @@ static void gen_unitr39(void) {
   fprintf(f, "extern const struct sc_tr39 tr39_excl_cont_list[%u];\n",
           stats.ranges + stats.singles);
   fputs("#endif\n", f);
-  printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
-         "tr39_excl_cont_list", stats.ranges, stats.singles,
-         stats.codepoints);
+  printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "tr39_excl_cont_list",
+         stats.ranges, stats.singles, stats.codepoints);
   memset(&stats, 0, sizeof(stats));
 
   // get tr39_medial. Empty for v14
@@ -666,9 +1069,8 @@ static void gen_unitr39(void) {
       if (u8ident_is_MEDIAL(cp)) {
         uint8_t s = u8ident_get_script(cp);
         enum u8id_gc gc = u8ident_get_gc(cp);
-        if (s < FIRST_LIMITED_USE_SCRIPT &&
-            !u8ident_is_MARK(cp) && gc != GC_Mc &&
-            !isExcludedIdtype(cp) &&
+        if (s < FIRST_LIMITED_USE_SCRIPT && !u8ident_is_MARK(cp) &&
+            gc != GC_Mc && !isExcludedIdtype(cp) &&
             !isHalfwidthOrFullwidth(cp)) {
           BITSET(c, cp);
         }
@@ -683,11 +1085,9 @@ static void gen_unitr39(void) {
       if (u8ident_is_MEDIAL(cp)) {
         uint8_t s = u8ident_get_script(cp);
         enum u8id_gc gc = u8ident_get_gc(cp);
-        if (s < FIRST_LIMITED_USE_SCRIPT &&
-            !u8ident_is_MARK(cp) && gc != GC_Mc &&
-            !isExcludedIdtype(cp) &&
-            !isArabicPresentationForm(cp) &&
-            !isHalfwidthOrFullwidth(cp)) {
+        if (s < FIRST_LIMITED_USE_SCRIPT && !u8ident_is_MARK(cp) &&
+            gc != GC_Mc && !isExcludedIdtype(cp) &&
+            !isArabicPresentationForm(cp) && !isHalfwidthOrFullwidth(cp)) {
           BITSET(c, cp);
         }
       }
@@ -695,22 +1095,21 @@ static void gen_unitr39(void) {
   }
   BITCLR(c, 0xB7);
 
-  fputs("\n// Currently empty MEDIAL list for safec26.\n", f);
+  //fputs("\n// Currently empty MEDIAL list for tr39.\n", f);
   fputs("// tr39_start/cont + MEDIAL\n", f);
-  fputs("#if 0\n", f);
-  fputs("#  ifndef EXTERN_SCRIPTS\n", f);
+  //fputs("#if 0\n", f);
+  fputs("#ifndef EXTERN_SCRIPTS\n", f);
   fputs("const struct range_bool tr39_medial_list[] = {\n", f);
   emit_ranges(f, 0x27, c, false);
   fprintf(f, "}; // %u ranges, %u singles, %u codepoints\n", stats.ranges,
           stats.singles, stats.codepoints);
-  fputs("#  else\n", f);
+  fputs("#else\n", f);
   fprintf(f, "extern const struct range_bool tr39_medial_list[%u];\n",
           stats.ranges + stats.singles);
-  fputs("#  endif\n", f);
   fputs("#endif\n", f);
-  printf("%s:\n  %u ranges, %u singles, %u codepoints\n",
-         "tr39_medial_list", stats.ranges, stats.singles,
-         stats.codepoints);
+  //fputs("#endif\n", f);
+  printf("%s:\n  %u ranges, %u singles, %u codepoints\n", "tr39_medial_list",
+         stats.ranges, stats.singles, stats.codepoints);
 
   fclose(f);
 #ifdef HAVE_SYS_STAT_H
@@ -725,6 +1124,12 @@ int main(/*int argc, char **argv*/) {
   u8ident_init(U8ID_PROFILE_TR39_4, U8ID_NFC, 0);
 
   gen_c11_all();
+  if (read_pva() != 0 || read_scx() != 0) {
+    fprintf(stderr, "Run: wget -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt"
+                    " https://www.unicode.org/Public/UNIDATA/ScriptExtensions.txt\n");
+    u8ident_free();
+    return 1;
+  }
   gen_unitr39();
 
   u8ident_free();

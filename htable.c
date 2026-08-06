@@ -13,18 +13,18 @@
 #include <assert.h>
 #include "htable.h"
 
-struct htable * new_htab(unsigned cap) {
+struct htable *new_htab(unsigned cap) {
   struct htable *ht = malloc(sizeof(struct htable));
   assert(cap % 2 == 0);
-  ht->keys = calloc(cap, sizeof(char*));
-  ht->values = calloc(cap, sizeof(char*));
+  ht->keys = calloc(cap, sizeof(char *));
+  ht->values = calloc(cap, sizeof(char *));
   ht->cap = cap;
   ht->size = 0;
   return ht;
 }
 
 void free_htab(struct htable *htab) {
-  for (unsigned i=0; i < htab->cap; i++) {
+  for (unsigned i = 0; i < htab->cap; i++) {
     if (htab->keys[i]) {
       free(htab->keys[i]);
       free(htab->values[i]);
@@ -60,8 +60,9 @@ void add_htab(struct htable *htab, const char *key, const char *value) {
     struct htable *ht2;
   resize:
     ht2 = new_htab(htab->cap * 2);
-    //fprintf(stderr, "resize %p[%lu] to %lu\n", htab, htab->size, htab->cap * 2);
-    for (unsigned i=0; i < htab->cap; i++) {
+    // fprintf(stderr, "resize %p[%lu] to %lu\n", htab, htab->size, htab->cap *
+    // 2);
+    for (unsigned i = 0; i < htab->cap; i++) {
       if (htab->keys[h]) {
         add_htab(ht2, htab->keys[h], htab->values[h]);
       }
@@ -79,7 +80,7 @@ void add_htab(struct htable *htab, const char *key, const char *value) {
       goto resize;
   }
   if (!htab->keys[h]) { // found a free slot
-    //fprintf(stderr, "add %s key to %p[%lu]\n", key, htab, htab->size+1);
+    // fprintf(stderr, "add %s key to %p[%lu]\n", key, htab, htab->size+1);
     htab->keys[h] = strdup(key);
     htab->values[h] = strdup(value);
     htab->size++;
@@ -87,7 +88,7 @@ void add_htab(struct htable *htab, const char *key, const char *value) {
   return;
 }
 
-char * find_htab(struct htable *htab, const char *key) {
+char *find_htab(struct htable *htab, const char *key) {
   assert(htab);
   if (!htab->size)
     return false;
@@ -101,7 +102,8 @@ char * find_htab(struct htable *htab, const char *key) {
     if (h == oh)
       return false;
   }
-  //if (htab->keys[h])
-  //  fprintf(stderr, "find %s -> %s in %p[%lu]\n", htab->keys[h], htab->values[h], htab, htab->size);
+  // if (htab->keys[h])
+  //   fprintf(stderr, "find %s -> %s in %p[%lu]\n", htab->keys[h],
+  //   htab->values[h], htab, htab->size);
   return htab->keys[h] ? htab->values[h] : NULL;
 }

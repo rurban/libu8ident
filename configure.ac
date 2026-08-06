@@ -24,6 +24,7 @@ LT_INIT
 AC_CHECK_TOOLS([AR], [gcc-ar ar])
 AC_CHECK_TOOLS([RANLIB], [gcc-ranlib ranlib])
 AC_CHECK_TOOLS([NM], [gcc-nm nm])
+AC_CHECK_PROG([UNIFDEF], [unifdef], [unifdef])
 #dnl Initialize pkg-config since we are installing a .pc file
 PKG_INSTALLDIR
 AM_CPPFLAGS="-I\$(top_srcdir)/include"
@@ -115,7 +116,7 @@ fi
 AC_SUBST([HAVE_CONFUS])
 
 download_croaring() {
-  git clone https://github.com/RoaringBitmap/CRoaring
+  git clone --depth 1 https://github.com/RoaringBitmap/CRoaring
 }
 
 AC_MSG_CHECKING([for --with-croaring])
@@ -129,13 +130,22 @@ AC_ARG_WITH([croaring],
              # in a parallel dir?
              with_croaring="$srcdir/../CRoaring"
              if test -d "${with_croaring}" && \
-                test -e "${with_croaring}/roaring.c" && \
-                test -e "${with_croaring}/roaring.h"
+                test -e "${with_croaring}/src/roaring.c" && \
+                test -e "${with_croaring}/include/roaring/roaring.h"
              then
                CROARING_PATH="\"$srcdir/../CRoaring\""
                AC_MSG_RESULT([found "$srcdir/../CRoaring"])
+             elif test -d "$srcdir/CRoaring" && \
+                test -e "$srcdir/CRoaring/roaring.c" && \
+                test -e "$srcdir/CRoaring/roaring.h"
+             then
+               CROARING_PATH="\"$srcdir/CRoaring\""
+               AC_MSG_RESULT([found "$srcdir/CRoaring"])
              else
-               download_croaring && CROARING_PATH="CRoaring"
+               echo "srcdir=$srcdir"
+               download_croaring && CROARING_PATH="\"$srcdir/CRoaring\""
+               AC_MSG_RESULT([downloaded to CRoaring])
+               cd CRoaring && ./amalgamation.sh
              fi
              ;;
         *)   if test -d "${with_croaring}" && \
@@ -322,6 +332,7 @@ AC_SUBST(LTEXEC)
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([libu8ident.pc
+                 libu8ident_c.pc
                  Makefile])
 AC_CONFIG_FILES([test-texts.test], [chmod +x test-texts.test])
 AC_OUTPUT

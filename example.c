@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
         const char *scripts = u8ident_existing_scripts(0);
         printf("\"%.*s\".%u: Wrong SCRIPT %s for U+%X, have %s\n", (int)len, s,
                linenr, scr, cp, scripts);
-        free((char*)scripts);
+        free((char *)scripts);
         break;
       }
       default:

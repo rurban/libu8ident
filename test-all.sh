@@ -12,4 +12,3 @@ for norm in NFKC NFC NFKD NFD FCC FCD; do
         make clean
     done
 done
-

@@ -19,10 +19,13 @@ const struct scx *u8ident_get_scx(const uint32_t cp);
 const struct sc_c23 *u8ident_get_safec23(const uint32_t cp);
 bool u8ident_is_MARK(const uint32_t cp);
 bool u8ident_is_MEDIAL(const uint32_t cp);
+#ifndef NO_UNITR39
+bool u8ident_is_tr39_MEDIAL(const uint32_t cp);
+#endif
 // member or bidi formatting characters for reordering attacks.
 // Only valid with RTL scripts, such as Hebrew and Arabic.
 bool u8ident_is_bidi(const uint32_t cp);
-// Greek letters confusable with Latin
+// Extra maintained Greek letters confusable with Latin (always enabled in TR39)
 bool u8ident_is_greek_latin_confus(const uint32_t cp);
 // bitmask of u8id_idtypes
 uint16_t u8ident_get_idtypes(const uint32_t cp);

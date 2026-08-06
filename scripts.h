@@ -200,10 +200,12 @@ LOCAL const char *const all_scripts[] = {
     // clang-format on
 };
 #else
-extern const char *const all_scripts[174];
+extern const char *const all_scripts[];
 #endif
 
-enum u8id_sc {
+#ifndef U8ID_SC_ENUM
+#define U8ID_SC_ENUM
+ enum u8id_sc {
 // clang-format off
 #define FIRST_RECOMMENDED_SCRIPT 0
   SC_Common     = 0,
@@ -386,11 +388,15 @@ enum u8id_sc {
 #define LAST_SCRIPT 174
   // clang-format on
 };
-struct sc {
-  uint32_t from;
-  uint32_t to;
-  enum u8id_sc scr;
-};
+#endif /* U8ID_SC_ENUM */
+#ifndef _STRUCT_SC_DEFINED
+#define _STRUCT_SC_DEFINED
+ struct sc {
+   uint32_t from;
+   uint32_t to;
+   enum u8id_sc scr;
+ };
+#endif
 
 struct scx {
   uint32_t from;
@@ -399,10 +405,13 @@ struct scx {
   const char *scx; // indices into sc
 };
 
+#ifndef _STRUCT_RANGE_BOOL_DEFINED
+#define _STRUCT_RANGE_BOOL_DEFINED
 struct range_bool {
   uint32_t from;
   uint32_t to;
 };
+#endif
 
 struct range_short {
   uint32_t from;
@@ -1864,33 +1873,33 @@ LOCAL const struct sc nonxid_script_list[] = {
 #ifndef EXTERN_SCRIPTS
 LOCAL const struct scx scx_list[] = {
     // clang-format off
-    {0x02C7, 0x02C7, GC_Lm, "\x06\x02"},	// Bopo Latn                     
-    {0x02C9, 0x02CB, GC_Lm, "\x06\x02"},	// Bopo Latn                     
-    {0x02CD, 0x02CD, GC_Lm, "\x02\x99"},	// Latn Lisu                     
+    {0x02C7, 0x02C7, GC_Lm, "\x06\x02"},	// Bopo Latn
+    {0x02C9, 0x02CB, GC_Lm, "\x06\x02"},	// Bopo Latn
+    {0x02CD, 0x02CD, GC_Lm, "\x02\x99"},	// Latn Lisu
     {0x02D7, 0x02D7, GC_Sk, "\x02\x1d"},	// Latn Thai                      (Not_XID)
     {0x02D9, 0x02D9, GC_Sk, "\x06\x02"},	// Bopo Latn                      (Not_NFKC)
-    {0x0302, 0x0302, GC_Mn, "\x93\x07\x02\xaa"},	// Cher Cyrl Latn Tfng           
-    {0x0303, 0x0303, GC_Mn, "\x38\x02\x7b\xa6\x1d"},	// Glag Latn Sunu Syrc Thai      
+    {0x0302, 0x0302, GC_Mn, "\x93\x07\x02\xaa"},	// Cher Cyrl Latn Tfng
+    {0x0303, 0x0303, GC_Mn, "\x38\x02\x7b\xa6\x1d"},	// Glag Latn Sunu Syrc Thai
     {0x0305, 0x0305, GC_Mn, "\x2c\x35\x38\x39\x12\x02"},	// Copt Elba Glag Goth Kana Latn  (Uncommon_Use)
-    {0x0306, 0x0306, GC_Mn, "\x07\x0b\x02\x63\xaa"},	// Cyrl Grek Latn Perm Tfng      
-    {0x0309, 0x0309, GC_Mn, "\x02\xaa"},	// Latn Tfng                     
-    {0x030A, 0x030A, GC_Mn, "\x33\x02\xa6"},	// Dupl Latn Syrc                
-    {0x030B, 0x030B, GC_Mn, "\x93\x07\x02\xa2"},	// Cher Cyrl Latn Osge           
-    {0x030C, 0x030C, GC_Mn, "\x93\x02\xa7"},	// Cher Latn Tale                
+    {0x0306, 0x0306, GC_Mn, "\x07\x0b\x02\x63\xaa"},	// Cyrl Grek Latn Perm Tfng
+    {0x0309, 0x0309, GC_Mn, "\x02\xaa"},	// Latn Tfng
+    {0x030A, 0x030A, GC_Mn, "\x33\x02\xa6"},	// Dupl Latn Syrc
+    {0x030B, 0x030B, GC_Mn, "\x93\x07\x02\xa2"},	// Cher Cyrl Latn Osge
+    {0x030C, 0x030C, GC_Mn, "\x93\x02\xa7"},	// Cher Latn Tale
     {0x030D, 0x030D, GC_Mn, "\x02\x7b"},	// Latn Sunu                      (Uncommon_Use)
-    {0x030E, 0x030E, GC_Mn, "\x09\x02"},	// Ethi Latn                     
-    {0x0310, 0x0310, GC_Mn, "\x02\x7b"},	// Latn Sunu                     
-    {0x0311, 0x0311, GC_Mn, "\x07\x02\x83"},	// Cyrl Latn Todr                
-    {0x0313, 0x0313, GC_Mn, "\x0b\x02\x63\x83"},	// Grek Latn Perm Todr           
-    {0x0323, 0x0323, GC_Mn, "\x93\x33\x12\x02\xa6\xaa"},	// Cher Dupl Kana Latn Syrc Tfng 
-    {0x0324, 0x0324, GC_Mn, "\x93\x33\x02\xa6"},	// Cher Dupl Latn Syrc           
-    {0x0325, 0x0325, GC_Mn, "\x02\xa6"},	// Latn Syrc                     
-    {0x032D, 0x032D, GC_Mn, "\x02\x7b\xa6"},	// Latn Sunu Syrc                
-    {0x032E, 0x032E, GC_Mn, "\x02\xa6"},	// Latn Syrc                     
-    {0x0330, 0x0330, GC_Mn, "\x93\x02\xa6"},	// Cher Latn Syrc                
-    {0x0342, 0x0345, GC_Mn, "\x0b"},	// Grek                          
+    {0x030E, 0x030E, GC_Mn, "\x09\x02"},	// Ethi Latn
+    {0x0310, 0x0310, GC_Mn, "\x02\x7b"},	// Latn Sunu
+    {0x0311, 0x0311, GC_Mn, "\x07\x02\x83"},	// Cyrl Latn Todr
+    {0x0313, 0x0313, GC_Mn, "\x0b\x02\x63\x83"},	// Grek Latn Perm Todr
+    {0x0323, 0x0323, GC_Mn, "\x93\x33\x12\x02\xa6\xaa"},	// Cher Dupl Kana Latn Syrc Tfng
+    {0x0324, 0x0324, GC_Mn, "\x93\x33\x02\xa6"},	// Cher Dupl Latn Syrc
+    {0x0325, 0x0325, GC_Mn, "\x02\xa6"},	// Latn Syrc
+    {0x032D, 0x032D, GC_Mn, "\x02\x7b\xa6"},	// Latn Sunu Syrc
+    {0x032E, 0x032E, GC_Mn, "\x02\xa6"},	// Latn Syrc
+    {0x0330, 0x0330, GC_Mn, "\x93\x02\xa6"},	// Cher Latn Syrc
+    {0x0342, 0x0345, GC_Mn, "\x0b"},	// Grek
     {0x0358, 0x0358, GC_Mn, "\x02\xa2"},	// Latn Osge                      (Uncommon_Use)
-    {0x035E, 0x035E, GC_Mn, "\x2a\x02\x83"},	// Aghb Latn Todr                
+    {0x035E, 0x035E, GC_Mn, "\x2a\x02\x83"},	// Aghb Latn Todr
     {0x0363, 0x036F, GC_Mn, "\x02"},	// Latn                           (Obsolete)
     {0x0374, 0x0375, GC_Lm, "\x2c\x0b"},	// Copt Grek                      (Not_NFKC)
     {0x0483, 0x0483, GC_Mn, "\x07\x63"},	// Cyrl Perm                      (Obsolete)
@@ -1899,17 +1908,17 @@ LOCAL const struct scx scx_list[] = {
     {0x0487, 0x0487, GC_Mn, "\x07\x38"},	// Cyrl Glag                      (Technical Obsolete)
     {0x0589, 0x0589, GC_Po, "\x04\x0a\x38"},	// Armn Geor Glag                 (Not_XID)
     {0x061C, 0x061C, GC_Cf, "\x03\xa6\x1c"},	// Arab Syrc Thaa                 (Default_Ignorable)
-    {0x064B, 0x0655, GC_Mn, "\x03\xa6"},	// Arab Syrc                     
-    {0x0660, 0x0669, GC_Nd, "\x03\x1c\x8a"},	// Arab Thaa Yezi                
-    {0x0670, 0x0670, GC_Mn, "\x03\xa6"},	// Arab Syrc                     
+    {0x064B, 0x0655, GC_Mn, "\x03\xa6"},	// Arab Syrc
+    {0x0660, 0x0669, GC_Nd, "\x03\x1c\x8a"},	// Arab Thaa Yezi
+    {0x0670, 0x0670, GC_Mn, "\x03\xa6"},	// Arab Syrc
     {0x06D4, 0x06D4, GC_Po, "\x03\x94"},	// Arab Rohg                      (Not_XID)
-    {0x0966, 0x096F, GC_Nd, "\x08\x32\x42\x4d"},	// Deva Dogr Kthi Mahj           
-    {0x09E6, 0x09EF, GC_Nd, "\x05\x91\xa5"},	// Beng Cakm Sylo                
+    {0x0966, 0x096F, GC_Nd, "\x08\x32\x42\x4d"},	// Deva Dogr Kthi Mahj
+    {0x09E6, 0x09EF, GC_Nd, "\x05\x91\xa5"},	// Beng Cakm Sylo
     {0x0A66, 0x0A6F, GC_Nd, "\x0d\x59"},	// Guru Mult                      (Uncommon_Use)
-    {0x0AE6, 0x0AEF, GC_Nd, "\x0c\x46"},	// Gujr Khoj                     
+    {0x0AE6, 0x0AEF, GC_Nd, "\x0c\x46"},	// Gujr Khoj
     {0x0BE6, 0x0BF3, GC_Nd, "\x3a\x1a"},	// Gran Taml                      (Uncommon_Use)
-    {0x0CE6, 0x0CEF, GC_Nd, "\x13\x5c\x86"},	// Knda Nand Tutg                
-    {0x1040, 0x1049, GC_Nd, "\x91\x17\xa7"},	// Cakm Mymr Tale                
+    {0x0CE6, 0x0CEF, GC_Nd, "\x13\x5c\x86"},	// Knda Nand Tutg
+    {0x1040, 0x1049, GC_Nd, "\x91\x17\xa7"},	// Cakm Mymr Tale
     {0x10FB, 0x10FB, GC_Po, "\x0a\x38\x02"},	// Geor Glag Latn                 (Not_XID)
     {0x16EB, 0x16ED, GC_Po, "\x71"},	// Runr                           (Exclusion Not_XID)
     {0x1735, 0x1736, GC_Po, "\x28\x3d\x7d\x7c"},	// Buhd Hano Tagb Tglg            (Exclusion Not_XID)
@@ -1946,13 +1955,13 @@ LOCAL const struct scx scx_list[] = {
     {0x1CF8, 0x1CF9, GC_Mn, "\x08\x3a"},	// Deva Gran                      (Obsolete)
     {0x1CFA, 0x1CFA, GC_Lo, "\x5c"},	// Nand                           (Exclusion)
     {0x1DC0, 0x1DC1, GC_Mn, "\x0b"},	// Grek                           (Technical Obsolete)
-    {0x1DF8, 0x1DF8, GC_Mn, "\x07\x02\xa6"},	// Cyrl Latn Syrc                
+    {0x1DF8, 0x1DF8, GC_Mn, "\x07\x02\xa6"},	// Cyrl Latn Syrc
     {0x1DFA, 0x1DFA, GC_Mn, "\xa6"},	// Syrc                           (Limited_Use Technical)
     {0x202F, 0x202F, GC_Zs, "\x02\x57\x6d"},	// Latn Mong Phag                 (Not_NFKC)
     {0x204F, 0x204F, GC_Po, "\x8c\x03"},	// Adlm Arab                      (Not_XID)
     {0x205A, 0x205A, GC_Po, "\x29\x0a\x38\x60\x4b\x67"},	// Cari Geor Glag Hung Lyci Orkh  (Obsolete Not_XID)
     {0x205D, 0x205D, GC_Po, "\x29\x0b\x60\x55"},	// Cari Grek Hung Mero            (Obsolete Not_XID)
-    {0x20F0, 0x20F0, GC_Mn, "\x08\x3a\x02"},	// Deva Gran Latn                
+    {0x20F0, 0x20F0, GC_Mn, "\x08\x3a\x02"},	// Deva Gran Latn
     {0x2E17, 0x2E17, GC_Pd, "\x2c\x02"},	// Copt Latn                      (Not_XID)
     {0x2E30, 0x2E30, GC_Po, "\x21\x67"},	// Avst Orkh                      (Exclusion Not_XID)
     {0x2E3C, 0x2E3C, GC_Po, "\x33"},	// Dupl                           (Exclusion Not_XID)
@@ -1960,21 +1969,21 @@ LOCAL const struct scx scx_list[] = {
     {0x2E43, 0x2E43, GC_Po, "\x07\x38"},	// Cyrl Glag                      (Not_XID)
     {0x2FF0, 0x2FFF, GC_So, "\x0f\x81"},	// Hani Tang                      (Not_XID)
     {0x3003, 0x3003, GC_Po, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana       (Not_XID)
-    {0x3006, 0x3006, GC_Lo, "\x0f"},	// Hani                          
+    {0x3006, 0x3006, GC_Lo, "\x0f"},	// Hani
     {0x300C, 0x3011, GC_Ps, "\x06\x0e\x0f\x11\x12\xad"},	// Bopo Hang Hani Hira Kana Yiii  (Not_XID)
     {0x3013, 0x3013, GC_So, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana       (Not_XID)
     {0x3014, 0x301B, GC_Ps, "\x06\x0e\x0f\x11\x12\xad"},	// Bopo Hang Hani Hira Kana Yiii  (Not_XID)
     {0x301C, 0x301F, GC_Pd, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana       (Not_XID)
-    {0x302A, 0x302D, GC_Mn, "\x06\x0f"},	// Bopo Hani                     
+    {0x302A, 0x302D, GC_Mn, "\x06\x0f"},	// Bopo Hani
     {0x3030, 0x3030, GC_Pd, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana       (Not_XID)
-    {0x3031, 0x3035, GC_Lm, "\x11\x12"},	// Hira Kana                     
+    {0x3031, 0x3035, GC_Lm, "\x11\x12"},	// Hira Kana
     {0x3037, 0x3037, GC_So, "\x06\x0e\x0f\x11\x12"},	// Bopo Hang Hani Hira Kana       (Not_XID)
-    {0x303C, 0x303D, GC_Lo, "\x0f\x11\x12"},	// Hani Hira Kana                
+    {0x303C, 0x303D, GC_Lo, "\x0f\x11\x12"},	// Hani Hira Kana
     {0x303E, 0x303F, GC_So, "\x0f"},	// Hani                           (Not_XID)
     {0x3099, 0x309C, GC_Mn, "\x11\x12"},	// Hira Kana                      (Uncommon_Use)
-    {0x30A0, 0x30A0, GC_Pd, "\x11\x12"},	// Hira Kana                     
-    {0x30FB, 0x30FB, GC_Po, "\x06\x0e\x0f\x11\x12\xad"},	// Bopo Hang Hani Hira Kana Yiii 
-    {0x30FC, 0x30FC, GC_Lm, "\x11\x12"},	// Hira Kana                     
+    {0x30A0, 0x30A0, GC_Pd, "\x11\x12"},	// Hira Kana
+    {0x30FB, 0x30FB, GC_Po, "\x06\x0e\x0f\x11\x12\xad"},	// Bopo Hang Hani Hira Kana Yiii
+    {0x30FC, 0x30FC, GC_Lm, "\x11\x12"},	// Hira Kana
     {0x3190, 0x319F, GC_So, "\x0f"},	// Hani                           (Not_XID)
     {0x31C0, 0x31E5, GC_So, "\x0f"},	// Hani                           (Not_XID)
     {0x31EF, 0x31EF, GC_So, "\x0f\x81"},	// Hani Tang                      (Not_XID)
@@ -2004,8 +2013,8 @@ LOCAL const struct scx scx_list[] = {
     {0x10137, 0x1013F, GC_So, "\x2e\x4a"},	// Cprt Linb                      (Exclusion Not_XID)
     {0x102E0, 0x102FB, GC_Mn, "\x03\x2c"},	// Arab Copt                      (Obsolete)
     {0x10AF2, 0x10AF2, GC_Po, "\x4f\x68"},	// Mani Ougr                      (Exclusion Not_XID)
-    {0x11301, 0x11301, GC_Mn, "\x3a\x1a"},	// Gran Taml                     
-    {0x11303, 0x11303, GC_Mc, "\x3a\x1a"},	// Gran Taml                     
+    {0x11301, 0x11301, GC_Mn, "\x3a\x1a"},	// Gran Taml
+    {0x11303, 0x11303, GC_Mc, "\x3a\x1a"},	// Gran Taml
     {0x1133B, 0x1133C, GC_Mn, "\x3a\x1a"},	// Gran Taml                      (Uncommon_Use)
     {0x11FD0, 0x11FD1, GC_No, "\x3a\x1a"},	// Gran Taml                      (Not_XID)
     {0x11FD3, 0x11FD3, GC_No, "\x3a\x1a"},	// Gran Taml                      (Not_XID)
