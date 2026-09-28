@@ -1123,8 +1123,15 @@ void test_greek(void) {
   if (u8ident_profile() == TR39_4) {
     ret = u8ident_check((const uint8_t *)"θ", NULL); // U+38B not confus
     CHECK_RET(ret, U8ID_EOK, 0);
-    ret = u8ident_check((const uint8_t *)"Α", NULL); // U+391 confus
-    CHECK_RET(ret, U8ID_EOK, 0); // already have Greek from θ above
+    ret = u8ident_check((const uint8_t *)"Α", NULL); // U+391 confusable
+    // Greek/Latin confusables are re-checked on every codepoint, even for
+    // an already-established script (see u8ident.c: "not is new, but
+    // still a possible greek confusable").
+#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
+    CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
+#else
+    CHECK_RET(ret, U8ID_EOK, 0);
+#endif
   } else if (u8ident_profile() < 5) {
     ret = u8ident_check((const uint8_t *)"θ", NULL);
     CHECK_RET(ret, U8ID_ERR_SCRIPTS, 0);

@@ -34,7 +34,6 @@ bin_PROGRAMS = u8idlint
 u8idlint_SOURCES = u8idlint.c $(libu8ident_la_SOURCES)
 u8idlint_CFLAGS = $(AM_CFLAGS) $(U8IDLINT_CFLAGS)
 u8idlint_LDADD = $(u8idlint_LIBS)
-EXTRA_HEADERS = c11-safe.h unitr39.h u8ident_c.h
 
 pcdatadir = $(libdir)/pkgconfig
 pcdata_DATA = libu8ident.pc libu8ident_c.pc
@@ -79,7 +78,8 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/bidi-sec-1.py	  texts/homo-sec-1.js	 texts/homo-sec-1.py    texts/norm-sec-1.py \
 	texts/norm-sec-1.cperl	  texts/norm-sec-1.raku
 
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.pl makefile.gnu \
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.pl \
+	mk-tr39-amalgam.pl makefile.gnu u8ident_c.h \
 	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4
 
