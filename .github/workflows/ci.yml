@@ -24,7 +24,7 @@ jobs:
     - uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e # v6-beta
       with:
         fetch-depth: 1
-    #- run: sudo apt-get install perl groff
+    - run: sudo apt-get update && sudo apt-get install -y unifdef
     - run: autoreconf -fi
     - run: ./configure --enable-confus
     - run: make V=1
