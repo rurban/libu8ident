@@ -258,7 +258,8 @@ if(NOT CMAKE_CROSSCOMPILING)
   add_executable(mktr39 mktr39.c ${libu8ident_SOURCES})
   set_source_files_properties(mktr39
     PROPERTIES COMPILE_FLAGS -DU8ID_PROFILE_TR39)
-  add_test(mktr39 ./mktr39)
+  # mktr39 is a maintainer-only generator requiring network-fetched Unicode
+  # data files (PropertyValueAliases.txt, ScriptExtensions.txt); not a test.
   add_executable(u8idtest_c test.c ${libu8ident_c_SOURCES})
   target_compile_definitions(u8idtest_c PRIVATE U8ID_TR31=TR39 U8ID_PROFILE_TR39 U8ID_NORM=NFC)
   add_test(test_c ./u8idtest_c)
