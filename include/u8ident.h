@@ -8,7 +8,7 @@
 
 #define U8IDENT_VERSION_MAJOR 0
 #define U8IDENT_VERSION_MINOR 0
-#define U8IDENT_UNICODE_VERSION  15
+#define U8IDENT_UNICODE_VERSION  18
 
 enum u8id_norm {
   U8ID_NFC = 0,  // the default, shorter canonical composed normalization
