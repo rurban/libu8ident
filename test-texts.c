@@ -108,8 +108,13 @@ int testdir(const char *dir, const char *fname) {
       // unicode #29 word-break, but simplified:
       // must not split at continuations (Combining marks). e.g. for
       // texts/arabic-1.txt
+#ifdef U8ID_PROFILE_TR39
+      const bool iscont = isTR39_cont(cp);
+      bool isword = prev_isword ? (isTR39_start(cp) || iscont) : isTR39_start(cp);
+#else
       const bool iscont = isXID_cont(cp);
       bool isword = prev_isword ? (isXID_start(cp) || iscont) : isXID_start(cp);
+#endif
       char force_break = (prev_isword != isword && !iscont);
 #if defined HAVE_UNIWBRK_H && defined HAVE_LIBUNISTRING
       if (force_break != brks[s - olds] && verbose)

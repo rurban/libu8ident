@@ -78,20 +78,24 @@ void test_scripts_no_init(void) {
   assert(strcmp(u8ident_script_name((uint8_t)scx->scx[0]), "Arabic") == 0);
   assert(strcmp(u8ident_script_name((uint8_t)scx->scx[1]), "Syriac") == 0);
 #ifndef DISABLE_CHECK_XID
+#ifndef U8ID_PROFILE_TR39
   assert(!isID_start('0'));
   assert(!isXID_start('0'));
   assert(!isALLOWED_start('0'));
   assert(!isC11_start('0'));
+#endif
 #  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(!isC23_start('0'));
 #  endif
   assert(!isTR39_start('0'));
   assert(!isALLUTF8_start('0'));
   assert(!isASCII_start('0'));
+#ifndef U8ID_PROFILE_TR39
   assert(isID_cont('0'));
   assert(isXID_cont('0'));
   assert(isALLOWED_cont('0'));
   assert(isC11_cont('0'));
+#endif
 #  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(isC23_cont('0'));
 #  endif
@@ -99,44 +103,54 @@ void test_scripts_no_init(void) {
   assert(isALLUTF8_cont('0'));
   assert(isASCII_cont('0'));
 
+#ifndef U8ID_PROFILE_TR39
   assert(!isID_start('$'));
   assert(!isXID_start('$'));
   assert(!isID_cont('$'));
   assert(!isXID_cont('$'));
   assert(!isALLOWED_start('$'));
   assert(!isALLOWED_cont('$'));
+#endif
   // GH #25: It is implementation-defined if $ is allowed in identifiers
 #  ifdef ALLOW_DOLLAR /* default */
+#ifndef U8ID_PROFILE_TR39
   assert(isC11_start('$'));
+#endif
   assert(isTR39_start('$'));
 #ifndef U8ID_PROFILE_TR39
   assert(isC23_start('$'));
-#endif
   assert(isC11_cont('$'));
+#endif
   assert(isTR39_cont('$'));
 #ifndef U8ID_PROFILE_TR39
   assert(isC23_cont('$'));
 #endif
 #  else
+#ifndef U8ID_PROFILE_TR39
   assert(!isC11_start('$'));
+#endif
   assert(!isTR39_start('$'));
 #ifndef U8ID_PROFILE_TR39
   assert(!isC23_start('$'));
-#endif
   assert(!isC11_cont('$'));
+#endif
   assert(!isTR39_cont('$'));
 #ifndef U8ID_PROFILE_TR39
   assert(!isC23_cont('$'));
 #endif
 #  endif
 
+#ifndef U8ID_PROFILE_TR39
   assert(isALLOWED_cont(0x27));  // '
   assert(!isALLOWED_cont(0x26)); // &
+#endif
 #  if (!defined(U8ID_NORM) || U8ID_NORM == 1) && !defined(U8ID_PROFILE_TR39)
   assert(isC23_cont(0x311)); // ̑
 #  endif
 
+#ifndef U8ID_PROFILE_TR39
   assert(u8ident_get_idtypes(0x102E2) == (U8ID_Obsolete | U8ID_Not_XID));
+#endif
 #endif
   // check that no list elements can be merged
 #if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
@@ -167,6 +181,7 @@ void test_scripts_no_init(void) {
     }
   }
 #ifndef DISABLE_CHECK_XID
+#ifndef U8ID_PROFILE_TR39
   for (size_t i = 0; i < ARRAY_SIZE(allowed_id_list) - 1; i++) {
     const struct range_bool *r = &allowed_id_list[i];
     const struct range_bool *n = &allowed_id_list[i + 1];
@@ -181,6 +196,7 @@ void test_scripts_no_init(void) {
     if (r->to + 1 >= n->from)
       assert(r->types != n->types); // can not be merged
   }
+#endif
 #endif
 }
 
@@ -954,6 +970,7 @@ void test_scx_crosscheck(void) {
   }
 }
 
+#ifndef U8ID_PROFILE_TR39
 void test_gc(void) {
   // check consecutive and alternating GC ranges
   assert(gc_list[0].from == 0);
@@ -962,12 +979,15 @@ void test_gc(void) {
     assert(gc_list[i - 1].gc != gc_list[i].gc);
   }
 }
+#endif
 
 void test_medial(void) {
+#ifndef U8ID_PROFILE_TR39
   // check consecutive medial ranges
   for (size_t i = 1; i < ARRAY_SIZE(medial_list); i++) {
     assert(medial_list[i - 1].to != medial_list[i].from);
   }
+#endif
 
 #ifndef DISABLE_CHECK_XID
   if (u8ident_tr31() == U8ID_TR31_ALLOWED)
@@ -1232,7 +1252,9 @@ int main(int argc, char **argv) {
   if (argc == 1) {
     test_scripts_no_init();
     test_init();
+#ifndef U8ID_PROFILE_TR39
     test_gc();
+#endif
     test_medial();
     test_tr39();
 #if U8ID_TR31 != 3
