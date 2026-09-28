@@ -1127,7 +1127,7 @@ void test_greek(void) {
     // Greek/Latin confusables are re-checked on every codepoint, even for
     // an already-established script (see u8ident.c: "not is new, but
     // still a possible greek confusable").
-#if defined(HAVE_CONFUS) && !defined(U8ID_PROFILE_TR39)
+#if defined(HAVE_CONFUS) && !defined(U8ID_AMALGAM)
     CHECK_RET(ret, U8ID_ERR_CONFUS, 0);
 #else
     CHECK_RET(ret, U8ID_EOK, 0);
