@@ -58,6 +58,17 @@ print <<'PREAMBLE';
 #  define U8ID_LOCAL
 #endif
 
+#if defined _WIN32 || defined __CYGWIN__
+#  define EXTERN __declspec(dllexport)
+#  define LOCAL
+#elif __GNUC__ >= 4
+#  define EXTERN __attribute__((visibility("default")))
+#  define LOCAL __attribute__((visibility("hidden")))
+#else
+#  define EXTERN
+#  define LOCAL
+#endif
+
 #if __GNUC__ >= 3
 #  define likely(expr)   __builtin_expect((long)((expr) != 0), 1)
 #  define unlikely(expr) __builtin_expect((long)((expr) != 0), 0)
@@ -147,6 +158,19 @@ enum u8id_errors {
 #define U8ID_PROFILE_DEFAULT U8ID_PROFILE_TR39_4
 #define U8ID_TR31_DEFAULT U8ID_TR31_TR39
 
+/* ---- Types needed by the tail's scx/nsm lookups (from scripts.h, mark.h) ---- */
+struct scx {
+  uint32_t from;
+  uint32_t to;
+  uint8_t gc;      // enum u8id_gc is too large
+  const char *scx; // indices into sc
+};
+
+struct nsm_ws {
+  uint32_t nsm;
+  wchar_t *letters;
+};
+
 /* ---- Data (unitr39.h is self-contained; remaining data inlined below) ---- */
 #include "unitr39.h"
 
@@ -160,7 +184,7 @@ sub extract_array {
     local $/;
     my $text = <$fh>;
     # Match: [LOCAL] const type name[] = { ... };
-    $text =~ /(?:(?:LOCAL|U8ID_LOCAL)\s+)?(const\s+\S+\s+\Q$name\E\[\]\s*=\s*\{.+?\};)/s
+    $text =~ /^(?:(?:LOCAL|U8ID_LOCAL)\s+)?(const\s+[\w\s*]*?\Q$name\E\[\]\s*=\s*\{.*?\n\};)/ms
         or die "Could not find $name in $file";
     return $1;
 }
@@ -207,14 +231,37 @@ static u8id_ctx_t i_ctx = 0;
 struct ctx_t *ctxp = NULL;
 
 PREAMBLE2
+
+my %skip_fn = map { $_ => 1 } qw(
     u8ident_is_MEDIAL
+    u8ident_is_MARK
     u8ident_get_tr39
+    isALLOWED_start
+    isALLOWED_cont
+    isID_start
+    isID_cont
+    isXID_start
+    isXID_cont
+    isC11_start
+    isC11_cont
+    u8ident_get_gc
+    u8ident_gc_name
+    u8ident_get_idtypes
 );
 
 my $in_body    = 0;  # 1 once we're past the file header
 my @skip_stack = (); # non-empty while inside a function we are skipping
 my $depth      = 0;  # brace depth inside the skipped function
 my $tr39cont   = 0;  # state: 0=before, 1=in isTR39_cont, 2=just closed it
+
+# ── 2. Run unifdef over u8idscr.c to collapse preprocessor conditionals ─────
+my $srcfile = "$srcdir/u8idscr.c";
+my @cmd = ($UNIFDEF, @flags, $srcfile);
+open my $up, '-|', @cmd or die "Cannot run @cmd: $!";
+my @src = <$up>;
+close $up;
+# unifdef exits 1 when it removed lines (normal); only >1 is an error.
+die "unifdef failed on $srcfile (exit @{[$? >> 8]})\n" if ($? >> 8) > 1;
 
 for my $line (@src) {
 
@@ -256,7 +303,7 @@ for my $line (@src) {
     }
 
     # ── Track isTR39_cont to inject pointer wrappers after it ────────────────
-    if ($tr39cont == 0 && $line =~ /^LOCAL bool isTR39_cont\b/) {
+    if ($tr39cont == 0 && $line =~ /^U8ID_LOCAL bool isTR39_cont\b/) {
         $tr39cont = 1;
     } elsif ($tr39cont == 1 && $line =~ /^\}/) {
         $tr39cont = 2;
