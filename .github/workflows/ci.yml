@@ -24,6 +24,7 @@ jobs:
     - uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e # v6-beta
       with:
         fetch-depth: 1
+    - run: git ls-files -z | xargs -0 touch -c -t 202001010000
     - run: sudo apt-get update && sudo apt-get install -y unifdef
     - run: autoreconf -fi
     - run: ./configure --enable-confus
@@ -54,6 +55,7 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e # v6-beta
+    - run: git ls-files -z | xargs -0 touch -c -t 202001010000
     - run: brew install autoconf automake libtool m4
     - run: autoreconf -fi
     - run: ./configure --enable-confus
