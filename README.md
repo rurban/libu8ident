@@ -450,8 +450,14 @@ twice as fast, and needs half the size.
 
 `enum u8id_errors u8ident_check_buf (const char* buf, int bufsize, char** outnorm)`
 
-Two variants to check if this identifier is valid. u8ident_check_buf
-avoids a strlen call. outnorm is set to a fresh normalized string if valid.
+Two variants to check if this identifier is valid; `u8ident_check_buf`
+avoids a `strlen` call. Which one you call does not affect
+allocation. `outnorm`, if non-NULL, is set to a freshly allocated
+normalized string on success, which the caller must free; pass NULL
+for `outnorm` if you only need the pass/fail result -- then nothing
+needs to be freed (fixes #19; internally this uses
+`u8ident_normalize_static` to avoid allocating in the first place,
+see below).
 
 Return values (`enum u8id_errors`):
 
@@ -489,6 +495,23 @@ exceeds `u8ident_maxlength()` (default 1024, raise it via
 `u8ident_set_maxlength()`). In the TR39 amalgam (`libu8ident_c`)
 normalization is a no-op memcpy of `srcsz` bytes, since all TR39
 codepoints are NFC-stable.
+
+`const char * u8ident_normalize_static (const char* src, int srcsz)`
+
+Fixes #19. Like `u8ident_normalize`, but writes into a fixed-size
+internal static buffer instead of allocating: no malloc/free at all.
+Use this when you only need to inspect or compare the normalized
+form and don't need to keep it (e.g. checking whether a string is
+already normalized). The returned pointer is NOT owned by the
+caller -- do not free it, and treat it as valid only until the next
+call to this function (shared, process-global storage, like this
+library's other global settings). Returns NULL if `src` is too
+large for the static buffer or normalization fails; fall back to
+`u8ident_normalize` in that case. `u8ident_check`/`u8ident_check_buf`
+already do this internally whenever `outnorm` is NULL, so callers
+who only want the pass/fail result never need to free anything.
+Not available in the TR39 amalgam (`libu8ident_c`), where
+`u8ident_normalize` is already allocation-free.
 
 `uint32_t u8ident_failed_char (const int ctx)`
 

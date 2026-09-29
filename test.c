@@ -1146,6 +1146,56 @@ void test_greek(void) {
   u8ident_free();
 }
 
+#if U8ID_TR31 != 3 /* != TR39: u8ident_normalize_static only in the full lib */
+// Fixes #19: u8ident_check/u8ident_check_buf must not require the caller
+// to free anything when outnorm is NULL. u8ident_normalize_static() gives
+// the same result as u8ident_normalize() without ever allocating, and
+// check_buf's outnorm==NULL path must agree with its outnorm!=NULL path.
+void test_normalize_static(void) {
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NORM_DEFAULT, 0));
+
+  const char *src = "Cafe\xcc\x81";
+  char *heap = u8ident_normalize(src, (int)strlen(src));
+  const char *stat = u8ident_normalize_static(src, (int)strlen(src));
+  assert(heap);
+  assert(stat);
+  assert(strEQ(heap, stat));
+  free(heap);
+
+  // u8ident_tr31() == TR39/C23 demand pre-normalized input and fail on
+  // XID before ever reaching the normalize step; skip those for the
+  // check()-agreement part, same as test_norm_nfc().
+  if (u8ident_tr31() != U8ID_TR31_TR39 && u8ident_tr31() != U8ID_TR31_C23) {
+    char *norm = NULL;
+    int ret_with_outnorm = u8ident_check((const uint8_t *)src, &norm);
+    free(norm);
+    int ret_without_outnorm = u8ident_check((const uint8_t *)src, NULL);
+    assert(ret_with_outnorm == ret_without_outnorm);
+  }
+
+  // Oversized input (exceeds the static buffer / u8ident_maxlength) must
+  // gracefully report "doesn't fit" from the static-buffer variant.
+  // check()'s outnorm==NULL and outnorm!=NULL paths must still agree
+  // with each other for such oversized input (both fall back to the
+  // same underlying u8ident_normalize(), which itself may fail for
+  // input this large -- see #22 -- but the two call styles must not
+  // *disagree*, which is the actual guarantee #19 is about).
+  char big[1200];
+  memset(big, 'a', sizeof(big) - 1);
+  big[sizeof(big) - 1] = 0;
+  assert(!u8ident_normalize_static(big, (int)strlen(big)));
+  if (u8ident_tr31() != U8ID_TR31_TR39 && u8ident_tr31() != U8ID_TR31_C23) {
+    char *norm_big = NULL;
+    int ret_big_outnorm = u8ident_check((const uint8_t *)big, &norm_big);
+    free(norm_big);
+    int ret_big_noout = u8ident_check((const uint8_t *)big, NULL);
+    assert(ret_big_outnorm == ret_big_noout);
+  }
+
+  u8ident_free();
+}
+#endif
+
 void test_add_scripts(void) {
   int c = u8ident_new_ctx();
   struct ctx_t *ctx = u8ident_ctx();
@@ -1268,6 +1318,9 @@ int main(int argc, char **argv) {
     test_tr39_nfc_stable();
 #endif
     test_greek();
+#if U8ID_TR31 != 3
+    test_normalize_static();
+#endif
     test_script();
   }
   if (combine) {
