@@ -1,7 +1,7 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022, 2026 Reini Urban
 
-libu8ident 0.5 - unreleased
+libu8ident 0.5 - 2026-09-29
 
 Implement U8ID_FOLDCASE: it was declared and accepted into the options
 bitmask but silently ignored (GH #31). u8ident_check/u8ident_check_buf
