@@ -417,6 +417,10 @@ contexts with usernames to avoid mixups.
 
 Changes to the context generated with `u8ident_new_ctx`.
 
+`u8id_ctx_t u8ident_copy_ctx (void)`
+
+Creates a deep copy of the current context.
+
 `int u8ident_add_script_name (const char *name)`
 `int u8ident_add_script (uint8_t script)`
 
