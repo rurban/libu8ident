@@ -146,9 +146,29 @@ U8ID_EXTERN int u8ident_free_ctx(u8id_ctx_t ctx);
 /* End this library, cleaning up all internal structures. */
 U8ID_EXTERN void u8ident_free(void);
 
-/* Returns a freshly allocated normalized string, in the option defined at
-   `u8ident_init`. Defaults to U8ID_NFC. */
-U8ID_EXTERN char *u8ident_normalize(const char *buf, int len);
+/* Normalize a UTF-8 string using the normalization form selected at
+   `u8ident_init` (defaults to U8ID_NFC).
+
+   @param src    Input UTF-8 string. Must be NUL-terminated; the
+                 normalization routines read it as a C string
+                 regardless of `srcsz`.
+   @param srcsz  Length of `src` in bytes: pass `strlen(src)`. In the
+                 full library this also seeds the internal output
+                 buffer, which is doubled (not grown incrementally)
+                 on the first attempt; if that doubled size exceeds
+                 `u8ident_maxlength()` (default 1024, raise it via
+                 `u8ident_set_maxlength()`), normalization fails and
+                 NULL is returned. Passing a value larger than
+                 `strlen(src)` is therefore not safe -- it is not a
+                 mere hint. In the TR39 amalgam (libu8ident_c) it is
+                 used literally as the number of bytes to copy:
+                 normalization there is a no-op memcpy, since all
+                 TR39 codepoints are NFC-stable.
+   @return       A freshly allocated normalized string; the caller
+                 must free() it. Returns NULL on allocation failure
+                 or if `srcsz` is too large (see above).
+*/
+U8ID_EXTERN char *u8ident_normalize(const char *src, int srcsz);
 
 #ifdef HAVE_CONFUS
 /*
