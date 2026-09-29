@@ -54,7 +54,7 @@
 #ifdef EXTERN_SCRIPTS
 extern const char *const u8id_gc_names[32];
 #else
-LOCAL const char *const u8id_gc_names[] = {
+U8ID_LOCAL const char *const u8id_gc_names[] = {
     "Cc", "Cf", "Co", "Cs", "Ll", "Lm", "Lo", "Lt", "Lu", "Mc",
     "Me", "Mn", "Nd", "Nl", "No", "Pc", "Pd", "Pe", "Pf", "Pi",
     "Po", "Ps", "Sc", "Sk", "Sm", "So", "Zl", "Zp", "Zs",

@@ -3,6 +3,8 @@
    SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 */
 
+#ifndef U8IDENT_H
+#define U8IDENT_H
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -226,3 +228,5 @@ U8ID_EXTERN const char *u8ident_failed_script_name(const u8id_ctx_t ctx);
    }
 */
 U8ID_EXTERN const char *u8ident_existing_scripts(const u8id_ctx_t ctx);
+
+#endif // U8IDENT_H

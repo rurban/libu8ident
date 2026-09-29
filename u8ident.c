@@ -73,7 +73,7 @@ static struct func_tr31_s tr31_funcs[] = {
    enum u8id_options, which define the performed checks. Recommended is
    `(U8ID_PROFILE_DEFAULT, U8ID_NORM_DEFAULT, 0)`.
 */
-EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
+U8ID_EXTERN int u8ident_init(enum u8id_profile profile, enum u8id_norm norm,
                         unsigned options) {
   u8ident_free(); // clear and reset the ctx
   if (options > 1023)
@@ -146,7 +146,7 @@ unsigned u8ident_options(void) { return s_u8id_options; }
    are not really identifiable anymore, and keep them under 80 or even less.
    Some filesystems do allow now 32K identifiers, which is a glaring security
    hole, waiting to be exploited. */
-EXTERN void u8ident_set_maxlength(unsigned maxlen) {
+U8ID_EXTERN void u8ident_set_maxlength(unsigned maxlen) {
   if (maxlen > 1)
     s_maxlen = maxlen;
 }
@@ -251,7 +251,7 @@ U8ID_LOCAL uint32_t dec_utf8(char **strp) {
   return cp;
 }
 
-EXTERN char *u8ident_normalize(const char *src, int srcsz) {
+U8ID_EXTERN char *u8ident_normalize(const char *src, int srcsz) {
   char *dest = malloc(srcsz + 1);
   if (dest) {
     memcpy(dest, src, srcsz);
@@ -264,7 +264,7 @@ EXTERN char *u8ident_normalize(const char *src, int srcsz) {
 /* Two variants to check if this identifier is valid. The second avoids
    a strlen call.
 */
-EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
+U8ID_EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
                                           char **outnorm) {
   int ret = U8ID_EOK;
   char *s = (char *)buf;
@@ -673,14 +673,14 @@ norm:
   return ret;
 }
 
-EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
+U8ID_EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {
   return u8ident_check_buf((char *)string, strlen((char *)string), outnorm);
 }
 
 #define ERR_NOSPACE -2
 
 /* The other primitive variant without mixed-sripts checks. */
-EXTERN enum u8id_errors u8ident_check_confusables(const char *buf,
+U8ID_EXTERN enum u8id_errors u8ident_check_confusables(const char *buf,
                                                   const int bufsz) {
 #ifndef HAVE_CONFUS
   (void)buf;

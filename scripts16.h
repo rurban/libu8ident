@@ -33,7 +33,7 @@ struct range_bool16 {
 
 #if !defined DISABLE_CHECK_XID && !defined ENABLE_CHECK_XID
 #  ifndef EXTERN_SCRIPTS
-LOCAL const struct sc16 xid_script_list16[] = {
+U8ID_LOCAL const struct sc16 xid_script_list16[] = {
     // clang-format off
     {0x0000, 0x0040, 0},	// Common
     {0x0041, 0x005A, 2},	// Latin
@@ -576,7 +576,7 @@ extern const struct sc16 xid_script_list16[534];
 #  endif
 
 #  ifndef EXTERN_SCRIPTS
-LOCAL const struct sc xid_script_list32[] = {
+U8ID_LOCAL const struct sc xid_script_list32[] = {
     // clang-format off
     {0x10000, 0x1000B, 74},	// Linear_B (Exclusion)
     {0x1000D, 0x10026, 74},	// Linear_B (Exclusion)
@@ -1037,7 +1037,7 @@ extern const struct sc xid_script_list32[450];
 
 #ifndef DISABLE_CHECK_XID
 #  ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool16 allowed_id_list16[] = {
+U8ID_LOCAL const struct range_bool16 allowed_id_list16[] = {
     // clang-format off
     {0x0027, 0x0027},
     {0x002D, 0x002E},
@@ -2593,7 +2593,7 @@ extern const struct range_bool16 allowed_id_list16[1547];
 #  endif
 
 #  ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool allowed_id_list32[] = {
+U8ID_LOCAL const struct range_bool allowed_id_list32[] = {
     // clang-format off
     {0x11301, 0x11301},
     {0x11303, 0x11303},
@@ -2673,7 +2673,7 @@ extern const struct range_bool allowed_id_list32[65];
 // NFD_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFD
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool16 NFD_N_list16[] = {
+U8ID_LOCAL const struct range_bool16 NFD_N_list16[] = {
     // clang-format off
     {0x00C0, 0x00C5},
     {0x00C7, 0x00CF},
@@ -2913,7 +2913,7 @@ extern const struct range_bool16 NFD_N_list16[231];
 #    endif
 
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool NFD_N_list32[] = {
+U8ID_LOCAL const struct range_bool NFD_N_list32[] = {
     // clang-format off
     {0x105C9, 0x105C9},
     {0x105E4, 0x105E4},
@@ -2947,7 +2947,7 @@ extern const struct range_bool NFD_N_list32[22];
 // NFC_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFC
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool16 NFC_N_list16[] = {
+U8ID_LOCAL const struct range_bool16 NFC_N_list16[] = {
     // clang-format off
     {0x0340, 0x0341},
     {0x0343, 0x0344},
@@ -3027,7 +3027,7 @@ extern const struct range_bool16 NFC_N_list16[71];
 #    endif
 
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool NFC_N_list32[] = {
+U8ID_LOCAL const struct range_bool NFC_N_list32[] = {
     // clang-format off
     {0x1D15E, 0x1D164},
     {0x1D1BB, 0x1D1C0},
@@ -3042,7 +3042,7 @@ extern const struct range_bool NFC_N_list32[3];
 // NFC_Quick_Check=Maybe
 #  if !defined U8ID_NORM || U8ID_NORM == NFC
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool16 NFC_M_list16[] = {
+U8ID_LOCAL const struct range_bool16 NFC_M_list16[] = {
     // clang-format off
     {0x0300, 0x0304},
     {0x0306, 0x030C},
@@ -3085,7 +3085,7 @@ extern const struct range_bool16 NFC_M_list16[34];
 #    endif
 
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool NFC_M_list32[] = {
+U8ID_LOCAL const struct range_bool NFC_M_list32[] = {
     // clang-format off
     {0x110BA, 0x110BA},
     {0x11127, 0x11127},
@@ -3113,7 +3113,7 @@ extern const struct range_bool NFC_M_list32[16];
 // NFKD_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFKD
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool16 NFKD_N_list16[] = {
+U8ID_LOCAL const struct range_bool16 NFKD_N_list16[] = {
     // clang-format off
     {0x00A0, 0x00A0},
     {0x00A8, 0x00A8},
@@ -3570,7 +3570,7 @@ extern const struct range_bool16 NFKD_N_list16[448];
 #    endif
 
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool NFKD_N_list32[] = {
+U8ID_LOCAL const struct range_bool NFKD_N_list32[] = {
     // clang-format off
     {0x105C9, 0x105C9},
     {0x105E4, 0x105E4},
@@ -3694,7 +3694,7 @@ extern const struct range_bool NFKD_N_list32[112];
 // NFKC_Quick_Check=No
 #  if !defined U8ID_NORM || U8ID_NORM == NFKC
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool16 NFKC_N_list16[] = {
+U8ID_LOCAL const struct range_bool16 NFKC_N_list16[] = {
     // clang-format off
     {0x00A0, 0x00A0},
     {0x00A8, 0x00A8},
@@ -4005,7 +4005,7 @@ extern const struct range_bool16 NFKC_N_list16[302];
 #    endif
 
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool NFKC_N_list32[] = {
+U8ID_LOCAL const struct range_bool NFKC_N_list32[] = {
     // clang-format off
     {0x10781, 0x10785},
     {0x10787, 0x107B0},
@@ -4110,7 +4110,7 @@ extern const struct range_bool NFKC_N_list32[93];
 // NFKC_Quick_Check=Maybe
 #  if !defined U8ID_NORM || U8ID_NORM == NFKC
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool16 NFKC_M_list16[] = {
+U8ID_LOCAL const struct range_bool16 NFKC_M_list16[] = {
     // clang-format off
     {0x0300, 0x0304},
     {0x0306, 0x030C},
@@ -4153,7 +4153,7 @@ extern const struct range_bool16 NFKC_M_list16[34];
 #    endif
 
 #    ifndef EXTERN_SCRIPTS
-LOCAL const struct range_bool NFKC_M_list32[] = {
+U8ID_LOCAL const struct range_bool NFKC_M_list32[] = {
     // clang-format off
     {0x110BA, 0x110BA},
     {0x11127, 0x11127},
