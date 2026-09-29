@@ -147,7 +147,7 @@ set(private_HEADERS
   u8idroar.h
   u8id_private.h
   un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h
-  mark.h unic11.h confus.h ${roaring_HEADERS})
+  mark.h unic11.h confus.h u8idcasefold.h ${roaring_HEADERS})
 
 add_library(u8ident_static STATIC
   ${libu8ident_HEADERS}

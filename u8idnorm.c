@@ -58,6 +58,7 @@ char tmp_stack[128];
 #  include "un8ifcmp.h" /* for NFC Canonical Composition lists */
 #endif
 #include "hangul.h" /* Korean/Hangul has special (easy) normalization rules */
+#include "u8idcasefold.h" /* simple Unicode case folding, for U8ID_FOLDCASE */
 #endif
 
 unsigned u8ident_options(void);
@@ -176,6 +177,55 @@ U8ID_LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
     dest[bytes] = '\0';
     return dest;
   }
+}
+
+static inline int _bsearch_casefold(const void *ptr1, const void *ptr2) {
+  const struct u8id_casefold *e1 = (const struct u8id_casefold *)ptr1;
+  const struct u8id_casefold *e2 = (const struct u8id_casefold *)ptr2;
+  return e1->cp > e2->cp ? 1 : e1->cp == e2->cp ? 0 : -1;
+}
+
+/* Simple Unicode case fold of a single codepoint (CaseFolding.txt,
+   status C + S only): returns cp unchanged if it has no case
+   folding, or isn't in the table. */
+U8ID_LOCAL uint32_t u8ident_casefold_cp(uint32_t cp) {
+  const struct u8id_casefold key = {cp, 0};
+  const struct u8id_casefold *e = (const struct u8id_casefold *)bsearch(
+      &key, u8id_casefold_tbl, U8ID_CASEFOLD_SIZE, sizeof(u8id_casefold_tbl[0]),
+      _bsearch_casefold);
+  return e ? e->folded : cp;
+}
+
+/* Case-fold every codepoint in (src, srcsz), for U8ID_FOLDCASE.
+   Returns a freshly allocated NUL-terminated UTF-8 string; the
+   caller must free() it. Every mapping is single-codepoint-to-
+   single-codepoint, so the result is never larger than 4 bytes per
+   input codepoint, i.e. never larger than 4*srcsz+1 bytes. Returns
+   NULL on allocation failure or malformed UTF-8 input. */
+U8ID_LOCAL char *u8ident_casefold(const char *src, int srcsz) {
+  char *dest = malloc((size_t)srcsz * 4 + 1);
+  if (!dest)
+    return NULL;
+  char *s = (char *)src;
+  const char *e = src + srcsz;
+  char *d = dest;
+  while (s < e) {
+    size_t dlen;
+    errno = 0;
+    uint32_t cp = dec_utf8(&s);
+    if (!cp && errno == EILSEQ) {
+      free(dest);
+      return NULL;
+    }
+    cp = u8ident_casefold_cp(cp);
+    if (!enc_utf8(d, &dlen, cp)) {
+      free(dest);
+      return NULL;
+    }
+    d += dlen;
+  }
+  *d = '\0';
+  return dest;
 }
 
 /* size of array for combining characters */

@@ -1,6 +1,13 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022, 2026 Reini Urban
 
+libu8ident 0.5 - unreleased
+
+Implement U8ID_FOLDCASE: it was declared and accepted into the options
+bitmask but silently ignored (GH #31). u8ident_check/u8ident_check_buf
+now simple-case-fold the identifier before checking/normalizing when
+set. Main library only; no-op in the TR39 amalgam (libu8ident_c).
+
 libu8ident 0.4 - 2026-03-18
 
 Update to Unicode version 16.0 and 17.0:

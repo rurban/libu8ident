@@ -225,5 +225,9 @@ U8ID_LOCAL const char *u8ident_errstr(int errcode);
 // from u8idnorm.c
 U8ID_LOCAL uint32_t dec_utf8(char **strp);
 U8ID_LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp);
+// simple Unicode case folding for U8ID_FOLDCASE, from u8idnorm.c
+// (main library only; not supported in the TR39 amalgam).
+U8ID_LOCAL uint32_t u8ident_casefold_cp(uint32_t cp);
+U8ID_LOCAL char *u8ident_casefold(const char *src, int srcsz);
 
 #endif // _U8ID_PRIVATE_H

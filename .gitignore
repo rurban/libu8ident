@@ -61,6 +61,7 @@ CRoaring/
 /IdentifierStatus.txt
 /confusables.txt
 /UnicodeData*.txt
+/CaseFolding.txt
 Unicode-Normalize
 libu8ident-*.tar.gz
 libu8ident-*.tar.xz

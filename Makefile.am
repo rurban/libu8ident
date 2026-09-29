@@ -56,7 +56,8 @@ doc_DATA += $(html_DATA)
 endif
 HDRS =  u8id_gc.h scripts.h confus.h u8id_private.h u8idscr.h u8idroar.h \
 	un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h hangul.h \
-	confus_croar.h mark.h medial.h unic11.h unitr39.h scripts16.h gconfus.h htable.h
+	confus_croar.h mark.h medial.h unic11.h unitr39.h scripts16.h gconfus.h htable.h \
+	u8idcasefold.h
 TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    texts/punjabi-1.txt \
 	texts/arabic-1.txt        texts/georgian-1.txt   texts/khmer-1.txt      texts/scots-gaelic-1.txt \
 	texts/armenian-1.txt      texts/greek-1.txt      texts/korean-1.txt     texts/sinhala-1.txt \
@@ -78,7 +79,7 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/bidi-sec-1.py	  texts/homo-sec-1.js	 texts/homo-sec-1.py    texts/norm-sec-1.py \
 	texts/norm-sec-1.cperl	  texts/norm-sec-1.raku
 
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.pl \
+EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.pl mkcasefold.pl \
 	mk-tr39-amalgam.pl makefile.gnu u8ident_c.h \
 	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4
@@ -103,6 +104,8 @@ $(srcdir)/medial.h: $(srcdir)/mkmedial.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkmedial.pl
 $(srcdir)/u8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkgc.pl
+$(srcdir)/u8idcasefold.h: $(srcdir)/mkcasefold.pl # CaseFolding.txt
+	cd $(srcdir) && $(PERL) mkcasefold.pl
 $(srcdir)/gconfus.h: $(srcdir)/gconfus.h.in
 	-if test -n "$(GPERF)"; then cd $(srcdir) && $(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp; fi
 
@@ -152,10 +155,11 @@ regen-scripts:
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
-	-$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierType.txt
 	-$(WGET) -N https://www.unicode.org/Public/security/latest/IdentifierStatus.txt
+	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/CaseFolding.txt
 	$(PERL) mkmark.pl
 	$(PERL) mkgc.pl
+	$(PERL) mkcasefold.pl
 	$(PERL) mkscripts.pl
 	-$(MAKE) unitr39.h
 # Download some UCD files and create confus.h

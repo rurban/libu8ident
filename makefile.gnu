@@ -22,7 +22,7 @@ PANDOC := pandoc
 HEADER = include/u8ident.h
 NORMHDRS = un8ifcan.h un8ifcmb.h un8ifcmp.h un8ifcpt.h un8ifexc.h
 HDRS = u8id_private.h u8id_gc.h scripts.h $(NORMHDRS) hangul.h \
-       mark.h medial.h unic11.h scripts16.h htable.h
+       mark.h medial.h unic11.h scripts16.h htable.h u8idcasefold.h
 SRC = u8ident.c u8idscr.c u8idnorm.c
 ifeq (${HAVE_CONFUS}, 1)
 SRC += u8idroar.c htable.c
@@ -165,6 +165,8 @@ mark.h: mkmark.pl # UnicodeData.txt
 	$(PERL) mkmark.pl
 u8id_gc.h: mkgc.pl # UnicodeData.txt
 	$(PERL) mkgc.pl
+u8idcasefold.h: mkcasefold.pl # CaseFolding.txt
+	$(PERL) mkcasefold.pl
 medial.h: mkmedial.pl # UnicodeData.txt
 	$(PERL) mkmedial.pl
 allowed_croar.h nfkc_croar.h nfc_croar.h nfkd_croar.h nfd_croar.h: mkroar.c mkconfus.pl FORCE

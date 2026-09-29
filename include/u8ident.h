@@ -48,7 +48,9 @@ enum u8id_options {
   U8ID_TR31_ASCII = 71, // only ASCII letters (as e.g. zig, j. older compilers)
   // room for more tr31 profiles
 
-  U8ID_FOLDCASE = 128,
+  U8ID_FOLDCASE = 128, // simple Unicode case fold before check/normalize,
+                       // for case-insensitive idents. Main library only,
+                       // no-op in the TR39 amalgam (libu8ident_c).
   U8ID_WARN_CONFUSABLE = 256,  // requires -DHAVE_CONFUS
   U8ID_ERROR_CONFUSABLE = 512, // requires -DHAVE_CONFUS
   // clang-format on

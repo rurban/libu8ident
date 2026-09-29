@@ -264,7 +264,7 @@ U8ID_EXTERN char *u8ident_normalize(const char *src, int srcsz) {
 /* Two variants to check if this identifier is valid. The second avoids
    a strlen call.
 */
-U8ID_EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
+static enum u8id_errors u8ident_check_buf_impl(const char *buf, const int bufsz,
                                           char **outnorm) {
   int ret = U8ID_EOK;
   char *s = (char *)buf;
@@ -689,6 +689,34 @@ norm:
   }
 #endif
   return ret;
+}
+
+U8ID_EXTERN enum u8id_errors u8ident_check_buf(const char *buf, const int bufsz,
+                                          char **outnorm) {
+#if U8ID_TR31 != 3 /* != TR39: FOLDCASE not supported in the TR39 amalgam */
+  if (unlikely(s_u8id_options & U8ID_FOLDCASE)) {
+    char *folded = u8ident_casefold(buf, bufsz);
+    if (!folded)
+      return U8ID_ERR_ENCODING;
+    const int flen = (int)strlen(folded);
+    const bool changed =
+        flen != bufsz || memcmp(folded, buf, (size_t)bufsz) != 0;
+    enum u8id_errors ret = u8ident_check_buf_impl(folded, flen, outnorm);
+    if (ret >= 0 && changed) {
+      ret = (enum u8id_errors)(ret | U8ID_EOK_NORM);
+      if (outnorm && !*outnorm) {
+        // impl's own normalization was a no-op (folded was already in
+        // the target normal form): the case-folded string itself is
+        // the normalized result, transfer ownership to the caller.
+        *outnorm = folded;
+        return ret;
+      }
+    }
+    free(folded);
+    return ret;
+  }
+#endif
+  return u8ident_check_buf_impl(buf, bufsz, outnorm);
 }
 
 U8ID_EXTERN enum u8id_errors u8ident_check(const uint8_t *string, char **outnorm) {

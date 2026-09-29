@@ -1194,6 +1194,58 @@ void test_normalize_static(void) {
 
   u8ident_free();
 }
+
+
+// #31: U8ID_FOLDCASE was declared/stored but never implemented.
+void test_foldcase(void) {
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NORM_DEFAULT, U8ID_FOLDCASE));
+
+  // Mixed case folds and is reported as needing normalization; the
+  // returned normalized form is the folded (lowercase) string.
+  char *norm = NULL;
+  int ret = u8ident_check((const uint8_t *)"FooBar", &norm);
+  assert(ret == U8ID_EOK_NORM);
+  assert(norm && strEQ(norm, "foobar"));
+  free(norm);
+
+  // Already-folded input needs no further folding: ret must not carry
+  // U8ID_ERR_*, and if outnorm gets allocated at all (some builds,
+  // e.g. -DU8ID_PROFILE=6 -DU8ID_TR31=NONE, unconditionally allocate
+  // it even when content is unchanged -- see u8ident_check_buf_impl's
+  // profile-6 shortcut in u8ident.c), its content must still be the
+  // unchanged folded string.
+  norm = NULL;
+  ret = u8ident_check((const uint8_t *)"foobar", &norm);
+  assert(ret == U8ID_EOK || ret == U8ID_EOK_NORM);
+  if (norm)
+    assert(strEQ(norm, "foobar"));
+  free(norm);
+
+  // KELVIN SIGN U+212A simple-case-folds to 'k': "K" + KELVIN SIGN +
+  // "elvin" folds to plain ASCII "kkelvin".
+  norm = NULL;
+  ret = u8ident_check((const uint8_t *)"K\xe2\x84\xaa" "elvin", &norm);
+  assert(ret == U8ID_EOK_NORM);
+  assert(norm && strEQ(norm, "kkelvin"));
+  free(norm);
+
+  // outnorm==NULL path must not crash/leak and must agree on validity.
+  ret = u8ident_check((const uint8_t *)"FooBar", NULL);
+  assert(ret == U8ID_EOK_NORM);
+
+  // Without U8ID_FOLDCASE, case is preserved (no folding happens);
+  // same outnorm-allocation caveat as above applies.
+  u8ident_free();
+  assert(!u8ident_init(U8ID_PROFILE_4, U8ID_NORM_DEFAULT, 0));
+  norm = NULL;
+  ret = u8ident_check((const uint8_t *)"FooBar", &norm);
+  assert(ret == U8ID_EOK || ret == U8ID_EOK_NORM);
+  if (norm)
+    assert(strEQ(norm, "FooBar"));
+  free(norm);
+
+  u8ident_free();
+}
 #endif
 
 void test_add_scripts(void) {
@@ -1320,6 +1372,7 @@ int main(int argc, char **argv) {
     test_greek();
 #if U8ID_TR31 != 3
     test_normalize_static();
+    test_foldcase();
 #endif
     test_script();
   }
