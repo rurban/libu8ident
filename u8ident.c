@@ -659,15 +659,33 @@ norm:
 #endif
 #if U8ID_TR31 != 3 /* != TR39 */
   if (need_normalize) {
-    char *norm = u8ident_normalize((char *)buf, bufsz);
-    if (!norm || strcmp(norm, buf)) {
-      ctx->last_cp = 0;
-      ret = U8ID_EOK_NORM | ret;
-    }
-    if (outnorm)
+    if (outnorm) {
+      char *norm = u8ident_normalize((char *)buf, bufsz);
+      if (!norm || strcmp(norm, buf)) {
+        ctx->last_cp = 0;
+        ret = U8ID_EOK_NORM | ret;
+      }
       *outnorm = norm;
-    else
-      free(norm);
+    } else {
+      // No caller-visible normalized string needed: avoid heap
+      // allocation entirely via the static-buffer variant, falling
+      // back to the heap-allocating path only if the input doesn't
+      // fit the static buffer.
+      const char *norm = u8ident_normalize_static((char *)buf, bufsz);
+      if (norm) {
+        if (strcmp(norm, buf)) {
+          ctx->last_cp = 0;
+          ret = U8ID_EOK_NORM | ret;
+        }
+      } else {
+        char *heap_norm = u8ident_normalize((char *)buf, bufsz);
+        if (!heap_norm || strcmp(heap_norm, buf)) {
+          ctx->last_cp = 0;
+          ret = U8ID_EOK_NORM | ret;
+        }
+        free(heap_norm);
+      }
+    }
   }
 #endif
   return ret;

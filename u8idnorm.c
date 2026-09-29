@@ -909,4 +909,79 @@ U8ID_EXTERN char *u8ident_normalize(const char *src, int srcsz) {
 #endif   // !FCD
   return dest;
 }
+
+/* Bound on the static buffers used by u8ident_normalize_static(). Large
+   enough for any realistic identifier; inputs whose decomposed form
+   could exceed it are rejected (return NULL) so the caller can fall
+   back to the heap-allocating u8ident_normalize(). */
+#define U8ID_STATIC_NORM_BUFSZ 2048
+
+/* Normalize (src, srcsz) using the normalization form selected at
+   `u8ident_init`, entirely without heap allocation: the result is
+   written into a fixed-size static buffer.
+
+   Unlike u8ident_normalize(), the returned pointer is NOT owned by
+   the caller: it must NOT be freed, and is only valid until the next
+   call to this function (from any thread -- the buffer is shared,
+   process-global storage, matching this library's existing use of
+   global state for options/profile/norm).
+
+   Returns NULL if `src` doesn't fit U8ID_STATIC_NORM_BUFSZ after
+   decomposition, or on normalization failure; the caller should then
+   fall back to u8ident_normalize(). */
+U8ID_EXTERN const char *u8ident_normalize_static(const char *src, int srcsz) {
+  static char s_dest[U8ID_STATIC_NORM_BUFSZ];
+#if !defined U8ID_NORM || U8ID_NORM != FCD
+  static char s_tmp[U8ID_STATIC_NORM_BUFSZ];
+#endif
+  const enum u8id_norm mode = u8ident_norm();
+  const bool iscompat = (mode == U8ID_NFKC || mode == U8ID_NFKD);
+  size_t destlen;
+  int err;
+
+  // u8id_decompose_s/u8id_compose_s reject any dmax exceeding
+  // u8ident_maxlength() (default 1024), so cap our fixed buffer use
+  // at that runtime value even though the static buffer itself is
+  // larger.
+  size_t dmax = u8ident_maxlength();
+  if (dmax > sizeof(s_dest))
+    dmax = sizeof(s_dest);
+  if (srcsz < 0 || (size_t)srcsz >= dmax)
+    return NULL; // too large for the static buffer / current maxlength
+
+  memset(s_dest, 0, sizeof(s_dest));
+  err = u8id_decompose_s(s_dest, dmax, (char *)src, &destlen, iscompat);
+  if (err)
+    return NULL;
+
+#if !defined U8ID_NORM || (U8ID_NORM != FCD)
+  if (mode == U8ID_FCD)
+#else
+  if (1)
+#endif
+    return s_dest;
+
+#if !defined U8ID_NORM || (U8ID_NORM != FCD)
+  memset(s_tmp, 0, sizeof(s_tmp));
+  err = u8id_reorder_s((unsigned char *)s_tmp, sizeof(s_tmp), s_dest, destlen);
+  if (err)
+    return NULL; // reorder scratch too small for this input
+
+#  if !defined U8ID_NORM || !(U8ID_NORM == NFD || U8ID_NORM == NFKD)
+  if (mode == U8ID_NFD || mode == U8ID_NFKD)
+#  else
+  if (1)
+#  endif // NFD or NFKD
+    return s_tmp;
+
+#  if !defined U8ID_NORM || !(U8ID_NORM == NFD || U8ID_NORM == NFKD)
+  // now compose to a shorter sequence
+  err = u8id_compose_s(s_dest, dmax, s_tmp, &destlen,
+                       mode == U8ID_FCC);
+  if (err)
+    return NULL;
+#  endif // !(NFD or NFKD)
+#endif   // !FCD
+  return s_dest;
+}
 #endif // U8ID_TR31 != 3

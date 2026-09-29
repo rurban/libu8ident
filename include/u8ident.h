@@ -170,6 +170,33 @@ U8ID_EXTERN void u8ident_free(void);
 */
 U8ID_EXTERN char *u8ident_normalize(const char *src, int srcsz);
 
+/* Like u8ident_normalize(), but writes into a fixed-size internal
+   static buffer instead of allocating: no malloc/free involved at
+   all. Use this when you only need to inspect or compare the
+   normalized form and don't need to keep it around (e.g. to check
+   whether a string is already normalized without any cleanup
+   afterwards).
+
+   @param src     Input UTF-8 string; see u8ident_normalize().
+   @param srcsz   Length of `src` in bytes: pass `strlen(src)`.
+   @return        A pointer into a static buffer, NOT owned by the
+                  caller: do not free() it, and treat it as valid
+                  only until the next call to this function (the
+                  buffer is shared, process-global state, like this
+                  library's other global settings). Returns NULL if
+                  `src` is too large for the static buffer or
+                  normalization fails; fall back to
+                  u8ident_normalize() in that case.
+
+   Not available (not declared as usable) in the TR39 amalgam
+   (libu8ident_c): there, u8ident_normalize() is already a
+   zero-allocation no-op memcpy, since all TR39 codepoints are
+   NFC-stable, so a static-buffer variant adds nothing.
+*/
+#if !defined U8ID_TR31 || U8ID_TR31 != 3
+U8ID_EXTERN const char *u8ident_normalize_static(const char *src, int srcsz);
+#endif
+
 #ifdef HAVE_CONFUS
 /*
   Lookup if the codepoint is a confusable. Only with --enable-confus
@@ -207,7 +234,9 @@ enum u8id_errors {
     * -4  - invalid encoding
     * -5  - invalid combination of codepoints
     * -6  - invalid because confusable
-    outnorm is set to a fresh normalized string if valid.
+    outnorm is set to a fresh normalized string if valid and non-NULL.
+    Pass NULL for outnorm if you only need the pass/fail result: then
+    nothing is allocated and there is nothing to free (fixes #19).
 
   Note that in the check we explicitly allow the Latin confusables: 0 1 I `
   i.e. U+30, U+31, U+49, U+60
