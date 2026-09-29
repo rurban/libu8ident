@@ -27,17 +27,6 @@
 #  define U8ID_LOCAL
 #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-#  define EXTERN __declspec(dllexport)
-#  define LOCAL
-#elif __GNUC__ >= 4
-#  define EXTERN __attribute__((visibility("default")))
-#  define LOCAL __attribute__((visibility("hidden")))
-#else
-#  define EXTERN
-#  define LOCAL
-#endif
-
 #if __GNUC__ >= 3
 #  define likely(expr)   __builtin_expect((long)((expr) != 0), 1)
 #  define unlikely(expr) __builtin_expect((long)((expr) != 0), 0)
@@ -1125,7 +1114,7 @@ enum u8id_norm s_u8id_norm = U8ID_NFC;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_TR39_4;
 unsigned s_maxlen = 1024;
 
-LOCAL const char *u8ident_errstr(int errcode) {
+U8ID_LOCAL const char *u8ident_errstr(int errcode) {
   static const char *const _str[] = {
       "ERR_CONFUS",      "ERR_COMBINE",          "ERR_ENCODING",
       "ERR_SCRIPTS",     "ERR_SCRIPT",           "ERR_XID",

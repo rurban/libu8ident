@@ -110,7 +110,7 @@ void u8ident_roar_free(void) {
 }
 
 #  ifdef HAVE_CONFUS
-EXTERN bool u8ident_is_confusable(const uint32_t cp) {
+U8ID_EXTERN bool u8ident_is_confusable(const uint32_t cp) {
   return roaring_bitmap_contains(rc, cp);
 }
 #  endif

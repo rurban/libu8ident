@@ -125,7 +125,7 @@ static int cp_len(const uint32_t cp) {
 }
 
 /* convert utf8 to unicode codepoint (to_cp) */
-LOCAL uint32_t dec_utf8(char **strp) {
+U8ID_LOCAL uint32_t dec_utf8(char **strp) {
   const unsigned char *str = (const unsigned char *)*strp;
   int bytes = utf8_len(*str);
   int shift;
@@ -150,7 +150,7 @@ LOCAL uint32_t dec_utf8(char **strp) {
 
 /* convert unicode codepoint to utf8 (to_utf8) */
 #if U8ID_TR31 != 3 /* != TR39 */
-LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
+U8ID_LOCAL char *enc_utf8(char *dest, size_t *lenp, const uint32_t cp) {
   if (cp > _UNICODE_MAX) {
     errno = EILSEQ;
     *lenp = 0;
@@ -825,7 +825,7 @@ static int u8id_compose_s(char *restrict dest, long dmax,
 // clang-format off
 GCC_DIAG_IGNORE(-Wreturn-local-addr)
 // clang-format on
-EXTERN char *u8ident_normalize(const char *src, int srcsz) {
+U8ID_EXTERN char *u8ident_normalize(const char *src, int srcsz) {
 #if !defined U8ID_NORM || U8ID_NORM != FCD
   char *tmp_ptr;
   char *tmp = NULL;

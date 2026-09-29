@@ -58,17 +58,6 @@ print <<'PREAMBLE';
 #  define U8ID_LOCAL
 #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-#  define EXTERN __declspec(dllexport)
-#  define LOCAL
-#elif __GNUC__ >= 4
-#  define EXTERN __attribute__((visibility("default")))
-#  define LOCAL __attribute__((visibility("hidden")))
-#else
-#  define EXTERN
-#  define LOCAL
-#endif
-
 #if __GNUC__ >= 3
 #  define likely(expr)   __builtin_expect((long)((expr) != 0), 1)
 #  define unlikely(expr) __builtin_expect((long)((expr) != 0), 0)
@@ -183,8 +172,8 @@ sub extract_array {
     open my $fh, '<', "$srcdir/$file" or die "$file: $!";
     local $/;
     my $text = <$fh>;
-    # Match: [LOCAL] const type name[] = { ... };
-    $text =~ /^(?:(?:LOCAL|U8ID_LOCAL)\s+)?(const\s+[\w\s*]*?\Q$name\E\[\]\s*=\s*\{.*?\n\};)/ms
+    # Match: [U8ID_LOCAL] const type name[] = { ... };
+    $text =~ /^(?:U8ID_LOCAL\s+)?(const\s+[\w\s*]*?\Q$name\E\[\]\s*=\s*\{.*?\n\};)/ms
         or die "Could not find $name in $file";
     return $1;
 }
@@ -192,8 +181,8 @@ sub extract_array {
 sub inline_array {
     my ($file, $name) = @_;
     my $def = extract_array($file, $name);
-    # Strip LOCAL prefix if present
-    $def =~ s/^(?:LOCAL|U8ID_LOCAL)\s+//;
+    # Strip U8ID_LOCAL prefix if present
+    $def =~ s/^U8ID_LOCAL\s+//;
     print "$def\n\n";
 }
 
@@ -213,7 +202,7 @@ enum u8id_norm s_u8id_norm = U8ID_NFC;
 enum u8id_profile s_u8id_profile = U8ID_PROFILE_TR39_4;
 unsigned s_maxlen = 1024;
 
-LOCAL const char *u8ident_errstr(int errcode) {
+U8ID_LOCAL const char *u8ident_errstr(int errcode) {
   static const char *const _str[] = {
       "ERR_CONFUS",      "ERR_COMBINE",          "ERR_ENCODING",
       "ERR_SCRIPTS",     "ERR_SCRIPT",           "ERR_XID",
@@ -279,7 +268,7 @@ for my $line (@src) {
 
     # ── Stop before normalization helpers and trailing comment block ─────────
     last if $line =~ /^\/\* quickcheck these lists/;
-    last if $line =~ /^LOCAL bool u8ident_maybe_normalized\b/;
+    last if $line =~ /^U8ID_LOCAL bool u8ident_maybe_normalized\b/;
     last if $line =~ m{^// See also the Table 3};
 
     # ── Enter skip mode when we hit a function we don't want ─────────────────
