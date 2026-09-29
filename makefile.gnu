@@ -305,12 +305,8 @@ Unicode-Normalize: un8ifcan.h
 	  cd Unicode-Normalize && git pull --rebase && cd ..; \
 	else \
 	  git clone https://github.com/rurban/Unicode-Normalize; fi
-regen-norm: Unicode-Normalize un8ifcan.h
-	cd Unicode-Normalize && \
-	  $(PERL) Makefile.PL && \
-	  make && \
-	  $(PERL) mkheader -ind -std && \
-	  cd - && cp Unicode-Normalize/un8if*.h .
+regen-norm: un8ifcan.h
+	$(PERL) mknorm.pl
 # Download some UCD files and create scripts.h
 regen-scripts:
 	$(WGET) -N https://www.unicode.org/Public/UNIDATA/Scripts.txt

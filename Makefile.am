@@ -79,7 +79,8 @@ TEXTS = texts/amharic-1.txt       texts/farsi-1.txt      texts/kannada-1.txt    
 	texts/bidi-sec-1.py	  texts/homo-sec-1.js	 texts/homo-sec-1.py    texts/norm-sec-1.py \
 	texts/norm-sec-1.cperl	  texts/norm-sec-1.raku
 
-EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.pl mkcasefold.pl \
+EXTRA_DIST = mkscripts.pl mkconfus.pl mknorm.pl mktest-norm.pl mkmark.pl \
+        mkgc.pl mkmedial.pl mkcasefold.pl \
 	mk-tr39-amalgam.pl makefile.gnu u8ident_c.h \
 	$(HDRS) $(doc_DATA) \
 	$(TEXTS) texts/result.lst u8idlint.test mkroar.c m4/ax_gcc_builtin.m4
@@ -106,6 +107,8 @@ $(srcdir)/u8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkgc.pl
 $(srcdir)/u8idcasefold.h: $(srcdir)/mkcasefold.pl # CaseFolding.txt
 	cd $(srcdir) && $(PERL) mkcasefold.pl
+$(srcdir)/un8ifcan.h $(srcdir)/un8ifcmb.h $(srcdir)/un8ifcmp.h $(srcdir)/un8ifcpt.h $(srcdir)/un8ifexc.h: $(srcdir)/mknorm.pl # UnicodeData.txt DerivedNormalizationProps.txt
+	cd $(srcdir) && $(PERL) mknorm.pl
 $(srcdir)/gconfus.h: $(srcdir)/gconfus.h.in
 	-if test -n "$(GPERF)"; then cd $(srcdir) && $(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp; fi
 
@@ -134,19 +137,8 @@ regen-man: $(bin_PROGRAMS)
 	  base=`basename $$p .1`; \
 	  LC_ALL=C help2man -N -s1 -p $(PACKAGE_NAME) --manual "U8IDENT Manual $(VERSION)" -o $$p ./$$base$(EXEEXT); done
 
-# Create the normalization headers via a current perl
-Unicode-Normalize: un8ifcan.h
-	if test -d $(srcdir)/Unicode-Normalize; then \
-	  cd $(srcdir)/Unicode-Normalize && git pull --rebase && cd ..; \
-	else \
-	  git clone https://github.com/rurban/Unicode-Normalize; fi
-regen-norm: Unicode-Normalize un8ifcan.h
-	cd $(srcdir)/Unicode-Normalize && \
-	  $(PERL) mkheader && \
-	  $(PERL) Makefile.PL && \
-	  make && \
-	  $(PERL) mkheader -ind -std && \
-	  cd - && cp Unicode-Normalize/un8if*.h .
+regen-norm: un8ifcan.h
+	cd $(srcdir) && $(PERL) mknorm.pl
 # Download some UCD files and create scripts.h
 regen-scripts:
 	-$(WGET) -N https://www.unicode.org/Public/UNIDATA/UnicodeData.txt
