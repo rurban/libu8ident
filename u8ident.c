@@ -164,6 +164,25 @@ bool in_SCX(const enum u8id_sc scr, const char *scx) {
   return false;
 }
 
+static bool nsm_has_base(const wchar_t *letters, const uint32_t base_cp) {
+  if (sizeof(wchar_t) > 2 || base_cp <= UINT16_MAX)
+    return wcschr(letters, (wchar_t)base_cp) != NULL;
+  if (base_cp > 0x10FFFF)
+    return false;
+
+  // Windows wchar_t strings encode supplementary code points as UTF-16.
+  const uint32_t supplementary = base_cp - 0x10000;
+  const wchar_t high = (wchar_t)(0xD800 + (supplementary >> 10));
+  const wchar_t low = (wchar_t)(0xDC00 + (supplementary & 0x3FF));
+  const wchar_t *p = letters;
+  while ((p = wcschr(p, high))) {
+    if (p[1] == low)
+      return true;
+    p++;
+  }
+  return false;
+}
+
 /* TR39#5.5 "Forbid sequences of base character + nonspacing mark that look the
    same as or confusingly similar to the base character alone", like i + DOT
    ABOVE  */
@@ -190,7 +209,7 @@ bool nsm_check(const uint32_t base_cp, const uint32_t cp) {
       break;
     if (l->nsm != cp)
       continue;
-    if (wcschr(l->letters, (wchar_t)base_cp))
+    if (nsm_has_base(l->letters, base_cp))
       return false;
   }
   return true;

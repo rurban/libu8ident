@@ -1,6 +1,12 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022, 2026 Reini Urban
 
+libu8ident 0.5.1 - unreleased
+
+Fix supplementary-plane nonspacing-mark checks on Windows, where wchar_t
+  stores UTF-16 surrogate pairs
+Restore enforced MinGW build, test, and pkg CI.
+
 libu8ident 0.5 - 2026-09-29
 
 Implement U8ID_FOLDCASE: it was declared and accepted into the options
