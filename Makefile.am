@@ -91,7 +91,7 @@ EXTRA_DIST = mkscripts.pl mkconfus.pl mktest-norm.pl mkmark.pl mkgc.pl mkmedial.
 	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -E -P -o $@ $<
 
-$(srcdir)/scripts.h: $(srcdir)/mkscripts.pl
+$(srcdir)/scripts.h $(srcdir)/scripts16.h: $(srcdir)/mkscripts.pl
 	cd $(srcdir) && $(PERL) mkscripts.pl
 $(srcdir)/confus.h: $(srcdir)/mkconfus.pl # confusables.txt
 	-cd $(srcdir) && $(PERL) mkconfus.pl -c
@@ -101,7 +101,7 @@ $(srcdir)/mark.h: $(srcdir)/mkmark.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkmark.pl
 $(srcdir)/medial.h: $(srcdir)/mkmedial.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkmedial.pl
-$(srcdir)/su8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
+$(srcdir)/u8id_gc.h: $(srcdir)/mkgc.pl # UnicodeData.txt
 	cd $(srcdir) && $(PERL) mkgc.pl
 $(srcdir)/gconfus.h: $(srcdir)/gconfus.h.in
 	-if test -n "$(GPERF)"; then cd $(srcdir) && $(GPERF) -n gconfus.h.in > gconfus.h.tmp && sed -e's,static const unsigned int asso_values,(void)len; static const unsigned int asso_values,' <gconfus.h.tmp >gconfus.h && rm gconfus.h.tmp; fi
