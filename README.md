@@ -477,10 +477,18 @@ identifier is stored in two dynamic hash tables, and for each
 confusable match, normalized to NFC, the first wins. Only with
 `--enable-confus / -DHAVE_CONFUS`.
 
-`char * u8ident_normalize (const char* buf, int bufsz)`
+`char * u8ident_normalize (const char* src, int srcsz)`
 
-Returns a freshly allocated normalized string, with the options defined at
-`u8ident_init`.
+Normalizes `src` (a NUL-terminated UTF-8 string) using the
+normalization form selected at `u8ident_init` (defaults to NFC), and
+returns a freshly allocated copy that the caller must free. `srcsz`
+is the length of `src` in bytes: pass `strlen(src)`, not an inflated
+value -- it seeds the internal output buffer, which is doubled on
+the first attempt, and fails (returning NULL) if that doubled size
+exceeds `u8ident_maxlength()` (default 1024, raise it via
+`u8ident_set_maxlength()`). In the TR39 amalgam (`libu8ident_c`)
+normalization is a no-op memcpy of `srcsz` bytes, since all TR39
+codepoints are NFC-stable.
 
 `uint32_t u8ident_failed_char (const int ctx)`
 
