@@ -1,11 +1,12 @@
 libu8ident NEWS -- history of user-visible changes.  -*-indented-text-*-
 Copyright (C) 2022, 2026 Reini Urban
 
-libu8ident 0.5.1 - unreleased
+libu8ident 0.5.1 - 2026-09-30
 
 Fix supplementary-plane nonspacing-mark checks on Windows, where wchar_t
   stores UTF-16 surrogate pairs
 Restore enforced MinGW build, test, and pkg CI.
+Add perl-independent mknorm.pl helper
 
 libu8ident 0.5 - 2026-09-29
 
